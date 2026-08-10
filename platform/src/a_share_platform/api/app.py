@@ -13,18 +13,27 @@ from fastapi import Depends, FastAPI, Query, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from a_share_platform.adapters.memory.financial_evidence import StaticFinancialEvidenceReader
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
 from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
+from a_share_platform.adapters.postgres.financial_evidence import PostgresFinancialEvidenceReader
 from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
+from a_share_platform.application.financial_evidence import (
+    FactComparisonQuery,
+    FactIdentityQuery,
+)
 from a_share_platform.application.permissions import Principal
 from a_share_platform.domain.market_data import (
     MarketDataCatalog,
     MarketDataConflict,
     MarketDataUnavailable,
 )
+from a_share_platform.domain.metrics import StatementType
+from a_share_platform.domain.pit import FinancialPeriodType
 from a_share_platform.domain.run_context import DataMode, DeploymentStage, RunContext
 from a_share_platform.domain.security_master import Exchange, SecurityMaster
 from a_share_platform.domain.universe import UniverseCatalog
+from a_share_platform.ports.financial_evidence import FinancialEvidenceReader
 from a_share_platform.ports.system_catalog import SystemCatalogReader
 
 from .schemas import Envelope, ProblemDetails, ResponseContext
@@ -102,6 +111,7 @@ def create_app(
     universe_catalog: UniverseCatalog | None = None,
     market_data_catalog: MarketDataCatalog | None = None,
     system_catalog: SystemCatalogReader | None = None,
+    financial_evidence: FinancialEvidenceReader | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="A-Share Platform Next",
@@ -118,11 +128,17 @@ def create_app(
         if database_url
         else StaticSystemCatalogReader()
     )
+    financial = financial_evidence or (
+        PostgresFinancialEvidenceReader.from_dsn(database_url)
+        if database_url
+        else StaticFinancialEvidenceReader()
+    )
     app.state.governance_repository = governance
     app.state.security_master = master
     app.state.universe_catalog = universes
     app.state.market_data_catalog = market_data
     app.state.system_catalog = system
+    app.state.financial_evidence = financial
 
     @app.exception_handler(RunContextOverrideDenied)
     async def run_context_override_handler(
@@ -494,6 +510,88 @@ def create_app(
         context: Annotated[RunContext, Depends(fixed_read_context)],
     ) -> Envelope:
         return envelope([asdict(item) for item in system.list_jobs()], context)
+
+    @app.get("/api/system/disclosures", response_model=Envelope)
+    def system_disclosures(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+        company_id: Annotated[str | None, Query()] = None,
+    ) -> Envelope:
+        return envelope(
+            [asdict(item) for item in financial.list_disclosures(company_id)],
+            context,
+        )
+
+    @app.get("/api/system/facts/revisions", response_model=Envelope)
+    def system_fact_revisions(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+        company_id: Annotated[str | None, Query()] = None,
+        security_id: Annotated[str | None, Query()] = None,
+        metric_code: Annotated[str | None, Query()] = None,
+        report_period_end: Annotated[date | None, Query()] = None,
+        period_type: Annotated[FinancialPeriodType | None, Query()] = None,
+        statement_type: Annotated[StatementType | None, Query()] = None,
+    ) -> Envelope:
+        query = FactIdentityQuery(
+            company_id=company_id,
+            security_id=security_id,
+            metric_code=metric_code,
+            report_period_end=report_period_end,
+            period_type=None if period_type is None else period_type.value,
+            statement_type=None if statement_type is None else statement_type.value,
+        )
+        return envelope(
+            [asdict(item) for item in financial.list_fact_revisions(query)],
+            context,
+        )
+
+    @app.get("/api/system/facts/compare", response_model=Envelope)
+    def system_fact_comparison(
+        company_id: Annotated[str, Query(min_length=1)],
+        security_id: Annotated[str, Query(min_length=1)],
+        metric_code: Annotated[str, Query(min_length=1)],
+        report_period_end: Annotated[date, Query()],
+        period_type: Annotated[FinancialPeriodType, Query()],
+        statement_type: Annotated[StatementType, Query()],
+        decision_time: Annotated[datetime, Query()],
+        system_time: Annotated[datetime, Query()],
+        authority_rule_version: Annotated[str, Query(min_length=1)],
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        result = financial.compare_fact(
+            FactComparisonQuery(
+                company_id=company_id,
+                security_id=security_id,
+                metric_code=metric_code,
+                report_period_end=report_period_end,
+                period_type=period_type.value,
+                statement_type=statement_type.value,
+                decision_time=decision_time,
+                system_time=system_time,
+                authority_rule_version=authority_rule_version,
+            )
+        )
+        if result is None:
+            raise ResourceNotFound("financial fact comparison inputs are unavailable")
+        return envelope(asdict(result), context, as_of=decision_time)
+
+    @app.get("/api/system/mismatches", response_model=Envelope)
+    def system_financial_mismatches(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope(
+            [asdict(item) for item in financial.list_mismatches()],
+            context,
+        )
+
+    @app.get("/api/system/evidence/{raw_object_id}", response_model=Envelope)
+    def system_raw_evidence(
+        raw_object_id: str,
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        result = financial.get_evidence(raw_object_id)
+        if result is None:
+            raise ResourceNotFound(f"raw evidence not found: {raw_object_id}")
+        return envelope(asdict(result), context, as_of=result.retrieved_at)
 
     @app.get("/api/calendars/{exchange}/next-session", response_model=Envelope)
     def next_session(

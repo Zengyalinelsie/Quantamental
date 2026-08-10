@@ -269,6 +269,31 @@
   font-size: 12px;
 }
 
+.systemEvidenceScreen,
+.evidenceView,
+.evidenceDrawerBody {
+  display: grid;
+  gap: 16px;
+}
+
+.evidenceQueryBar {
+  display: grid;
+  grid-template-columns: minmax(260px, 520px) auto;
+  gap: 10px;
+}
+
+.factQueryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .deskSection .ant-pro-table-list-toolbar-container {
   min-height: 0;
   padding-block: 0;

@@ -220,6 +220,34 @@ PYTHONPATH=src .venv/bin/mypy src
 PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache .venv/bin/python -m compileall -q src
 ```
 
+## P3-W05b：财务证据诊断与双时间对比
+
+在 System → Catalog → Financial Evidence 中完成：
+
+- 官方披露 timeline 展示 publication、available、first tradable、公开版本序号、
+  corrected/withdrawn 状态、替代关系和原因；
+- Fact revision timeline 同时展示 public revision 和半开 system-time interval，不把两种
+  “修订”混在一起；
+- Current / Strict 对同一经济事实分别执行选择；`normalized_current` 只能出现在 current，
+  strict 无 `pit_verified` 观察时显式 `unavailable + blocks_downstream`；
+- Mismatch Queue 合并 pending unmapped field、blocked/unavailable quality 和当前多供应商语义值
+  冲突；冲突保留全部 provider/fact ID，不静默覆盖；
+- Raw Evidence Drawer 展示 source URL、hash、provider、retrieved_at、media type、license 和
+  retention；不向匿名只读 API 暴露内部 `storage_uri`，禁止再分发时不回传文档内容；
+- 新 API 全部为 GET，PostgreSQL 每次查询均显式 `READ ONLY`；没有 `ASP_DATABASE_URL` 时
+  使用真实空 reader，不注入测试公告、财务值或 Authority Rule；
+- API 和页面查询需要显式 company/fact identity，不默认选公司，也不使用运行时演示数据。
+
+TDD 红灯先表现为 financial evidence reader 和 `SystemEvidenceScreen` 不存在；随后加入纯选择、
+多源冲突、PostgreSQL 只读事务、API、Drawer 和 UI current/strict 负向测试。全量验证：Python
+`256 passed`、前端 `26 passed`、Ruff、mypy（80 source files）、compileall、生产构建和
+`git diff --check` 通过。真实开发库端到端结果为 disclosures/fact revisions/mismatches 均
+HTTP 200、0 行，证明空表接线但不证明真实数据已经摄取。
+
+浏览器控制仍无可用实例，不能把 jsdom 结果冒充视觉截图；W04 的 3–5 家真实公司、两个修订
+案例和 W06 每日 Timing 记录仍是 P3 Gate 阻断项。测试通过不证明财务数据正确、因子有效、
+策略盈利或模型科学有效。
+
 ## P3-W06a：Timing Shadow Ledger 合同与持久化
 
 已实现 P3 baseline 所需的 immutable 领域合同和 append-only ledger：

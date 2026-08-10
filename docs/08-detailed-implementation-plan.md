@@ -411,11 +411,11 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 ### P3-W05：前端数据与管理
 
 - [x] Catalog/Quality/Lineage/Jobs；
-- [ ] Disclosure timeline；
-- [ ] Fact revision timeline；
-- [ ] current/strict 对比；
-- [ ] mismatch queue；
-- [ ] 原始证据 Drawer；
+- [x] Disclosure timeline；
+- [x] Fact revision timeline；
+- [x] current/strict 对比；
+- [x] mismatch queue；
+- [x] 原始证据 Drawer；
 - [x] coverage 和阻断原因。
 
 状态（2026-08-10）：W05a 已实现 System 四个只读面板、PostgreSQL `READ ONLY`
@@ -423,6 +423,10 @@ reader、真实空态和任务内 coverage/checkpoint/失败原因；开发库�
 DatasetVersion、26 份质量报告、14 个任务，Lineage 当前 0 行并显示真实空态。浏览器控制
 当前没有可用实例，视觉截图仍待补齐；Disclosure/Fact timeline、current/strict 对比、
 mismatch queue 和原始证据 Drawer 留在 W05b。证据见 `docs/13-p3-implementation-evidence.md`。
+
+W05b 已补齐上述诊断页面和 PostgreSQL 只读 reader；真实开发库相关表当前为 0 行，页面
+显示真实空态，没有注入测试公告或财务事实。浏览器视觉截图限制仍保留，不影响继续补
+W04 真实 fixture，但 P3 Gate 在真实样本和页面原文追溯证据完成前仍不通过。
 
 ### P3-W06：Timing Shadow Ledger 基础
 

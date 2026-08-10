@@ -48,8 +48,13 @@ export interface paths {
   "/api/runs": { get: ReadOperation };
   "/api/securities": { get: ReadOperation };
   "/api/system/catalog": { get: ReadOperation };
+  "/api/system/disclosures": { get: ReadOperation };
+  "/api/system/evidence/{raw_object_id}": { get: ReadOperation };
+  "/api/system/facts/compare": { get: ReadOperation };
+  "/api/system/facts/revisions": { get: ReadOperation };
   "/api/system/jobs": { get: ReadOperation };
   "/api/system/lineage": { get: ReadOperation };
+  "/api/system/mismatches": { get: ReadOperation };
   "/api/system/quality": { get: ReadOperation };
   "/api/universes": { get: ReadOperation };
   "/api/universes/{universe_version_id}/coverage": { get: ReadOperation };

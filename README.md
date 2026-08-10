@@ -10,7 +10,7 @@
 
 ## 当前状态
 
-P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；当前已增加显式 ack 的私人本地 `normalized_current` 行情/日历回填，以及沪深当前 Security Master/CSI300/500 历史成分采集能力，但 320/768/1024/1440 浏览器视觉证据、XBSE 和真实全范围回填仍未完成，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository；P3-W05a 已接通只读 Catalog/Quality/Lineage/Jobs，P3-W04、W05 其余时间线和 W06 每日记录仍在进行。
+P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；当前已增加显式 ack 的私人本地 `normalized_current` 行情/日历回填，以及沪深当前 Security Master/CSI300/500 历史成分采集能力，但 320/768/1024/1440 浏览器视觉证据、XBSE 和真实全范围回填仍未完成，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository；P3-W05 已接通数据管理、披露/事实时间线、current/strict 对比、mismatch 和证据 Drawer。P3-W04 真实样本与 W06 每日 Timing 记录仍在进行。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 

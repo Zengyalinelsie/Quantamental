@@ -46,6 +46,17 @@
         "title": "Exchange",
         "type": "string"
       },
+      "FinancialPeriodType": {
+        "enum": [
+          "q1",
+          "half_year",
+          "q3",
+          "annual",
+          "ttm"
+        ],
+        "title": "FinancialPeriodType",
+        "type": "string"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -134,6 +145,15 @@
         ],
         "title": "ResponseContext",
         "type": "object"
+      },
+      "StatementType": {
+        "enum": [
+          "balance_sheet",
+          "income_statement",
+          "cash_flow_statement"
+        ],
+        "title": "StatementType",
+        "type": "string"
       },
       "ValidationError": {
         "properties": {
@@ -1178,6 +1198,462 @@
         "summary": "System Datasets"
       }
     },
+    "/api/system/disclosures": {
+      "get": {
+        "operationId": "system_disclosures_api_system_disclosures_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "company_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Disclosures"
+      }
+    },
+    "/api/system/evidence/{raw_object_id}": {
+      "get": {
+        "operationId": "system_raw_evidence_api_system_evidence__raw_object_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "raw_object_id",
+            "required": true,
+            "schema": {
+              "title": "Raw Object Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Raw Evidence"
+      }
+    },
+    "/api/system/facts/compare": {
+      "get": {
+        "operationId": "system_fact_comparison_api_system_facts_compare_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "title": "Company Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "security_id",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "title": "Security Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "metric_code",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "title": "Metric Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "report_period_end",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Report Period End",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period_type",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FinancialPeriodType"
+            }
+          },
+          {
+            "in": "query",
+            "name": "statement_type",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/StatementType"
+            }
+          },
+          {
+            "in": "query",
+            "name": "decision_time",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "title": "Decision Time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "system_time",
+            "required": true,
+            "schema": {
+              "format": "date-time",
+              "title": "System Time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "authority_rule_version",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "title": "Authority Rule Version",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Fact Comparison"
+      }
+    },
+    "/api/system/facts/revisions": {
+      "get": {
+        "operationId": "system_fact_revisions_api_system_facts_revisions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "company_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "security_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Security Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "metric_code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Metric Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "report_period_end",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Report Period End"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FinancialPeriodType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "statement_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/StatementType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Statement Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Fact Revisions"
+      }
+    },
     "/api/system/jobs": {
       "get": {
         "operationId": "system_jobs_api_system_jobs_get",
@@ -1300,6 +1776,68 @@
           }
         },
         "summary": "System Lineage"
+      }
+    },
+    "/api/system/mismatches": {
+      "get": {
+        "operationId": "system_financial_mismatches_api_system_mismatches_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Financial Mismatches"
       }
     },
     "/api/system/quality": {

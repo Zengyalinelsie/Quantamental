@@ -133,6 +133,102 @@ export interface IngestionJobEntry {
   coverage_reports: CoverageReportEntry[]
 }
 
+export interface RawEvidenceEntry {
+  raw_object_id: string
+  object_kind: 'request' | 'response' | 'file'
+  content_hash: string
+  source_url: string
+  provider_id: string
+  retrieved_at: string
+  media_type: string
+  license_id: string
+  retention_policy: 'indefinite' | 'until_date' | 'metadata_only'
+  retention_until: string | null
+  redistribution_allowed: boolean
+}
+
+export interface DisclosureTimelineEntry {
+  disclosure_id: string
+  document_key: string
+  external_document_id: string
+  company_id: string
+  security_id: string | null
+  source_system: string
+  title: string
+  document_type: string
+  report_period_end: string | null
+  published_at: string
+  available_at: string
+  first_tradable_at: string
+  version_sequence: number
+  status: 'published' | 'corrected' | 'withdrawn'
+  raw_object_id: string
+  supersedes_disclosure_id: string | null
+  status_reason: string | null
+}
+
+export interface FactRevisionEntry {
+  fact_id: string
+  company_id: string
+  security_id: string
+  metric_code: string
+  value: string | number | boolean
+  unit: string
+  currency: string | null
+  report_period_end: string
+  period_type: string
+  statement_type: string
+  announced_at: string
+  available_at: string
+  known_from: string
+  known_to: string | null
+  revision_sequence: number
+  provider_id: string
+  source_field: string
+  trust_state: 'raw' | 'normalized_current' | 'pit_verified'
+  quality_state: 'passed' | 'warning' | 'blocked' | 'unavailable'
+  mapping_version_id: string
+  source_object_id: string
+  dataset_version_id: string
+  quality_issue_ids: string[]
+}
+
+export interface FactSelectionEntry {
+  status: 'selected' | 'unavailable' | 'blocked'
+  selected: FactRevisionEntry | null
+  conflicting_fact_ids: string[]
+  quality_issue_ids: string[]
+  blocks_downstream: boolean
+  reason: string | null
+}
+
+export interface FactComparisonEntry {
+  company_id: string
+  security_id: string
+  metric_code: string
+  report_period_end: string
+  period_type: string
+  statement_type: string
+  decision_time: string
+  system_time: string
+  authority_rule_version: string
+  current: FactSelectionEntry
+  strict: FactSelectionEntry
+}
+
+export interface FinancialMismatchEntry {
+  mismatch_id: string
+  mismatch_type: string
+  status: string
+  company_id: string | null
+  security_id: string | null
+  metric_code: string | null
+  report_period_end: string | null
+  provider_ids: string[]
+  related_ids: string[]
+  reason: string
+}
+
 export type SystemSection = 'catalog' | 'quality' | 'lineage' | 'jobs'
 
 export interface SystemSectionData {
@@ -177,4 +273,30 @@ export function getUniverseCoverage(universeId: string, asOf: string, signal?: A
 
 export function getSystemSection<S extends SystemSection>(section: S, signal?: AbortSignal) {
   return getEnvelope<SystemSectionData[S]>(`/api/system/${section}`, signal)
+}
+
+export function getDisclosures(companyId: string, signal?: AbortSignal) {
+  return getEnvelope<DisclosureTimelineEntry[]>(
+    `/api/system/disclosures?company_id=${encodeURIComponent(companyId)}`,
+    signal,
+  )
+}
+
+export function getFactRevisions(params: URLSearchParams, signal?: AbortSignal) {
+  return getEnvelope<FactRevisionEntry[]>(`/api/system/facts/revisions?${params}`, signal)
+}
+
+export function getFactComparison(params: URLSearchParams, signal?: AbortSignal) {
+  return getEnvelope<FactComparisonEntry>(`/api/system/facts/compare?${params}`, signal)
+}
+
+export function getFinancialMismatches(signal?: AbortSignal) {
+  return getEnvelope<FinancialMismatchEntry[]>('/api/system/mismatches', signal)
+}
+
+export function getRawEvidence(rawObjectId: string, signal?: AbortSignal) {
+  return getEnvelope<RawEvidenceEntry>(
+    `/api/system/evidence/${encodeURIComponent(rawObjectId)}`,
+    signal,
+  )
 }
