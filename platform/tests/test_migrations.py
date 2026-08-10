@@ -55,8 +55,26 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0008_financial_facts.sql",
                 "0009_nullable_industry_code.sql",
                 "0010_canonical_universe_lineage.sql",
+                "0011_domain_aware_checkpoint_adjustment.sql",
             ),
         )
+
+    def test_checkpoint_adjustment_mode_is_domain_aware(self) -> None:
+        sql = (
+            PLATFORM_ROOT
+            / "migrations"
+            / "0011_domain_aware_checkpoint_adjustment.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "DROP CONSTRAINT ingestion_checkpoints_adjustment_mode_check",
+            "SET adjustment_mode = 'not_applicable'",
+            "data_domain <> 'raw_daily_bar'",
+            "data_domain = 'raw_daily_bar' AND adjustment_mode = 'unadjusted'",
+            "data_domain <> 'raw_daily_bar' AND adjustment_mode = 'not_applicable'",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_missing_provider_industry_code_remains_null_instead_of_a_sentinel(self) -> None:
         sql = (PLATFORM_ROOT / "migrations" / "0009_nullable_industry_code.sql").read_text(
