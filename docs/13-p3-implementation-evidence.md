@@ -132,3 +132,49 @@ PYTHONPATH=src .venv/bin/mypy src
 工作包完成时证据：定向 9 tests、Python 全量 `216 passed`；compileall、Ruff、mypy
 （64 source files）通过。Factor Service 与 Wind 的已知 profile 在测试中保持 candidate；
 只有名字明确为“假设性获批”的路由 fixture 才验证未来主备顺序。
+
+## P3-W04b：Factor Service adapter 与资格探针
+
+同花顺/iFinD/THS 作为第一资格候选，已实现不依赖领域核心的 provider-edge adapter：
+
+- 覆盖 v1 `health`、`factor/list`、`table/list`、`factor/query`，以及 v2 `health`、
+  `meta/schema`、`metadata`、`tables`、`table/detail`、`columns/search`、`table/count`、
+  `table/query`；
+- 同时接受开发文档的业务成功码 `0` 和生产样例的 `20000`，其他 HTTP/业务码失败关闭；
+- Bearer token 只从环境注入，不进入 client/request repr；provider 和 transport 错误在抛出前
+  脱敏；代码、fixture 和文档都不包含 PDF 中的旧 token；
+- JSON 小数直接解码为 `Decimal`，不让财务值先经过二进制 float；非有限 JSON 数字失败；
+- query 明确要求 `allow_read_through_cache`，没有确认时发出 HTTP 前失败；count 保持只读；
+- v2 单页强制不超过 5,000 行，iterator 先 count 后分页，空页、超报数和非法 offset 阻断；
+- 对“通用文档称 primary key 必填、生产宏观样例省略主键”的冲突不做静默选择：默认要求
+  主键，只有 live metadata 明确允许 date-only 时调用方才能显式放开；三张 A 股财务表始终
+  以 `scode` 作为主键；
+- 可重复资格探针覆盖全部接口、三张 A 股报表的 detail/search/count，并只在显式确认缓存
+  副作用后执行单股票、单报告期 query；输出只含状态和数量，不打印原始财务数值或凭证。
+
+TDD 红灯先后为 adapter import 不存在、probe import 不存在、JSON 财务小数仍为 float；实现后
+定向 8 tests 通过。实时无凭证探针仍显示：开发地址所有入口约 5 秒被对端 reset；生产地址
+经当前网络路由返回 404；iFinD `edb_service` 无新 token 返回 401。它们是连接/鉴权证据，
+不是来源资格通过或数据正确证据。
+
+新凭证由本地 secret manager/环境注入后，复测命令为：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m \
+  a_share_platform.adapters.providers.factor_service_probe \
+  --symbol 601089 \
+  --report-period-end 2024-12-31 \
+  --allow-read-through-cache
+```
+
+要求预先设置 `FACTOR_SERVICE_BASE_URL` 和 `FACTOR_SERVICE_BEARER_TOKEN`；不得把 token 写进
+命令行、仓库或 fixture。未加 `--allow-read-through-cache` 时 query 显式 skipped，进程以 2
+退出，不能被误当成完整 qualification。
+
+本工作包仍未取得合法新凭证、真实三表响应、本地批量保存许可、3–5 家真实公司人工期望值
+或两个修订案例，因此 Factor Service 保持 candidate，P3-W04 和 P3 Gate 均未完成。
+
+工作包完成时证据：定向 `8 passed`；共享工作树全量 `225 passed`；compileall、Ruff、mypy
+（66 source files）通过，`git diff --check` 通过。测试通过只证明 adapter/probe 合同，不证明
+同花顺当前可达、字段值正确、覆盖完整、许可已批准或模型科学有效。

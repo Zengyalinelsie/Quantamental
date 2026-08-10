@@ -111,6 +111,11 @@ A 股财务三表的生产摄取**不需要从 PDF 抽取起步**。当前更合
 因此本文区分“文档声明”“无凭证可达性”和“带合法新凭证的数据合同验证”，不把 curl
 示例、TCP 建连、401 或 404 当成数据源资格通过证据。
 
+平台现已提供 `FactorServiceClient` 和可重复资格探针。adapter 支持文档列出的全部 v1/v2
+接口、`0`/`20000` 两种成功码、`Decimal` 财务值、5,000 行分页、Bearer 脱敏，以及 query
+的 read-through cache 显式确认。它使后续 live qualification 可重复，但不会把当前连接
+失败转写成成功，也不会自行晋升 source profile。
+
 第三份文档包含明文 Factor Service Bearer token 和 iFinD access token。本文没有复制
 任何凭证，也没有用这些凭证发请求。原凭证应立即吊销/轮换；源文档应替换为环境变量
 占位符后再传播。Agent 不得从文档、聊天、Git、日志或 fixture 获取运行凭证。
@@ -227,9 +232,12 @@ macro precision、约 83.2%–85.8% 的覆盖率，以及多个 micro 指标。�
    表不计数。服务对“541 个因子”的版本边界应由 live metadata 固化。
 5. Factor Service 的查询会在调用第三方 API 后写缓存。只读研究客户端必须明确哪些
    endpoint 纯读、哪些 endpoint 有 read-through write 副作用。
-6. `ths_stock_daily_capital` 文本称暂时入库到 2025，示例日期却查询 2026-07；覆盖截止
+6. v2 通用合同写 `primary_key` 必填，但生产宏观查询样例省略它，metadata 又增加
+   `allow_date_only_query`。adapter 默认要求主键，只有 live metadata 明确允许 date-only
+   且调用方显式传入时才放开；不能从示例猜测。
+7. `ths_stock_daily_capital` 文本称暂时入库到 2025，示例日期却查询 2026-07；覆盖截止
    必须以只读 count/metadata 和 DatasetVersion 为准。
-7. SneAgent 的内部 `verified` 与平台 `pit_verified` 名称相近但含义不同，接入时必须
+8. SneAgent 的内部 `verified` 与平台 `pit_verified` 名称相近但含义不同，接入时必须
    保留两个独立字段，禁止自动映射。
 
 ## 8. 财务来源路由
