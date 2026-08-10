@@ -268,7 +268,8 @@ class IdentityUniverseBackfillSource:
         issues: Counter[str] = Counter()
         for raw in basic_rows:
             code = self._canonical_code(self._text(raw, "code"))
-            legal_name = self._legal_name(akshare, code)
+            listed_on = self._date(raw, "ipoDate")
+            legal_name = self._legal_name(akshare, code, listed_on)
             if legal_name is None:
                 rejected += 1
                 issues["legal_name_unavailable"] += 1
@@ -294,7 +295,7 @@ class IdentityUniverseBackfillSource:
                     security_name=self._text(raw, "code_name"),
                     exchange=_EXCHANGES[unit.market],
                     board=self._board(code),
-                    listed_on=self._date(raw, "ipoDate"),
+                    listed_on=listed_on,
                     delisted_on=delisted_on,
                     listing_state=(
                         ListingState.ACTIVE if status == "1" else ListingState.TERMINATED
@@ -432,7 +433,7 @@ class IdentityUniverseBackfillSource:
             )
         return UniverseMembershipPayload(benchmark_code, tuple(intervals))
 
-    def _legal_name(self, akshare: Any, code: str) -> str | None:
+    def _legal_name(self, akshare: Any, code: str, listed_on: date) -> str | None:
         symbol = code.split(".", 1)[1]
         for attempt in range(self._profile_attempts):
             try:
@@ -446,17 +447,41 @@ class IdentityUniverseBackfillSource:
                 records = ()
             for raw in records:
                 row = cast(Mapping[str, object], raw)
-                returned_code = self._cninfo_code(row)
-                if returned_code != symbol:
-                    raise ProviderBackfillUnavailable(
-                        "CNInfo company profile code mismatch"
-                    )
+                self._validate_cninfo_identity(row, code, symbol, listed_on)
                 value = self._optional_text(row, "公司名称")
                 if value:
                     return value
             if attempt + 1 < self._profile_attempts:
                 self._sleeper(self._profile_retry_delay_seconds * (2**attempt))
         return None
+
+    @classmethod
+    def _validate_cninfo_identity(
+        cls,
+        row: Mapping[str, object],
+        code: str,
+        symbol: str,
+        listed_on: date,
+    ) -> None:
+        returned_code = cls._optional_text(row, "A股代码")
+        if returned_code is not None:
+            if cls._cninfo_code(row) != symbol:
+                raise ProviderBackfillUnavailable(
+                    "CNInfo company profile code mismatch"
+                )
+            return
+        if not code.startswith("SH.689"):
+            raise ProviderBackfillUnavailable(
+                "A股代码 is missing from provider payload"
+            )
+        if cls._optional_text(row, "所属市场") != "上交所科创板":
+            raise ProviderBackfillUnavailable(
+                "CNInfo CDR company profile market mismatch"
+            )
+        if cls._date(row, "上市日期") != listed_on:
+            raise ProviderBackfillUnavailable(
+                "CNInfo CDR company profile listing date mismatch"
+            )
 
     @classmethod
     def _cninfo_code(cls, row: Mapping[str, object]) -> str:
