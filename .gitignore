@@ -1,0 +1,29 @@
+# 两个只读 donor 仓库，不纳入新项目 Git
+sources/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Frontend
+node_modules/
+dist/
+coverage/
+
+# macOS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+
