@@ -60,8 +60,29 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0013_disclosure_time_precision.sql",
                 "0015_timing_benchmark_bars.sql",
                 "0016_financial_backfill_dimensions.sql",
+                "0017_feature_snapshots_and_research_labels.sql",
             ),
         )
+
+    def test_feature_and_research_label_storage_is_physically_separate_and_append_only(self) -> None:
+        sql = (
+            PLATFORM_ROOT
+            / "migrations"
+            / "0017_feature_snapshots_and_research_labels.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE feature_snapshots",
+            "CREATE TABLE research_labels",
+            "dataset_version_ids",
+            "input_content_hashes",
+            "feature_snapshots_append_only",
+            "research_labels_append_only",
+            "BEFORE UPDATE OR DELETE ON feature_snapshots",
+            "BEFORE UPDATE OR DELETE ON research_labels",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_financial_backfill_reuses_ledgers_with_explicit_work_unit_dimensions(self) -> None:
         sql = (
