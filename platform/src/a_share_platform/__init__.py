@@ -1,21 +1,30 @@
 """Authoritative domain core for A-Share Platform Next."""
 
-from .domain.investment_view import ExpectedReturnDistribution, InvestmentComponent, InvestmentView
+from .domain.investment_view import (
+    ExpectedReturnDistribution,
+    InvestmentComponent,
+    InvestmentComponentStatus,
+    InvestmentView,
+)
 from .domain.pit import (
     DataTrustState,
-    DataUseCase,
     FactObservation,
     PointInTimeConflictError,
     select_fact_as_of,
 )
+from .domain.run_context import DataMode, DeploymentStage, InvalidRunContextError, RunContext
 
 __all__ = [
+    "DataMode",
     "DataTrustState",
-    "DataUseCase",
+    "DeploymentStage",
     "ExpectedReturnDistribution",
     "FactObservation",
     "InvestmentComponent",
+    "InvestmentComponentStatus",
     "InvestmentView",
+    "InvalidRunContextError",
     "PointInTimeConflictError",
+    "RunContext",
     "select_fact_as_of",
 ]

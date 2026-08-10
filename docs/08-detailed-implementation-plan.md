@@ -111,7 +111,9 @@ Gate 证据：`01-donor-audit.md`、`03-migration-map.md`、ADR-0001。
 已实现：
 
 - `DataTrustState`；
-- `DataUseCase`；
+- `DataMode = current_research | strict_historical`；
+- 独立的 `DeploymentStage` 和 `RunContext`；
+- 双轴组合 fail-closed（`strict_historical` 仅允许 `research`）；
 - timezone-aware `FactObservation`；
 - 双时间可见性；
 - strict/current 资格；
@@ -122,8 +124,6 @@ Gate 证据：`01-donor-audit.md`、`03-migration-map.md`、ADR-0001。
 
 - [ ] 引入 unit/currency/provider/source field；
 - [ ] 支持同一事实多供应商观察与权威选值；
-- [ ] 将 `DataUseCase` 命名与 SPEC-005 的 `data_mode` 对齐；
-- [ ] 新增独立 `DeploymentStage`/`RunContext`，验证两个轴的合法组合；
 - [ ] property-based 时间边界测试；
 - [ ] 序列化和 schema version。
 
@@ -134,14 +134,15 @@ Gate 证据：`01-donor-audit.md`、`03-migration-map.md`、ADR-0001。
 - 预期收益分布；
 - 分项贡献、证据和版本；
 - invalidators；
-- 分项闭合；
+- 四态 `InvestmentComponent`；
+- 仅 `quantified` 分项参与数值闭合；
+- 显式 residual 闭合；
 - factor/stock selection/timing/event/portfolio/execution 验证政策。
 
 剩余：
 
 - [ ] downside/tail risk；
 - [ ] catalyst；
-- [ ] InvestmentComponent status（quantified/constrained/unavailable/not_applicable）和显式 residual；
 - [ ] Feature/Model/Run 强类型引用；
 - [ ] ValidationResult 与 waiver/approval 对象。
 
@@ -152,6 +153,16 @@ Gate 证据：`01-donor-audit.md`、`03-migration-map.md`、ADR-0001。
 - [ ] 一致性审查无 unresolved blocker；
 - [x] 新核心测试通过；
 - [x] 来源仓库未修改。
+
+当前核心合同验证命令（`PYTHON_BIN` 必须指向 Python 3.11+）：
+
+```bash
+cd platform
+PYTHON_BIN="${PYTHON_BIN:-python3.11}"
+"$PYTHON_BIN" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
+PYTHONPATH=src "$PYTHON_BIN" -m unittest discover -s tests -v
+PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q src
+```
 
 P0 Gate 未由用户批准前，不进入大规模实现。
 

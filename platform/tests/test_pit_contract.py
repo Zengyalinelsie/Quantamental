@@ -3,11 +3,11 @@ import unittest
 
 from a_share_platform.domain.pit import (
     DataTrustState,
-    DataUseCase,
     FactObservation,
     PointInTimeConflictError,
     select_fact_as_of,
 )
+from a_share_platform.domain.run_context import DataMode
 
 
 UTC = timezone.utc
@@ -35,7 +35,7 @@ class FactObservationTest(unittest.TestCase):
         fact = make_fact()
         self.assertFalse(
             fact.eligible_for(
-                DataUseCase.STRICT_HISTORICAL_RESEARCH,
+                DataMode.STRICT_HISTORICAL,
                 decision_time=fact.available_at - timedelta(seconds=1),
                 system_time=fact.known_from,
             )
@@ -45,14 +45,14 @@ class FactObservationTest(unittest.TestCase):
         fact = make_fact(trust_state=DataTrustState.NORMALIZED_CURRENT)
         self.assertFalse(
             fact.eligible_for(
-                DataUseCase.STRICT_HISTORICAL_RESEARCH,
+                DataMode.STRICT_HISTORICAL,
                 decision_time=fact.available_at,
                 system_time=fact.known_from,
             )
         )
         self.assertTrue(
             fact.eligible_for(
-                DataUseCase.CURRENT_RESEARCH,
+                DataMode.CURRENT_RESEARCH,
                 decision_time=fact.available_at,
                 system_time=fact.known_from,
             )
@@ -82,13 +82,13 @@ class FactObservationTest(unittest.TestCase):
         )
         before_revision = select_fact_as_of(
             (original, revised),
-            DataUseCase.STRICT_HISTORICAL_RESEARCH,
+            DataMode.STRICT_HISTORICAL,
             decision_time=revised.available_at - timedelta(seconds=1),
             system_time=original.known_from,
         )
         after_revision = select_fact_as_of(
             (original, revised),
-            DataUseCase.STRICT_HISTORICAL_RESEARCH,
+            DataMode.STRICT_HISTORICAL,
             decision_time=revised.available_at,
             system_time=original.known_from,
         )
@@ -101,7 +101,7 @@ class FactObservationTest(unittest.TestCase):
         with self.assertRaises(PointInTimeConflictError):
             select_fact_as_of(
                 (original, duplicate),
-                DataUseCase.STRICT_HISTORICAL_RESEARCH,
+                DataMode.STRICT_HISTORICAL,
                 decision_time=original.available_at,
                 system_time=original.known_from,
             )

@@ -13,6 +13,8 @@ from enum import Enum
 from math import isfinite
 from typing import Iterable, TypeAlias
 
+from .run_context import DataMode
+
 FactValue: TypeAlias = str | int | float | bool
 
 
@@ -20,11 +22,6 @@ class DataTrustState(str, Enum):
     RAW = "raw"
     NORMALIZED_CURRENT = "normalized_current"
     PIT_VERIFIED = "pit_verified"
-
-
-class DataUseCase(str, Enum):
-    CURRENT_RESEARCH = "current_research"
-    STRICT_HISTORICAL_RESEARCH = "strict_historical_research"
 
 
 class PointInTimeConflictError(RuntimeError):
@@ -82,20 +79,20 @@ class FactObservation:
 
     def eligible_for(
         self,
-        use_case: DataUseCase,
+        data_mode: DataMode,
         *,
         decision_time: datetime,
         system_time: datetime,
     ) -> bool:
         """Return whether this exact fact version may serve the requested use case."""
 
-        use_case = DataUseCase(use_case)
+        data_mode = DataMode(data_mode)
         decision_time = _require_aware(decision_time, "decision_time")
         if not self.visible_in_system(system_time):
             return False
         if self.available_at > decision_time:
             return False
-        if use_case is DataUseCase.STRICT_HISTORICAL_RESEARCH:
+        if data_mode is DataMode.STRICT_HISTORICAL:
             return self.trust_state is DataTrustState.PIT_VERIFIED
         return self.trust_state in {
             DataTrustState.NORMALIZED_CURRENT,
@@ -105,7 +102,7 @@ class FactObservation:
 
 def select_fact_as_of(
     observations: Iterable[FactObservation],
-    use_case: DataUseCase,
+    data_mode: DataMode,
     *,
     decision_time: datetime,
     system_time: datetime,
@@ -129,7 +126,7 @@ def select_fact_as_of(
         row
         for row in rows
         if row.eligible_for(
-            use_case,
+            data_mode,
             decision_time=decision_time,
             system_time=system_time,
         )

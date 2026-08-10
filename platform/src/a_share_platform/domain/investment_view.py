@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from math import isfinite
 
 
@@ -30,22 +31,45 @@ class ExpectedReturnDistribution:
             raise ValueError("point estimate must lie inside [p10, p90]")
 
 
+class InvestmentComponentStatus(str, Enum):
+    QUANTIFIED = "quantified"
+    CONSTRAINED = "constrained"
+    UNAVAILABLE = "unavailable"
+    NOT_APPLICABLE = "not_applicable"
+
+
 @dataclass(frozen=True)
 class InvestmentComponent:
     name: str
-    expected_return_contribution: float
-    evidence_ids: tuple[str, ...]
+    status: InvestmentComponentStatus
+    expected_return_contribution: float | None = None
+    evidence_ids: tuple[str, ...] = ()
+    status_reason: str | None = None
 
     def __post_init__(self) -> None:
         if not str(self.name or "").strip():
             raise ValueError("component name must not be empty")
-        object.__setattr__(
-            self,
-            "expected_return_contribution",
-            _finite(self.expected_return_contribution, "expected_return_contribution"),
-        )
-        if not self.evidence_ids or any(not str(value or "").strip() for value in self.evidence_ids):
-            raise ValueError("each component requires at least one evidence id")
+        status = InvestmentComponentStatus(self.status)
+        object.__setattr__(self, "status", status)
+        if any(not str(value or "").strip() for value in self.evidence_ids):
+            raise ValueError("component evidence ids must not be empty")
+        if status is InvestmentComponentStatus.QUANTIFIED:
+            if self.expected_return_contribution is None:
+                raise ValueError("quantified component requires an expected-return contribution")
+            object.__setattr__(
+                self,
+                "expected_return_contribution",
+                _finite(self.expected_return_contribution, "expected_return_contribution"),
+            )
+            if not self.evidence_ids:
+                raise ValueError("quantified component requires at least one evidence id")
+        else:
+            if self.expected_return_contribution is not None:
+                raise ValueError(
+                    f"{status.value} component must not have a numeric contribution"
+                )
+            if not str(self.status_reason or "").strip():
+                raise ValueError(f"{status.value} component requires an explicit reason")
 
 
 @dataclass(frozen=True)
@@ -57,6 +81,7 @@ class InvestmentView:
     expected_return: ExpectedReturnDistribution
     confidence: float
     components: tuple[InvestmentComponent, ...]
+    residual: float
     invalidators: tuple[str, ...]
     dataset_version_ids: tuple[str, ...]
     model_version_id: str
@@ -78,20 +103,31 @@ class InvestmentView:
         component_names = [item.name for item in self.components]
         if len(component_names) != len(set(component_names)):
             raise ValueError("component names must be unique")
+        object.__setattr__(self, "residual", _finite(self.residual, "residual"))
         if not self.invalidators or any(not str(value or "").strip() for value in self.invalidators):
             raise ValueError("InvestmentView requires explicit invalidators")
         if not self.dataset_version_ids or any(
             not str(value or "").strip() for value in self.dataset_version_ids
         ):
             raise ValueError("InvestmentView requires dataset version bindings")
-        if abs(self.component_total - self.expected_return.point) > 1e-9:
+        if abs(self.reconciled_expected_return - self.expected_return.point) > 1e-9:
             raise ValueError(
-                "component contributions must reconcile to the point expected return"
+                "quantified component contributions plus residual must reconcile "
+                "to the point expected return"
             )
 
     @property
     def component_total(self) -> float:
-        return sum(item.expected_return_contribution for item in self.components)
+        return sum(
+            item.expected_return_contribution
+            for item in self.components
+            if item.status is InvestmentComponentStatus.QUANTIFIED
+            and item.expected_return_contribution is not None
+        )
+
+    @property
+    def reconciled_expected_return(self) -> float:
+        return self.component_total + self.residual
 
     @property
     def all_evidence_ids(self) -> tuple[str, ...]:

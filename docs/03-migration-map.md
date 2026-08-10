@@ -31,7 +31,7 @@
 
 | 模块 | 决策 | 迁移前修改 |
 |---|---|---|
-| DataTrustState/DataUseCase | Adopt | 收敛为独立领域枚举 |
+| DataTrustState/DataMode/DeploymentStage/RunContext | Adopt | 双轴独立枚举并 fail closed 校验组合 |
 | ODS envelope/hash/lineage | Adapt | 去除 Futu 偏置，统一 provider 合同 |
 | PIT financial query | Adopt | 补 A 股公告、修订和可用时间来源 |
 | Security master | Adapt | 增加 A 股公司/证券/挂牌、历史行业、退市 |
@@ -78,4 +78,3 @@
 - 不把报告方向命中率作为策略收益；
 - 不让 UI 为了显示完整而生成占位数字；
 - 不在没有数据版本、代码版本和参数 hash 时展示“已回测”。
-

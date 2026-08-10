@@ -13,7 +13,7 @@
 
 本轮没有批准大规模实现、没有修改两个来源仓库、没有修改用户原项目工作树、没有授权真实交易。
 
-现有 P0 Python 合同早于本次 0.9.1 修订：它们的 13 个测试通过，但尚未实现新的双轴 `RunContext` 和 InvestmentComponent status。Plan 已把这两项明确列回 P0 剩余工作，因此“测试通过”不被误写成“Spec 已实现”。
+P0 Python 合同现已实现双轴 `RunContext`、与 SPEC-005 一致的 `DataMode` 命名、InvestmentComponent 四态和显式 residual 闭合；25 个单元测试通过。Plan 中仍有 unit/currency/provider、多供应商选值、property-based 边界、schema version、downside/tail risk、catalyst、强类型版本引用和 ValidationResult/approval 等 P0 工作，因此“测试通过”仍不代表完整 P0 Gate 或 Spec 已全部实现。
 
 ## 2. 真源与优先级
 

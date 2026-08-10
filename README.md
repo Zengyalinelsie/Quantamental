@@ -53,7 +53,10 @@ platform/                    # 新平台代码，只在这里实现新能力
 
 ```bash
 cd platform
-PYTHONPATH=src python3.11 -m unittest discover -s tests -v
+PYTHON_BIN="${PYTHON_BIN:-python3.11}"  # 任一 Python 3.11+；本机可设为 python3.12
+"$PYTHON_BIN" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
+PYTHONPATH=src "$PYTHON_BIN" -m unittest discover -s tests -v
+PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q src
 ```
 
 项目采用模块化单体起步。数据、研究、组合、交易和 Agent 有清晰边界，但第一版不拆微服务。
