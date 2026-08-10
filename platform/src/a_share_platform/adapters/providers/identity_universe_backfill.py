@@ -129,6 +129,7 @@ class IdentityUniverseBackfillSource:
                     akshare,
                     unit,
                     retrieved_at.date(),
+                    requested_symbols=plan.symbols,
                 )
                 units = (("identity", "record"),)
                 cutoff_date = retrieved_at.date()
@@ -179,8 +180,15 @@ class IdentityUniverseBackfillSource:
             raise ValueError("identity/universe source requires private_local_research use")
         if plan.output_trust_state is not DataTrustState.NORMALIZED_CURRENT:
             raise ValueError("identity/universe source can emit only normalized_current")
-        if not plan.all_a_share or plan.symbols:
-            raise ValueError("identity/universe source requires an all_a_share plan")
+        if plan.symbols and not plan.all_a_share:
+            if unit.domain is not BackfillDataDomain.SECURITY_MASTER:
+                raise ValueError(
+                    "explicit-symbol identity source supports only security_master"
+                )
+        elif not plan.all_a_share or plan.symbols:
+            raise ValueError(
+                "identity/universe source requires all_a_share or explicit symbols"
+            )
         if unit.domain not in {
             BackfillDataDomain.SECURITY_MASTER,
             BackfillDataDomain.UNIVERSE,
@@ -195,6 +203,8 @@ class IdentityUniverseBackfillSource:
         akshare: Any,
         unit: BackfillWorkUnit,
         observed_on: date,
+        *,
+        requested_symbols: tuple[str, ...],
     ) -> tuple[SecurityMasterPayload, int, Counter[str], int]:
         if unit.market not in _EXCHANGES:
             raise ProviderBackfillUnavailable(
@@ -205,12 +215,23 @@ class IdentityUniverseBackfillSource:
             baostock.query_stock_basic,
         )
         self._require_success(basic_result, "security master")
-        basic_rows = tuple(
+        market_basic_rows = tuple(
             row
             for row in self._result_rows(basic_result)
             if self._security_market(row) == unit.market
         )
-        if len(basic_rows) < self._minimum_security_rows:
+        requested = {
+            symbol
+            for symbol in requested_symbols
+            if self._symbol_market(symbol) == unit.market
+        }
+        basic_rows = tuple(
+            row
+            for row in market_basic_rows
+            if not requested
+            or self._canonical_code(self._text(row, "code")) in requested
+        )
+        if not requested and len(basic_rows) < self._minimum_security_rows:
             raise ProviderBackfillUnavailable(
                 "security master row count is below the configured minimum"
             )
@@ -219,6 +240,10 @@ class IdentityUniverseBackfillSource:
         )
         if len(basic_codes) != len(set(basic_codes)):
             raise ProviderBackfillUnavailable("security master contains duplicate codes")
+        if requested and set(basic_codes) != requested:
+            raise ProviderBackfillUnavailable(
+                "security master provider omitted requested symbols"
+            )
         industry_result = self._provider_call(
             "industry membership",
             lambda: baostock.query_stock_industry(date=observed_on.isoformat()),
@@ -285,7 +310,8 @@ class IdentityUniverseBackfillSource:
                 )
             )
         coverage_ratio = len(accepted) / len(basic_rows)
-        if coverage_ratio < self._minimum_security_coverage_ratio:
+        required_coverage = 1.0 if requested else self._minimum_security_coverage_ratio
+        if coverage_ratio < required_coverage:
             raise ProviderBackfillUnavailable(
                 "security master accepted-row coverage is below the configured minimum"
             )
@@ -472,6 +498,10 @@ class IdentityUniverseBackfillSource:
         if code is None or not IdentityUniverseBackfillSource._is_a_share_code(code):
             return None
         return "XSHG" if code.lower().startswith("sh.") else "XSHE"
+
+    @staticmethod
+    def _symbol_market(code: str) -> str | None:
+        return {"SH": "XSHG", "SZ": "XSHE", "BJ": "XBSE"}.get(code[:2])
 
     @staticmethod
     def _is_a_share_code(value: str) -> bool:

@@ -125,6 +125,19 @@ def plan_for(domain: BackfillDataDomain):
     )
 
 
+def explicit_identity_plan(*symbols: str, domain: BackfillDataDomain = BackfillDataDomain.SECURITY_MASTER):
+    return build_private_local_backfill_plan(
+        plan_id=f"private:{domain.value}:explicit:v1",
+        provider_id="a_share_identity_universe",
+        symbols=tuple(symbols),
+        all_a_share=False,
+        domains=(domain,),
+        start_date=date(2018, 1, 1),
+        end_date=date(2018, 1, 3),
+        created_at=NOW,
+    )
+
+
 class IdentityUniverseBackfillSourceTest(unittest.TestCase):
     def source(
         self,
@@ -173,6 +186,33 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
         self.assertEqual(row.industry_name, "酒、饮料和精制茶制造业")
         self.assertEqual(batch.metadata.adjustment_mode, "not_applicable")
         BackfillService._validate_batch(plan, unit, batch)
+
+    def test_explicit_security_master_fetches_only_requested_symbols(self) -> None:
+        plan = explicit_identity_plan("SH.600519")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = self.source().fetch(unit, plan)
+
+        payload = batch.payload
+        assert isinstance(payload, SecurityMasterPayload)
+        self.assertEqual([row.code for row in payload.rows], ["SH.600519"])
+        self.assertEqual(batch.expected_rows, 1)
+        self.assertEqual(batch.row_count, 1)
+        BackfillService._validate_batch(plan, unit, batch)
+
+    def test_explicit_security_master_requires_every_requested_symbol(self) -> None:
+        plan = explicit_identity_plan("SH.600519", "SH.601318")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        with self.assertRaisesRegex(ProviderBackfillUnavailable, "requested symbols"):
+            self.source().fetch(unit, plan)
+
+    def test_explicit_symbols_cannot_fetch_universe(self) -> None:
+        plan = explicit_identity_plan("SH.600519", domain=BackfillDataDomain.UNIVERSE)
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        with self.assertRaisesRegex(ValueError, "only security_master"):
+            self.source().fetch(unit, plan)
 
     def test_security_master_rejects_duplicate_codes(self) -> None:
         class DuplicateBasic(FakeBaostock):

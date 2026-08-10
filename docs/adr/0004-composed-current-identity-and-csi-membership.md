@@ -28,6 +28,7 @@
 11. Canonical UniverseVersion 必须保存 `trust_state`、provider/source、`retrieved_at`、`system_as_of` 和 DatasetVersion；`normalized_current` 的 `available_at` 必须为 `NULL`，严格 PIT consumer/view 只能读取 `pit_verified`。
 12. 每日指数快照必须通过非空、成分数量、日变化率和 provider `updateDate` 质量门；当前 Security Master 必须通过最低行数和法定名称覆盖率，重复/错配身份直接 fail closed。真实 provider 调用必须有显式限流和单次超时。
 13. 成功并提交的 checkpoint 可恢复；尚未落库的 fetch payload 不宣称 durable staging。长区间真实运行按年度独立 plan 执行，失败只重取未成功年度。
+14. 为先建立少量研究标的的 Listing FK，允许 `--symbols` 与仅 `security_master` 的窄路径；请求代码必须全部出现在 BaoStock 基础表且法定名称覆盖率为 100%。显式 symbols 不得请求 Universe，历史 CSI Universe 仍必须 `--all-a-share`。
 
 ## 结果
 

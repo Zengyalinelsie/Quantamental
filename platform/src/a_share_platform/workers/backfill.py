@@ -223,8 +223,15 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
         blockers.append(
             f"provider={args.provider} does not execute every requested domain"
         )
-    if args.provider == "a_share_identity_universe" and not args.all_a_share:
-        blockers.append("provider=a_share_identity_universe requires --all-a-share")
+    if args.provider == "a_share_identity_universe":
+        requested_domains = set(args.domains or ())
+        if not args.all_a_share and requested_domains != {
+            BackfillDataDomain.SECURITY_MASTER.value
+        }:
+            blockers.append(
+                "provider=a_share_identity_universe with explicit symbols supports "
+                "only security_master; Universe requires --all-a-share"
+            )
     if args.all_a_share and args.provider != "a_share_identity_universe":
         blockers.append("--all-a-share requires provider=a_share_identity_universe")
     return blockers

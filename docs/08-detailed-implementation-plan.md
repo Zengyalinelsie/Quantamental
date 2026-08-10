@@ -338,6 +338,7 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 - [x] Futu `OpenQuoteContext` 沪深 raw 日线 source，不含账户或交易能力；
 - [x] PostgreSQL + Parquet canonical sink 和恢复测试；
 - [x] `--all-a-share` 独立执行门、BaoStock/CNInfo 当前沪深 Security Master 采集与 canonical persistence；
+- [x] 显式 symbols 的当前 Security Master 快速路径；只允许 `security_master`，Universe 仍强制 `--all-a-share`；
 - [x] 沪深 300/中证 500 每交易日历史快照采集、半开区间压缩与 research-only persistence；
 - [ ] 真实 A 股全市场 Security Master 回填；
 - [ ] 沪深 300/中证 500 历史 Universe 持久化；

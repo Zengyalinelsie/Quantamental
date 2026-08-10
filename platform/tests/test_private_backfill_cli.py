@@ -101,6 +101,75 @@ class PrivateBackfillCliTest(unittest.TestCase):
         self.assertEqual(payload["symbols"], [])
         execute.assert_called_once()
 
+    def test_explicit_identity_security_master_can_reach_injected_runtime(self) -> None:
+        output = io.StringIO()
+        args = [
+            "--provider",
+            "a_share_identity_universe",
+            "--start",
+            "2018-01-01",
+            "--end",
+            "2026-08-10",
+            "--symbols",
+            "SH.600519",
+            "SZ.000001",
+            "--domains",
+            "security_master",
+            "--database-url",
+            "postgresql://localhost/research",
+            "--parquet-root",
+            str(PRIVATE_LOCAL_STORAGE_ROOT / "test-explicit-identity"),
+            "--private-local-research-ack",
+            "--execute",
+        ]
+        with patch(
+            "a_share_platform.workers.backfill._execute_backfill",
+            return_value={
+                "execution_status": "succeeded",
+                "dataset_version_id": "dataset:explicit-identity:v1",
+            },
+        ) as execute, redirect_stdout(output):
+            exit_code = main(args)
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertFalse(payload["all_a_share"])
+        self.assertEqual(payload["symbols"], ["SH.600519", "SZ.000001"])
+        execute.assert_called_once()
+
+    def test_explicit_identity_universe_still_requires_all_a_share(self) -> None:
+        output = io.StringIO()
+        args = [
+            "--provider",
+            "a_share_identity_universe",
+            "--start",
+            "2018-01-01",
+            "--end",
+            "2018-12-31",
+            "--symbols",
+            "SH.600519",
+            "--domains",
+            "universe",
+            "--database-url",
+            "postgresql://localhost/research",
+            "--parquet-root",
+            str(PRIVATE_LOCAL_STORAGE_ROOT / "test-explicit-universe"),
+            "--private-local-research-ack",
+            "--execute",
+        ]
+        with (
+            patch("a_share_platform.workers.backfill._execute_backfill") as execute,
+            redirect_stdout(output),
+        ):
+            exit_code = main(args)
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 2)
+        self.assertTrue(
+            any("only security_master" in item for item in payload["blockers"])
+        )
+        execute.assert_not_called()
+
     def test_execute_rejects_remote_postgres_and_parquet_outside_controlled_root(self) -> None:
         cases = (
             (
