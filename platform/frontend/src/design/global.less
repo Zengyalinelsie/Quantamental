@@ -1,0 +1,76 @@
+@import './tokens.less';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  color: @text;
+  background: @layout;
+  font-family: @font-family;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid @primary;
+  outline-offset: 2px;
+}
+
+.numericCell {
+  display: inline-block;
+  min-width: 5ch;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.numericCell--missing {
+  color: @tertiary-text;
+}
+
+.workspaceState {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  padding: 32px 20px;
+  border: 1px solid @secondary-border;
+  border-radius: @radius;
+  background: @container;
+  text-align: center;
+}
+
+.workspaceState__inner {
+  display: grid;
+  max-width: 520px;
+  gap: 8px;
+  justify-items: center;
+}
+
+.workspaceState__label {
+  margin: 0;
+  color: @text;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.workspaceState__reason {
+  margin: 0;
+  color: @secondary-text;
+  font-size: 13px;
+  line-height: 1.6;
+}

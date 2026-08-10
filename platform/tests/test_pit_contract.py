@@ -1,5 +1,5 @@
-from datetime import date, datetime, timedelta, timezone
 import unittest
+from datetime import UTC, date, datetime, timedelta
 
 from a_share_platform.domain.pit import (
     DataTrustState,
@@ -8,9 +8,6 @@ from a_share_platform.domain.pit import (
     select_fact_as_of,
 )
 from a_share_platform.domain.run_context import DataMode
-
-
-UTC = timezone.utc
 
 
 def make_fact(*, trust_state: DataTrustState = DataTrustState.PIT_VERIFIED) -> FactObservation:
@@ -66,7 +63,12 @@ class FactObservationTest(unittest.TestCase):
 
     def test_timezone_free_timestamps_fail_closed(self) -> None:
         with self.assertRaisesRegex(ValueError, "announced_at must be timezone-aware"):
-            FactObservation(**{**make_fact().__dict__, "announced_at": datetime(2026, 3, 30, 10)})
+            FactObservation(
+                **{
+                    **make_fact().__dict__,
+                    "announced_at": datetime(2026, 3, 30, 10),  # noqa: DTZ001
+                }
+            )
 
     def test_public_revision_only_replaces_original_after_its_availability(self) -> None:
         original = make_fact()

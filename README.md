@@ -10,7 +10,9 @@
 
 ## 当前状态
 
-目前完成的是 Phase 0：来源审计、目标架构和第一批核心合同。尚未声称已经具备可盈利策略或可连接真实账户的能力。
+P0 领域合同已在提交 `0c32725` 完成，P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已通过 Capability Gate。P2 尚未开始。
+
+P1 页面会诚实显示尚未接入的业务能力及原因，不注入行情、股票、组合或研究结果假数据。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
 ```text
 sources/                     # 只读来源仓库
@@ -48,6 +50,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [详细系统 Spec](docs/07-detailed-system-spec.md)
 - [详细实施 Plan](docs/08-detailed-implementation-plan.md)
 - [Spec 与 Plan 一致性审查](docs/09-spec-plan-consistency-review.md)
+- [P1 实现与验证证据](docs/10-p1-implementation-evidence.md)
 
 ## 开发入口
 
@@ -57,6 +60,35 @@ PYTHON_BIN="${PYTHON_BIN:-python3.11}"  # 任一 Python 3.11+；本机可设为 
 "$PYTHON_BIN" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
 PYTHONPATH=src "$PYTHON_BIN" -m unittest discover -s tests -v
 PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q src
+```
+
+本地 PostgreSQL 使用专用主机端口 `55432`，避免与机器上已有的 PostgreSQL `5432` 冲突：
+
+```bash
+cd platform
+PYTHON_BIN="${PYTHON_BIN:-python3.11}"
+docker compose up -d postgres
+PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.adapters.postgres.cli
+PYTHONPATH=src "$PYTHON_BIN" -m uvicorn a_share_platform.api.app:app --reload
+```
+
+另开终端启动前端，浏览器访问 <http://127.0.0.1:5173/>：
+
+```bash
+cd platform/frontend
+npm ci
+PYTHON_BIN=python3.11 npm run generate:api  # 可替换为任一 Python 3.11+
+npm run dev
+```
+
+运行 P1 全量验证；若要包含真实 PostgreSQL migration smoke，显式传入本地验证库 URL：
+
+```bash
+cd platform
+PYTHON_BIN="$PWD/.venv/bin/python" \
+ASP_DATABASE_URL=postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+./ci/verify.sh
+npm --prefix frontend audit --audit-level=low
 ```
 
 项目采用模块化单体起步。数据、研究、组合、交易和 Agent 有清晰边界，但第一版不拆微服务。

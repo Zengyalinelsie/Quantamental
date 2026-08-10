@@ -1,10 +1,12 @@
 # 实施路线图
 
+> 状态说明（2026-08-10）：本文保留早期阶段切分作为历史路线概要，其 P0–P8 编号不再作为当前执行编号。现行 P0–P11 阶段、工作包、依赖和 Capability Gate 以 `docs/08-detailed-implementation-plan.md` 为真源；Spec 与 Plan 的裁决依据见 `docs/09-spec-plan-consistency-review.md`。
+
 ## 总原则
 
 按可验证的纵向切片建设。每个阶段必须产出真实数据、可运行代码、测试、版本化 Artifact 和明确的未完成项，不能只增加页面和类名。
 
-## P0：权威核心与来源审计（当前阶段）
+## P0：权威核心与来源审计（旧路线图编号）
 
 目标：建立新仓库边界、领域语言和科学门。
 
@@ -138,4 +140,3 @@
 1. 为 `Security/Listing/UniverseMembership` 写第一版领域合同和历史有效区间测试；
 2. 选择 A 股最小真实股票池和一个财务/公告数据来源，做字段与许可盘点；
 3. 用 3–5 家公司、两个财报修订案例建立 `FactObservation` 的真实 fixture，验证 PIT 查询。
-

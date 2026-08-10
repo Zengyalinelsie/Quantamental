@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
 import unittest
+from datetime import UTC, datetime
 
 from a_share_platform.domain.investment_view import (
     ExpectedReturnDistribution,
@@ -32,7 +32,7 @@ def make_view(
     return InvestmentView(
         view_id="view:001",
         security_id="security:CN:600519:XSHG",
-        decision_time=datetime(2026, 8, 10, 7, 30, tzinfo=timezone.utc),
+        decision_time=datetime(2026, 8, 10, 7, 30, tzinfo=UTC),
         horizon_trading_days=60,
         expected_return=ExpectedReturnDistribution(point, -0.12, 0.04, 0.19),
         confidence=0.62,
@@ -100,14 +100,15 @@ class InvestmentViewTest(unittest.TestCase):
             InvestmentComponentStatus.UNAVAILABLE,
             InvestmentComponentStatus.NOT_APPLICABLE,
         ):
-            with self.subTest(status=status):
-                with self.assertRaisesRegex(ValueError, "must not have a numeric contribution"):
-                    InvestmentComponent(
-                        "event",
-                        status,
-                        expected_return_contribution=0.0,
-                        status_reason="不能把非量化状态伪装为零",
-                    )
+            with self.subTest(status=status), self.assertRaisesRegex(
+                ValueError, "must not have a numeric contribution"
+            ):
+                InvestmentComponent(
+                    "event",
+                    status,
+                    expected_return_contribution=0.0,
+                    status_reason="不能把非量化状态伪装为零",
+                )
 
     def test_non_quantified_components_require_explicit_reason(self) -> None:
         for status in (
@@ -115,9 +116,10 @@ class InvestmentViewTest(unittest.TestCase):
             InvestmentComponentStatus.UNAVAILABLE,
             InvestmentComponentStatus.NOT_APPLICABLE,
         ):
-            with self.subTest(status=status):
-                with self.assertRaisesRegex(ValueError, "requires an explicit reason"):
-                    InvestmentComponent("event", status)
+            with self.subTest(status=status), self.assertRaisesRegex(
+                ValueError, "requires an explicit reason"
+            ):
+                InvestmentComponent("event", status)
 
     def test_view_rejects_unordered_return_distribution(self) -> None:
         with self.assertRaisesRegex(ValueError, "p10 <= p50 <= p90"):

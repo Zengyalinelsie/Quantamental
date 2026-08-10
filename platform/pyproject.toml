@@ -4,13 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "a-share-platform"
-version = "0.1.0"
+version = "0.2.0"
 description = "Point-in-time A-share fundamental research and execution platform"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "fastapi>=0.116,<0.117",
+    "psycopg[binary]>=3.2,<4",
+    "uvicorn>=0.35,<1",
+]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
+dev = ["httpx>=0.28,<1", "pytest>=8", "ruff>=0.6", "mypy>=1.11"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -21,4 +25,3 @@ target-version = "py311"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-

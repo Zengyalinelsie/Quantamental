@@ -7,11 +7,12 @@ later backfill was already present in the warehouse.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
 from math import isfinite
-from typing import Iterable, TypeAlias
+from typing import TypeAlias
 
 from .run_context import DataMode
 
@@ -56,7 +57,7 @@ class FactObservation:
             if not str(getattr(self, name) or "").strip():
                 raise ValueError(f"{name} must not be empty")
         if not isinstance(self.report_period_end, date):
-            raise ValueError("report_period_end must be a date")
+            raise TypeError("report_period_end must be a date")
         announced_at = _require_aware(self.announced_at, "announced_at")
         available_at = _require_aware(self.available_at, "available_at")
         known_from = _require_aware(self.known_from, "known_from")

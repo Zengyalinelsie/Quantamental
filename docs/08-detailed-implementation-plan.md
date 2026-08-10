@@ -176,14 +176,14 @@ P0 Gate 未由用户批准前，不进入大规模实现。
 
 任务：
 
-- [ ] 确定 package layout：`domain/application/ports/adapters/api/workers`；
-- [ ] PostgreSQL、对象存储和 Parquet 的本地配置；
-- [ ] migration runner；
-- [ ] settings 和 secret loading；
-- [ ] domain dependency lint；
-- [ ] structured logging、trace_id/run_id；
-- [ ] CI：Python、类型、lint、test、migration、frontend build；
-- [ ] dev/test/prod 配置隔离。
+- [x] 确定 package layout：`domain/application/ports/adapters/api/workers`；
+- [x] PostgreSQL、对象存储和 Parquet 的本地配置；
+- [x] migration runner；
+- [x] settings 和 secret loading；
+- [x] domain dependency lint；
+- [x] structured logging、trace_id/run_id；
+- [x] CI：Python、类型、lint、test、migration、frontend build；
+- [x] dev/test/prod 配置隔离。
 
 交付：`compose.yaml`、migration 0001、CI、Architecture Test。
 
@@ -191,13 +191,13 @@ P0 Gate 未由用户批准前，不进入大规模实现。
 
 任务：
 
-- [ ] `DatasetVersion`；
-- [ ] `RunRecord`；
-- [ ] `Artifact`；
-- [ ] `LineageEdge`；
-- [ ] immutable content hash；
-- [ ] run 状态机和失败原因；
-- [ ] API 响应统一 context envelope。
+- [x] `DatasetVersion`；
+- [x] `RunRecord`；
+- [x] `Artifact`；
+- [x] `LineageEdge`；
+- [x] immutable content hash；
+- [x] run 状态机和失败原因；
+- [x] API 响应统一 context envelope。
 
 测试：重复写幂等、hash 冲突、失败保留、版本不可覆盖。
 
@@ -207,14 +207,14 @@ P0 Gate 未由用户批准前，不进入大规模实现。
 
 任务：
 
-- [ ] React 19/Vite 7/AntD 6/ProTable/TanStack Query/Zustand/Less/Recharts；
-- [ ] 迁移 `#2F5EA8` 冷调蓝灰 token；
-- [ ] 3px 圆角、无阴影、高密度表格；
-- [ ] 数据质量/审批/涨跌/严重度四组语义色；
-- [ ] `NumericCell`；
-- [ ] `PageHeading`、`WorkspaceUnavailable`、`EvidenceDrawer`；
-- [ ] loading/error/empty/blocked/ready 五态组件；
-- [ ] 320/768/1024/1440 responsive contract。
+- [x] React 19/Vite 7/AntD 6/ProTable/TanStack Query/Zustand/Less/Recharts；
+- [x] 迁移 `#2F5EA8` 冷调蓝灰 token；
+- [x] 3px 圆角、无阴影、高密度表格；
+- [x] 数据质量/审批/涨跌/严重度四组语义色；
+- [x] `NumericCell`；
+- [x] `PageHeading`、`WorkspaceUnavailable`、`EvidenceDrawer`；
+- [x] loading/error/empty/blocked/ready 五态组件；
+- [x] 320/768/1024/1440 responsive contract。
 
 禁止：复制原工作树未提交代码而不记录来源；引入另一套设计系统。
 
@@ -222,35 +222,37 @@ P0 Gate 未由用户批准前，不进入大规模实现。
 
 任务：
 
-- [ ] `/desk /research /factors /portfolios /monitoring /system`；
-- [ ] 280/72 desktop sidebar；
-- [ ] mobile Drawer；
-- [ ] 全局证券搜索；
-- [ ] as_of/system_as_of；
-- [ ] 分离的 `data_mode = current/strict`；
-- [ ] 分离的 `deployment_stage = research/shadow/paper/limited_live`；
-- [ ] 非法组合由服务端拒绝；
-- [ ] Universe/Portfolio context；
-- [ ] 环境和只读/交易状态；
-- [ ] 旧路由 redirect；
-- [ ] URL query 保存筛选/排序；
-- [ ] 不默认选择 fixture 股票。
+- [x] `/desk /research /factors /portfolios /monitoring /system`；
+- [x] 280/72 desktop sidebar；
+- [x] mobile Drawer；
+- [x] 全局证券搜索；
+- [x] as_of/system_as_of；
+- [x] 分离的 `data_mode = current_research/strict_historical`；
+- [x] 分离的 `deployment_stage = research/shadow/paper/limited_live`；
+- [x] 非法组合由服务端拒绝；
+- [x] Universe/Portfolio context；
+- [x] 环境和只读/交易状态；
+- [x] 旧路由 redirect；
+- [x] URL query 保存筛选/排序；
+- [x] 不默认选择 fixture 股票。
 
 ### P1-W05：FastAPI 只读骨架
 
 任务：
 
-- [ ] health/version/capability；
-- [ ] dataset/run/artifact read API；
-- [ ] context envelope；
-- [ ] problem details 错误；
-- [ ] OpenAPI 与前端 type generation；
-- [ ] anonymous read-only 默认；写入口先关闭；
-- [ ] AuthN/AuthZ ports、服务端 permission policy 和审计主体合同；
-- [ ] Viewer/Researcher/Reviewer/Data Operator/PM/Trader/Admin/Agent 的 deny-by-default 矩阵测试；
-- [ ] 不把前端隐藏、本地字符串或请求 header 冒充可信身份。
+- [x] health/version/capability；
+- [x] dataset/run/artifact read API；
+- [x] context envelope；
+- [x] problem details 错误；
+- [x] OpenAPI 与前端 type generation；
+- [x] anonymous read-only 默认；写入口先关闭；
+- [x] AuthN/AuthZ ports、服务端 permission policy 和审计主体合同；
+- [x] Viewer/Researcher/Reviewer/Data Operator/PM/Trader/Admin/Agent 的 deny-by-default 矩阵测试；
+- [x] 不把前端隐藏、本地字符串或请求 header 冒充可信身份。
 
 ### Gate P1
+
+状态（2026-08-10）：Capability Gate 已通过。实现、迁移、TDD、浏览器矩阵和限制证据见 `docs/10-p1-implementation-evidence.md`。此状态不代表任何模型科学有效，也不授予真实交易能力。
 
 - 单元/集成/前端/构建通过；
 - 六项导航和最新机构视觉通过视觉回归；

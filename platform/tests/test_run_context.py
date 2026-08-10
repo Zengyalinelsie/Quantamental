@@ -37,9 +37,10 @@ class RunContextTest(unittest.TestCase):
             DeploymentStage.PAPER,
             DeploymentStage.LIMITED_LIVE,
         ):
-            with self.subTest(stage=stage):
-                with self.assertRaisesRegex(InvalidRunContextError, "cannot be combined"):
-                    RunContext(DataMode.STRICT_HISTORICAL, stage)
+            with self.subTest(stage=stage), self.assertRaisesRegex(
+                InvalidRunContextError, "cannot be combined"
+            ):
+                RunContext(DataMode.STRICT_HISTORICAL, stage)
 
     def test_string_values_are_normalized_to_enum_members(self) -> None:
         context = RunContext("current_research", "shadow")
