@@ -101,6 +101,25 @@ class BackfillServiceTest(unittest.TestCase):
         self.assertTrue(all(unit.end_date == date(2019, 12, 31) for unit in master))
         self.assertEqual(len(universe), 4)
 
+    def test_private_universe_plan_can_select_one_explicit_csi_benchmark(self) -> None:
+        value = build_private_local_backfill_plan(
+            plan_id="plan:csi500-only:v1",
+            provider_id="a_share_identity_universe",
+            symbols=(),
+            all_a_share=True,
+            domains=(BackfillDataDomain.UNIVERSE,),
+            universe_benchmark_codes=("000905",),
+            start_date=date(2026, 1, 1),
+            end_date=date(2026, 8, 10),
+            created_at=NOW,
+        )
+
+        self.assertEqual(
+            tuple(scope.scope_id for scope in value.scopes),
+            ("index:000905",),
+        )
+        self.assertEqual(len(BackfillPlanner().work_units(value)), 1)
+
     def test_full_market_plan_cannot_hide_symbol_scoped_domains_or_explicit_symbols(self) -> None:
         with self.assertRaisesRegex(ValueError, "only security_master and universe"):
             build_private_local_backfill_plan(

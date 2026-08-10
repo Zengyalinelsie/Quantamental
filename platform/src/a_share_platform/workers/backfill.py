@@ -59,6 +59,12 @@ def _parser() -> argparse.ArgumentParser:
         choices=[item.value for item in BackfillDataDomain],
         help="explicit data domains; each executable provider enforces its own subset",
     )
+    parser.add_argument(
+        "--benchmarks",
+        nargs="+",
+        choices=("000300", "000905"),
+        help="explicit CSI benchmark subset for an all-A-share universe backfill",
+    )
     parser.add_argument("--database-url", help="explicit local PostgreSQL DSN")
     parser.add_argument("--parquet-root", type=Path, help="explicit local Parquet root")
     parser.add_argument(
@@ -153,6 +159,7 @@ def _default_plan_id(args: argparse.Namespace, private_request: bool) -> str:
             args.end.isoformat(),
             ",".join(args.symbols or ()),
             ",".join(args.domains),
+            ",".join(args.benchmarks or ("000300", "000905")),
             "all_a_share" if args.all_a_share else "explicit_symbols",
         )
     ).encode("utf-8")
@@ -175,6 +182,9 @@ def _build_plan(
             start_date=args.start,
             end_date=args.end,
             created_at=now,
+            universe_benchmark_codes=(
+                None if args.benchmarks is None else tuple(args.benchmarks)
+            ),
         )
     return build_csi_backfill_plan(
         plan_id=plan_id,

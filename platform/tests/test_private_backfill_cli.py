@@ -9,6 +9,30 @@ from a_share_platform.workers.backfill import PRIVATE_LOCAL_STORAGE_ROOT, main
 
 
 class PrivateBackfillCliTest(unittest.TestCase):
+    def test_universe_dry_run_can_select_one_explicit_csi_benchmark(self) -> None:
+        output = io.StringIO()
+        with redirect_stdout(output):
+            exit_code = main(
+                [
+                    "--provider",
+                    "a_share_identity_universe",
+                    "--start",
+                    "2026-01-01",
+                    "--end",
+                    "2026-08-10",
+                    "--all-a-share",
+                    "--domains",
+                    "universe",
+                    "--benchmarks",
+                    "000905",
+                ]
+            )
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["scopes"], ["index:000905"])
+        self.assertEqual(payload["work_unit_count"], 1)
+
     def test_execute_requires_explicit_private_ack_database_symbols_and_domains(self) -> None:
         output = io.StringIO()
         with redirect_stdout(output):

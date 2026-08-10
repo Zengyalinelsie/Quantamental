@@ -100,6 +100,7 @@ def build_private_local_backfill_plan(
     end_date: date,
     created_at: datetime,
     all_a_share: bool = False,
+    universe_benchmark_codes: tuple[str, ...] | None = None,
 ) -> BackfillPlan:
     """Build an explicitly bounded, non-PIT private local research plan."""
 
@@ -113,6 +114,23 @@ def build_private_local_backfill_plan(
         {BackfillDataDomain.SECURITY_MASTER, BackfillDataDomain.UNIVERSE}
     ):
         raise ValueError("all_a_share supports only security_master and universe domains")
+    selected_benchmarks = (
+        ("000300", "000905")
+        if universe_benchmark_codes is None
+        else tuple(universe_benchmark_codes)
+    )
+    if not selected_benchmarks or len(selected_benchmarks) != len(
+        set(selected_benchmarks)
+    ):
+        raise ValueError("universe benchmark codes must be non-empty and unique")
+    unsupported_benchmarks = set(selected_benchmarks).difference({"000300", "000905"})
+    if unsupported_benchmarks:
+        raise ValueError("universe benchmark codes support only 000300 and 000905")
+    if (
+        universe_benchmark_codes is not None
+        and BackfillDataDomain.UNIVERSE not in selected_domains
+    ):
+        raise ValueError("universe benchmark selection requires the universe domain")
     symbol_markets = {
         "SH": "XSHG",
         "SZ": "XSHE",
@@ -134,7 +152,8 @@ def build_private_local_backfill_plan(
     ):
         scopes.append(A_SHARE_SECURITY_MASTER_SCOPE)
     if BackfillDataDomain.UNIVERSE in selected_domains:
-        scopes.extend((CSI_300_SCOPE, CSI_500_SCOPE))
+        benchmark_scopes = {"000300": CSI_300_SCOPE, "000905": CSI_500_SCOPE}
+        scopes.extend(benchmark_scopes[code] for code in selected_benchmarks)
     if any(
         domain
         in {
