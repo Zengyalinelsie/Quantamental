@@ -355,12 +355,12 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 ### P3-W02：Canonical Metric Registry
 
-- [ ] 三表字段 code、名称、单位、币种、符号；
-- [ ] provider field 显式映射；
-- [ ] 禁止模糊映射进入生产；
-- [ ] mapping version；
-- [ ] 财务平衡/跨表质量规则；
-- [ ] unmapped queue。
+- [x] 三表字段 code、名称、单位、币种、符号；
+- [x] provider field 显式映射；
+- [x] 禁止模糊映射进入生产；
+- [x] mapping version；
+- [x] 财务平衡/跨表质量规则；
+- [x] unmapped queue。
 
 ### P3-W03：PIT Financial Repository
 

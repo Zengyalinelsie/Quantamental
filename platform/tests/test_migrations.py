@@ -51,6 +51,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0004_market_data.sql",
                 "0005_data_backfill.sql",
                 "0006_disclosure_evidence.sql",
+                "0007_canonical_metrics.sql",
             ),
         )
 
@@ -68,6 +69,21 @@ class MigrationRunnerTest(unittest.TestCase):
             "available_at",
             "first_tradable_at",
             "supersedes_disclosure_id",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, sql)
+
+    def test_metric_registry_migration_blocks_fuzzy_production_mappings(self) -> None:
+        sql = (PLATFORM_ROOT / "migrations" / "0007_canonical_metrics.sql").read_text(
+            encoding="utf-8"
+        )
+        for contract in (
+            "CREATE TABLE canonical_metrics",
+            "CREATE TABLE metric_mapping_versions",
+            "CREATE TABLE provider_field_mappings",
+            "method <> 'fuzzy' OR production_allowed = FALSE",
+            "CREATE TABLE financial_quality_rules",
+            "CREATE TABLE unmapped_metric_fields",
         ):
             with self.subTest(contract=contract):
                 self.assertIn(contract, sql)
