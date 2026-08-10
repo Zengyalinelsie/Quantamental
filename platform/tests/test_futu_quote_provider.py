@@ -2,7 +2,15 @@ import unittest
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+from a_share_platform.adapters.providers.backfill_payloads import DailyObservationPayload
+from a_share_platform.adapters.providers.futu_backfill import FutuQuoteBackfillSource
 from a_share_platform.adapters.providers.futu_quote import FutuQuoteDailyReader
+from a_share_platform.application.backfill import (
+    BackfillPlanner,
+    build_private_local_backfill_plan,
+)
+from a_share_platform.domain.backfill import BackfillDataDomain
+from a_share_platform.domain.pit import DataTrustState
 
 NOW = datetime(2026, 8, 10, 9, 0, tzinfo=UTC)
 
@@ -83,7 +91,7 @@ class FutuQuoteProviderTest(unittest.TestCase):
         self.assertEqual(result.metadata.cutoff_date, date(2018, 1, 2))
         self.assertEqual(result.metadata.adjustment_mode, "unadjusted")
         self.assertIn(("volume", "shares"), result.metadata.units)
-        self.assertTrue(any("not licensed" in item for item in result.metadata.warnings))
+        self.assertTrue(any("private local" in item for item in result.metadata.warnings))
         self.assertEqual(module.context.calls[0]["autype"], "NONE")
         self.assertTrue(module.context.closed)
 
@@ -100,6 +108,32 @@ class FutuQuoteProviderTest(unittest.TestCase):
         forbidden = "Trade" + "Context"
         self.assertNotIn(forbidden, source)
         self.assertIn("OpenQuoteContext", source)
+
+    def test_quote_reader_can_stage_explicit_private_local_raw_bars(self) -> None:
+        module = FakeFutuModule()
+        reader = FutuQuoteDailyReader(
+            module_loader=lambda _name: module,
+            clock=lambda: NOW,
+        )
+        source = FutuQuoteBackfillSource(reader=reader)
+        plan = build_private_local_backfill_plan(
+            plan_id="private:futu:v1",
+            provider_id="futu_quote",
+            symbols=("SH.600519",),
+            domains=(BackfillDataDomain.RAW_DAILY_BAR,),
+            start_date=date(2018, 1, 1),
+            end_date=date(2018, 1, 5),
+            created_at=NOW,
+        )
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = source.fetch(unit, plan)
+
+        self.assertIsInstance(batch.payload, DailyObservationPayload)
+        self.assertEqual(batch.trust_state, DataTrustState.NORMALIZED_CURRENT)
+        self.assertEqual(batch.metadata.provider_id, "futu_quote")
+        self.assertTrue(any("private local" in item for item in batch.metadata.warnings))
+        self.assertEqual(module.context.calls[0]["autype"], "NONE")
 
 
 if __name__ == "__main__":

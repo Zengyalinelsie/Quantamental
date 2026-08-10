@@ -10,7 +10,7 @@
 
 ## 当前状态
 
-P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；320/768/1024/1440 浏览器视觉证据和私人本地真实数据回填仍在补齐，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository，P3-W04–W06 仍在进行。
+P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；当前已增加显式 ack 的私人本地 `normalized_current` 行情/日历回填路径，但 320/768/1024/1440 浏览器视觉证据和真实全范围回填仍未完成，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository，P3-W04–W06 仍在进行。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -55,6 +55,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P2 实现与验证证据](docs/12-p2-implementation-evidence.md)
 - [P3 实现与验证证据](docs/13-p3-implementation-evidence.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
+- [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 
 ## 开发入口
 
@@ -64,7 +65,36 @@ PYTHON_BIN="${PYTHON_BIN:-python3.11}"  # 任一 Python 3.11+；本机可设为 
 "$PYTHON_BIN" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
 PYTHONPATH=src "$PYTHON_BIN" -m unittest discover -s tests -v
 PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q src
+"$PYTHON_BIN" -m ruff check src tests
+"$PYTHON_BIN" -m mypy src
 ```
+
+### 私人本地真实数据回填
+
+默认命令仍是只读 dry-run。真实执行仅支持显式小范围 `normalized_current` 数据，并要求本地 ack、symbols、domains、数据库和 Parquet 路径。以下命令只展示调用格式，不应在未确认供应商具体保存条款、未完成 migration 和 Security Master 映射前直接扩大范围：
+
+```bash
+cd platform
+PYTHON_BIN="$PWD/.venv/bin/python"
+# 需要真实 source 时显式安装；默认测试不要求 provider SDK 或网络
+"$PYTHON_BIN" -m pip install -e '.[data]'
+PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
+  --provider baostock_sdk \
+  --start 2018-01-01 --end 2018-12-31 \
+  --symbols SH.600519 SZ.000001 \
+  --domains raw_daily_bar trading_calendar
+
+PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
+  --provider baostock_sdk \
+  --start 2018-01-01 --end 2018-12-31 \
+  --symbols SH.600519 SZ.000001 \
+  --domains trading_calendar \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --parquet-root ./var/private-research/parquet \
+  --private-local-research-ack --execute
+```
+
+上面的 execute 示例先回填不依赖 Listing FK 的交易日历。raw 日线必须先存在对应 symbol 在各日期唯一有效的 Security Master/Listing 映射，否则 canonical sink 会 fail closed。Futu 可将 provider 改为 `futu_quote`，但当前只支持 `raw_daily_bar`，且只使用 `OpenQuoteContext`。这些数据禁止外部分发、`strict_historical`、生产决策和 `pit_verified`；测试没有替用户执行真实下载或入库。
 
 本地 PostgreSQL 使用专用主机端口 `55432`，避免与机器上已有的 PostgreSQL `5432` 冲突：
 

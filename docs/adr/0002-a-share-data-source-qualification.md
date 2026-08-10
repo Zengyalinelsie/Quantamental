@@ -2,6 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-08-10
+- 补充：私人本地研究的受限持久化例外由 ADR-0003 定义；本 ADR 对通用 raw bulk、外部分发、严格历史和生产用途的禁止仍有效
 
 ## 背景
 
@@ -28,8 +29,8 @@ PyPI 公共元数据在 2026-08-10 显示 Baostock 客户端为 BSD、AkShare �
 2. AkShare 是字段缺失和北交所的备用候选；其客户端 MIT 不提升上游网页数据资格。正式 adapter 接入前仍要逐端点记录来源条款、频率和保存期限。
 3. 上交所、深交所、北交所是证券身份、挂牌状态、交易日历、市场规则和公司行动的权威核验源；巨潮/交易所/公司披露在 P3 承担公告权威源。
 4. Baostock/AkShare 观察的 trust ceiling 为 `normalized_current`。它们不能自行产生 `pit_verified`，也不能用于 `strict_historical` 或生产决策。
-5. 当前没有任何免费源获批用于批量原始持久化、对外再分发或 Limited Live。生产/商业使用前必须完成数据条款审查或采购有明确授权的结构化供应商。
-6. P2 不进行全市场批量回填。只允许小型、版本化、标明来源和用途的合同 fixture，以及明确的 current 研究调用。
+5. 当前没有任何免费源获批用于通用 `raw_bulk_persistence`、对外再分发或 Limited Live。ADR-0003 后续增加的 `private_local_research` 是受限本地例外，不改变生产/商业使用前的数据条款审查或采购要求。
+6. P2 不进行未经限定的全市场批量回填。除小型、版本化合同 fixture 和明确 current 研究调用外，ADR-0003 只允许显式 ack、symbols、domains 和本地目标的 `normalized_current` 私人回填。
 7. Fallback 生成独立来源观察和诊断，不覆盖主源记录；来源冲突必须保留。
 8. 字段级决策由 `ProviderRegistry` 执行，文档矩阵见 `docs/11-p2-data-source-coverage-matrix.md`。
 

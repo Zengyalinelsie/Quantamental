@@ -327,6 +327,21 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 - [x] 不可交易/退市明确展示；
 - [x] ProTable 列配置和 URL view。
 
+### P2-W06：私人本地真实数据回填
+
+状态：`in_progress`。该工作包补充数据覆盖，不降低 P2/P3 的 PIT 和来源资格标准。
+
+- [x] 独立 `private_local_research` 用途与 retention 明确禁止优先规则；
+- [x] 仅 `normalized_current`，禁止 `pit_verified`、strict historical、生产决策和外部分发；
+- [x] 显式 symbols/domains、年度 checkpoint、质量/覆盖率和 DatasetVersion；
+- [x] BaoStock SDK 沪深 raw 日线/日历 source；
+- [x] Futu `OpenQuoteContext` 沪深 raw 日线 source，不含账户或交易能力；
+- [x] PostgreSQL + Parquet canonical sink 和恢复测试；
+- [ ] 真实 A 股全市场 Security Master 回填；
+- [ ] 沪深 300/中证 500 历史 Universe 持久化；
+- [ ] 2018+ 股本和公司行动合格来源与入库；
+- [ ] Data Operator 在确认具体数据条款后执行真实小样本并保存质量/覆盖率证据。
+
 ### Gate P2
 
 状态（2026-08-10）：实现、迁移、自动化测试和真实 HTTP 接线已完成；Capability Gate 暂不宣称通过。浏览器控制当前无可用实例，交付清单要求的 320/768/1024/1440 截图与视觉回归尚待补齐。证据和剩余项见 `docs/12-p2-implementation-evidence.md`。

@@ -20,6 +20,7 @@ from a_share_platform.domain.backfill import (
     BackfillJobStatus,
     BackfillPlan,
     BackfillQualification,
+    BackfillScope,
     BackfillScopeKind,
     BackfillWorkUnit,
     DatasetCoverageReport,
@@ -35,7 +36,7 @@ from a_share_platform.ports.backfill import (
     BackfillSink,
     BackfillSource,
 )
-from a_share_platform.ports.governance import GovernanceRepository
+from a_share_platform.ports.governance import DatasetVersionRepository
 
 _MARKETS = ("XSHG", "XSHE", "XBSE")
 _INDEX_MARKETS = ("XSHG", "XSHE")
@@ -89,6 +90,73 @@ def build_csi_backfill_plan(
     )
 
 
+def build_private_local_backfill_plan(
+    *,
+    plan_id: str,
+    provider_id: str,
+    symbols: tuple[str, ...],
+    domains: tuple[BackfillDataDomain, ...],
+    start_date: date,
+    end_date: date,
+    created_at: datetime,
+) -> BackfillPlan:
+    """Build an explicitly bounded, non-PIT private local research plan."""
+
+    selected_domains = tuple(BackfillDataDomain(item) for item in domains)
+    selected_symbols = tuple(symbols)
+    if not selected_symbols:
+        raise ValueError("private local research backfill requires explicit symbols")
+    symbol_markets = {
+        "SH": "XSHG",
+        "SZ": "XSHE",
+        "BJ": "XBSE",
+    }
+    markets = tuple(
+        market
+        for market in _MARKETS
+        if any(symbol_markets.get(symbol[:2]) == market for symbol in selected_symbols)
+    )
+    scopes: list[BackfillScope] = []
+    if any(
+        domain in {BackfillDataDomain.SECURITY_MASTER, BackfillDataDomain.TRADING_CALENDAR}
+        for domain in selected_domains
+    ):
+        scopes.append(A_SHARE_SECURITY_MASTER_SCOPE)
+    if BackfillDataDomain.UNIVERSE in selected_domains:
+        scopes.extend((CSI_300_SCOPE, CSI_500_SCOPE))
+    if any(
+        domain
+        in {
+            BackfillDataDomain.RAW_DAILY_BAR,
+            BackfillDataDomain.SHARE_CAPITAL,
+            BackfillDataDomain.CORPORATE_ACTION,
+        }
+        for domain in selected_domains
+    ):
+        scopes.append(
+            BackfillScope(
+                scope_id="symbols:explicit",
+                name="显式私人本地研究标的",
+                kind=BackfillScopeKind.EXPLICIT_SYMBOLS,
+                symbols=selected_symbols,
+            )
+        )
+    return BackfillPlan(
+        plan_id=plan_id,
+        provider_id=provider_id,
+        scopes=tuple(scopes),
+        domains=selected_domains,
+        start_date=start_date,
+        end_date=end_date,
+        created_at=created_at,
+        output_trust_state=DataTrustState.NORMALIZED_CURRENT,
+        price_adjustment=PriceAdjustment.UNADJUSTED,
+        provider_use=ProviderUse.PRIVATE_LOCAL_RESEARCH,
+        symbols=selected_symbols,
+        markets=markets,
+    )
+
+
 class BackfillPlanner:
     """Create deterministic annual work units suitable for checkpoints."""
 
@@ -100,14 +168,23 @@ class BackfillPlanner:
         index_scopes = tuple(
             scope for scope in plan.scopes if scope.kind is BackfillScopeKind.INDEX_UNIVERSE
         )
+        explicit_scopes = tuple(
+            scope for scope in plan.scopes if scope.kind is BackfillScopeKind.EXPLICIT_SYMBOLS
+        )
         for domain in plan.domains:
             scope_markets: tuple[tuple[str, str | None], ...]
             if domain is BackfillDataDomain.SECURITY_MASTER or domain is BackfillDataDomain.TRADING_CALENDAR:
                 scope_markets = tuple(
-                    (scope.scope_id, market) for scope in master_scopes for market in _MARKETS
+                    (scope.scope_id, market) for scope in master_scopes for market in plan.markets
                 )
             elif domain is BackfillDataDomain.UNIVERSE:
                 scope_markets = tuple((scope.scope_id, None) for scope in index_scopes)
+            elif explicit_scopes:
+                scope_markets = tuple(
+                    (scope.scope_id, market)
+                    for scope in explicit_scopes
+                    for market in plan.markets
+                )
             else:
                 scope_markets = tuple(
                     (scope.scope_id, market)
@@ -164,7 +241,7 @@ class BackfillService:
         repository: BackfillRepository,
         clock: Callable[[], datetime],
         planner: BackfillPlanner | None = None,
-        governance_repository: GovernanceRepository | None = None,
+        governance_repository: DatasetVersionRepository | None = None,
     ) -> None:
         self._registry = registry
         self._repository = repository
@@ -304,10 +381,19 @@ class BackfillService:
             "retrieval time and historical dates do not prove PIT availability",
         }
         for domain in plan.domains:
-            markets = _MARKETS if domain in {
-                BackfillDataDomain.SECURITY_MASTER,
-                BackfillDataDomain.TRADING_CALENDAR,
-            } else _INDEX_MARKETS
+            markets = (
+                plan.markets
+                if plan.provider_use is ProviderUse.PRIVATE_LOCAL_RESEARCH
+                else (
+                    _MARKETS
+                    if domain
+                    in {
+                        BackfillDataDomain.SECURITY_MASTER,
+                        BackfillDataDomain.TRADING_CALENDAR,
+                    }
+                    else _INDEX_MARKETS
+                )
+            )
             for field in _DOMAIN_FIELDS[domain]:
                 for market in markets:
                     try:
@@ -318,10 +404,10 @@ class BackfillService:
                             f"field={field.value}, market={market}"
                         )
                         continue
-                    if not policy.allows(ProviderUse.RAW_BULK_PERSISTENCE, market):
+                    if not policy.allows(plan.provider_use, market):
                         blockers.add(
                             f"provider={plan.provider_id} is not qualified for "
-                            f"use={ProviderUse.RAW_BULK_PERSISTENCE.value}, "
+                            f"use={plan.provider_use.value}, "
                             f"field={field.value}, market={market}, "
                             f"license_status={policy.license_status.value}"
                         )

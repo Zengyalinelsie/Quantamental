@@ -34,6 +34,7 @@ class ProviderUse(str, Enum):
     LOCAL_FIXTURE = "local_fixture"
     CURRENT_RESEARCH = "current_research"
     INTERNAL_DISPLAY = "internal_display"
+    PRIVATE_LOCAL_RESEARCH = "private_local_research"
     STRICT_HISTORICAL = "strict_historical"
     RAW_BULK_PERSISTENCE = "raw_bulk_persistence"
     EXTERNAL_REDISTRIBUTION = "external_redistribution"
@@ -66,6 +67,7 @@ class ProviderFieldPolicy:
     trust_ceiling: DataTrustState
     coverage: CoverageStatus = CoverageStatus.AVAILABLE
     warning: str = ""
+    retention_prohibited: bool = False
 
     def __post_init__(self) -> None:
         if not self.provider_id.strip():
@@ -81,6 +83,8 @@ class ProviderFieldPolicy:
         object.__setattr__(self, "license_status", LicenseStatus(self.license_status))
         object.__setattr__(self, "trust_ceiling", DataTrustState(self.trust_ceiling))
         object.__setattr__(self, "coverage", CoverageStatus(self.coverage))
+        if type(self.retention_prohibited) is not bool:
+            raise TypeError("retention_prohibited must be a boolean")
         if not self.markets:
             raise ValueError("markets must not be empty")
         if self.coverage is CoverageStatus.PARTIAL and not self.warning.strip():
@@ -92,6 +96,11 @@ class ProviderFieldPolicy:
         }
         if self.license_status is not LicenseStatus.VERIFIED and self.permitted_uses & restricted:
             raise ValueError("unverified data terms cannot grant persistence or production uses")
+        if self.retention_prohibited and self.permitted_uses & {
+            ProviderUse.PRIVATE_LOCAL_RESEARCH,
+            ProviderUse.RAW_BULK_PERSISTENCE,
+        }:
+            raise ValueError("provider terms that prohibit retention override persistence uses")
 
     @property
     def is_partial(self) -> bool:

@@ -7,10 +7,13 @@ from typing import Protocol
 from a_share_platform.domain.governance import Artifact, DatasetVersion, LineageEdge, RunRecord
 
 
-class GovernanceRepository(Protocol):
+class DatasetVersionRepository(Protocol):
     def register_dataset(self, value: DatasetVersion) -> DatasetVersion: ...
 
     def list_datasets(self) -> tuple[DatasetVersion, ...]: ...
+
+
+class GovernanceRepository(DatasetVersionRepository, Protocol):
 
     def register_run(self, value: RunRecord) -> RunRecord: ...
 

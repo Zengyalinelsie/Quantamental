@@ -20,6 +20,7 @@ PROTOTYPE_USES = frozenset(
         ProviderUse.INTERNAL_DISPLAY,
     }
 )
+PRIVATE_LOCAL_USES = PROTOTYPE_USES | frozenset({ProviderUse.PRIVATE_LOCAL_RESEARCH})
 AUTHORITY_USES = frozenset(
     {
         ProviderUse.LOCAL_FIXTURE,
@@ -101,14 +102,36 @@ def build_p2_provider_registry() -> ProviderRegistry:
         ),
         *(
             _policy(
+                "baostock_sdk",
+                field,
+                ProviderTier.FALLBACK,
+                sh_sz,
+                uses=PRIVATE_LOCAL_USES,
+                warning=(
+                    "private local research persistence requires explicit user acknowledgement; "
+                    "no external redistribution, strict historical, or production use"
+                ),
+            )
+            for field in (
+                DataField.TRADING_CALENDAR,
+                DataField.RAW_DAILY_BAR,
+            )
+        ),
+        *(
+            _policy(
                 "futu_quote",
                 field,
                 ProviderTier.FALLBACK,
                 sh_sz,
+                uses=(
+                    PRIVATE_LOCAL_USES
+                    if field is DataField.RAW_DAILY_BAR
+                    else PROTOTYPE_USES
+                ),
                 coverage=CoverageStatus.PARTIAL,
                 warning=(
                     "optional read-only OpenQuoteContext; OpenD entitlement, historical "
-                    "coverage, data retention terms, and PIT semantics require verification"
+                    "coverage, provider retention restrictions, and PIT semantics remain visible"
                 ),
             )
             for field in (

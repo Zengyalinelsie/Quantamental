@@ -21,7 +21,8 @@
 ## 2. 数据资格与 PIT 边界
 
 - Baostock/a-share-mcp 是沪深本地原型主源，AkShare 是北交所和缺失字段备用源，三家交易所是权威核验源；
-- 免费源只允许原型用途，禁止 strict historical、生产决策、批量 raw 持久化和外部分发；
+- 免费源禁止 strict historical、生产决策、通用 `raw_bulk_persistence` 和外部分发；ADR-0003 仅增加显式 ack 的 `private_local_research` 本地保存例外；
+- 私人本地例外只能输出 `normalized_current`，供应商或具体端点明确禁止 retention 时仍 fail closed；
 - 免费源观察只能生成 `normalized_current`，provider adapter 无法直接生成 `pit_verified`；
 - 历史日期页面保持 API 返回的 `data_mode=current_research`，并明确提示它不是 `strict_historical`、也不代表 PIT verified；
 - fallback 生成独立来源观察；来源冲突保留并阻断选值，不静默覆盖。
@@ -134,8 +135,19 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --end 2026-
 PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --provider futu_quote --end 2026-08-08
 ```
 
-`--execute` 也会 fail closed：当前 registry 中 Baostock、AkShare、Futu 和官方网页端点均没有获得所有目标字段的 `raw_bulk_persistence` 资格，CLI 没有配置获批 bulk source/sink，不会借机下载或写入。Futu adapter 仅是可选的无账户、小样本 quote reader，不创建交易连接、不查询账户，也不具备批量保存资格。
+通用 `--execute` 仍会 fail closed：当前没有 provider 获得所有目标字段的 `raw_bulk_persistence` 资格。ADR-0003 另行允许显式、小范围的 `private_local_research` 执行，且必须同时提供 ack、symbols、domains、本地 PostgreSQL DSN 和 Parquet root。首批 executable source/sink 为：
 
-本扩展新增 14 个定向单元测试；domain、planner、许可门、dry-run CLI、PostgreSQL repository、provider provenance 往返和 Futu raw/unadjusted 分页读取均有覆盖。当前仍未执行真实批量回填，因此业务数据行和 Parquet 增量均为 0；这不是用 fixture 冒充真实数据。要真正落库，下一步必须为每个数据域取得明确允许保存/回测的来源合同，再接入获批 source/sink 并运行小范围核验。该准备能力不改变前述 P2 Gate 判断，也不证明任何模型科学有效。
+- `baostock_sdk`：沪深 raw 日线和交易日历；测试锁定 `frequency="d"` 与 `adjustflag="3"`；
+- `futu_quote`：沪深 raw 日线；只创建 `OpenQuoteContext`、使用 `AuType.NONE`，代码级测试继续禁止任何账户或交易上下文；
+- canonical sink：先注册 DatasetVersion，再写 raw bar Parquet、partition manifest、daily market state、calendar、checkpoint、质量和覆盖率；Listing 代码映射缺失/歧义会阻断；
+- 断点恢复跳过已经成功的 checkpoint，不重复请求或写入该 checkpoint。
+
+执行门示例见 README。默认 dry-run 无网络和数据库写入；本轮自动化全部使用 fake SDK/connection，没有替用户下载真实行情或写真实数据库。
+
+最初回填规划扩展新增 14 个定向单元测试；ADR-0003 执行扩展又增加 14 个定向测试，覆盖私人用途/retention 硬门、显式 symbol/domain 计划、BaoStock raw/calendar、Futu quote-only staging、DatasetVersion FK 顺序、canonical sink、CLI ack/DSN 门和成功 checkpoint 恢复。当前仍未执行真实批量回填，因此业务数据行和 Parquet 增量均为 0；这不是用 fixture 冒充真实数据。
+
+仍未完成的真实数据域：A 股全市场 Security Master、沪深 300/中证 500 历史 Universe、2018+ 股本和公司行动。donor 的 AkShare 历史价三路均为 qfq，current stock index 也不是历史 Universe，因此没有为追求表面覆盖而接入。该能力不改变前述 P2 Gate 判断，也不证明任何模型科学有效。
+
+本工作包最终验证：Python unittest `166 passed`，compileall 通过，Ruff 通过，mypy `62 source files` 通过。所有 provider、数据库和 CLI execute 测试使用 fake/injected runtime；这些测试证明合同与程序行为，不证明供应商稳定性、真实数据覆盖或模型科学有效。
 
 主代理在本机隔离 PostgreSQL `127.0.0.1:55432` 复验：首次运行 migration 输出 `0005_data_backfill`，二次运行无输出且退出码为 0。`ingestion_jobs`、`ingestion_checkpoints`、`dataset_quality_reports` 和 `dataset_coverage_reports` 均为 0 行，说明 schema 已持久化，但没有用 fixture 或未获许可数据填充开发库。

@@ -16,7 +16,7 @@
 | FastAPI/Web 工作台信息架构 | Reference/Adapt | 产品体验成熟，领域模型不同 | P6 后接新 API |
 | 任务进度、历史报告 | Adapt | 需要绑定 Run/Artifact 版本 | P4–P6 |
 | 通知渠道 | Adapt | 渠道能力成熟，消息必须引用冻结快照 | P6 |
-| 数据源 fallback | Adapt | 稳定性好，但不同源不能无痕混值 | P1 |
+| 数据源 fallback | Reference/Rewrite | 顺序、retry、熔断和原子缓存值得借鉴；现有 A 股历史价均为 qfq 且 provenance 不完整，不复制 fetcher，不允许不同源无痕混值 | P1/P2 |
 | 市场代码与交易日历测试 | Adapt | 多市场边界和测试丰富 | P1/P4 |
 | 新闻搜索与 RSS 情报 | Adapt | 当前研究好用，需补原文 hash 和事件账本 | P6 |
 | Agent orchestrator/opinion | Adapt | 结构化与保守修订有价值 | P6 |

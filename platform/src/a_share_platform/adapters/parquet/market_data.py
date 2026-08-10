@@ -74,6 +74,26 @@ class ParquetMarketDataStore:
                 connection.close()
         return tuple(sorted(targets.values()))
 
+    def ensure_bars(self, bars: Iterable[DailyBar]) -> tuple[Path, ...]:
+        """Write once, or prove an interrupted retry has identical content."""
+
+        rows = tuple(bars)
+        grouped: dict[tuple[str, Exchange, int], list[DailyBar]] = defaultdict(list)
+        for bar in rows:
+            grouped[(bar.dataset_version_id, bar.exchange, bar.session_date.year)].append(bar)
+        targets = {key: self._bar_partition(*key) for key in grouped}
+        existing = {key: path.exists() for key, path in targets.items()}
+        if not any(existing.values()):
+            return self.write_bars(rows)
+        if not all(existing.values()):
+            raise FileExistsError("partial partition set exists; manual reconciliation required")
+        for key, expected in grouped.items():
+            actual = self._read_bar_partition(targets[key])
+            order = lambda row: (row.listing_id, row.session_date, row.source_id)
+            if tuple(sorted(actual, key=order)) != tuple(sorted(expected, key=order)):
+                raise FileExistsError(f"partition content differs: {targets[key]}")
+        return tuple(sorted(targets.values()))
+
     def write_adjustment_factors(
         self,
         factors: Iterable[AdjustmentFactor],
@@ -293,3 +313,20 @@ class ParquetMarketDataStore:
             dataset_version_id=str(row[13]),
             trust_state=DataTrustState(str(row[14])),
         )
+
+    @classmethod
+    def _read_bar_partition(cls, path: Path) -> tuple[DailyBar, ...]:
+        connection = duckdb.connect(":memory:")
+        try:
+            rows = connection.execute(
+                """
+                SELECT listing_id, exchange, session_date, currency, open, high, low,
+                       close, previous_close, volume_shares, amount, adjustment,
+                       source_id, dataset_version_id, trust_state
+                FROM read_parquet(?)
+                """,
+                (str(path),),
+            ).fetchall()
+        finally:
+            connection.close()
+        return tuple(cls._bar_from_row(row) for row in rows)

@@ -9,8 +9,11 @@ from enum import Enum
 
 from .market_data import PriceAdjustment
 from .pit import DataTrustState
+from .provider import ProviderUse
 
 _SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
+_A_SHARE_SYMBOL = re.compile(r"^(SH|SZ|BJ)\.\d{6}$")
+_MARKETS = frozenset({"XSHG", "XSHE", "XBSE"})
 
 
 def _required(value: str, field: str) -> str:
@@ -35,6 +38,7 @@ def _date_interval(start_date: date, end_date: date) -> None:
 class BackfillScopeKind(str, Enum):
     SECURITY_MASTER = "security_master"
     INDEX_UNIVERSE = "index_universe"
+    EXPLICIT_SYMBOLS = "explicit_symbols"
 
 
 class BackfillDataDomain(str, Enum):
@@ -81,15 +85,29 @@ class BackfillScope:
     name: str
     kind: BackfillScopeKind
     benchmark_code: str | None = None
+    symbols: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         _required(self.scope_id, "scope_id")
         _required(self.name, "name")
         object.__setattr__(self, "kind", BackfillScopeKind(self.kind))
+        object.__setattr__(self, "symbols", tuple(self.symbols))
+        if len(self.symbols) != len(set(self.symbols)):
+            raise ValueError("scope symbols must be unique")
+        for symbol in self.symbols:
+            if _A_SHARE_SYMBOL.fullmatch(symbol) is None:
+                raise ValueError("scope symbols must use SH.000000, SZ.000000, or BJ.000000")
         if self.kind is BackfillScopeKind.INDEX_UNIVERSE:
             _required(self.benchmark_code or "", "benchmark_code")
-        elif self.benchmark_code is not None:
-            raise ValueError("security-master scope cannot have a benchmark_code")
+            if self.symbols:
+                raise ValueError("index-universe scope cannot embed explicit symbols")
+        elif self.kind is BackfillScopeKind.EXPLICIT_SYMBOLS:
+            if self.benchmark_code is not None:
+                raise ValueError("explicit-symbol scope cannot have a benchmark_code")
+            if not self.symbols:
+                raise ValueError("explicit-symbol scope requires symbols")
+        elif self.benchmark_code is not None or self.symbols:
+            raise ValueError("security-master scope cannot have benchmark or symbols")
 
 
 A_SHARE_SECURITY_MASTER_SCOPE = BackfillScope(
@@ -122,6 +140,9 @@ class BackfillPlan:
     created_at: datetime
     output_trust_state: DataTrustState
     price_adjustment: PriceAdjustment
+    provider_use: ProviderUse = ProviderUse.RAW_BULK_PERSISTENCE
+    symbols: tuple[str, ...] = ()
+    markets: tuple[str, ...] = ("XSHG", "XSHE", "XBSE")
 
     def __post_init__(self) -> None:
         _required(self.plan_id, "plan_id")
@@ -141,6 +162,26 @@ class BackfillPlan:
             raise ValueError("backfill scopes must be unique")
         if len(self.domains) != len(set(self.domains)):
             raise ValueError("backfill data domains must be unique")
+        object.__setattr__(self, "provider_use", ProviderUse(self.provider_use))
+        object.__setattr__(self, "symbols", tuple(self.symbols))
+        object.__setattr__(self, "markets", tuple(self.markets))
+        if len(self.symbols) != len(set(self.symbols)):
+            raise ValueError("backfill symbols must be unique")
+        for symbol in self.symbols:
+            if _A_SHARE_SYMBOL.fullmatch(symbol) is None:
+                raise ValueError("backfill symbols must use SH.000000, SZ.000000, or BJ.000000")
+        if not self.markets or len(self.markets) != len(set(self.markets)):
+            raise ValueError("backfill markets must be non-empty and unique")
+        if any(market not in _MARKETS for market in self.markets):
+            raise ValueError("backfill markets must be XSHG, XSHE, or XBSE")
+        explicit_symbols = tuple(
+            symbol
+            for scope in self.scopes
+            if scope.kind is BackfillScopeKind.EXPLICIT_SYMBOLS
+            for symbol in scope.symbols
+        )
+        if explicit_symbols and set(explicit_symbols) != set(self.symbols):
+            raise ValueError("plan symbols must match explicit-symbol scopes")
         _date_interval(self.start_date, self.end_date)
         _aware(self.created_at, "created_at")
         object.__setattr__(self, "output_trust_state", DataTrustState(self.output_trust_state))
@@ -154,6 +195,11 @@ class BackfillPlan:
             and adjustment is not PriceAdjustment.UNADJUSTED
         ):
             raise ValueError("backfill prices must be raw and unadjusted")
+        if (
+            self.provider_use is ProviderUse.PRIVATE_LOCAL_RESEARCH
+            and self.output_trust_state is not DataTrustState.NORMALIZED_CURRENT
+        ):
+            raise ValueError("private local research backfills must remain normalized_current")
 
 
 @dataclass(frozen=True)

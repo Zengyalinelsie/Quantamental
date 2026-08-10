@@ -1,4 +1,4 @@
-"""Optional Futu quote-only reader for explicit, non-persistent probes."""
+"""Optional Futu quote-only reader for explicit bounded research requests."""
 
 from __future__ import annotations
 
@@ -27,9 +27,9 @@ class FutuQuoteRows:
 class FutuQuoteDailyReader:
     """Read raw daily rows through the SDK's quote-only context.
 
-    This adapter is deliberately not a bulk backfill source. The provider
-    registry keeps it outside ``raw_bulk_persistence`` until retention terms,
-    entitlement, coverage, and time semantics are independently approved.
+    This reader never opens an account or execution context. Persistence is
+    permitted only through the separately gated ``private_local_research``
+    workflow and remains outside general ``raw_bulk_persistence``.
     """
 
     provider_id = "futu_quote"
@@ -121,7 +121,8 @@ class FutuQuoteDailyReader:
                     ("turnover", "CNY"),
                 ),
                 warnings=(
-                    "Futu quote data is not licensed by this platform for bulk persistence",
+                    "private local research persistence requires explicit user acknowledgement",
+                    "external redistribution, strict historical, and production use are prohibited",
                     "retrieved_at and time_key do not establish PIT available_at",
                     "output trust ceiling is normalized_current",
                 ),

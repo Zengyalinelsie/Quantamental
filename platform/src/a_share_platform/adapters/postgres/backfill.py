@@ -23,6 +23,7 @@ from a_share_platform.domain.backfill import (
 )
 from a_share_platform.domain.market_data import PriceAdjustment
 from a_share_platform.domain.pit import DataTrustState
+from a_share_platform.domain.provider import ProviderUse
 
 
 def _json_parameter(value: object) -> object:
@@ -292,6 +293,7 @@ class PostgresBackfillRepository:
                     "name": scope.name,
                     "kind": scope.kind.value,
                     "benchmark_code": scope.benchmark_code,
+                    "symbols": list(scope.symbols),
                 }
                 for scope in value.scopes
             ],
@@ -301,6 +303,9 @@ class PostgresBackfillRepository:
             "created_at": value.created_at.isoformat(),
             "output_trust_state": value.output_trust_state.value,
             "price_adjustment": value.price_adjustment.value,
+            "provider_use": value.provider_use.value,
+            "symbols": list(value.symbols),
+            "markets": list(value.markets),
         }
 
     @staticmethod
@@ -330,6 +335,10 @@ class PostgresBackfillRepository:
                         if scope.get("benchmark_code") is None
                         else str(scope["benchmark_code"])
                     ),
+                    symbols=tuple(
+                        str(item)
+                        for item in cast(list[object], scope.get("symbols", []))
+                    ),
                 )
                 for scope in scopes_raw
             ),
@@ -342,6 +351,17 @@ class PostgresBackfillRepository:
             created_at=datetime.fromisoformat(str(value["created_at"])),
             output_trust_state=DataTrustState(str(value["output_trust_state"])),
             price_adjustment=PriceAdjustment(str(value["price_adjustment"])),
+            provider_use=ProviderUse(
+                str(value.get("provider_use", ProviderUse.RAW_BULK_PERSISTENCE.value))
+            ),
+            symbols=tuple(str(item) for item in cast(list[object], value.get("symbols", []))),
+            markets=tuple(
+                str(item)
+                for item in cast(
+                    list[object],
+                    value.get("markets", ["XSHG", "XSHE", "XBSE"]),
+                )
+            ),
         )
 
     @staticmethod

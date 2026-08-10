@@ -169,3 +169,16 @@ DSA 已有账户、交易流水、快照、公司行动和风险提醒，适合�
 - Legacy 此前选定因子、Signal、回测和 Qlib 适配测试在原审计中通过；本次没有重跑其全量测试；
 - 本文判断来自代码路径，不以 README 宣传作为科学能力证据。
 
+## 9. A 股数据源二次只读审计
+
+为 ADR-0003 的私人本地数据回填再次只读检查 donor，未修改来源文件、未发网络请求：
+
+- `data_provider/akshare_fetcher.py` 的 A 股历史日线依次 fallback 到东财、新浪、腾讯，但三路均显式传入 `qfq`；它们不能进入新平台 raw/unadjusted bar；
+- 新浪/腾讯分支在缺少涨跌幅时用查询窗口内 `pct_change`，首行 `fillna(0)`；这会把缺失和窗口边界伪装为 0，新平台拒绝迁移该行为；
+- donor 的 normalize 结果没有把真实 endpoint winner、adjustment、retrieved_at、cutoff 和单位完整绑定到每批数据；异常捕获也会混合 schema drift、限流和质量错误；
+- `src/data/stock_index_loader.py` 读取的是 current code/name/active alias 文件，以文件新旧和远程缓存选择，不含经济有效区间或 `available_at`，不是历史 Security Master 或 CSI300/CSI500 Universe；
+- `screening/dsa_provider.py` 是最多 5 个候选的 current quote/fundamental/news enrichment，不是权威数据层。
+
+可借鉴但必须窄重写的模式包括：确定性 fallback 顺序、空结果继续、有界 retry+jitter、限流/熔断、可终止的第三方调用、临时文件原子替换、last-good fallback、代码/市场别名规范化和 enrichment 的显式 unavailable/warnings。
+
+许可证边界不变：donor 根 MIT 和 screening 的 Apache-2.0 只覆盖代码，不证明东财、新浪、腾讯、Tushare 或 Futu 数据可保存/再分发。若未来迁移具体 screening 代码，必须保留 AlphaSift Apache 归因和修改记录；当前实现只参考模式，没有复制这些 fetcher。

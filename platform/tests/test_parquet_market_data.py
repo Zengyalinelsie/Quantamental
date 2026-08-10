@@ -1,6 +1,8 @@
 import tempfile
 import unittest
+from dataclasses import replace
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 from a_share_platform.adapters.parquet.market_data import ParquetMarketDataStore
@@ -66,6 +68,17 @@ class ParquetMarketDataStoreTest(unittest.TestCase):
             store.write_bars((self.catalog.bars[0],))
             with self.assertRaisesRegex(FileExistsError, "partition already exists"):
                 store.write_bars((self.catalog.bars[0],))
+
+    def test_ensure_bars_resumes_identical_partition_but_rejects_conflict(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = ParquetMarketDataStore(Path(directory))
+            first = store.ensure_bars((self.catalog.bars[0],))
+            resumed = store.ensure_bars((self.catalog.bars[0],))
+            self.assertEqual(resumed, first)
+
+            conflicting = replace(self.catalog.bars[0], amount=Decimal(1))
+            with self.assertRaisesRegex(FileExistsError, "content differs"):
+                store.ensure_bars((conflicting,))
 
     def test_empty_store_query_is_explicitly_empty(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

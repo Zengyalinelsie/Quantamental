@@ -2,15 +2,16 @@
 
 日期：2026-08-10
 
-本矩阵落实 SPEC-015 和 ADR-0002。`可用于原型` 只指本地 current 研究、小型合同 fixture 和内部展示，不代表严格历史、批量保存、对外分发或生产决策获批。
+本矩阵落实 SPEC-015、ADR-0002 和 ADR-0003。`可用于原型` 只指本地 current 研究、小型合同 fixture 和内部展示。另有受限的 `private_local_research`：仅在用户显式 ack、具体端点未明确禁止 retention、显式 symbols/domains 和本地存储目标下允许保存 `normalized_current`。它不代表通用 `raw_bulk_persistence`、严格历史、对外分发或生产决策获批。
 
 ## 1. 来源资格
 
 | 来源 | 角色 | 成本/凭据 | 客户端代码许可 | 数据条款状态 | 获批用途 |
 |---|---|---|---|---|---|
-| a-share-mcp / Baostock | P2 沪深第一主源 | 免费、无 key | PyPI：BSD | 上游数据保存/再分发权待审 | 本地原型、current 研究、小型 fixture、内部展示 |
+| a-share-mcp / Baostock | P2 沪深探针主源 | 免费、无 key | PyPI：BSD | 上游数据保存/再分发权待审 | 本地原型、current 研究、小型 fixture、内部展示；不直接执行持久化 |
+| Baostock Python SDK | 沪深本地回填执行源 | 免费、无 key | PyPI：BSD | 非商业/再分发与具体保存边界仍需操作者核对；明确禁止时 fail closed | 显式 ack 的私人本地 raw 日线/日历，`normalized_current` only |
 | AkShare | 北交所与缺失字段备用候选 | 免费、无 key | PyPI：MIT | 各网页上游条款逐端点待审；存在限流和结构变化风险 | 本地原型、current 研究、小型 fixture、内部展示 |
-| Futu OpenQuoteContext | 可选沪深行情/日历只读候选 | 本地 OpenD、行情权限；不读取账户 | SDK/数据条款分离 | 行情权限、2018+ 覆盖、保存期限和再分发权待审 | 仅显式小样本 quote probe；禁止批量持久化和 PIT 标记 |
+| Futu OpenQuoteContext | 可选沪深行情只读候选 | 本地 OpenD、行情权限；不读取账户 | SDK/数据条款分离 | 行情权限、2018+ 覆盖、保存期限和再分发权仍需操作者核对；明确禁止时 fail closed | 显式 ack 的私人本地 raw 日线，`normalized_current` only；无账户/交易能力 |
 | 上交所/深交所/北交所 | 身份、挂牌、日历、规则、公司行动权威核验 | 公开页面/API，频率不统一 | 不适用 | 保存期限和再分发条款待逐站点审查 | 权威核验、小样本证据 |
 | 巨潮/交易所/公司披露 | P3 公告权威源 | 公开页面/API，频率不统一 | 不适用 | P3 建立 license/retention policy | P3 公告证据，不在 P2 冒充新闻或 PIT 财务 |
 | Tushare Pro | 备用商业候选 | Token/积分/可能付费 | 客户端与数据条款分离 | 未评审、未配置 | 当前不启用 |
@@ -34,9 +35,10 @@
 | 分红/送转/配股 | 分红接口部分覆盖 | 候选 | 公告/交易所 | 公司行动需统一事件合同和抽样核算 |
 | 公告时间和修订 | 不满足 | 不视为权威 | 巨潮/交易所/公司 | 留到 P3；P2 不授予 `pit_verified` |
 
-## 3. 明确禁止
+## 3. 明确禁止与私人本地例外
 
-- `strict_historical`、生产决策、批量 raw 持久化和外部分发当前均无合格免费源；
+- `strict_historical`、生产决策、通用 `raw_bulk_persistence` 和外部分发当前均无合格免费源；
+- `private_local_research` 只是受限本地例外：供应商/端点明确禁止 retention 时仍阻断，且永远不能产生 `pit_verified`；
 - 当前数据、检索时间或数据库入库时间不得冒充历史 `available_at`；
 - 复权因子、股本、停牌或退市缺失不得填 0；
 - 免费源之间的 fallback 不得静默覆盖主源观察；
@@ -50,3 +52,19 @@
 - AkShare/Baostock 的客户端开源许可不等于上游数据许可；
 - donor 的 Futu 集成读取真实账户持仓，不属于本工作包允许范围，因此没有迁移；新适配器只允许 SDK `OpenQuoteContext` 行情读取，代码级测试禁止任何交易上下文；
 - fallback 必须形成独立观察、warning 和 provenance，不能覆盖主源记录。
+
+进一步的 endpoint 级审计发现：
+
+- donor A 股历史日线按东财 → 新浪 → 腾讯 fallback，但三路都显式使用 `qfq`，因此不得写入平台 raw/unadjusted bar；
+- 新浪/腾讯缺字段路径会用窗口内 `pct_change` 并对首行填 0，违反缺失显式表达原则；
+- `stocks.index.json` 是 current code/name alias 索引，没有有效区间和 `available_at`，不能冒充 Security Master 历史或 CSI300/CSI500 Universe；
+- 值得重写借鉴的仅是有界 retry+jitter、限流/熔断、可终止超时、临时文件原子替换和 last-good fallback；每次真实 winner、请求参数、调整口径和失败诊断仍必须进入本平台 provenance。
+
+## 5. 当前可执行私人本地覆盖
+
+| provider_id | 可执行域 | 市场 | 硬约束 | 仍不可用 |
+|---|---|---|---|---|
+| `baostock_sdk` | `raw_daily_bar`、`trading_calendar` | XSHG/XSHE | `frequency=d`、`adjustflag=3`、显式 ack/symbol/domain/DSN/Parquet root | XBSE、Security Master、历史 Universe、股本、公司行动 |
+| `futu_quote` | `raw_daily_bar` | XSHG/XSHE | `OpenQuoteContext`、`AuType.NONE`、显式 ack/symbol/domain/DSN/Parquet root | 日历、Security Master、历史 Universe、股本、公司行动、所有账户与交易能力 |
+
+`financial-data-hub` 是来源选择与对照入口；它不会绕过 `ProviderRegistry`、许可门或 canonical sink。当前没有把 donor AkShare 接入 raw sink，因为其已审计历史端点均为 qfq。
