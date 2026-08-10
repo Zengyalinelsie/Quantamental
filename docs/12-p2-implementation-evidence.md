@@ -149,9 +149,9 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --provider 
 
 执行门示例见 README。默认 dry-run 无网络和数据库写入；本轮自动化全部使用 fake SDK/connection，没有替用户下载真实行情或写真实数据库。
 
-最初回填规划扩展新增 14 个定向单元测试；ADR-0003 执行扩展又增加 14 个定向测试，覆盖私人用途/retention 硬门、显式 symbol/domain 计划、BaoStock raw/calendar、Futu quote-only staging、DatasetVersion FK 顺序、canonical sink、CLI ack/DSN 门和成功 checkpoint 恢复。当前仍未执行真实批量回填，因此业务数据行和 Parquet 增量均为 0；这不是用 fixture 冒充真实数据。
+最初回填规划扩展新增 14 个定向单元测试；ADR-0003 执行扩展又增加 14 个定向测试，覆盖私人用途/retention 硬门、显式 symbol/domain 计划、BaoStock raw/calendar、Futu quote-only staging、DatasetVersion FK 顺序、canonical sink、CLI ack/DSN 门和成功 checkpoint 恢复。该代码提交时尚未执行真实批量回填，因此当时业务数据行和 Parquet 增量均为 0；后续真实运行证据见本文件第 11 节。
 
-新增自动采集能力仍未替用户执行真实下载或入库。当前 Security Master 执行范围仅 XSHG/XSHE，XBSE、可靠历史代码/名称、2018+ 股本和公司行动仍未完成；CSI 历史成员是检索时获得的带日期快照，固定为 `normalized_current`，且历史可交易状态未验证前 `tradable_eligible=false`。donor 的 AkShare 历史价三路均为 qfq，current stock index 也不是历史 Universe，因此没有为追求表面覆盖而接入 raw/PIT。该能力不改变前述 P2 Gate 判断，也不证明任何模型科学有效。
+该自动采集能力提交时尚未替用户执行真实下载或入库。当前 Security Master 执行范围仍仅 XSHG/XSHE，XBSE、完整历史代码/名称、2018+ 股本和公司行动仍未完成；CSI 历史成员是检索时获得的带日期快照，固定为 `normalized_current`，且历史可交易状态未验证前 `tradable_eligible=false`。donor 的 AkShare 历史价三路均为 qfq，current stock index 也不是历史 Universe，因此没有为追求表面覆盖而接入 raw/PIT。后续 CSI800 当前身份真实运行不改变这些边界，也不证明任何模型科学有效。
 
 恢复边界保持显式：成功并已提交的 checkpoint 可跨 CLI 重启跳过；若 source 在 DatasetVersion 注册和 batch 落库前失败，本次尚未成功的 fetch 会重取。真实 CSI 长区间因此建议按年度使用独立 plan id 执行，避免把“有 checkpoint 键”误写成任意故障点都具有 payload staging。
 
@@ -192,3 +192,40 @@ guard 启用前没有调用账本，因此此前真实日调用数无法精确�
 选源边界保持不变：`financial-data-hub` 负责路由和交叉核验，Futu 只允许
 `OpenQuoteContext` 行情，`sources/daily_stock_analysis` 永久只读且仅借鉴容错模式。
 所有免费源输出最多为 `normalized_current`，不得冒充 PIT。
+
+## 11. CSI800 当前 Security Master 真实运行证据
+
+在用户明确批准免费源和 Futu 仅用于私人本地研究批量持久化、固定
+`normalized_current` 且禁止外部分发、strict historical、生产决策和 `pit_verified`
+之后，主代理在本机隔离 PostgreSQL 执行 CSI300 + CSI500 去重后的 800 个目标代码。
+所有 BaoStock 请求都在第 10 节 guard 下单会话运行。
+
+最终数据库核验：
+
+- XSHG 目标批：469/469，job/checkpoint 均 `succeeded`，processed/rejected 为 469/0；
+- XSHE 验收批：30/30，job/checkpoint 均 `succeeded`，processed/rejected 为 30/0；
+- XSHE 主批：300/300，job/checkpoint 均 `succeeded`，processed/rejected 为 300/0；
+- 三批 quality 均 `passed`，coverage 均为 1.0；
+- 以原始两个 target plan 的 800 个代码与开放 code identifier 做 SQL 反连接，精确覆盖为
+  799/800，唯一缺失 `SZ.302132`；
+- 数据库当前 listings 为 XSHG 479、XSHE 330，共 809。XSHG 的 479 包含此前样本及 10 家
+  非本次 CSI800 目标，不能把 809 或 479 冒充 CSI800 目标完成数；
+- guard 当日持久化 11 次 `login/query/logout` 调用，blocked attempt 为 0、无 cooldown，
+  每个 worker 都正常 logout。
+
+`SZ.302132` 没有被静默删除。原始 XSHE 331 家 job 保留失败状态和
+`missing_count=1; missing_symbols=SZ.302132`；后续两个成功 batch 是显式隔离异常标的的
+30 + 300 工作单元，专门的代码变更 bucket 仍未完成。
+
+独立来源与官方公告已经证明该标的不是错码：CNInfo 公司概况返回中航成飞、当前代码
+302132、上市日 2010-08-27；巨潮公告 `1222544408`（2025-02-15 发布）明确同一上市主体
+旧简称/代码为中航电测/300114，自 2025-02-17 起启用中航成飞/302132。当前 staged
+payload 只能表达单个 current code/name，canonical sink 又按 current code 派生 Listing ID；
+若直接补当前值，会把同一 Listing 拆成两个，违反 SPEC-010。该 Spec/现有代码冲突已按规则
+报告并暂停，未擅自选择稳定 ID 策略或推断旧 identifier 的 `valid_from`。
+
+因此当前事实是“CSI800 当前身份目标 799/800，唯一代码变更案例待合同决策”，不是
+Security Master、历史 Universe、2018+ 行情、股本或公司行动全部完成。所有已入库身份仍是
+`normalized_current`，不能用于 strict historical 或被晋升为 `pit_verified`。这些覆盖与质量
+证据只证明这三个 ingestion batch 的工程运行结果，不证明供应商数据科学正确、策略盈利或
+模型科学有效。

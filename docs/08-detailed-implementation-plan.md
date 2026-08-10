@@ -343,7 +343,7 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 - [ ] 真实 A 股全市场 Security Master 回填；
 - [ ] 沪深 300/中证 500 历史 Universe 持久化；
 - [ ] 2018+ 股本和公司行动合格来源与入库；
-- [ ] Data Operator 在确认具体数据条款后执行真实小样本并保存质量/覆盖率证据。
+- [x] Data Operator 在确认具体数据条款后执行真实小样本并保存质量/覆盖率证据。
 
 前两项未勾选表示尚未执行真实下载/入库：当前代码能力只覆盖 XSHG/XSHE，XBSE 仍缺；历史成员仍为 `normalized_current`，且在可交易状态未验证前 `tradable_eligible=false`。
 
