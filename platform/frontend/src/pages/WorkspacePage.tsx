@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 
 import { PageHeading } from '../components/PageHeading'
 import { WorkspaceUnavailable } from '../components/WorkspaceUnavailable'
+import { SystemScreen } from './SystemScreen'
 import { UniverseScreen } from './UniverseScreen'
 
 interface WorkspacePageProps {
@@ -38,6 +39,8 @@ export function WorkspacePage({ title, description, tabs }: WorkspacePageProps) 
       label,
       children: key === 'universe-screen'
         ? <UniverseScreen />
+        : ['catalog', 'quality', 'lineage', 'jobs'].includes(key) && title === '数据与管理'
+          ? <SystemScreen section={key as 'catalog' | 'quality' | 'lineage' | 'jobs'} />
         : <WorkspaceUnavailable reason={reason} />,
     }
   })

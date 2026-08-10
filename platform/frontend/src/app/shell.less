@@ -219,6 +219,56 @@
   box-shadow: none !important;
 }
 
+.systemScreen {
+  display: grid;
+  gap: 16px;
+}
+
+.systemScreen > .ant-table-wrapper,
+.systemJobs .ant-card {
+  overflow: hidden;
+  border: 1px solid @border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.systemJobs {
+  display: grid;
+  gap: 14px;
+}
+
+.systemJobAlert {
+  margin-top: 14px;
+}
+
+.systemJobEvidence {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.systemJobEvidence section {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid @secondary-border;
+  border-radius: @radius;
+  background: @layout;
+}
+
+.systemJobEvidence small {
+  color: @tertiary-text;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.systemJobEvidence span {
+  color: @secondary-text;
+  font-size: 12px;
+}
+
 .deskSection .ant-pro-table-list-toolbar-container {
   min-height: 0;
   padding-block: 0;

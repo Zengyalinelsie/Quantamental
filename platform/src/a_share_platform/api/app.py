@@ -1,7 +1,8 @@
-"""FastAPI read-only API for platform governance and P2 market foundations."""
+"""FastAPI read-only API for governed market, financial, and system data."""
 
 from __future__ import annotations
 
+import os
 from dataclasses import asdict
 from datetime import UTC, date, datetime, time
 from importlib.metadata import version
@@ -13,6 +14,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
+from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
+from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
 from a_share_platform.application.permissions import Principal
 from a_share_platform.domain.market_data import (
     MarketDataCatalog,
@@ -22,6 +25,7 @@ from a_share_platform.domain.market_data import (
 from a_share_platform.domain.run_context import DataMode, DeploymentStage, RunContext
 from a_share_platform.domain.security_master import Exchange, SecurityMaster
 from a_share_platform.domain.universe import UniverseCatalog
+from a_share_platform.ports.system_catalog import SystemCatalogReader
 
 from .schemas import Envelope, ProblemDetails, ResponseContext
 
@@ -97,20 +101,28 @@ def create_app(
     security_master: SecurityMaster | None = None,
     universe_catalog: UniverseCatalog | None = None,
     market_data_catalog: MarketDataCatalog | None = None,
+    system_catalog: SystemCatalogReader | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="A-Share Platform Next",
-        summary="Read-only P2 identity, universe, market data, and governance API",
+        summary="Read-only governed research data and system-management API",
         version=version("a-share-platform"),
     )
     governance = repository or InMemoryGovernanceRepository()
     master = security_master or SecurityMaster.empty()
     universes = universe_catalog or UniverseCatalog.empty()
     market_data = market_data_catalog or MarketDataCatalog.empty()
+    database_url = os.environ.get("ASP_DATABASE_URL", "").strip()
+    system = system_catalog or (
+        PostgresSystemCatalogReader.from_dsn(database_url)
+        if database_url
+        else StaticSystemCatalogReader()
+    )
     app.state.governance_repository = governance
     app.state.security_master = master
     app.state.universe_catalog = universes
     app.state.market_data_catalog = market_data
+    app.state.system_catalog = system
 
     @app.exception_handler(RunContextOverrideDenied)
     async def run_context_override_handler(
@@ -458,6 +470,30 @@ def create_app(
         context: Annotated[RunContext, Depends(fixed_read_context)],
     ) -> Envelope:
         return envelope(asdict(market_data.quality_report()), context)
+
+    @app.get("/api/system/catalog", response_model=Envelope)
+    def system_datasets(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope([asdict(item) for item in system.list_datasets()], context)
+
+    @app.get("/api/system/quality", response_model=Envelope)
+    def system_quality(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope([asdict(item) for item in system.list_quality_reports()], context)
+
+    @app.get("/api/system/lineage", response_model=Envelope)
+    def system_lineage(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope([asdict(item) for item in system.list_lineage()], context)
+
+    @app.get("/api/system/jobs", response_model=Envelope)
+    def system_jobs(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope([asdict(item) for item in system.list_jobs()], context)
 
     @app.get("/api/calendars/{exchange}/next-session", response_model=Envelope)
     def next_session(

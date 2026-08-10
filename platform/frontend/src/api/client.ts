@@ -61,6 +61,87 @@ export interface UniverseCoverage {
   identity_coverage: number | null
 }
 
+export interface DatasetCatalogEntry {
+  dataset_version_id: string
+  content_hash: string
+  created_at: string
+  schema_version: string
+  metadata: Record<string, unknown>
+}
+
+export interface QualityReportEntry {
+  quality_report_id: string
+  dataset_version_id: string
+  job_id: string
+  status: 'passed' | 'warned' | 'failed'
+  checks_passed: number
+  checks_failed: number
+  issue_counts: Record<string, number>
+  warnings: string[]
+  created_at: string
+}
+
+export interface CoverageReportEntry {
+  coverage_report_id: string
+  dataset_version_id: string
+  job_id: string
+  scope_id: string
+  data_domain: string
+  start_date: string
+  end_date: string
+  expected_rows: number | null
+  observed_rows: number
+  coverage_ratio: number | null
+  warnings: string[]
+  created_at: string
+}
+
+export interface LineageCatalogEntry {
+  upstream_id: string
+  downstream_id: string
+  relation: string
+}
+
+export interface IngestionCheckpointEntry {
+  checkpoint_key: string
+  scope_id: string
+  data_domain: string
+  market: string | null
+  status: 'pending' | 'running' | 'succeeded' | 'failed'
+  processed_rows: number
+  rejected_rows: number
+  provider_id: string | null
+  updated_at: string
+  error: string | null
+  warnings: string[]
+}
+
+export interface IngestionJobEntry {
+  job_id: string
+  plan_id: string
+  provider_id: string
+  status: 'planned' | 'blocked' | 'running' | 'succeeded' | 'failed'
+  output_trust_state: 'raw' | 'normalized_current' | 'pit_verified'
+  start_date: string
+  end_date: string
+  created_at: string
+  updated_at: string
+  dataset_version_id: string | null
+  failure_reasons: string[]
+  checkpoints: IngestionCheckpointEntry[]
+  quality_reports: QualityReportEntry[]
+  coverage_reports: CoverageReportEntry[]
+}
+
+export type SystemSection = 'catalog' | 'quality' | 'lineage' | 'jobs'
+
+export interface SystemSectionData {
+  catalog: DatasetCatalogEntry[]
+  quality: QualityReportEntry[]
+  lineage: LineageCatalogEntry[]
+  jobs: IngestionJobEntry[]
+}
+
 export class ApiError extends Error {
   constructor(public readonly status: number, message: string) {
     super(message)
@@ -92,4 +173,8 @@ export function getUniverseCoverage(universeId: string, asOf: string, signal?: A
     `/api/universes/${encodeURIComponent(universeId)}/coverage?as_of=${encodeURIComponent(asOf)}`,
     signal,
   )
+}
+
+export function getSystemSection<S extends SystemSection>(section: S, signal?: AbortSignal) {
+  return getEnvelope<SystemSectionData[S]>(`/api/system/${section}`, signal)
 }

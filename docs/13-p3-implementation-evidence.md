@@ -179,6 +179,47 @@ PYTHONPATH=src .venv/bin/python -m \
 （66 source files）通过，`git diff --check` 通过。测试通过只证明 adapter/probe 合同，不证明
 同花顺当前可达、字段值正确、覆盖完整、许可已批准或模型科学有效。
 
+## P3-W05a：Catalog / Quality / Lineage / Jobs
+
+已实现 System 数据管理的第一组真实只读页面和 API：
+
+- 新增与 Web/数据库解耦的 System Catalog read models 和 reader port；
+- `/api/system/catalog`、`quality`、`lineage`、`jobs` 只有 GET 方法，并沿用固定
+  `current_research + research` envelope；
+- PostgreSQL reader 每次读取都显式执行 `SET TRANSACTION READ ONLY`，不会通过 System API
+  修改 DatasetVersion、报告、血缘、任务或 checkpoint；DSN 不出现在 repr；
+- 未配置 `ASP_DATABASE_URL` 时返回真实空集合，不注入 demo DatasetVersion 或任务；
+- Jobs 页面同时展示 status、`output_trust_state`、coverage、processed/rejected、checkpoint
+  error 和完整失败原因，`normalized_current` 不被视觉或 API 提升为 `pit_verified`；
+- Catalog/Quality/Lineage/Jobs 都有 loading/error/empty/ready；Lineage 当前 0 行时显示真实空态；
+- 本项目开发端口固定为前端 `5173`、后端 `8010`，不再与用户另一个 `8000` 服务冲突。
+
+TDD 红灯先表现为后端 System reader 模块和前端 `SystemScreen` 不存在。实现后的定向测试为
+后端 7 项、前端 3 项；全量验证为 Python `249 passed`、前端 `24 passed`，Ruff、mypy
+（76 source files）、compileall、TypeScript build 和 `git diff --check` 通过。真实开发库只读
+验证返回 `catalog=9`、`quality=26`、`lineage=0`、`jobs=14`；库内另有 26 份 coverage 和
+35 个 checkpoint，由 Jobs payload 聚合展示。
+
+浏览器技能连接列表当前为空，因此没有把 jsdom、构建成功或源码检查冒充 320/768/1024/1440
+真实浏览器视觉证据。W05a 的 API/组件/真实数据库接线完成，视觉截图与 W05b 的
+Disclosure/Fact timeline、current/strict 对比、mismatch queue、原始证据 Drawer 仍待完成。
+这些测试不证明数据库内容正确、数据具备 PIT 资格、策略有效或模型科学有效。
+
+验证命令：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_system_api tests.test_postgres_system_catalog -v
+npm --prefix frontend test -- --run src/pages/SystemScreen.test.tsx
+PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+npm --prefix frontend test -- --run
+npm --prefix frontend run build
+.venv/bin/ruff check src tests
+PYTHONPATH=src .venv/bin/mypy src
+PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache .venv/bin/python -m compileall -q src
+```
+
 ## P3-W06a：Timing Shadow Ledger 合同与持久化
 
 已实现 P3 baseline 所需的 immutable 领域合同和 append-only ledger：

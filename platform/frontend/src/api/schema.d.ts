@@ -47,6 +47,10 @@ export interface paths {
   "/api/market-data/summary": { get: ReadOperation };
   "/api/runs": { get: ReadOperation };
   "/api/securities": { get: ReadOperation };
+  "/api/system/catalog": { get: ReadOperation };
+  "/api/system/jobs": { get: ReadOperation };
+  "/api/system/lineage": { get: ReadOperation };
+  "/api/system/quality": { get: ReadOperation };
   "/api/universes": { get: ReadOperation };
   "/api/universes/{universe_version_id}/coverage": { get: ReadOperation };
   "/api/universes/{universe_version_id}/diff": { get: ReadOperation };

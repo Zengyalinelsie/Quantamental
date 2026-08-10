@@ -171,7 +171,7 @@
     }
   },
   "info": {
-    "summary": "Read-only P2 identity, universe, market data, and governance API",
+    "summary": "Read-only governed research data and system-management API",
     "title": "A-Share Platform Next",
     "version": "0.2.0"
   },
@@ -1114,6 +1114,254 @@
           }
         },
         "summary": "Securities"
+      }
+    },
+    "/api/system/catalog": {
+      "get": {
+        "operationId": "system_datasets_api_system_catalog_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Datasets"
+      }
+    },
+    "/api/system/jobs": {
+      "get": {
+        "operationId": "system_jobs_api_system_jobs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Jobs"
+      }
+    },
+    "/api/system/lineage": {
+      "get": {
+        "operationId": "system_lineage_api_system_lineage_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Lineage"
+      }
+    },
+    "/api/system/quality": {
+      "get": {
+        "operationId": "system_quality_api_system_quality_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Quality"
       }
     },
     "/api/universes": {
