@@ -56,8 +56,28 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0009_nullable_industry_code.sql",
                 "0010_canonical_universe_lineage.sql",
                 "0011_domain_aware_checkpoint_adjustment.sql",
+                "0012_timing_shadow_ledger.sql",
             ),
         )
+
+    def test_timing_shadow_migration_is_append_only_and_keeps_required_context(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0012_timing_shadow_ledger.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE timing_forecasts",
+            "data_mode = 'current_research'",
+            "deployment_stage = 'shadow'",
+            "input_trust_state IN ('normalized_current', 'pit_verified')",
+            "UNIQUE (benchmark_id, universe_version_id, effective_session)",
+            "jsonb_array_length(horizon_forecasts) = 4",
+            "passive_exposure_ratio",
+            "active_adjustment",
+            "dataset_version_ids",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_checkpoint_adjustment_mode_is_domain_aware(self) -> None:
         sql = (

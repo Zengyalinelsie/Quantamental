@@ -127,6 +127,17 @@ PYTHONPATH=src .venv/bin/python -m unittest \
   tests.test_identity_universe_backfill_source -v
 ```
 
+P3 Timing Shadow Ledger 当前实现 immutable schema、cutoff、被动波动率基线公式和
+append-only 持久化门；尚未接入每日调度，也不会把测试 fixture 写进运行时。定向验证：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_timing_shadow_ledger \
+  tests.test_postgres_timing \
+  tests.test_migrations -v
+```
+
 本地 PostgreSQL 使用专用主机端口 `55432`，避免与机器上已有的 PostgreSQL `5432` 冲突：
 
 ```bash

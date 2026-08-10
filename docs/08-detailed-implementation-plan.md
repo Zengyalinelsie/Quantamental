@@ -422,10 +422,15 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 为了不等 Timing 模型完成才开始积累：
 
-- [ ] 定义 TimingForecast immutable schema；
+- [x] 定义 TimingForecast immutable schema；
 - [ ] 每日记录静态满仓与被动波动率基线，标记 `data_mode=current_research`、`deployment_stage=shadow`；
-- [ ] 保存市场标签未来计算所需 cutoff；
-- [ ] 只作为 baseline/shadow，不声称主动模型已完成。
+- [x] 保存市场标签未来计算所需 cutoff；
+- [x] 只作为 baseline/shadow，不声称主动模型已完成。
+
+状态（2026-08-10）：immutable schema、append-only PostgreSQL ledger、cutoff 和
+baseline/shadow 服务端门已完成；开发库 `timing_forecasts=0`。在真实 CSI benchmark
+行情 DatasetVersion 和每日调度接线完成前，“每日记录”仍不勾选，也不以测试 fixture
+冒充运行记录。证据见 `docs/13-p3-implementation-evidence.md`。
 
 ### Gate P3
 

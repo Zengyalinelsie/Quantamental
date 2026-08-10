@@ -178,3 +178,50 @@ PYTHONPATH=src .venv/bin/python -m \
 工作包完成时证据：定向 `8 passed`；共享工作树全量 `225 passed`；compileall、Ruff、mypy
 （66 source files）通过，`git diff --check` 通过。测试通过只证明 adapter/probe 合同，不证明
 同花顺当前可达、字段值正确、覆盖完整、许可已批准或模型科学有效。
+
+## P3-W06a：Timing Shadow Ledger 合同与持久化
+
+已实现 P3 baseline 所需的 immutable 领域合同和 append-only ledger：
+
+- `TimingForecast` 固定包含 benchmark、UniverseVersion、交易日、decision/cutoff/created
+  三个时间、1/5/20/60 日 horizon slots、风险预测、静态满仓、被动波动率仓位、主动调整、
+  最终仓位区间、model lifecycle、run、approval scope、DatasetVersion 和输入 trust；
+- 尚未实现的 horizon、风险预测和主动调整必须显式为 `unavailable` 并保存原因；
+  `unavailable` 不能携带数值，P3 不以 0 或伪预测补齐 schema；
+- 波动率目标仓位只接受有限 `Decimal`，使用
+  `min(static_exposure, target_volatility / observed_volatility)`，P3 静态满仓固定为 1；
+- `TimingShadowLedger.append_baseline` 只接受
+  `data_mode=current_research + deployment_stage=shadow`、`model_lifecycle=baseline` 和
+  `approval_scope=shadow_baseline_only`；主动输出必须保持 unavailable，最终区间必须等于
+  被动基线；
+- 内存 repository 对 forecast ID 和 benchmark/Universe/交易日键都做不可变冲突检查；
+- PostgreSQL `0012_timing_shadow_ledger.sql` 保存完整字段，以唯一键禁止同日重复，且通过
+  `BEFORE UPDATE OR DELETE` trigger 拒绝修改或删除历史记录；
+- cutoff 必须不晚于 decision time，created time 必须不早于 decision time；输入只允许
+  `normalized_current` 或 `pit_verified`，raw 不能进入 TimingForecast。
+
+TDD 红灯先表现为 timing domain、repository 和 `0012` migration 均不存在；实现后 21 项
+定向测试通过。全量验证为 `242 passed`，Ruff、mypy（72 source files）、compileall 和
+`git diff --check` 通过。本机隔离 PostgreSQL 首次应用输出
+`0012_timing_shadow_ledger`，二次运行无输出；migration 记录为 1、append-only trigger
+存在。
+
+当前限制保持显式：开发库 `timing_forecasts=0`。本地只有 2018 年 30 家个股样本行情，
+没有可绑定的 CSI300/CSI500 benchmark 行情 DatasetVersion，因此没有用测试值或临时网络值
+伪造第一条每日 Shadow 记录。P3-W06 的“每日记录”仍未完成；需要先把真实 benchmark
+raw bars、波动率定义版本和 scheduler 接线后再开始追加。P7 才实现、验证和晋级主动择时。
+本工作包不证明主动模型存在、择时有效、策略可盈利或模型科学有效。
+
+验证命令：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_timing_shadow_ledger \
+  tests.test_postgres_timing \
+  tests.test_migrations -v
+PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache .venv/bin/python -m compileall -q src
+.venv/bin/ruff check src tests
+PYTHONPATH=src .venv/bin/mypy src
+```
