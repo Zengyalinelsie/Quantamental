@@ -24,6 +24,7 @@
 - 免费源禁止 strict historical、生产决策、通用 `raw_bulk_persistence` 和外部分发；ADR-0003 仅增加显式 ack 的 `private_local_research` 本地保存例外；
 - 私人本地例外只能输出 `normalized_current`，供应商或具体端点明确禁止 retention 时仍 fail closed；
 - 免费源观察只能生成 `normalized_current`，provider adapter 无法直接生成 `pit_verified`；
+- 当前 Security Master 的 identifier `valid_from` 保留真实检索日，绝不回写成上市日来伪造历史 PIT。仅在 `normalized_current` canonical sink 中，历史行情或 Universe 无法按 identifier 有效期解析时，才允许按交易所与确定性 Listing ID 回溯；候选还必须满足 `listed_on <= as_of`、未在该日之前退市且结果唯一。该路径会向质量与覆盖率报告写入 `current-known identity mapping` warning，严格 PIT 消费者不得使用；
 - 历史日期页面保持 API 返回的 `data_mode=current_research`，并明确提示它不是 `strict_historical`、也不代表 PIT verified；
 - fallback 生成独立来源观察；来源冲突保留并阻断选值，不静默覆盖。
 
@@ -140,7 +141,7 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --provider 
 - `baostock_sdk`：沪深 raw 日线和交易日历；测试锁定 `frequency="d"` 与 `adjustflag="3"`；
 - `futu_quote`：沪深 raw 日线；只创建 `OpenQuoteContext`、使用 `AuType.NONE`，代码级测试继续禁止任何账户或交易上下文；
 - `a_share_identity_universe`：BaoStock 当前挂牌/行业 + AkShare CNInfo 法定名称，以及带日期的 CSI300/500 每交易日成员；只允许 `--all-a-share` 的 `security_master`/`universe`；
-- canonical sink：先注册 DatasetVersion，再写 raw bar Parquet、partition manifest、daily market state、calendar、checkpoint、质量和覆盖率；Listing 代码映射缺失/歧义会阻断；
+- canonical sink：先注册 DatasetVersion，再写 raw bar Parquet、partition manifest、daily market state、calendar、checkpoint、质量和覆盖率；优先按 identifier 有效期严格解析 Listing。只有 `normalized_current` 可以使用受控的 current-known identity mapping，且缺失、上市/退市区间不兼容或非唯一结果都会阻断；strict PIT 不会进入该 fallback；
 - 断点恢复跳过已经成功的 checkpoint，不重复请求或写入该 checkpoint；CLI 重启时沿用数据库中首次计划的 `created_at`；
 - PostgreSQL 只接受 loopback/Unix socket，Parquet 只允许写入 `platform/var/private-research/`；
 - UniverseVersion 持久化 `normalized_current`、provider/source、retrieved/system time 和 DatasetVersion lineage，严格 PIT view 不接收该数据；

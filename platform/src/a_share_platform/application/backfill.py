@@ -368,7 +368,17 @@ class BackfillService:
             dataset = self._register_dataset(job.plan, content_by_key)
             for checkpoint, batch in pending_batches:
                 current_checkpoint = checkpoint
-                sink.persist(batch, dataset_version_id=dataset.dataset_version_id)
+                persistence_warnings = sink.persist(
+                    batch,
+                    dataset_version_id=dataset.dataset_version_id,
+                )
+                if persistence_warnings:
+                    batch = replace(
+                        batch,
+                        warnings=tuple(
+                            dict.fromkeys((*batch.warnings, *persistence_warnings))
+                        ),
+                    )
                 succeeded = checkpoint.transition(
                     BackfillCheckpointStatus.SUCCEEDED,
                     at=self._clock(),

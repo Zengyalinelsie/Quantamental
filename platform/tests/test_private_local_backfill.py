@@ -10,12 +10,14 @@ from a_share_platform.application.backfill import (
 )
 from a_share_platform.application.provider_registry import build_p2_provider_registry
 from a_share_platform.domain.backfill import (
+    BackfillBatch,
     BackfillCheckpoint,
     BackfillCheckpointStatus,
     BackfillDataDomain,
     BackfillJob,
     BackfillJobStatus,
     BackfillPlan,
+    DatasetQualityStatus,
     ProviderRetrievalMetadata,
 )
 from a_share_platform.domain.market_data import PriceAdjustment
@@ -269,6 +271,67 @@ class PrivateLocalBackfillTest(unittest.TestCase):
         self.assertEqual(checkpoints[0].status, BackfillCheckpointStatus.FAILED)
         self.assertIn("rollback", repository.transaction_events)
         self.assertEqual(repository.transaction_events[-1], "commit")
+
+    def test_sink_warnings_are_persisted_in_quality_and_coverage_reports(self) -> None:
+        warning = (
+            "current-known identity mapping used for normalized_current persistence; "
+            "not PIT verified"
+        )
+        plan = build_private_local_backfill_plan(
+            plan_id="private:sink-warning:v1",
+            provider_id="baostock_sdk",
+            symbols=("SH.600519",),
+            domains=(BackfillDataDomain.RAW_DAILY_BAR,),
+            start_date=date(2018, 1, 2),
+            end_date=date(2018, 1, 2),
+            created_at=NOW,
+        )
+
+        class Source:
+            provider_id = "baostock_sdk"
+
+            def fetch(self, unit: object, _plan: object) -> BackfillBatch:
+                return BackfillBatch(
+                    work_unit=unit,  # type: ignore[arg-type]
+                    metadata=ProviderRetrievalMetadata(
+                        provider_id=self.provider_id,
+                        retrieved_at=NOW,
+                        cutoff_date=date(2018, 1, 2),
+                        adjustment_mode="unadjusted",
+                        units=(("close", "CNY/share"),),
+                        warnings=("normalized_current only",),
+                    ),
+                    row_count=1,
+                    rejected_rows=0,
+                    content_hash="sha256:" + "c" * 64,
+                    expected_rows=1,
+                    trust_state=DataTrustState.NORMALIZED_CURRENT,
+                    quality_status=DatasetQualityStatus.PASSED,
+                    issue_counts=(),
+                    warnings=(),
+                    payload=object(),
+                )
+
+        class WarningSink:
+            def persist(
+                self, _batch: BackfillBatch, *, dataset_version_id: str
+            ) -> tuple[str, ...]:
+                self.dataset_version_id = dataset_version_id
+                return (warning,)
+
+        repository = InMemoryBackfillRepository()
+        service = BackfillService(
+            registry=build_p2_provider_registry(),
+            repository=repository,
+            governance_repository=InMemoryGovernanceRepository(),
+            clock=lambda: NOW,
+        )
+
+        completed = service.start(plan, source=Source(), sink=WarningSink())  # type: ignore[arg-type]
+
+        self.assertEqual(completed.status, BackfillJobStatus.SUCCEEDED)
+        self.assertIn(warning, repository.list_quality_reports()[0].warnings)
+        self.assertIn(warning, repository.list_coverage_reports()[0].warnings)
 
 
 if __name__ == "__main__":

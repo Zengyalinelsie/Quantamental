@@ -49,4 +49,9 @@ class BackfillSource(Protocol):
 
 
 class BackfillSink(Protocol):
-    def persist(self, batch: BackfillBatch, *, dataset_version_id: str) -> None: ...
+    def persist(
+        self,
+        batch: BackfillBatch,
+        *,
+        dataset_version_id: str,
+    ) -> tuple[str, ...]: ...

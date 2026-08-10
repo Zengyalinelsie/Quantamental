@@ -52,6 +52,12 @@ class CanonicalSinkError(RuntimeError):
     """Raised when staged data cannot map to canonical persisted contracts."""
 
 
+CURRENT_KNOWN_IDENTITY_MAPPING_WARNING = (
+    "current-known identity mapping used for normalized_current persistence; "
+    "identifier validity at the historical date is not PIT verified"
+)
+
+
 @dataclass(frozen=True)
 class CanonicalUniverseVersion:
     universe_version_id: str
@@ -64,6 +70,12 @@ class CanonicalUniverseVersion:
     retrieved_at: datetime
     system_as_of: datetime
     available_at: datetime | None
+
+
+@dataclass(frozen=True)
+class ListingResolution:
+    listing_id: str
+    warnings: tuple[str, ...] = ()
 
 
 class PostgresListingResolver:
@@ -107,7 +119,12 @@ class CanonicalBackfillSink:
         self._clock = clock
         self._listing_resolver = listing_resolver or PostgresListingResolver(connection)
 
-    def persist(self, batch: BackfillBatch, *, dataset_version_id: str) -> None:
+    def persist(
+        self,
+        batch: BackfillBatch,
+        *,
+        dataset_version_id: str,
+    ) -> tuple[str, ...]:
         if not dataset_version_id.strip():
             raise ValueError("dataset_version_id must not be empty")
         if batch.trust_state is not DataTrustState.NORMALIZED_CURRENT:
@@ -116,26 +133,24 @@ class CanonicalBackfillSink:
             batch.work_unit.domain is BackfillDataDomain.RAW_DAILY_BAR
             and isinstance(batch.payload, DailyObservationPayload)
         ):
-            self._persist_daily(batch, batch.payload, dataset_version_id)
-            return
+            return self._persist_daily(batch, batch.payload, dataset_version_id)
         if (
             batch.work_unit.domain is BackfillDataDomain.TRADING_CALENDAR
             and isinstance(batch.payload, TradingCalendarPayload)
         ):
             self._persist_calendar(batch.payload)
-            return
+            return ()
         if (
             batch.work_unit.domain is BackfillDataDomain.SECURITY_MASTER
             and isinstance(batch.payload, SecurityMasterPayload)
         ):
             self._persist_security_master(batch.payload, dataset_version_id)
-            return
+            return ()
         if (
             batch.work_unit.domain is BackfillDataDomain.UNIVERSE
             and isinstance(batch.payload, UniverseMembershipPayload)
         ):
-            self._persist_universe(batch, batch.payload, dataset_version_id)
-            return
+            return self._persist_universe(batch, batch.payload, dataset_version_id)
         raise CanonicalSinkError(
             f"payload does not implement domain={batch.work_unit.domain.value}"
         )
@@ -179,11 +194,18 @@ class CanonicalBackfillSink:
         batch: BackfillBatch,
         payload: DailyObservationPayload,
         dataset_version_id: str,
-    ) -> None:
+    ) -> tuple[str, ...]:
         bars: list[DailyBar] = []
         states: list[DailyMarketState] = []
+        warnings: set[str] = set()
         for row in payload.rows:
-            listing_id = self._listing_resolver(row.code, row.session_date)
+            resolution = self._resolve_listing(
+                row.code,
+                row.session_date,
+                trust_state=batch.trust_state,
+            )
+            listing_id = resolution.listing_id
+            warnings.update(resolution.warnings)
             states.append(
                 DailyMarketState(
                     listing_id=listing_id,
@@ -257,6 +279,7 @@ class CanonicalBackfillSink:
             raise CanonicalSinkError("one checkpoint unexpectedly produced multiple partitions")
         for path in paths:
             self._save_partition(batch, dataset_version_id, path, len(bars))
+        return tuple(sorted(warnings))
 
     def _save_partition(
         self,
@@ -542,7 +565,7 @@ class CanonicalBackfillSink:
         batch: BackfillBatch,
         payload: UniverseMembershipPayload,
         dataset_version_id: str,
-    ) -> None:
+    ) -> tuple[str, ...]:
         names = {"000300": "沪深 300", "000905": "中证 500"}
         definition_id = f"csi:{payload.benchmark_code}"
         checkpoint_hash = hashlib.sha256(
@@ -612,8 +635,15 @@ class CanonicalBackfillSink:
             version_result,
             "universe version identifier conflicts with different lineage",
         )
+        warnings: set[str] = set()
         for row in payload.rows:
-            listing_id = self._resolve_universe_listing(row.code, row.valid_from)
+            resolution = self._resolve_listing(
+                row.code,
+                row.valid_from,
+                trust_state=batch.trust_state,
+            )
+            listing_id = resolution.listing_id
+            warnings.update(resolution.warnings)
             membership_result = self._connection.execute(
                 """
                 INSERT INTO universe_memberships (
@@ -649,11 +679,20 @@ class CanonicalBackfillSink:
                 membership_result,
                 "universe membership conflicts on the same effective date",
             )
+        return tuple(sorted(warnings))
 
-    def _resolve_universe_listing(self, code: str, as_of: date) -> str:
+    def _resolve_listing(
+        self,
+        code: str,
+        as_of: date,
+        *,
+        trust_state: DataTrustState,
+    ) -> ListingResolution:
         try:
-            return self._listing_resolver(code, as_of)
-        except CanonicalSinkError:
+            return ListingResolution(self._listing_resolver(code, as_of))
+        except CanonicalSinkError as strict_error:
+            if trust_state is not DataTrustState.NORMALIZED_CURRENT:
+                raise
             exchange = {"SH": "XSHG", "SZ": "XSHE", "BJ": "XBSE"}[code[:2]]
             _company_id, _security_id, listing_id = self._identity_ids(exchange, code)
             rows = self._connection.execute(
@@ -661,17 +700,21 @@ class CanonicalBackfillSink:
                 SELECT listing_id
                 FROM listings
                 WHERE listing_id = %s
+                  AND exchange = %s
                   AND listed_on <= %s
                   AND (delisted_on IS NULL OR %s <= delisted_on)
                 """,
-                (listing_id, as_of, as_of),
+                (listing_id, exchange, as_of, as_of),
             ).fetchall()
             if len(rows) != 1:
                 raise CanonicalSinkError(
-                    "historical universe code has no compatible current identity: "
-                    f"code={code}, as_of={as_of}"
-                )
-            return str(rows[0][0])
+                    "current-known identity fallback requires one unique compatible "
+                    f"current identity: code={code}, as_of={as_of}; got {len(rows)}"
+                ) from strict_error
+            return ListingResolution(
+                listing_id=str(rows[0][0]),
+                warnings=(CURRENT_KNOWN_IDENTITY_MAPPING_WARNING,),
+            )
 
     @staticmethod
     def _identity_ids(exchange: str, code: str) -> tuple[str, str, str]:

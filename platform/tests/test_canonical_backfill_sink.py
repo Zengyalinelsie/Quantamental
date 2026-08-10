@@ -223,6 +223,122 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         self.assertIn("INSERT INTO daily_market_states", sql)
         self.assertIn("INSERT INTO market_data_partitions", sql)
 
+    def test_normalized_current_bars_use_unique_current_known_listing_with_warning(self) -> None:
+        connection = CurrentIdentityFallbackConnection()
+        parquet = FakeParquetStore()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=parquet,  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = DailyObservationPayload(
+            rows=(
+                StagedDailyObservation(
+                    code="SH.600519",
+                    exchange=Exchange.XSHG,
+                    session_date=date(2018, 1, 2),
+                    currency="CNY",
+                    open=Decimal(700),
+                    high=Decimal(710),
+                    low=Decimal(699),
+                    close=Decimal(705),
+                    previous_close=Decimal("697.49"),
+                    volume_shares=4_961_248,
+                    amount=Decimal(3497193408),
+                    is_trading=True,
+                    special_treatment=SpecialTreatment.NONE,
+                    source_id="baostock_sdk",
+                ),
+            )
+        )
+
+        warnings = sink.persist(
+            batch_for(BackfillDataDomain.RAW_DAILY_BAR, payload),
+            dataset_version_id="dataset:bars:v1",
+        )
+
+        self.assertEqual(parquet.bars[0].listing_id, "listing:XSHG:600519")
+        self.assertTrue(any("current-known identity mapping" in item for item in warnings))
+        fallback_query, fallback_params = next(
+            (query, params)
+            for query, params in connection.calls
+            if "FROM listings" in query and "listed_on <=" in query
+        )
+        self.assertIn("exchange = %s", fallback_query)
+        self.assertEqual(
+            fallback_params,
+            ("listing:XSHG:600519", "XSHG", date(2018, 1, 2), date(2018, 1, 2)),
+        )
+
+    def test_current_known_listing_fallback_requires_exactly_one_compatible_row(self) -> None:
+        class MultipleRowsResult(FakeResult):
+            def fetchall(self) -> list[tuple[object, ...]]:
+                return [
+                    ("listing:XSHG:600519",),
+                    ("listing:XSHG:600519:duplicate",),
+                ]
+
+        class AmbiguousFallbackConnection(FakeConnection):
+            def execute(
+                self, query: str, params: tuple[object, ...] = ()
+            ) -> FakeResult:
+                self.calls.append((query, params))
+                if "FROM identifier_history AS identifiers" in query:
+                    return FakeResult()
+                if "FROM listings" in query and "listed_on <=" in query:
+                    return MultipleRowsResult()
+                return FakeResult((True,)) if "RETURNING" in query else FakeResult()
+
+        sink = CanonicalBackfillSink(
+            connection=AmbiguousFallbackConnection(),
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = DailyObservationPayload(
+            rows=(
+                StagedDailyObservation(
+                    code="SH.600519",
+                    exchange=Exchange.XSHG,
+                    session_date=date(2018, 1, 2),
+                    currency="CNY",
+                    open=None,
+                    high=None,
+                    low=None,
+                    close=None,
+                    previous_close=None,
+                    volume_shares=None,
+                    amount=None,
+                    is_trading=False,
+                    special_treatment=SpecialTreatment.NONE,
+                    source_id="baostock_sdk",
+                ),
+            )
+        )
+
+        with self.assertRaisesRegex(CanonicalSinkError, "unique compatible current identity"):
+            sink.persist(
+                batch_for(BackfillDataDomain.RAW_DAILY_BAR, payload),
+                dataset_version_id="dataset:bars:v1",
+            )
+
+    def test_strict_pit_batch_never_queries_current_known_listing_fallback(self) -> None:
+        connection = CurrentIdentityFallbackConnection()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = DailyObservationPayload(rows=())
+        strict_batch = replace(
+            batch_for(BackfillDataDomain.RAW_DAILY_BAR, payload),
+            trust_state=DataTrustState.PIT_VERIFIED,
+        )
+
+        with self.assertRaisesRegex(CanonicalSinkError, "only normalized_current"):
+            sink.persist(strict_batch, dataset_version_id="dataset:strict:v1")
+
+        self.assertEqual(connection.calls, [])
+
     def test_persists_calendar_with_explicit_provider_closure_reason(self) -> None:
         connection = FakeConnection()
         sink = CanonicalBackfillSink(
@@ -554,7 +670,6 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             params for query, params in connection.calls if "INSERT INTO universe_memberships" in query
         )
         self.assertEqual(membership[1], "listing:XSHG:600519")
-
 
 if __name__ == "__main__":
     unittest.main()
