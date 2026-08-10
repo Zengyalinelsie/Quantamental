@@ -48,6 +48,7 @@ class BackfillDataDomain(str, Enum):
     SHARE_CAPITAL = "share_capital"
     CORPORATE_ACTION = "corporate_action"
     TRADING_CALENDAR = "trading_calendar"
+    FINANCIAL_STATEMENT = "financial_statement"
 
 
 class BackfillJobStatus(str, Enum):

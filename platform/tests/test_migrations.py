@@ -59,8 +59,28 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0012_timing_shadow_ledger.sql",
                 "0013_disclosure_time_precision.sql",
                 "0015_timing_benchmark_bars.sql",
+                "0016_financial_backfill_dimensions.sql",
             ),
         )
+
+    def test_financial_backfill_reuses_ledgers_with_explicit_work_unit_dimensions(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0016_financial_backfill_dimensions.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "financial_statement",
+            "statement_type",
+            "provider_table",
+            "report_period_end",
+            "symbol_bucket_id",
+            "symbol_count",
+            "provider_profile_version",
+            "universe_version_id",
+            "mapping_version_id",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_disclosure_precision_migration_distinguishes_date_only_metadata(self) -> None:
         sql = (
