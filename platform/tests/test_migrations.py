@@ -52,6 +52,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0005_data_backfill.sql",
                 "0006_disclosure_evidence.sql",
                 "0007_canonical_metrics.sql",
+                "0008_financial_facts.sql",
             ),
         )
 
@@ -84,6 +85,32 @@ class MigrationRunnerTest(unittest.TestCase):
             "method <> 'fuzzy' OR production_allowed = FALSE",
             "CREATE TABLE financial_quality_rules",
             "CREATE TABLE unmapped_metric_fields",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, sql)
+
+    def test_financial_fact_migration_preserves_bitemporal_and_lineage_contracts(self) -> None:
+        sql = (PLATFORM_ROOT / "migrations" / "0008_financial_facts.sql").read_text(
+            encoding="utf-8"
+        )
+        for contract in (
+            "CREATE TABLE financial_fact_observations",
+            "company_id",
+            "security_id",
+            "report_period_end",
+            "announced_at",
+            "available_at",
+            "known_from",
+            "known_to",
+            "revision_sequence",
+            "provider_id",
+            "raw_object_hash",
+            "trust_state",
+            "quality_state",
+            "mapping_version_id",
+            "dataset_version_id",
+            "quality_issue_ids",
+            "CREATE TABLE financial_authority_rules",
         ):
             with self.subTest(contract=contract):
                 self.assertIn(contract, sql)

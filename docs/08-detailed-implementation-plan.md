@@ -364,13 +364,13 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 ### P3-W03：PIT Financial Repository
 
-- [ ] FactObservation 持久化；
-- [ ] announcement/available/revision/system interval；
-- [ ] current 与 strict query；
-- [ ] 同源修订；
-- [ ] 多源冲突和权威选择；
-- [ ] backfill 不污染历史；
-- [ ] lineage 和 quality propagation。
+- [x] FactObservation 持久化；
+- [x] announcement/available/revision/system interval；
+- [x] current 与 strict query；
+- [x] 同源修订；
+- [x] 多源冲突和权威选择；
+- [x] backfill 不污染历史；
+- [x] lineage 和 quality propagation。
 
 ### P3-W04：真实 PIT Fixture Pack
 

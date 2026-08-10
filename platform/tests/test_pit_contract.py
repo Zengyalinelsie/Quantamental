@@ -1,9 +1,14 @@
 import unittest
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 
+from a_share_platform.domain.metrics import MetricUnit, StatementType
 from a_share_platform.domain.pit import (
+    AuthorityRule,
+    DataQualityState,
     DataTrustState,
     FactObservation,
+    FinancialPeriodType,
     PointInTimeConflictError,
     select_fact_as_of,
 )
@@ -13,21 +18,49 @@ from a_share_platform.domain.run_context import DataMode
 def make_fact(*, trust_state: DataTrustState = DataTrustState.PIT_VERIFIED) -> FactObservation:
     return FactObservation(
         fact_id="fact:revenue:2025",
+        company_id="company:600519",
         security_id="security:CN:600519:XSHG",
         metric_code="revenue",
         value=100.0,
+        unit=MetricUnit.CURRENCY,
+        currency="CNY",
         report_period_end=date(2025, 12, 31),
+        period_type=FinancialPeriodType.ANNUAL,
+        statement_type=StatementType.INCOME_STATEMENT,
         announced_at=datetime(2026, 3, 30, 10, tzinfo=UTC),
         available_at=datetime(2026, 3, 30, 10, 1, tzinfo=UTC),
         known_from=datetime(2026, 4, 1, 9, tzinfo=UTC),
         known_to=None,
         revision_sequence=0,
+        provider_id="provider:cninfo",
+        source_field="revenue",
+        raw_object_hash="sha256:" + "a" * 64,
         trust_state=trust_state,
+        quality_state=DataQualityState.PASSED,
+        mapping_version_id="metric-mapping:cninfo:v1",
         source_object_id="raw:sha256:abc",
+        dataset_version_id="dataset:financials:v1",
+        quality_issue_ids=(),
     )
 
 
 class FactObservationTest(unittest.TestCase):
+    def test_currency_hash_quality_and_authority_contracts_fail_closed(self) -> None:
+        with self.assertRaisesRegex(ValueError, "currency is required"):
+            replace(make_fact(), currency=None)
+        with self.assertRaisesRegex(ValueError, "raw_object_hash"):
+            replace(make_fact(), raw_object_hash="not-a-hash")
+        with self.assertRaisesRegex(ValueError, "quality_issue_ids"):
+            replace(make_fact(), quality_state=DataQualityState.BLOCKED)
+
+        authority = AuthorityRule("authority:official-first:v1", ("provider:cninfo",))
+        self.assertEqual(authority.provider_priority, ("provider:cninfo",))
+        with self.assertRaisesRegex(ValueError, "unique"):
+            AuthorityRule(
+                "authority:duplicate:v1",
+                ("provider:cninfo", "provider:cninfo"),
+            )
+
     def test_strict_history_rejects_fact_before_public_availability(self) -> None:
         fact = make_fact()
         self.assertFalse(
