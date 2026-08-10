@@ -10,7 +10,7 @@
 
 ## 当前状态
 
-P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 的数据来源决策、A 股身份、历史股票池、市场数据合同、真实 Parquet、只读 API 和 Universe & Screen 前端已经实现并通过自动化与 HTTP 验证；320/768/1024/1440 浏览器视觉证据尚未补齐，因此暂不宣称 P2 Capability Gate 通过。
+P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；320/768/1024/1440 浏览器视觉证据和合规真实数据回填尚未补齐，因此暂不宣称 P2 Capability Gate 通过。P3-W01 已建立不可变 RawObject 与官方披露版本链，P3 其余工作包仍在进行。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -53,6 +53,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P1 实现与验证证据](docs/10-p1-implementation-evidence.md)
 - [P2 数据来源覆盖矩阵](docs/11-p2-data-source-coverage-matrix.md)
 - [P2 实现与验证证据](docs/12-p2-implementation-evidence.md)
+- [P3 实现与验证证据](docs/13-p3-implementation-evidence.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 
 ## 开发入口

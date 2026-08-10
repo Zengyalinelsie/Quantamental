@@ -49,8 +49,27 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0002_security_master.sql",
                 "0003_universe.sql",
                 "0004_market_data.sql",
+                "0006_disclosure_evidence.sql",
             ),
         )
+
+    def test_disclosure_migration_preserves_raw_evidence_and_public_versions(self) -> None:
+        sql = (PLATFORM_ROOT / "migrations" / "0006_disclosure_evidence.sql").read_text(
+            encoding="utf-8"
+        )
+        for contract in (
+            "CREATE TABLE raw_objects",
+            "content_hash",
+            "license_id",
+            "retention_policy",
+            "CREATE TABLE official_disclosures",
+            "published_at",
+            "available_at",
+            "first_tradable_at",
+            "supersedes_disclosure_id",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, sql)
 
     def test_discovers_and_applies_unseen_migrations_in_order(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

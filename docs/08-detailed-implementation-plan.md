@@ -345,13 +345,13 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 ### P3-W01：RawObject 与官方披露
 
-- [ ] 请求/响应/文件不可变保存；
-- [ ] SHA-256、URL、provider、retrieved_at；
-- [ ] 巨潮/交易所/公司公告索引；
-- [ ] publication 和 first tradable availability；
-- [ ] 文档版本、更正、撤回；
-- [ ] PDF/HTML 元数据；
-- [ ] license/retention policy。
+- [x] 请求/响应/文件不可变保存；
+- [x] SHA-256、URL、provider、retrieved_at；
+- [x] 巨潮/交易所/公司公告索引；
+- [x] publication 和 first tradable availability；
+- [x] 文档版本、更正、撤回；
+- [x] PDF/HTML 元数据；
+- [x] license/retention policy。
 
 ### P3-W02：Canonical Metric Registry
 
