@@ -31,13 +31,13 @@ Provider Registry、许可、canonical sink 或 PIT 门。
 | `a_share_mcp_baostock` | 沪深身份探针、日历、日线、状态、行业、指数成员样本 | 原型查询可用 | `normalized_current` | 小样本、current 研究、交叉核验 | 无公告可用时间；不直接批量持久化 |
 | `baostock_sdk` | 沪深 raw 日线、交易日历 | 已实现并真实落库日历 | `normalized_current` | 经显式 ack 的私人本地研究 | 日线必须 `adjustflag=3`；不含北交所和完整公司行动 |
 | `a_share_identity_universe` | 沪深 Security Master、行业、CSI300/500 成分 | 真实 CSI800 当前身份 799/800；CSI500 当日 Universe 500；历史 Universe 未完成 | `normalized_current` | 经显式 ack 的私人本地研究 | current 身份和历史检索不等于 PIT；不含北交所 |
-| `akshare` / CNInfo 网页端点 | 身份补充、指数、财务、宏观、新闻、公告候选 | fallback 候选；部分用于组合身份源 | `normalized_current` | current 研究、小型 fixture、补字段 | 网页结构/限流/端点条款逐项审查；不得接入 qfq 结果作为 raw bar |
-| `futu_quote` | 沪深 raw 日线；未来可评估只读资讯 | raw 日线 adapter 已实现 | `normalized_current` | 私人本地研究备源 | 只允许 `OpenQuoteContext`；禁止账户、持仓、订单和交易上下文 |
+| `akshare` / CNInfo 网页端点 | 身份补充、指数、财务、股本变动、分红送转、宏观、新闻、公告候选 | 组合身份源部分使用；股本/公司行动纯 normalizer 与 staging 已实现，canonical source/sink 未接 | `normalized_current` | current 研究、小型 fixture、补字段 | date-only 公告日不是 `available_at`；网页结构/限流/端点条款逐项审查；不得接入 qfq 结果作为 raw bar |
+| `futu_quote` | 沪深 raw 日线；未来可评估只读资讯和部分公司行动 | raw 日线 adapter 已实现；A 股公司行动尚未接平台 | `normalized_current` | 私人本地研究备源 | 只允许 `OpenQuoteContext`；接口目录只证明 A 股回购为候选，拆合股不支持 A 股，未证明完整历史股本；禁止账户、持仓、订单和交易上下文 |
 | Wind | 身份、行情、三表、预期、行业、指数、公司行动等候选 | 用户有能力，接口和许可待提供 | 待资格审查 | 高优先级结构化候选 | 不因付费自动获得 PIT；需确认历史修订、可用时间和本地保存权 |
 | Factor Service / iFinD/THS | A 股三表、日行情、股本、市值、汇率、宏观等 | 文档可用；live metadata 未验证 | `normalized_current` | 结构化 current 主候选、交叉对账 | 部分查询有 read-through cache 写入；字段数、覆盖和 PIT 时间存在冲突 |
 | SneAgent | PDF 主表/notes 抽取，报告聚焦港股五表 | 内部服务候选 | `raw` / `normalized_current` | 缺字段、notes、复杂版式、冲突复核 | 内部 `verified` 不等于 `pit_verified`；单份约 7–13 分钟 |
 | 巨潮/交易所/公司披露 | 公告、PDF、发布时间、更正/撤回、原始证据 | P3 合同已实现；4 家/8 份 PDF/2 修订链真实小样本已落库 | `raw`；治理后可形成 PIT 观察 | 公告与财务事实权威证据 | 保存/再分发逐站点审查；日期精度不可靠时用保守时间 |
-| 上交所/深交所/北交所 | 身份、挂牌、日历、规则、公司行动 | 权威核验候选 | `raw` | 权威抽样和争议核验 | API/页面不统一，端点许可待审 |
+| 上交所/深交所/北交所 | 身份、挂牌、日历、规则、公司行动 | 权威核验候选；经 AkShare 包装的 BSE current 列表探针返回 333 行，尚无 direct adapter | `raw` | 权威抽样和争议核验 | current 列表不含完整历史身份；API/页面不统一，端点许可待审 |
 | 中证指数公司 | CSI300/500 定义和成员 | 权威核验候选 | `raw` | Universe 版本核验 | 历史文件、下载许可和有效区间需固化 |
 | XE（经 Factor Service） | HKD/CNY/USD 交叉汇率 | 文档称 2021–2026 已入库 | `normalized_current` | current 估值/换算候选 | 必须保存货币对、日期、source；不能把 current 汇率回填历史 |
 | 官方宏观来源/Factor Service | 国债、LPR、Shibor、回购、GDP、CPI、社融、M2、投资、消费、贸易 | 部分内部表已入库 | `normalized_current` | current 宏观特征候选 | 需要 release/available time 才能进入 strict historical |
@@ -50,11 +50,12 @@ Provider Registry、许可、canonical sink 或 PIT 门。
 | 数据需求 | 主源 | 备源/权威核验 | 当前可用模式 |
 |---|---|---|---|
 | 沪深 Security Master | `a_share_identity_universe` | 交易所、Wind、AkShare | `current_research` / 私人本地 |
+| XBSE Security Master | 北交所 direct adapter（待实现） | AkShare BSE current 列表、Wind | 仅有 current 形状探针和 `BJ.*` staging；尚不可 canonical 入库 |
 | CSI300/500 成分 | 组合身份源 | 中证指数公司、Wind | `normalized_current`；历史 PIT 尚未证明 |
 | 交易日历 | `baostock_sdk` | 交易所、AkShare | `normalized_current`；已落库 2018+ |
 | raw 日线 OHLCV | `baostock_sdk` | Futu quote、Wind、交易所抽样 | 私人本地 `normalized_current` |
-| 股本/自由流通/市值 | 第一资格候选 Factor Service/iFinD/THS | Wind 候选、公告/交易所核验 | 候选，尚未接入 canonical sink |
-| 公司行动 | 官方交易所/公告 | Factor Service、Wind、AkShare/BaoStock 候选 | 当前缺口；不得填 0 |
+| 股本/自由流通/市值 | 第一资格候选 Factor Service/iFinD/THS | Wind、CNInfo/AkShare staging、公告/交易所核验 | CNInfo 股本变动 shape/normalizer 可用；尚未接 source/canonical sink |
+| 公司行动 | 官方交易所/公告 | Factor Service、Wind、CNInfo/AkShare、BaoStock/Futu 部分候选 | CNInfo 分红送转 shape/normalizer 可用；尚未 canonical 入库，不得填 0 |
 | A 股三表 current | 通过资格审查的 Factor Service/iFinD/THS | Wind 候选、官方公告抽样对账 | `normalized_current` |
 | A 股三表 strict history | 具有修订和可用时间的结构化源 | 官方公告版本链 + 人工/程序核验 | 当前无通用合格源 |
 | PDF notes/缺失字段 | SneAgent | 人工复核、官方 PDF | `raw` / `normalized_current` |
@@ -63,6 +64,36 @@ Provider Registry、许可、canonical sink 或 PIT 门。
 | 公司公告 | 巨潮/交易所/公司披露 | 官方交叉核验 | P3 evidence ledger |
 | 新闻/事件 | 官方公告优先，AkShare/Futu 只读资讯候选 | donor 的搜索路由模式 | P8 前仅公告；新闻 runtime 尚未迁移 |
 | 全球行情/财务 | Wind 或 yfinance 候选 | 官方 filing | 当前不属于 A 股 P2 主链 |
+
+### 3.1 P2 股本、公司行动和 XBSE 的精确状态
+
+2026-08-10 的只读最小探针与代码能力必须分开解读：
+
+| 数据域 | 只读探针 | 已实现代码 | 尚未完成 | 可信上限 |
+|---|---|---|---|---|
+| 沪深股本变动 | 五粮液 2018–2026 返回 18 行，含变动/公告日期、总/流通/受限股本 | provider-neutral payload、纯 CNInfo normalizer、单位与缺失检查 | AkShare source、Registry/CLI、canonical sink、全范围覆盖和许可验证 | `normalized_current` |
+| 沪深分红送转 | 五粮液返回 28 行，含实施公告、送股、转增、派息、登记和除权日期 | 送股/转增分离 staging、十股到每股 Decimal 换算、零分配不造 action | 配股/回购等完整行动、source/canonical sink、修订和精确可用时间 | `normalized_current` |
+| XBSE current 列表 | BSE 包装端点返回 333 行，含代码、简称、股本、上市日、行业和报告日 | 通用 staging 接受 `BJ.* + XBSE` | direct BSE adapter、法定公司身份、历史代码/名称/退市、canonical sink | `normalized_current` |
+
+探针行数没有进入数据库，也不是覆盖率报告。`announced_on` 只保留供应商的 date 精度，
+不能转换为历史 `available_at`。staging 使用内容稳定的 provider record ID，重复或矛盾记录
+fail closed，但这仍不能解决代码变化下的稳定 Listing 身份。
+
+当前 source 顺序为：
+
+1. 股本 current 结构化第一资格候选仍是 Factor Service/iFinD/THS，Wind 是待审备用；
+   CNInfo/AkShare 是已验证形状的 fallback，交易所/公告负责权威核验。
+2. 公司行动以交易所/官方公告为权威；CNInfo/AkShare 已覆盖分红送转形状，BaoStock/Futu
+   只作为部分字段候选，不得把部分覆盖写成完整公司行动。
+3. XBSE 身份目标主链应为北交所 direct adapter，AkShare 包装列表只能做 current fallback；
+   缺法定公司身份或历史有效区间时拒绝 canonical 映射。
+4. 历史 CSI Universe 优先评估中证官方文件或合格 Wind 数据；BaoStock 的带日期检索继续是
+   `normalized_current` fallback，不能绕过 `SZ.302132` 稳定 Listing 冲突或 `SH.600079`
+   历史身份缺口。
+
+`CanonicalBackfillSink` 当前没有接收股本/公司行动新 payload，执行 CLI 也未开放这些来源。
+现有 `corporate_actions` schema 的 DatasetVersion/trust 和送股/转增表达仍需单独设计审查；
+在 SPEC-010 稳定 Listing ID 冲突裁决前，不新增 current-code 派生持久化路径。
 
 ## 4. 财务三表结论
 

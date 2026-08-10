@@ -255,3 +255,52 @@ Security Master、历史 Universe、2018+ 行情、股本或公司行动全部�
 因此当前准确状态是：CSI800 当前 Security Master 目标 799/800；CSI500 当日 Universe
 500/500；完整历史 CSI300/CSI500 Universe 仍未完成。单日成功记录可供 P3 当日被动 Timing
 baseline 绑定，但不能代替历史 Universe，更不能用于 `strict_historical`。
+
+## 13. 股本、公司行动与 XBSE staging 工作包
+
+在不选择 SPEC-010 稳定 Listing ID 方案、不访问交易账户且不写数据库的前提下，P2 新增了
+一个 provider-neutral staging 工作包。它只解决“如何诚实接住来源观察”，没有把来源升级为
+可执行全量 backfill 或 canonical 数据：
+
+- `StagedShareCapitalObservation/ShareCapitalPayload` 保存证券代码、交易所、股本变动日、
+  date-only 公告日、总股本、已流通、流通受限、自由流通缺失、来源和稳定 provider record ID；
+- `StagedCorporateActionObservation/CorporateActionPayload` 分开保存每股现金、送股、转增和
+  配股经济条款，不把送股与转增静默合并；
+- `CninfoMarketStructureNormalizer` 是不访问网络的纯转换层，可把已经取得的
+  `stock_share_change_cninfo` 和 `stock_dividend_cninfo` 记录转换为上述 payload；CNInfo 的
+  每十股分配口径使用 `Decimal` 显式换算为每股口径；
+- provider 返回的零分配不会被写成数值为 0 的公司行动；缺失自由流通股本保持 `None`；
+- 不可能的股本分项、代码错配、重复 provider record、缺失经济条款和不完整配股条款均
+  fail closed；
+- payload 合同接受 `BJ.* + Exchange.XBSE`，证明 XBSE 市场结构观察可以进入同一 staging
+  边界；这不等于已经实现北交所 Security Master source、法定名称映射或 canonical 入库。
+
+同日只读最小探针取得的来源形状为：
+
+- `stock_share_change_cninfo(000858, 2018–2026)`：18 行，包含变动日期、公告日期、总股本、
+  已流通股份、流通受限股份和变动原因；
+- `stock_dividend_cninfo(000858)`：28 行，包含实施方案公告日期、送股比例、转增比例、
+  派息比例、股权登记日和除权日；
+- `stock_info_bj_name_code()`：333 行，包含北交所证券代码、简称、总股本、流通股本、
+  上市日期、行业和报告日期。
+
+这些行数只证明探针当时返回了可解析结果，不证明全市场/2018+ 覆盖、端点稳定性、许可、
+修订连续性或 PIT。探针结果没有写入平台数据库。staging 中的 `announced_on` 仍只是 date
+精度字段，不生成或推断 `available_at`；所有免费源结果最多为 `normalized_current`。
+
+TDD 证据：先以缺失 payload/normalizer 的 import error 建立红灯，再完成最小实现。定向
+`12 tests` 通过；当时共享分支全量 `311 tests` 通过，Ruff 通过、mypy `91 source files`
+通过、compileall 和 `git diff --check` 通过。全量计数包含同期其他工作包，不能把 311 全部
+归因于本工作包。
+
+尚未完成且继续阻断 durable 链路：
+
+1. `CanonicalBackfillSink` 尚不接收这两类 payload，Provider Registry 和执行 CLI 也未开放；
+2. `corporate_actions` 现有 schema 没有完整 DatasetVersion/trust 和“送股/转增分别保存”合同，
+   本工作包没有用 migration 猜测最终 schema；
+3. `SZ.302132/SZ.300114` 仍证明 current-code 派生 Listing ID 违反 SPEC-010 的稳定身份要求；
+4. `SH.600079` 仍缺唯一历史身份，完整 CSI300/CSI500 Universe 不能据此继续；
+5. 北交所 333 行只是 current 列表探针，缺历史代码/名称、退市、法定公司身份和有效区间。
+
+因此本节证明的是 staging 和 fail-closed 转换能力，不是股本/公司行动/XBSE 已真实入库，
+不改变 P2 Capability Gate 的待验证结论，也不证明任何数据、因子或模型科学有效。
