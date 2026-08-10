@@ -68,6 +68,7 @@ describe('SystemEvidenceScreen', () => {
         published_at: '2026-08-10T12:00:00Z',
         available_at: '2026-08-10T12:00:00Z',
         first_tradable_at: '2026-08-10T12:00:00Z',
+        publication_time_precision: 'date_only',
         version_sequence: 1,
         status: 'corrected',
         raw_object_id: 'raw:cninfo:1',
@@ -79,6 +80,7 @@ describe('SystemEvidenceScreen', () => {
     fireEvent.change(screen.getByLabelText('公司 ID'), { target: { value: 'company:600519' } })
     fireEvent.click(screen.getByRole('button', { name: '查询披露' }))
     expect(await screen.findByText('2024 年年度报告（更正后）')).toBeInTheDocument()
+    expect(screen.getByText('仅日期')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '查看原始证据' }))
     expect(await screen.findByText('metadata_only')).toBeInTheDocument()
     expect(screen.getByText(/不允许再分发/)).toBeInTheDocument()

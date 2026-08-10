@@ -45,6 +45,7 @@ class DisclosureTimelineEntry:
     published_at: datetime
     available_at: datetime
     first_tradable_at: datetime
+    publication_time_precision: str
     version_sequence: int
     status: str
     raw_object_id: str

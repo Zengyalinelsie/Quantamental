@@ -80,6 +80,7 @@ class FinancialEvidenceApiTest(unittest.TestCase):
                     published_at=NOW,
                     available_at=NOW,
                     first_tradable_at=NOW,
+                    publication_time_precision="exact",
                     version_sequence=1,
                     status="corrected",
                     raw_object_id="raw:cninfo:1",

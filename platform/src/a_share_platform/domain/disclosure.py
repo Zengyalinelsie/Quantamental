@@ -51,6 +51,13 @@ class DisclosureSource(str, Enum):
     COMPANY = "company"
 
 
+class PublicationTimePrecision(str, Enum):
+    """Precision supplied by the official index, never inferred from a clock value."""
+
+    EXACT = "exact"
+    DATE_ONLY = "date_only"
+
+
 @dataclass(frozen=True)
 class RawObject:
     """One immutable request, response, or document body plus its usage policy."""
@@ -117,6 +124,7 @@ class OfficialDisclosure:
     raw_object_id: str
     supersedes_disclosure_id: str | None
     status_reason: str | None
+    publication_time_precision: PublicationTimePrecision = PublicationTimePrecision.EXACT
 
     def __post_init__(self) -> None:
         for name in (
@@ -137,6 +145,15 @@ class OfficialDisclosure:
         published_at = _aware(self.published_at, "published_at")
         available_at = _aware(self.available_at, "available_at")
         first_tradable_at = _aware(self.first_tradable_at, "first_tradable_at")
+        precision = PublicationTimePrecision(self.publication_time_precision)
+        object.__setattr__(self, "publication_time_precision", precision)
+        if precision is PublicationTimePrecision.DATE_ONLY and (
+            published_at.hour,
+            published_at.minute,
+            published_at.second,
+            published_at.microsecond,
+        ) != (0, 0, 0, 0):
+            raise ValueError("date_only publication metadata must use local midnight")
         if available_at < published_at:
             raise ValueError("available_at cannot precede published_at")
         if first_tradable_at < available_at:
@@ -163,6 +180,7 @@ __all__ = [
     "DisclosureSource",
     "DisclosureStatus",
     "OfficialDisclosure",
+    "PublicationTimePrecision",
     "RawObject",
     "RawObjectKind",
     "RetentionPolicy",

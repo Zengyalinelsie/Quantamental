@@ -9,6 +9,7 @@ from a_share_platform.adapters.postgres.financial_evidence import (
 )
 from a_share_platform.application.financial_evidence import (
     FactComparisonQuery,
+    FactIdentityQuery,
     compare_fact_modes,
 )
 from a_share_platform.domain.metrics import MetricUnit, StatementType
@@ -186,6 +187,44 @@ class FinancialEvidenceSelectionTest(unittest.TestCase):
 
 
 class PostgresFinancialEvidenceReaderTest(unittest.TestCase):
+    def test_jsonb_numeric_text_is_not_reparsed_through_binary_float(self) -> None:
+        exact = "17085765657.950001"
+        row = fact_row(replace(fact(), value=exact))
+        connection = FakeConnection({"facts": [row]})
+        restored = PostgresFinancialEvidenceReader(Factory(connection)).list_fact_revisions(
+            # A company filter is sufficient for this read-model round trip.
+            FactIdentityQuery(company_id="company:600519")
+        )
+        self.assertEqual(restored[0].value, exact)
+        self.assertIsInstance(restored[0].value, str)
+
+    def test_disclosure_preserves_official_publication_time_precision(self) -> None:
+        disclosure = (
+            "disclosure:1",
+            "document:1",
+            "1",
+            "company:600519",
+            "security:600519",
+            "cninfo",
+            "年度报告",
+            "annual_report",
+            date(2024, 12, 31),
+            NOW,
+            NOW,
+            NOW,
+            "date_only",
+            0,
+            "published",
+            "raw:1",
+            None,
+            None,
+        )
+        connection = FakeConnection({"disclosures": [disclosure]})
+        rows = PostgresFinancialEvidenceReader(Factory(connection)).list_disclosures(
+            "company:600519"
+        )
+        self.assertEqual(rows[0].publication_time_precision, "date_only")
+
     def test_comparison_reads_facts_and_versioned_authority_in_read_only_transactions(self) -> None:
         connection = FakeConnection(
             {

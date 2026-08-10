@@ -53,14 +53,8 @@ class Connection(Protocol):
 ConnectionFactory = Callable[[], AbstractContextManager[Connection]]
 
 
-def _json(value: object) -> object:
-    if isinstance(value, str):
-        return json.loads(value)
-    return value
-
-
 def _strings(value: object) -> tuple[str, ...]:
-    parsed = _json(value)
+    parsed = json.loads(value) if isinstance(value, str) else value
     if not isinstance(parsed, (list, tuple)):
         raise TypeError("stored JSON value is not an array")
     return tuple(str(item) for item in parsed)
@@ -102,7 +96,8 @@ class PostgresFinancialEvidenceReader:
             f"""
             SELECT disclosure_id, document_key, external_document_id, company_id,
                    security_id, source_system, title, document_type, report_period_end,
-                   published_at, available_at, first_tradable_at, version_sequence,
+                   published_at, available_at, first_tradable_at,
+                   publication_time_precision, version_sequence,
                    status, raw_object_id, supersedes_disclosure_id, status_reason
             FROM official_disclosures {where}
             ORDER BY document_key, version_sequence, published_at
@@ -281,7 +276,9 @@ class PostgresFinancialEvidenceReader:
 
     @staticmethod
     def _fact(row: Sequence[object]) -> FactObservation:
-        value = _json(row[4])
+        # psycopg already decodes JSONB. A JSON string containing a decimal is
+        # therefore Python ``str`` here and must not be parsed a second time.
+        value = row[4]
         if type(value) not in {str, int, float, bool}:
             raise TypeError("stored fact value has an unsupported type")
         return FactObservation(
@@ -326,9 +323,10 @@ class PostgresFinancialEvidenceReader:
             published_at=cast(datetime, row[9]),
             available_at=cast(datetime, row[10]),
             first_tradable_at=cast(datetime, row[11]),
-            version_sequence=int(cast(int, row[12])),
-            status=str(row[13]),
-            raw_object_id=str(row[14]),
-            supersedes_disclosure_id=None if row[15] is None else str(row[15]),
-            status_reason=None if row[16] is None else str(row[16]),
+            publication_time_precision=str(row[12]),
+            version_sequence=int(cast(int, row[13])),
+            status=str(row[14]),
+            raw_object_id=str(row[15]),
+            supersedes_disclosure_id=None if row[16] is None else str(row[16]),
+            status_reason=None if row[17] is None else str(row[17]),
         )

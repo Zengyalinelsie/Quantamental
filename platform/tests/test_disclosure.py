@@ -3,6 +3,7 @@ import unittest
 from dataclasses import FrozenInstanceError, replace
 from datetime import UTC, date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from a_share_platform.adapters.memory.disclosure import InMemoryDisclosureRepository
 from a_share_platform.adapters.object_store.local import LocalRawObjectStore
@@ -10,6 +11,7 @@ from a_share_platform.application.disclosure_ledger import DisclosureLedger
 from a_share_platform.domain.disclosure import (
     DisclosureStatus,
     OfficialDisclosure,
+    PublicationTimePrecision,
     RawObject,
     RawObjectKind,
     RetentionPolicy,
@@ -112,6 +114,19 @@ class OfficialDisclosureTest(unittest.TestCase):
             replace(disclosure(), available_at=PUBLISHED_AT.replace(hour=9))
         with self.assertRaisesRegex(ValueError, "first_tradable_at"):
             replace(disclosure(), first_tradable_at=PUBLISHED_AT)
+
+    def test_date_only_publication_is_explicit_and_cannot_masquerade_as_exact(self) -> None:
+        shanghai = ZoneInfo("Asia/Shanghai")
+        value = replace(
+            disclosure(),
+            published_at=datetime(2025, 4, 26, 0, 0, tzinfo=shanghai),
+            available_at=datetime(2025, 4, 28, 9, 15, tzinfo=shanghai),
+            first_tradable_at=datetime(2025, 4, 28, 9, 30, tzinfo=shanghai),
+            publication_time_precision=PublicationTimePrecision.DATE_ONLY,
+        )
+        self.assertEqual(value.publication_time_precision, PublicationTimePrecision.DATE_ONLY)
+        with self.assertRaisesRegex(ValueError, "date_only"):
+            replace(value, published_at=value.published_at.replace(hour=18))
 
     def test_original_correction_and_withdrawal_form_one_version_chain(self) -> None:
         original = self.repository.register_disclosure(disclosure())

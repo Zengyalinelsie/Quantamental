@@ -57,8 +57,22 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0010_canonical_universe_lineage.sql",
                 "0011_domain_aware_checkpoint_adjustment.sql",
                 "0012_timing_shadow_ledger.sql",
+                "0013_disclosure_time_precision.sql",
             ),
         )
+
+    def test_disclosure_precision_migration_distinguishes_date_only_metadata(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0013_disclosure_time_precision.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "ADD COLUMN publication_time_precision",
+            "publication_time_precision IN ('exact', 'date_only')",
+            "date_only",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_timing_shadow_migration_is_append_only_and_keeps_required_context(self) -> None:
         sql = (

@@ -172,7 +172,7 @@ class PostgresFinancialFactRepository:
         return prefix + cls._columns()
 
     @staticmethod
-    def _json_value(raw: object) -> object:
+    def _json_array(raw: object) -> object:
         if isinstance(raw, str):
             try:
                 return json.loads(raw)
@@ -182,10 +182,12 @@ class PostgresFinancialFactRepository:
 
     @classmethod
     def _from_row(cls, row: Sequence[object]) -> FactObservation:
-        raw_value = cls._json_value(row[4])
+        # psycopg already decodes JSONB. Numeric financial text intentionally
+        # remains a string and must never be reparsed through binary float.
+        raw_value = row[4]
         if type(raw_value) not in {str, int, float, bool}:
             raise ValueError("stored financial fact value has an unsupported JSON type")
-        raw_issues = cls._json_value(row[23])
+        raw_issues = cls._json_array(row[23])
         if not isinstance(raw_issues, (list, tuple)):
             raise TypeError("stored quality_issue_ids must be an array")
         return FactObservation(

@@ -101,7 +101,14 @@ function DisclosureView({ openEvidence }: { openEvidence: (id: string) => void }
   const columns: ColumnsType<DisclosureTimelineEntry> = [
     { title: '标题', dataIndex: 'title', width: 300 },
     { title: '报告期', dataIndex: 'report_period_end', width: 120 },
-    { title: '发布时间', dataIndex: 'published_at', width: 210 },
+    {
+      title: '发布时间',
+      dataIndex: 'published_at',
+      width: 260,
+      render: (value: string, row) => (
+        <span>{value} <Tag>{row.publication_time_precision === 'exact' ? '精确时间' : '仅日期'}</Tag></span>
+      ),
+    },
     { title: '市场可用', dataIndex: 'available_at', width: 210 },
     { title: '首次可交易', dataIndex: 'first_tradable_at', width: 210 },
     {

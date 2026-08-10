@@ -160,6 +160,7 @@ export interface DisclosureTimelineEntry {
   published_at: string
   available_at: string
   first_tradable_at: string
+  publication_time_precision: 'exact' | 'date_only'
   version_sequence: number
   status: 'published' | 'corrected' | 'withdrawn'
   raw_object_id: string

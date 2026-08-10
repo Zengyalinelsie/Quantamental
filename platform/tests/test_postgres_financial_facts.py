@@ -70,6 +70,41 @@ class FakeConnection:
 
 
 class PostgresFinancialFactRepositoryTest(unittest.TestCase):
+    def test_jsonb_numeric_text_preserves_decimal_digits_as_text(self) -> None:
+        value = observation()
+        exact = "17085765657.950001"
+        row = [
+            value.fact_id,
+            value.company_id,
+            value.security_id,
+            value.metric_code,
+            exact,
+            value.unit.value,
+            value.currency,
+            value.report_period_end,
+            value.period_type.value,
+            value.statement_type.value,
+            value.announced_at,
+            value.available_at,
+            value.known_from,
+            value.known_to,
+            value.revision_sequence,
+            value.provider_id,
+            value.source_field,
+            value.raw_object_hash,
+            value.trust_state.value,
+            value.quality_state.value,
+            value.mapping_version_id,
+            value.source_object_id,
+            value.dataset_version_id,
+            list(value.quality_issue_ids),
+        ]
+        restored = PostgresFinancialFactRepository(FakeConnection([tuple(row)])).get(
+            value.fact_id
+        )
+        self.assertEqual(restored.value, exact)  # type: ignore[union-attr]
+        self.assertIsInstance(restored.value, str)  # type: ignore[union-attr]
+
     def test_insert_preserves_all_fact_dimensions_and_is_immutable(self) -> None:
         connection = FakeConnection()
         repository = PostgresFinancialFactRepository(connection)
