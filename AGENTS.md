@@ -38,4 +38,5 @@ PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache python3.11 -m compileall -q sr
 - 权威目标架构：`docs/02-target-architecture.md`
 - 迁移取舍：`docs/03-migration-map.md`
 - 阶段、门槛和完成定义：`docs/04-execution-roadmap.md`
+- 数据源选择、覆盖、信任上限和 Agent 路由：`docs/14-data-source-catalog-and-agent-routing.md`
 - 重大且不可逆的技术决策：`docs/adr/`
