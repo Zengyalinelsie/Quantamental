@@ -4,6 +4,8 @@ from pathlib import Path
 
 from a_share_platform.adapters.postgres.migrations import apply_migrations, discover_migrations
 
+PLATFORM_ROOT = Path(__file__).resolve().parents[1]
+
 
 class FakeResult:
     def __init__(self, value: object | None = None) -> None:
@@ -39,6 +41,17 @@ class FakeConnection:
 
 
 class MigrationRunnerTest(unittest.TestCase):
+    def test_platform_migrations_are_versioned_in_order(self) -> None:
+        self.assertEqual(
+            tuple(path.name for path in discover_migrations(PLATFORM_ROOT / "migrations")),
+            (
+                "0001_governance_ledger.sql",
+                "0002_security_master.sql",
+                "0003_universe.sql",
+                "0004_market_data.sql",
+            ),
+        )
+
     def test_discovers_and_applies_unseen_migrations_in_order(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

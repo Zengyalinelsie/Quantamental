@@ -20,4 +20,12 @@ describe('workspace state', () => {
     expect(useWorkspaceStore.getState().desktopCollapsed).toBe(true)
     expect(useWorkspaceStore.getState().mobileDrawerOpen).toBe(true)
   })
+
+  it('tracks API system time without persisting a fake default', () => {
+    expect(useWorkspaceStore.getState().systemAsOf).toBeNull()
+    useWorkspaceStore.getState().setSystemAsOf('2026-08-10T04:00:00Z')
+    expect(useWorkspaceStore.getState().systemAsOf).toBe('2026-08-10T04:00:00Z')
+    useWorkspaceStore.getState().reset()
+    expect(useWorkspaceStore.getState().systemAsOf).toBeNull()
+  })
 })

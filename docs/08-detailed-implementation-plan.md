@@ -273,11 +273,11 @@ P0 Gate 未由用户批准前，不进入大规模实现。
 
 任务：
 
-- [ ] 对候选来源评估字段、2018+ 历史、公告时间、修订、退市、许可、稳定性、价格；
-- [ ] 明确免费原型源与未来实盘源的不同资格；
-- [ ] 定义 Provider Registry 和字段权限；
-- [ ] 选择第一主源、备用源、交易所权威源；
-- [ ] 写 ADR 和 coverage matrix。
+- [x] 对候选来源评估字段、2018+ 历史、公告时间、修订、退市、许可、稳定性、价格；
+- [x] 明确免费原型源与未来实盘源的不同资格；
+- [x] 定义 Provider Registry 和字段权限；
+- [x] 选择第一主源、备用源、交易所权威源；
+- [x] 写 ADR 和 coverage matrix。
 
 Gate：没有来源/许可决策，不开始批量历史回填。
 
@@ -285,49 +285,51 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 任务：
 
-- [ ] Company/Security/Listing schema；
-- [ ] SH/SZ/BJ 和板块；
-- [ ] 名称、代码、上市/退市历史；
-- [ ] ST、暂停上市、终止上市；
-- [ ] 行业分类 membership 有效区间；
-- [ ] 公司/证券/挂牌映射 API；
-- [ ] 代码变化和多证券 fixture。
+- [x] Company/Security/Listing schema；
+- [x] SH/SZ/BJ 和板块；
+- [x] 名称、代码、上市/退市历史；
+- [x] ST、暂停上市、终止上市；
+- [x] 行业分类 membership 有效区间；
+- [x] 公司/证券/挂牌映射 API；
+- [x] 代码变化和多证券 fixture。
 
 ### P2-W03：历史 Universe
 
 任务：
 
-- [ ] UniverseDefinition/Version/Membership；
-- [ ] research eligible 与 tradable eligible 分离；
-- [ ] 纳入/排除原因；
-- [ ] benchmark membership；
-- [ ] 退市样本覆盖；
-- [ ] 任意日重建查询；
-- [ ] Universe diff 和覆盖报告。
+- [x] UniverseDefinition/Version/Membership；
+- [x] research eligible 与 tradable eligible 分离；
+- [x] 纳入/排除原因；
+- [x] benchmark membership；
+- [x] 退市样本覆盖；
+- [x] 任意日重建查询；
+- [x] Universe diff 和覆盖报告。
 
 ### P2-W04：行情、日历、公司行动
 
 任务：
 
-- [ ] 原始不复权 OHLCV/amount；
-- [ ] 复权因子；
-- [ ] 涨跌停/停牌/ST/listing status；
-- [ ] 总/流通/自由流通股本；
-- [ ] 分红、送转、拆股、配股；
-- [ ] 交易日历和下一可交易 session；
-- [ ] 数据质量和来源冲突；
-- [ ] Parquet 分区与查询。
+- [x] 原始不复权 OHLCV/amount；
+- [x] 复权因子；
+- [x] 涨跌停/停牌/ST/listing status；
+- [x] 总/流通/自由流通股本；
+- [x] 分红、送转、拆股、配股；
+- [x] 交易日历和下一可交易 session；
+- [x] 数据质量和来源冲突；
+- [x] Parquet 分区与查询。
 
 ### P2-W05：前端研究入口
 
-- [ ] Research → Universe & Screen；
-- [ ] 历史时点和当前时点切换；
-- [ ] 成员、原因、状态、行业和版本；
-- [ ] 数据覆盖表；
-- [ ] 不可交易/退市明确展示；
-- [ ] ProTable 列配置和 URL view。
+- [x] Research → Universe & Screen；
+- [x] 历史时点和当前时点切换；
+- [x] 成员、原因、状态、行业和版本；
+- [x] 数据覆盖表；
+- [x] 不可交易/退市明确展示；
+- [x] ProTable 列配置和 URL view。
 
 ### Gate P2
+
+状态（2026-08-10）：实现、迁移、自动化测试和真实 HTTP 接线已完成；Capability Gate 暂不宣称通过。浏览器控制当前无可用实例，交付清单要求的 320/768/1024/1440 截图与视觉回归尚待补齐。证据和剩余项见 `docs/12-p2-implementation-evidence.md`。
 
 - 任意选定历史日可返回研究池、可交易池、行业和挂牌；
 - 至少包含一个退市、ST、停牌、代码/名称变化案例；

@@ -1,11 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { AppShell } from './AppShell'
 import { useWorkspaceStore } from '../state/workspace'
 
 describe('AppShell', () => {
+  afterEach(cleanup)
+
   beforeEach(() => {
     useWorkspaceStore.getState().reset()
   })
@@ -22,7 +24,8 @@ describe('AppShell', () => {
     expect(screen.getByText('research')).toBeInTheDocument()
     expect(screen.getByText('AS OF')).toBeInTheDocument()
     expect(screen.getByText('SYSTEM AS OF')).toBeInTheDocument()
-    expect(await screen.findByRole('heading', { name: '研究' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '研究' }, { timeout: 3_000 }))
+      .toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Events' })).toHaveAttribute('aria-selected', 'true')
   })
 
@@ -32,6 +35,23 @@ describe('AppShell', () => {
         <AppShell />
       </MemoryRouter>,
     )
-    expect(await screen.findByRole('heading', { name: '今日工作台' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '今日工作台' }, { timeout: 3_000 }))
+      .toBeInTheDocument()
+  })
+
+  it('reflects URL universe and historical as-of without relabelling the data mode', async () => {
+    render(
+      <MemoryRouter initialEntries={[
+        '/research?tab=events&universe=universe-version%3Acore-a-share%3Av1'
+        + '&point=historical&as_of=2020-05-22',
+      ]}>
+        <AppShell />
+      </MemoryRouter>,
+    )
+    expect(await screen.findByRole('heading', { name: '研究' }, { timeout: 3_000 }))
+      .toBeInTheDocument()
+    expect(screen.getByText('universe-version:core-a-share:v1')).toBeInTheDocument()
+    expect(screen.getByText('2020-05-22')).toBeInTheDocument()
+    expect(screen.getByText('current_research')).toBeInTheDocument()
   })
 })

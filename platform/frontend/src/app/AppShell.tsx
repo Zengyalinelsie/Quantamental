@@ -49,9 +49,15 @@ function RouteWorkspace({ definition }: { definition: (typeof workspaceDefinitio
 }
 
 export function AppShell() {
+  const location = useLocation()
+  const routeContext = new URLSearchParams(location.search)
+  const selectedUniverse = routeContext.get('universe')
+  const selectedAsOf = routeContext.get('as_of')
+  const pointMode = routeContext.get('point') === 'historical' ? 'historical' : 'current'
   const desktopCollapsed = useWorkspaceStore((state) => state.desktopCollapsed)
   const mobileDrawerOpen = useWorkspaceStore((state) => state.mobileDrawerOpen)
   const securityQuery = useWorkspaceStore((state) => state.securityQuery)
+  const systemAsOf = useWorkspaceStore((state) => state.systemAsOf)
   const setDesktopCollapsed = useWorkspaceStore((state) => state.setDesktopCollapsed)
   const setMobileDrawerOpen = useWorkspaceStore((state) => state.setMobileDrawerOpen)
   const setSecurityQuery = useWorkspaceStore((state) => state.setSecurityQuery)
@@ -124,7 +130,7 @@ export function AppShell() {
             </span>
             <span className="contextItem contextItem--scope">
               <small>UNIVERSE</small>
-              <strong>未选择</strong>
+              <strong title={selectedUniverse ?? undefined}>{selectedUniverse ?? '未选择'}</strong>
             </span>
             <span className="contextItem contextItem--scope">
               <small>PORTFOLIO</small>
@@ -132,11 +138,11 @@ export function AppShell() {
             </span>
             <span className="contextItem contextItem--time">
               <small>AS OF</small>
-              <strong>未选择</strong>
+              <strong>{selectedAsOf ?? (pointMode === 'current' ? '当前日期' : '未选择')}</strong>
             </span>
             <span className="contextItem contextItem--time">
               <small>SYSTEM AS OF</small>
-              <strong>API 未连接</strong>
+              <strong>{systemAsOf ?? 'API 未连接'}</strong>
             </span>
             <Tag className="environmentTag">DEV · READ ONLY</Tag>
           </div>

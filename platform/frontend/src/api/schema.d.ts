@@ -34,10 +34,22 @@ export interface ReadOperation {
 
 export interface paths {
   "/api/artifacts": { get: ReadOperation };
+  "/api/calendars/{exchange}/next-session": { get: ReadOperation };
   "/api/capabilities": { get: ReadOperation };
+  "/api/companies/{company_id}": { get: ReadOperation };
   "/api/datasets": { get: ReadOperation };
   "/api/health": { get: ReadOperation };
   "/api/identity": { get: ReadOperation };
+  "/api/listings/resolve": { get: ReadOperation };
+  "/api/market-data/bars": { get: ReadOperation };
+  "/api/market-data/corporate-actions": { get: ReadOperation };
+  "/api/market-data/quality": { get: ReadOperation };
+  "/api/market-data/summary": { get: ReadOperation };
   "/api/runs": { get: ReadOperation };
+  "/api/securities": { get: ReadOperation };
+  "/api/universes": { get: ReadOperation };
+  "/api/universes/{universe_version_id}/coverage": { get: ReadOperation };
+  "/api/universes/{universe_version_id}/diff": { get: ReadOperation };
+  "/api/universes/{universe_version_id}/snapshot": { get: ReadOperation };
   "/api/version": { get: ReadOperation };
 }

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 
 import { PageHeading } from '../components/PageHeading'
 import { WorkspaceUnavailable } from '../components/WorkspaceUnavailable'
+import { UniverseScreen } from './UniverseScreen'
 
 interface WorkspacePageProps {
   title: string
@@ -35,7 +36,9 @@ export function WorkspacePage({ title, description, tabs }: WorkspacePageProps) 
     return {
       key,
       label,
-      children: <WorkspaceUnavailable reason={reason} />,
+      children: key === 'universe-screen'
+        ? <UniverseScreen />
+        : <WorkspaceUnavailable reason={reason} />,
     }
   })
   return (

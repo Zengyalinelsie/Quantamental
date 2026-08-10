@@ -17,7 +17,8 @@ const capabilityRows: CapabilityRow[] = [
   { key: 'run-context', area: '核心合同', capability: '双轴 RunContext', state: 'ready', reason: '合法组合由领域合同 fail closed' },
   { key: 'pit', area: '核心合同', capability: 'PIT 时间与可信状态', state: 'ready', reason: '当前仅有领域合同，尚无生产数据' },
   { key: 'ledger', area: '治理', capability: '版本、运行与 Artifact 账本', state: 'ready', reason: '内存适配器供本地合同验证' },
-  { key: 'universe', area: '数据', capability: '历史股票池', state: 'blocked', reason: '等待 P2 数据来源与许可 ADR' },
+  { key: 'universe', area: '数据', capability: '历史股票池', state: 'ready', reason: 'P2 身份、历史成员与只读 API 合同就绪；运行时仍需真实摄取' },
+  { key: 'market-data', area: '数据', capability: '市场基础数据', state: 'ready', reason: '原始行情、复权因子、状态与 Parquet 查询就绪；免费源上限为 normalized_current' },
   { key: 'financials', area: '数据', capability: 'PIT 财务事实', state: 'blocked', reason: '等待 P3 正式接入' },
   { key: 'quality', area: '研究', capability: '公司质量', state: 'blocked', reason: '等待行业模板与特征版本' },
   { key: 'valuation', area: '研究', capability: '估值预期差', state: 'blocked', reason: '等待 P5 估值服务' },
@@ -75,13 +76,13 @@ export function DeskPage() {
         title="今日工作台"
         description="先看数据和能力是否可信，再看研究输出。当前页面只显示真实建设状态，不展示模拟行情或组合数字。"
         eyebrow="FUNDAMENTAL QUANT"
-        extra={<Tag color="processing">P1 · READ ONLY</Tag>}
+        extra={<Tag color="processing">P2 · READ ONLY</Tag>}
       />
       <section aria-label="平台能力状态" className="deskSection">
         <div className="sectionHeading">
           <div>
             <h2>能力与数据就绪度</h2>
-            <p>15 项核心能力逐项说明当前状态和启用条件。</p>
+            <p>16 项核心能力逐项说明当前状态和启用条件。</p>
           </div>
         </div>
         <ProTable<CapabilityRow>
@@ -91,7 +92,7 @@ export function DeskPage() {
           search={false}
           cardBordered={false}
           dateFormatter="string"
-          pagination={{ pageSize: 15, hideOnSinglePage: true }}
+          pagination={{ pageSize: 20, hideOnSinglePage: true }}
           options={{ density: true, fullScreen: true, setting: true, reload: false }}
           onChange={(_, filters, sorter) => {
             const updated = new URLSearchParams(searchParams)

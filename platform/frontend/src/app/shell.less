@@ -224,6 +224,150 @@
   padding-block: 0;
 }
 
+.universeScreen {
+  display: grid;
+  gap: 16px;
+}
+
+.universeControls {
+  display: flex;
+  min-height: 72px;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 14px 16px;
+  border: 1px solid @border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.universeControls label,
+.currentAsOf {
+  display: grid;
+  min-width: 190px;
+  gap: 7px;
+}
+
+.universeControls label:first-child {
+  width: min(430px, 40vw);
+}
+
+.universeControls label > span,
+.currentAsOf small,
+.datasetEvidence span {
+  color: @tertiary-text;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.universeControls input[type='date'] {
+  height: 32px;
+  padding: 4px 10px;
+  border: 1px solid @border;
+  border-radius: @radius;
+  color: @text;
+  background: @container;
+}
+
+.currentAsOf {
+  align-self: center;
+}
+
+.currentAsOf strong,
+.datasetEvidence strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.coverageGrid {
+  display: grid;
+  overflow: hidden;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  border: 1px solid @border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.coverageGrid .ant-statistic {
+  min-width: 0;
+  padding: 14px 16px;
+  border-right: 1px solid @secondary-border;
+}
+
+.coverageGrid .ant-statistic:last-child {
+  border-right: 0;
+}
+
+.coverageGrid .ant-statistic-title {
+  color: @tertiary-text;
+  font-size: 11px;
+}
+
+.coverageGrid .ant-statistic-content {
+  color: @text;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.universeTable {
+  overflow: hidden;
+  border: 1px solid @border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.datasetEvidence {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-bottom: 1px solid @secondary-border;
+}
+
+.datasetEvidence strong + span {
+  margin-left: 14px;
+}
+
+.universeTable .ant-pro-card,
+.universeTable .ant-pro-table-list-toolbar-container {
+  box-shadow: none !important;
+}
+
+.securityIdentity,
+.statusTags,
+.reasonTags {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.securityIdentity {
+  flex-direction: column;
+}
+
+.securityIdentity strong {
+  font-size: 12px;
+}
+
+.securityIdentity small {
+  color: @tertiary-text;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+}
+
+.securityIdentity .ant-tag,
+.statusTags .ant-tag,
+.reasonTags .ant-tag {
+  margin: 0;
+}
+
+.statusTags,
+.reasonTags {
+  flex-wrap: wrap;
+}
+
 @media (max-width: 1280px) {
   .contextItem--scope,
   .contextItem--time,
@@ -280,6 +424,36 @@
 
   .pageHeading h1 {
     font-size: 21px;
+  }
+
+  .universeControls {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .universeControls label,
+  .universeControls label:first-child,
+  .currentAsOf {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .coverageGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coverageGrid .ant-statistic {
+    border-bottom: 1px solid @secondary-border;
+  }
+
+  .datasetEvidence {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .datasetEvidence strong + span {
+    margin-left: 0;
+    margin-top: 4px;
   }
 }
 
