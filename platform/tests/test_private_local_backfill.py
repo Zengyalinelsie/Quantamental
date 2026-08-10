@@ -1,5 +1,5 @@
 import unittest
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 from a_share_platform.adapters.memory.backfill import InMemoryBackfillRepository
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
@@ -181,6 +181,94 @@ class PrivateLocalBackfillTest(unittest.TestCase):
         )
         self.assertEqual(resumed.status, BackfillJobStatus.SUCCEEDED)
         self.assertIsNotNone(resumed.dataset_version_id)
+
+    def test_resume_accepts_same_plan_identity_with_a_new_cli_created_at(self) -> None:
+        original = build_private_local_backfill_plan(
+            plan_id="private:stable-resume:v1",
+            provider_id="baostock_sdk",
+            symbols=("SH.600519",),
+            domains=(BackfillDataDomain.RAW_DAILY_BAR,),
+            start_date=date(2018, 1, 1),
+            end_date=date(2018, 1, 5),
+            created_at=NOW,
+        )
+        retried = build_private_local_backfill_plan(
+            plan_id=original.plan_id,
+            provider_id=original.provider_id,
+            symbols=original.symbols,
+            domains=original.domains,
+            start_date=original.start_date,
+            end_date=original.end_date,
+            created_at=NOW + timedelta(hours=1),
+        )
+        repository = InMemoryBackfillRepository()
+        governance = InMemoryGovernanceRepository()
+        service = BackfillService(
+            registry=build_p2_provider_registry(),
+            repository=repository,
+            governance_repository=governance,
+            clock=lambda: NOW,
+        )
+
+        first = service.start(original, source=None, sink=None)
+        self.assertEqual(first.status, BackfillJobStatus.FAILED)
+
+        resumed = service.start(retried, source=None, sink=None)
+
+        self.assertEqual(resumed.status, BackfillJobStatus.FAILED)
+        self.assertEqual(resumed.plan.created_at, original.created_at)
+
+    def test_failure_checkpoint_is_rolled_back_then_committed_durably(self) -> None:
+        class DurableRepository(InMemoryBackfillRepository):
+            def __init__(self) -> None:
+                super().__init__()
+                self.transaction_events: list[str] = []
+
+            def commit(self) -> None:
+                self.transaction_events.append("commit")
+
+            def rollback(self) -> None:
+                self.transaction_events.append("rollback")
+
+        class FailingSource:
+            provider_id = "baostock_sdk"
+
+            def fetch(self, *_args: object, **_kwargs: object) -> object:
+                raise RuntimeError("provider interrupted")
+
+        class NeverCalledSink:
+            def persist(self, *_args: object, **_kwargs: object) -> None:
+                raise AssertionError("a failed fetch cannot reach the sink")
+
+        plan = build_private_local_backfill_plan(
+            plan_id="private:durable-failure:v1",
+            provider_id="baostock_sdk",
+            symbols=("SH.600519",),
+            domains=(BackfillDataDomain.RAW_DAILY_BAR,),
+            start_date=date(2018, 1, 1),
+            end_date=date(2018, 1, 5),
+            created_at=NOW,
+        )
+        repository = DurableRepository()
+        service = BackfillService(
+            registry=build_p2_provider_registry(),
+            repository=repository,
+            governance_repository=InMemoryGovernanceRepository(),
+            clock=lambda: NOW,
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "provider interrupted"):
+            service.start(
+                plan,
+                source=FailingSource(),  # type: ignore[arg-type]
+                sink=NeverCalledSink(),
+            )
+
+        checkpoints = repository.list_checkpoints(f"job:{plan.plan_id}")
+        self.assertEqual(len(checkpoints), 1)
+        self.assertEqual(checkpoints[0].status, BackfillCheckpointStatus.FAILED)
+        self.assertIn("rollback", repository.transaction_events)
+        self.assertEqual(repository.transaction_events[-1], "commit")
 
 
 if __name__ == "__main__":

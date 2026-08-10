@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -8,11 +9,18 @@ from a_share_platform.adapters.postgres.dataset_versions import (
 )
 from a_share_platform.adapters.providers.backfill_payloads import (
     DailyObservationPayload,
+    SecurityMasterPayload,
     StagedDailyObservation,
+    StagedSecurityIdentity,
     StagedTradingCalendarDay,
+    StagedUniverseMembership,
     TradingCalendarPayload,
+    UniverseMembershipPayload,
 )
-from a_share_platform.adapters.sinks.canonical_backfill import CanonicalBackfillSink
+from a_share_platform.adapters.sinks.canonical_backfill import (
+    CanonicalBackfillSink,
+    CanonicalSinkError,
+)
 from a_share_platform.application.backfill import (
     BackfillPlanner,
     build_private_local_backfill_plan,
@@ -25,7 +33,12 @@ from a_share_platform.domain.backfill import (
 )
 from a_share_platform.domain.governance import DatasetVersion, VersionConflictError
 from a_share_platform.domain.pit import DataTrustState
-from a_share_platform.domain.security_master import Exchange, SpecialTreatment
+from a_share_platform.domain.security_master import (
+    Board,
+    Exchange,
+    ListingState,
+    SpecialTreatment,
+)
 
 NOW = datetime(2026, 8, 10, 9, 0, tzinfo=UTC)
 HASH = "sha256:" + "a" * 64
@@ -51,6 +64,20 @@ class FakeConnection:
         self.calls.append((query, params))
         if "SELECT dataset_version_id" in query:
             return FakeResult(self.selected)
+        if "RETURNING" in query:
+            return FakeResult((True,))
+        return FakeResult()
+
+
+class CurrentIdentityFallbackConnection(FakeConnection):
+    def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
+        self.calls.append((query, params))
+        if "RETURNING" in query:
+            return FakeResult((True,))
+        if "FROM identifier_history AS identifiers" in query:
+            return FakeResult()
+        if "FROM listings" in query and "listed_on <=" in query:
+            return FakeResult(("listing:XSHG:600519",))
         return FakeResult()
 
 
@@ -106,20 +133,56 @@ def batch_for(domain: BackfillDataDomain, payload: object) -> BackfillBatch:
 class CanonicalBackfillSinkTest(unittest.TestCase):
     def test_registers_dataset_before_business_foreign_keys_and_detects_conflict(self) -> None:
         value = DatasetVersion("dataset:test:v1", HASH, NOW, "p2-backfill-v1")
+        metadata = {
+            "manifest": {
+                "plan_id": "private:universe:v1",
+                "provider_id": "a_share_identity_universe",
+            }
+        }
         connection = FakeConnection(
-            (value.dataset_version_id, value.content_hash, value.created_at, value.schema_version)
+            (
+                value.dataset_version_id,
+                value.content_hash,
+                value.created_at,
+                value.schema_version,
+                metadata,
+            )
         )
         repository = PostgresDatasetVersionRepository(connection)
 
-        self.assertEqual(repository.register_dataset(value), value)
+        self.assertEqual(repository.register_dataset(value, metadata=metadata), value)
+        self.assertEqual(repository.dataset_metadata(value.dataset_version_id), metadata)
         self.assertIn("INSERT INTO dataset_versions", connection.calls[0][0])
+        self.assertIn("metadata", connection.calls[0][0])
         self.assertIn("SELECT dataset_version_id", connection.calls[1][0])
 
         conflict_connection = FakeConnection(
-            (value.dataset_version_id, "sha256:" + "b" * 64, value.created_at, value.schema_version)
+            (
+                value.dataset_version_id,
+                "sha256:" + "b" * 64,
+                value.created_at,
+                value.schema_version,
+                metadata,
+            )
         )
         with self.assertRaises(VersionConflictError):
-            PostgresDatasetVersionRepository(conflict_connection).register_dataset(value)
+            PostgresDatasetVersionRepository(conflict_connection).register_dataset(
+                value, metadata=metadata
+            )
+
+        metadata_conflict = FakeConnection(
+            (
+                value.dataset_version_id,
+                value.content_hash,
+                value.created_at,
+                value.schema_version,
+                {"manifest": {"provider_id": "different"}},
+            )
+        )
+        with self.assertRaisesRegex(VersionConflictError, "metadata"):
+            PostgresDatasetVersionRepository(metadata_conflict).register_dataset(
+                value, metadata=metadata
+            )
 
     def test_persists_normalized_bars_states_and_partition_manifest(self) -> None:
         connection = FakeConnection()
@@ -187,6 +250,297 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         query, params = connection.calls[-1]
         self.assertIn("INSERT INTO exchange_calendar_days", query)
         self.assertEqual(params[3], "provider_reported_closed")
+
+    def test_persists_current_security_identity_without_inventing_industry_code(self) -> None:
+        connection = FakeConnection()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = SecurityMasterPayload(
+            rows=(
+                StagedSecurityIdentity(
+                    code="SH.600519",
+                    company_legal_name="贵州茅台酒股份有限公司",
+                    security_name="贵州茅台",
+                    exchange=Exchange.XSHG,
+                    board=Board.MAIN,
+                    listed_on=date(2001, 8, 27),
+                    delisted_on=None,
+                    listing_state=ListingState.ACTIVE,
+                    observed_on=date(2026, 8, 10),
+                    industry_taxonomy="证监会行业",
+                    industry_code=None,
+                    industry_name="酒、饮料和精制茶制造业",
+                    identity_source_id="baostock_sdk.query_stock_basic",
+                    legal_name_source_id="akshare.stock_profile_cninfo",
+                    industry_source_id="baostock_sdk.query_stock_industry",
+                ),
+            )
+        )
+
+        sink.persist(
+            batch_for(BackfillDataDomain.SECURITY_MASTER, payload),
+            dataset_version_id="dataset:identity:v1",
+        )
+
+        sql = "\n".join(query for query, _params in connection.calls)
+        for table in (
+            "companies",
+            "securities",
+            "listings",
+            "identifier_history",
+            "listing_state_periods",
+            "industry_memberships",
+        ):
+            self.assertIn(f"INSERT INTO {table}", sql)
+        industry_call = next(
+            params for query, params in connection.calls if "INSERT INTO industry_memberships" in query
+        )
+        self.assertIsNone(industry_call[3])
+        listing_state_call = next(
+            params
+            for query, params in connection.calls
+            if "INSERT INTO listing_state_periods" in query
+        )
+        self.assertIsNone(listing_state_call[3])
+        listing_state_sql = next(
+            query
+            for query, _params in connection.calls
+            if "INSERT INTO listing_state_periods" in query
+        )
+        self.assertNotIn("'none'", listing_state_sql)
+
+    def test_persists_historical_universe_as_research_only_until_tradability_is_evaluated(self) -> None:
+        connection = FakeConnection()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            listing_resolver=lambda code, _as_of: f"listing:{code}",
+            clock=lambda: NOW,
+        )
+        payload = UniverseMembershipPayload(
+            benchmark_code="000300",
+            rows=(
+                StagedUniverseMembership(
+                    code="SH.600519",
+                    valid_from=date(2018, 1, 2),
+                    valid_to=date(2018, 1, 4),
+                    source_id="baostock_sdk.query_hs300_stocks",
+                ),
+            ),
+        )
+
+        sink.persist(
+            batch_for(BackfillDataDomain.UNIVERSE, payload),
+            dataset_version_id="dataset:universe:v1",
+        )
+
+        sql = "\n".join(query for query, _params in connection.calls)
+        self.assertIn("INSERT INTO universe_definitions", sql)
+        self.assertIn("INSERT INTO universe_versions", sql)
+        version = next(
+            params for query, params in connection.calls if "INSERT INTO universe_versions" in query
+        )
+        self.assertEqual(version[2], "dataset:universe:v1")
+        self.assertEqual(version[4], DataTrustState.NORMALIZED_CURRENT.value)
+        self.assertEqual(version[5], "baostock_sdk")
+        self.assertIn("baostock_sdk.query_hs300_stocks", str(version[6]))
+        self.assertEqual(version[7], NOW)
+        self.assertEqual(version[8], NOW)
+        self.assertIsNone(version[9])
+        membership = next(
+            params for query, params in connection.calls if "INSERT INTO universe_memberships" in query
+        )
+        self.assertTrue(membership[4])
+        self.assertFalse(membership[5])
+        self.assertIn("tradability_not_evaluated", str(membership[7]))
+        self.assertEqual(membership[9], "baostock_sdk.query_hs300_stocks")
+
+    def test_normalized_current_universe_is_rejected_by_strict_pit_reader(self) -> None:
+        row = (
+            "universe:000300:dataset:universe:v1",
+            "csi:000300",
+            "dataset:universe:v1",
+            NOW,
+            DataTrustState.NORMALIZED_CURRENT.value,
+            "a_share_identity_universe",
+            ["baostock_sdk.query_hs300_stocks"],
+            NOW,
+            NOW,
+            None,
+        )
+
+        class UniverseReadConnection(FakeConnection):
+            def execute(
+                self, query: str, params: tuple[object, ...] = ()
+            ) -> FakeResult:
+                self.calls.append((query, params))
+                if "FROM universe_versions" in query:
+                    return FakeResult(row)
+                return FakeResult()
+
+        sink = CanonicalBackfillSink(
+            connection=UniverseReadConnection(),
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+
+        with self.assertRaisesRegex(CanonicalSinkError, "strict PIT"):
+            sink.get_universe_version(
+                "universe:000300:dataset:universe:v1",
+                require_pit_verified=True,
+            )
+
+        restored = sink.get_universe_version(
+            "universe:000300:dataset:universe:v1",
+            require_pit_verified=False,
+        )
+        assert restored is not None
+        self.assertEqual(restored.trust_state, DataTrustState.NORMALIZED_CURRENT)
+        self.assertEqual(restored.dataset_version_id, "dataset:universe:v1")
+        self.assertEqual(restored.retrieved_at, NOW)
+        self.assertEqual(restored.system_as_of, NOW)
+        self.assertEqual(
+            restored.source_ids, ("baostock_sdk.query_hs300_stocks",)
+        )
+
+    def test_same_benchmark_annual_checkpoints_have_distinct_stable_versions(self) -> None:
+        connection = FakeConnection()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            listing_resolver=lambda code, _as_of: f"listing:{code}",
+            clock=lambda: NOW.replace(hour=23),
+        )
+        first_payload = UniverseMembershipPayload(
+            benchmark_code="000300",
+            rows=(
+                StagedUniverseMembership(
+                    code="SH.600519",
+                    valid_from=date(2018, 1, 2),
+                    valid_to=date(2018, 12, 29),
+                    source_id="baostock_sdk.query_hs300_stocks",
+                ),
+            ),
+        )
+        first = batch_for(BackfillDataDomain.UNIVERSE, first_payload)
+        second_payload = UniverseMembershipPayload(
+            benchmark_code="000300",
+            rows=(
+                StagedUniverseMembership(
+                    code="SH.600519",
+                    valid_from=date(2019, 1, 2),
+                    valid_to=date(2019, 12, 29),
+                    source_id="baostock_sdk.query_hs300_stocks",
+                ),
+            ),
+        )
+        second = replace(
+            first,
+            work_unit=replace(
+                first.work_unit,
+                checkpoint_key="universe:index-000300:ALL:2019-01-01:2019-12-31",
+                start_date=date(2019, 1, 1),
+                end_date=date(2019, 12, 31),
+            ),
+            payload=second_payload,
+        )
+
+        sink.persist(first, dataset_version_id="dataset:universe:v1")
+        sink.persist(second, dataset_version_id="dataset:universe:v1")
+        sink.persist(first, dataset_version_id="dataset:universe:v1")
+
+        versions = [
+            params
+            for query, params in connection.calls
+            if "INSERT INTO universe_versions" in query
+        ]
+        self.assertEqual(len(versions), 3)
+        self.assertNotEqual(versions[0][0], versions[1][0])
+        self.assertEqual(versions[0][:6], versions[2][:6])
+        self.assertEqual(str(versions[0][6]), str(versions[2][6]))
+        self.assertEqual(versions[0][7:], versions[2][7:])
+        self.assertEqual(versions[0][7], first.metadata.retrieved_at)
+        self.assertEqual(versions[0][8], first.metadata.retrieved_at)
+
+    def test_same_effective_date_correction_fails_closed_instead_of_do_nothing(self) -> None:
+        class ConflictConnection(FakeConnection):
+            def execute(
+                self, query: str, params: tuple[object, ...] = ()
+            ) -> FakeResult:
+                self.calls.append((query, params))
+                if "RETURNING" in query and "INSERT INTO identifier_history" in query:
+                    return FakeResult()
+                if "RETURNING" in query:
+                    return FakeResult((True,))
+                return FakeResult()
+
+        sink = CanonicalBackfillSink(
+            connection=ConflictConnection(),
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = SecurityMasterPayload(
+            rows=(
+                StagedSecurityIdentity(
+                    code="SH.600519",
+                    company_legal_name="贵州茅台酒股份有限公司",
+                    security_name="贵州茅台",
+                    exchange=Exchange.XSHG,
+                    board=Board.MAIN,
+                    listed_on=date(2001, 8, 27),
+                    delisted_on=None,
+                    listing_state=ListingState.ACTIVE,
+                    observed_on=date(2026, 8, 10),
+                    industry_taxonomy=None,
+                    industry_code=None,
+                    industry_name=None,
+                    identity_source_id="baostock_sdk.query_stock_basic",
+                    legal_name_source_id="akshare.stock_profile_cninfo",
+                    industry_source_id=None,
+                ),
+            )
+        )
+
+        with self.assertRaisesRegex(CanonicalSinkError, "same effective date"):
+            sink.persist(
+                batch_for(BackfillDataDomain.SECURITY_MASTER, payload),
+                dataset_version_id="dataset:identity:v1",
+            )
+
+    def test_historical_universe_fallback_requires_a_compatible_listing_interval(self) -> None:
+        connection = CurrentIdentityFallbackConnection()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = UniverseMembershipPayload(
+            benchmark_code="000300",
+            rows=(
+                StagedUniverseMembership(
+                    code="SH.600519",
+                    valid_from=date(2018, 1, 2),
+                    valid_to=date(2018, 1, 4),
+                    source_id="baostock_sdk.query_hs300_stocks",
+                ),
+            ),
+        )
+
+        sink.persist(
+            batch_for(BackfillDataDomain.UNIVERSE, payload),
+            dataset_version_id="dataset:universe:v1",
+        )
+
+        self.assertTrue(
+            any("listed_on <=" in query for query, _params in connection.calls)
+        )
+        membership = next(
+            params for query, params in connection.calls if "INSERT INTO universe_memberships" in query
+        )
+        self.assertEqual(membership[1], "listing:XSHG:600519")
 
 
 if __name__ == "__main__":

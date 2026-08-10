@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime
 
 from a_share_platform.domain.backfill import (
@@ -99,22 +99,33 @@ def build_private_local_backfill_plan(
     start_date: date,
     end_date: date,
     created_at: datetime,
+    all_a_share: bool = False,
 ) -> BackfillPlan:
     """Build an explicitly bounded, non-PIT private local research plan."""
 
     selected_domains = tuple(BackfillDataDomain(item) for item in domains)
     selected_symbols = tuple(symbols)
-    if not selected_symbols:
+    if all_a_share and selected_symbols:
+        raise ValueError("all_a_share and explicit symbols are mutually exclusive")
+    if not all_a_share and not selected_symbols:
         raise ValueError("private local research backfill requires explicit symbols")
+    if all_a_share and not set(selected_domains).issubset(
+        {BackfillDataDomain.SECURITY_MASTER, BackfillDataDomain.UNIVERSE}
+    ):
+        raise ValueError("all_a_share supports only security_master and universe domains")
     symbol_markets = {
         "SH": "XSHG",
         "SZ": "XSHE",
         "BJ": "XBSE",
     }
-    markets = tuple(
-        market
-        for market in _MARKETS
-        if any(symbol_markets.get(symbol[:2]) == market for symbol in selected_symbols)
+    markets = (
+        _INDEX_MARKETS
+        if all_a_share
+        else tuple(
+            market
+            for market in _MARKETS
+            if any(symbol_markets.get(symbol[:2]) == market for symbol in selected_symbols)
+        )
     )
     scopes: list[BackfillScope] = []
     if any(
@@ -154,6 +165,7 @@ def build_private_local_backfill_plan(
         provider_use=ProviderUse.PRIVATE_LOCAL_RESEARCH,
         symbols=selected_symbols,
         markets=markets,
+        all_a_share=all_a_share,
     )
 
 
@@ -192,10 +204,12 @@ class BackfillPlanner:
                     for market in _INDEX_MARKETS
                 )
             for scope_id, market in scope_markets:
-                for start_date, end_date in self._annual_ranges(
-                    plan.start_date,
-                    plan.end_date,
-                ):
+                ranges = (
+                    ((plan.start_date, plan.end_date),)
+                    if domain is BackfillDataDomain.SECURITY_MASTER
+                    else self._annual_ranges(plan.start_date, plan.end_date)
+                )
+                for start_date, end_date in ranges:
                     market_key = market or "ALL"
                     checkpoint_key = ":".join(
                         (
@@ -266,14 +280,20 @@ class BackfillService:
         preview = self.preview(plan)
         existing = self._repository.get_job(f"job:{plan.plan_id}")
         if existing is not None:
-            if existing.plan != plan:
+            if replace(existing.plan, created_at=plan.created_at) != plan:
                 raise ValueError(f"existing backfill job has a different plan: {existing.job_id}")
             if existing.status in {BackfillJobStatus.BLOCKED, BackfillJobStatus.SUCCEEDED}:
                 return existing
+            plan = existing.plan
+            preview = self.preview(plan)
 
         if not preview.qualification.permitted:
             job = BackfillJob.blocked(plan, preview.qualification)
-            return self._repository.save_job(job) if existing is None else existing
+            if existing is not None:
+                return existing
+            blocked = self._repository.save_job(job)
+            self._commit()
+            return blocked
 
         if existing is None:
             job = self._repository.save_job(BackfillJob.planned(plan, preview.qualification))
@@ -283,14 +303,19 @@ class BackfillService:
             job = self._repository.append_job_state(
                 job.transition(BackfillJobStatus.RUNNING, at=self._clock())
             )
+            self._commit()
         if source is None or sink is None or self._governance is None:
             failure = ("approved source, sink, and governance repository are required",)
             failed = job.transition(BackfillJobStatus.FAILED, at=self._clock(), failure_reason=failure)
-            return self._repository.append_job_state(failed)
+            failed = self._repository.append_job_state(failed)
+            self._commit()
+            return failed
         if source.provider_id != plan.provider_id:
             failure = ("source provider_id does not match the immutable backfill plan",)
             failed = job.transition(BackfillJobStatus.FAILED, at=self._clock(), failure_reason=failure)
-            return self._repository.append_job_state(failed)
+            failed = self._repository.append_job_state(failed)
+            self._commit()
+            return failed
 
         return self._execute(job, preview.work_units, source, sink)
 
@@ -320,6 +345,7 @@ class BackfillService:
                             at=self._clock(),
                         )
                     )
+                    self._commit()
                 if checkpoint.status is BackfillCheckpointStatus.SUCCEEDED:
                     if checkpoint.content_hash is None:  # defensive against repository corruption
                         raise ValueError("succeeded checkpoint is missing its content hash")
@@ -332,6 +358,7 @@ class BackfillService:
                     checkpoint = self._repository.save_checkpoint(
                         checkpoint.transition(BackfillCheckpointStatus.RUNNING, at=self._clock())
                     )
+                    self._commit()
                 current_checkpoint = checkpoint
                 batch = source.fetch(unit, job.plan)
                 self._validate_batch(job.plan, unit, batch)
@@ -352,14 +379,18 @@ class BackfillService:
                 )
                 self._repository.save_checkpoint(succeeded)
                 self._save_batch_reports(job, dataset, batch)
+                self._commit()
                 current_checkpoint = None
             succeeded_job = job.transition(
                 BackfillJobStatus.SUCCEEDED,
                 at=self._clock(),
                 dataset_version_id=dataset.dataset_version_id,
             )
-            return self._repository.append_job_state(succeeded_job)
+            succeeded_job = self._repository.append_job_state(succeeded_job)
+            self._commit()
+            return succeeded_job
         except Exception as error:
+            self._rollback()
             if current_checkpoint is not None and current_checkpoint.status is not BackfillCheckpointStatus.SUCCEEDED:
                 failed_checkpoint = current_checkpoint.transition(
                     BackfillCheckpointStatus.FAILED,
@@ -373,7 +404,18 @@ class BackfillService:
                 failure_reason=(f"{type(error).__name__}: {error}",),
             )
             self._repository.append_job_state(failed_job)
+            self._commit()
             raise
+
+    def _commit(self) -> None:
+        commit = getattr(self._repository, "commit", None)
+        if callable(commit):
+            commit()
+
+    def _rollback(self) -> None:
+        rollback = getattr(self._repository, "rollback", None)
+        if callable(rollback):
+            rollback()
 
     def _qualify(self, plan: BackfillPlan) -> BackfillQualification:
         blockers: set[str] = set()
@@ -436,11 +478,23 @@ class BackfillService:
             raise ValueError("provider batch does not match requested checkpoint")
         if batch.metadata.provider_id != plan.provider_id:
             raise ValueError("provider metadata does not match the immutable plan")
-        if batch.metadata.adjustment_mode != PriceAdjustment.UNADJUSTED.value:
-            raise ValueError("only raw unadjusted market data may enter this backfill")
+        expected_adjustment = (
+            PriceAdjustment.UNADJUSTED.value
+            if unit.domain is BackfillDataDomain.RAW_DAILY_BAR
+            else "not_applicable"
+        )
+        if batch.metadata.adjustment_mode != expected_adjustment:
+            raise ValueError(
+                f"domain={unit.domain.value} requires adjustment_mode={expected_adjustment}"
+            )
         if batch.trust_state is not plan.output_trust_state:
             raise ValueError("provider batch trust state does not match the immutable plan")
-        if batch.metadata.cutoff_date is not None and batch.metadata.cutoff_date > plan.end_date:
+        if unit.domain is BackfillDataDomain.SECURITY_MASTER:
+            if batch.metadata.cutoff_date != batch.metadata.retrieved_at.date():
+                raise ValueError(
+                    "current security-master cutoff must equal its real retrieval date"
+                )
+        elif batch.metadata.cutoff_date is not None and batch.metadata.cutoff_date > plan.end_date:
             raise ValueError("provider cutoff exceeds the immutable plan end_date")
 
     def _register_dataset(

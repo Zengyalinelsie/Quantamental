@@ -10,7 +10,7 @@
 
 ## 当前状态
 
-P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；当前已增加显式 ack 的私人本地 `normalized_current` 行情/日历回填路径，但 320/768/1024/1440 浏览器视觉证据和真实全范围回填仍未完成，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository，P3-W04–W06 仍在进行。
+P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；当前已增加显式 ack 的私人本地 `normalized_current` 行情/日历回填，以及沪深当前 Security Master/CSI300/500 历史成分采集能力，但 320/768/1024/1440 浏览器视觉证据、XBSE 和真实全范围回填仍未完成，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository，P3-W04–W06 仍在进行。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -56,6 +56,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P3 实现与验证证据](docs/13-p3-implementation-evidence.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
+- [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)
 
 ## 开发入口
 
@@ -71,7 +72,7 @@ PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q
 
 ### 私人本地真实数据回填
 
-默认命令仍是只读 dry-run。真实执行仅支持显式小范围 `normalized_current` 数据，并要求本地 ack、symbols、domains、数据库和 Parquet 路径。以下命令只展示调用格式，不应在未确认供应商具体保存条款、未完成 migration 和 Security Master 映射前直接扩大范围：
+默认命令仍是只读 dry-run。真实执行只允许 `normalized_current`，并要求本地 ack、domains、数据库和 Parquet 路径。行情必须给显式 symbols；身份/Universe 另有与 symbols 互斥的 `--all-a-share` 明示门。以下命令只展示调用格式，不应在未确认供应商具体保存条款和未完成 migration 前执行：
 
 ```bash
 cd platform
@@ -92,9 +93,19 @@ PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
   --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
   --parquet-root ./var/private-research/parquet \
   --private-local-research-ack --execute
+
+# 沪深当前 Security Master + 2018 年以来 CSI300/CSI500 历史成分；不含 XBSE，仍非 PIT
+PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
+  --provider a_share_identity_universe \
+  --start 2018-01-01 --end 2026-08-08 \
+  --all-a-share \
+  --domains security_master universe \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --parquet-root ./var/private-research/parquet \
+  --private-local-research-ack --execute
 ```
 
-上面的 execute 示例先回填不依赖 Listing FK 的交易日历。raw 日线必须先存在对应 symbol 在各日期唯一有效的 Security Master/Listing 映射，否则 canonical sink 会 fail closed。Futu 可将 provider 改为 `futu_quote`，但当前只支持 `raw_daily_bar`，且只使用 `OpenQuoteContext`。这些数据禁止外部分发、`strict_historical`、生产决策和 `pit_verified`；测试没有替用户执行真实下载或入库。
+第一个 execute 示例先回填不依赖 Listing FK 的交易日历。raw 日线必须先存在对应 symbol 在各日期唯一有效的 Security Master/Listing 映射，否则 canonical sink 会 fail closed。组合身份命令会逐证券查询 CNInfo 法定名称，可能较慢；缺法定名称、代码复用或挂牌区间不兼容会显式失败/拒绝。历史指数成员默认仅可研究，`tradable_eligible=false`。Futu 可将 provider 改为 `futu_quote`，但当前只支持 `raw_daily_bar`，且只使用 `OpenQuoteContext`。这些数据禁止外部分发、`strict_historical`、生产决策和 `pit_verified`；测试没有替用户执行真实下载或入库。
 
 本地 PostgreSQL 使用专用主机端口 `55432`，避免与机器上已有的 PostgreSQL `5432` 冲突：
 

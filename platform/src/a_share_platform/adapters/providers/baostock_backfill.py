@@ -116,7 +116,11 @@ class BaostockBackfillSource:
                 provider_id=self.provider_id,
                 retrieved_at=retrieved_at,
                 cutoff_date=max(dates) if dates else None,
-                adjustment_mode="unadjusted",
+                adjustment_mode=(
+                    "unadjusted"
+                    if unit.domain is BackfillDataDomain.RAW_DAILY_BAR
+                    else "not_applicable"
+                ),
                 units=units,
                 warnings=tuple(warnings),
             ),

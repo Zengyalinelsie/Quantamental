@@ -6,8 +6,14 @@ import re
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from itertools import pairwise
 
-from a_share_platform.domain.security_master import Exchange, SpecialTreatment
+from a_share_platform.domain.security_master import (
+    Board,
+    Exchange,
+    ListingState,
+    SpecialTreatment,
+)
 
 _SYMBOL = re.compile(r"^(SH|SZ|BJ)\.\d{6}$")
 _SYMBOL_EXCHANGE = {
@@ -21,6 +27,102 @@ def _text(value: str, field: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field} must not be empty")
     return value
+
+
+@dataclass(frozen=True)
+class StagedSecurityIdentity:
+    code: str
+    company_legal_name: str
+    security_name: str
+    exchange: Exchange
+    board: Board
+    listed_on: date
+    delisted_on: date | None
+    listing_state: ListingState
+    observed_on: date
+    industry_taxonomy: str | None
+    industry_code: str | None
+    industry_name: str | None
+    identity_source_id: str
+    legal_name_source_id: str
+    industry_source_id: str | None
+
+    def __post_init__(self) -> None:
+        if _SYMBOL.fullmatch(self.code) is None:
+            raise ValueError("code must use SH.000000, SZ.000000, or BJ.000000")
+        object.__setattr__(self, "exchange", Exchange(self.exchange))
+        if _SYMBOL_EXCHANGE[self.code[:2]] is not self.exchange:
+            raise ValueError("code prefix and exchange disagree")
+        object.__setattr__(self, "board", Board(self.board))
+        object.__setattr__(self, "listing_state", ListingState(self.listing_state))
+        for value, field in (
+            (self.company_legal_name, "company_legal_name"),
+            (self.security_name, "security_name"),
+            (self.identity_source_id, "identity_source_id"),
+            (self.legal_name_source_id, "legal_name_source_id"),
+        ):
+            _text(value, field)
+        if not isinstance(self.listed_on, date) or not isinstance(self.observed_on, date):
+            raise TypeError("identity dates must be dates")
+        if self.delisted_on is not None and self.delisted_on <= self.listed_on:
+            raise ValueError("delisted_on must be later than listed_on")
+        industry_values = (
+            self.industry_taxonomy,
+            self.industry_name,
+            self.industry_source_id,
+        )
+        if any(value is not None for value in industry_values):
+            if any(value is None for value in industry_values):
+                raise ValueError("industry taxonomy, name, and source must be supplied together")
+            _text(self.industry_taxonomy or "", "industry_taxonomy")
+            _text(self.industry_name or "", "industry_name")
+            _text(self.industry_source_id or "", "industry_source_id")
+        if self.industry_code is not None:
+            _text(self.industry_code, "industry_code")
+
+
+@dataclass(frozen=True)
+class SecurityMasterPayload:
+    rows: tuple[StagedSecurityIdentity, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "rows", tuple(self.rows))
+        if any(not isinstance(row, StagedSecurityIdentity) for row in self.rows):
+            raise TypeError("security-master payload rows must be staged identities")
+
+
+@dataclass(frozen=True)
+class StagedUniverseMembership:
+    code: str
+    valid_from: date
+    valid_to: date
+    source_id: str
+
+    def __post_init__(self) -> None:
+        if _SYMBOL.fullmatch(self.code) is None:
+            raise ValueError("code must use SH.000000, SZ.000000, or BJ.000000")
+        if not isinstance(self.valid_from, date) or not isinstance(self.valid_to, date):
+            raise TypeError("membership boundaries must be dates")
+        if self.valid_to <= self.valid_from:
+            raise ValueError("valid_to must be later than valid_from")
+        _text(self.source_id, "source_id")
+
+
+@dataclass(frozen=True)
+class UniverseMembershipPayload:
+    benchmark_code: str
+    rows: tuple[StagedUniverseMembership, ...]
+
+    def __post_init__(self) -> None:
+        if self.benchmark_code not in {"000300", "000905"}:
+            raise ValueError("benchmark_code must be 000300 or 000905")
+        object.__setattr__(self, "rows", tuple(self.rows))
+        if any(not isinstance(row, StagedUniverseMembership) for row in self.rows):
+            raise TypeError("universe payload rows must be staged memberships")
+        ordered = sorted(self.rows, key=lambda row: (row.code, row.valid_from))
+        for left, right in pairwise(ordered):
+            if left.code == right.code and right.valid_from < left.valid_to:
+                raise ValueError("universe membership intervals must not overlap")
 
 
 @dataclass(frozen=True)

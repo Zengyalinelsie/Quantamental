@@ -49,10 +49,20 @@ class Connection(Protocol):
         params: tuple[object, ...] = (),
     ) -> QueryResult: ...
 
+    def commit(self) -> None: ...
+
+    def rollback(self) -> None: ...
+
 
 class PostgresBackfillRepository:
     def __init__(self, connection: Connection) -> None:
         self._connection = connection
+
+    def commit(self) -> None:
+        self._connection.commit()
+
+    def rollback(self) -> None:
+        self._connection.rollback()
 
     def save_job(self, value: BackfillJob) -> BackfillJob:
         self._connection.execute(
@@ -306,6 +316,7 @@ class PostgresBackfillRepository:
             "provider_use": value.provider_use.value,
             "symbols": list(value.symbols),
             "markets": list(value.markets),
+            "all_a_share": value.all_a_share,
         }
 
     @staticmethod
@@ -362,6 +373,7 @@ class PostgresBackfillRepository:
                     value.get("markets", ["XSHG", "XSHE", "XBSE"]),
                 )
             ),
+            all_a_share=bool(value.get("all_a_share", False)),
         )
 
     @staticmethod

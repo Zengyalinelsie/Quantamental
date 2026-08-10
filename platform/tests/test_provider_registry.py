@@ -21,10 +21,27 @@ class ProviderRegistryTest(unittest.TestCase):
             [(policy.provider_id, policy.tier) for policy in policies],
             [
                 ("a_share_mcp_baostock", ProviderTier.PRIMARY),
+                ("a_share_identity_universe", ProviderTier.FALLBACK),
                 ("akshare", ProviderTier.FALLBACK),
                 ("official_exchanges", ProviderTier.AUTHORITY),
             ],
         )
+
+    def test_composed_identity_source_is_private_local_only(self) -> None:
+        for field in (
+            DataField.SECURITY_IDENTITY,
+            DataField.IDENTIFIER_HISTORY,
+            DataField.LISTING_STATUS,
+            DataField.INDUSTRY_MEMBERSHIP,
+            DataField.BENCHMARK_MEMBERSHIP,
+        ):
+            policy = self.registry.policy("a_share_identity_universe", field)
+            self.assertEqual(
+                policy.permitted_uses,
+                frozenset({ProviderUse.PRIVATE_LOCAL_RESEARCH}),
+            )
+            self.assertNotIn(ProviderUse.STRICT_HISTORICAL, policy.permitted_uses)
+            self.assertIs(policy.trust_ceiling, DataTrustState.NORMALIZED_CURRENT)
 
     def test_prototype_primary_is_limited_to_shanghai_and_shenzhen(self) -> None:
         shanghai = self.registry.require(

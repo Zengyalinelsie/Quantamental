@@ -3,7 +3,10 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 from a_share_platform.adapters.postgres.backfill import PostgresBackfillRepository
-from a_share_platform.application.backfill import build_csi_backfill_plan
+from a_share_platform.application.backfill import (
+    build_csi_backfill_plan,
+    build_private_local_backfill_plan,
+)
 from a_share_platform.domain.backfill import (
     CSI_300_SCOPE,
     BackfillCheckpoint,
@@ -32,13 +35,31 @@ class FakeResult:
 class FakeConnection:
     def __init__(self) -> None:
         self.calls: list[tuple[str, tuple[object, ...]]] = []
+        self.commits = 0
+        self.rollbacks = 0
 
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
         return FakeResult()
 
+    def commit(self) -> None:
+        self.commits += 1
+
+    def rollback(self) -> None:
+        self.rollbacks += 1
+
 
 class PostgresBackfillTest(unittest.TestCase):
+    def test_repository_exposes_explicit_checkpoint_transaction_boundaries(self) -> None:
+        connection = FakeConnection()
+        repository = PostgresBackfillRepository(connection)
+
+        repository.commit()
+        repository.rollback()
+
+        self.assertEqual(connection.commits, 1)
+        self.assertEqual(connection.rollbacks, 1)
+
     def test_migration_reuses_dataset_versions_and_persists_audit_outputs(self) -> None:
         sql = (PLATFORM_ROOT / "migrations" / "0005_data_backfill.sql").read_text(
             encoding="utf-8"
@@ -139,6 +160,25 @@ class PostgresBackfillTest(unittest.TestCase):
         )
         restored = repository._checkpoint_from_row(row)
         self.assertEqual(restored.retrieval_metadata, metadata)
+
+    def test_plan_json_round_trip_preserves_explicit_full_market_authorization(self) -> None:
+        value = build_private_local_backfill_plan(
+            plan_id="plan:all-a-share:v1",
+            provider_id="a_share_identity_universe",
+            symbols=(),
+            all_a_share=True,
+            domains=(BackfillDataDomain.SECURITY_MASTER, BackfillDataDomain.UNIVERSE),
+            start_date=date(2018, 1, 1),
+            end_date=date(2026, 8, 8),
+            created_at=NOW,
+        )
+
+        restored = PostgresBackfillRepository._plan_from_json(
+            PostgresBackfillRepository._plan_json(value)
+        )
+
+        self.assertEqual(restored, value)
+        self.assertTrue(restored.all_a_share)
 
 
 if __name__ == "__main__":

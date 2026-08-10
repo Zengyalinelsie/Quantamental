@@ -16,7 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["httpx>=0.28,<1", "pytest>=8", "ruff>=0.6", "mypy>=1.11"]
-data = ["baostock>=0.8.9,<1", "futu-api>=10.4.6408,<11"]
+data = ["akshare>=1.12,<2", "baostock>=0.8.9,<1", "futu-api>=10.4.6408,<11"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

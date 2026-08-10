@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import ipaddress
 import json
+import shlex
 from collections.abc import Sequence
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, unquote, urlparse
 
 from a_share_platform.adapters.memory.backfill import InMemoryBackfillRepository
 from a_share_platform.adapters.parquet.market_data import ParquetMarketDataStore
@@ -19,6 +22,9 @@ from a_share_platform.adapters.postgres.dataset_versions import (
 from a_share_platform.adapters.providers.baostock_backfill import BaostockBackfillSource
 from a_share_platform.adapters.providers.futu_backfill import FutuQuoteBackfillSource
 from a_share_platform.adapters.providers.futu_quote import FutuQuoteDailyReader
+from a_share_platform.adapters.providers.identity_universe_backfill import (
+    IdentityUniverseBackfillSource,
+)
 from a_share_platform.adapters.sinks.canonical_backfill import CanonicalBackfillSink
 from a_share_platform.application.backfill import (
     BackfillService,
@@ -29,6 +35,10 @@ from a_share_platform.application.provider_registry import build_p2_provider_reg
 from a_share_platform.domain.backfill import BackfillDataDomain, BackfillPlan
 from a_share_platform.ports.backfill import BackfillSource
 
+PRIVATE_LOCAL_STORAGE_ROOT = (
+    Path(__file__).resolve().parents[3] / "var" / "private-research"
+).resolve()
+
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -36,12 +46,18 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--start", type=date.fromisoformat, default=date(2018, 1, 1))
     parser.add_argument("--end", type=date.fromisoformat, required=True)
     parser.add_argument("--plan-id")
-    parser.add_argument("--symbols", nargs="+", help="explicit SH./SZ. symbols")
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument("--symbols", nargs="+", help="explicit SH./SZ. symbols")
+    scope.add_argument(
+        "--all-a-share",
+        action="store_true",
+        help="explicitly authorize full XSHG/XSHE identity and CSI 300/500 membership",
+    )
     parser.add_argument(
         "--domains",
         nargs="+",
         choices=[item.value for item in BackfillDataDomain],
-        help="explicit data domains; executable sources currently cover raw bars/calendar",
+        help="explicit data domains; each executable provider enforces its own subset",
     )
     parser.add_argument("--database-url", help="explicit local PostgreSQL DSN")
     parser.add_argument("--parquet-root", type=Path, help="explicit local Parquet root")
@@ -64,7 +80,7 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     now = datetime.now(UTC)
-    private_request = bool(args.symbols and args.domains)
+    private_request = bool(args.domains and (args.symbols or args.all_a_share))
     plan_id = args.plan_id or _default_plan_id(args, private_request)
     plan = _build_plan(args, plan_id, now, private_request)
     repository = InMemoryBackfillRepository()
@@ -87,6 +103,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "scopes": [scope.scope_id for scope in plan.scopes],
         "domains": [domain.value for domain in plan.domains],
         "symbols": list(plan.symbols),
+        "all_a_share": plan.all_a_share,
         "markets": list(plan.markets),
         "work_unit_count": len(preview.work_units),
         "provider_use": plan.provider_use.value,
@@ -134,8 +151,9 @@ def _default_plan_id(args: argparse.Namespace, private_request: bool) -> str:
             args.provider,
             args.start.isoformat(),
             args.end.isoformat(),
-            ",".join(args.symbols),
+            ",".join(args.symbols or ()),
             ",".join(args.domains),
+            "all_a_share" if args.all_a_share else "explicit_symbols",
         )
     ).encode("utf-8")
     return f"private-local:{args.provider}:{hashlib.sha256(identity).hexdigest()[:20]}"
@@ -151,7 +169,8 @@ def _build_plan(
         return build_private_local_backfill_plan(
             plan_id=plan_id,
             provider_id=args.provider,
-            symbols=tuple(args.symbols),
+            symbols=tuple(args.symbols or ()),
+            all_a_share=args.all_a_share,
             domains=tuple(BackfillDataDomain(item) for item in args.domains),
             start_date=args.start,
             end_date=args.end,
@@ -172,9 +191,18 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
         blockers.append("private-local-research ack is required for execution")
     if not args.database_url:
         blockers.append("an explicit local database URL is required for execution")
+    elif not _postgres_endpoint_is_private_local(args.database_url):
+        blockers.append(
+            "private-local PostgreSQL must use a loopback or Unix socket endpoint"
+        )
     if args.parquet_root is None:
         blockers.append("an explicit local Parquet root is required for execution")
-    if not args.symbols:
+    elif not _parquet_root_is_private_local(args.parquet_root):
+        blockers.append(
+            "Parquet output must remain under the controlled private-local root "
+            f"{PRIVATE_LOCAL_STORAGE_ROOT}"
+        )
+    if not args.symbols and not args.all_a_share:
         blockers.append("explicit symbols are required for execution")
     if not args.domains:
         blockers.append("explicit domains are required for execution")
@@ -184,6 +212,10 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
             BackfillDataDomain.TRADING_CALENDAR.value,
         },
         "futu_quote": {BackfillDataDomain.RAW_DAILY_BAR.value},
+        "a_share_identity_universe": {
+            BackfillDataDomain.SECURITY_MASTER.value,
+            BackfillDataDomain.UNIVERSE.value,
+        },
     }
     if args.provider not in supported:
         blockers.append(f"provider={args.provider} has no executable private-local source")
@@ -191,7 +223,76 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
         blockers.append(
             f"provider={args.provider} does not execute every requested domain"
         )
+    if args.provider == "a_share_identity_universe" and not args.all_a_share:
+        blockers.append("provider=a_share_identity_universe requires --all-a-share")
+    if args.all_a_share and args.provider != "a_share_identity_universe":
+        blockers.append("--all-a-share requires provider=a_share_identity_universe")
     return blockers
+
+
+def _postgres_endpoint_is_private_local(dsn: str) -> bool:
+    value = dsn.strip()
+    if not value:
+        return False
+    if value.startswith(("postgresql://", "postgres://")):
+        parsed = urlparse(value)
+        query = parse_qs(parsed.query, keep_blank_values=True)
+        if "service" in query or "servicefile" in query:
+            return False
+        endpoints: list[tuple[str, bool]] = []
+        if parsed.hostname is not None:
+            endpoints.append((parsed.hostname, False))
+        endpoints.extend((unquote(item), True) for item in query.get("host", ()))
+        endpoints.extend((unquote(item), False) for item in query.get("hostaddr", ()))
+        return not endpoints or all(
+            _postgres_host_is_private_local(host, allow_unix_socket=allow_socket)
+            for host, allow_socket in endpoints
+        )
+
+    try:
+        tokens = shlex.split(value)
+    except ValueError:
+        return False
+    parameters: dict[str, str] = {}
+    for token in tokens:
+        if "=" not in token:
+            return False
+        key, item = token.split("=", 1)
+        parameters[key.casefold()] = item
+    if "service" in parameters or "servicefile" in parameters:
+        return False
+    endpoints = []
+    if "host" in parameters:
+        endpoints.append((parameters["host"], True))
+    if "hostaddr" in parameters:
+        endpoints.append((parameters["hostaddr"], False))
+    return not endpoints or all(
+        _postgres_host_is_private_local(host, allow_unix_socket=allow_socket)
+        for host, allow_socket in endpoints
+    )
+
+
+def _postgres_host_is_private_local(host: str, *, allow_unix_socket: bool) -> bool:
+    values = tuple(item.strip() for item in host.split(","))
+    if not values or any(not item for item in values):
+        return False
+    for item in values:
+        if allow_unix_socket and Path(item).is_absolute():
+            continue
+        if item.casefold() == "localhost":
+            continue
+        try:
+            if ipaddress.ip_address(item).is_loopback:
+                continue
+        except ValueError:
+            pass
+        return False
+    return True
+
+
+def _parquet_root_is_private_local(root: Path) -> bool:
+    candidate = root.expanduser().resolve(strict=False)
+    return candidate.is_relative_to(PRIVATE_LOCAL_STORAGE_ROOT)
 
 
 def _execute_backfill(
@@ -217,6 +318,8 @@ def _execute_backfill(
             source = FutuQuoteBackfillSource(
                 reader=FutuQuoteDailyReader(clock=lambda: datetime.now(UTC))
             )
+        elif plan.provider_id == "a_share_identity_universe":
+            source = IdentityUniverseBackfillSource(clock=lambda: datetime.now(UTC))
         else:  # protected by the CLI gate and retained as defense in depth
             raise ValueError(f"unsupported executable provider: {plan.provider_id}")
         assert args.parquet_root is not None

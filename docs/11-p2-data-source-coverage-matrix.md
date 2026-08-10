@@ -2,7 +2,7 @@
 
 日期：2026-08-10
 
-本矩阵落实 SPEC-015、ADR-0002 和 ADR-0003。`可用于原型` 只指本地 current 研究、小型合同 fixture 和内部展示。另有受限的 `private_local_research`：仅在用户显式 ack、具体端点未明确禁止 retention、显式 symbols/domains 和本地存储目标下允许保存 `normalized_current`。它不代表通用 `raw_bulk_persistence`、严格历史、对外分发或生产决策获批。
+本矩阵落实 SPEC-015、ADR-0002、ADR-0003 和 ADR-0004。`可用于原型` 只指本地 current 研究、小型合同 fixture 和内部展示。另有受限的 `private_local_research`：仅在用户显式 ack、具体端点未明确禁止 retention、显式 symbols（或身份/Universe 专用 `--all-a-share`）、domains 和本地存储目标下允许保存 `normalized_current`。它不代表通用 `raw_bulk_persistence`、严格历史、对外分发或生产决策获批。
 
 ## 1. 来源资格
 
@@ -12,6 +12,7 @@
 | Baostock Python SDK | 沪深本地回填执行源 | 免费、无 key | PyPI：BSD | 非商业/再分发与具体保存边界仍需操作者核对；明确禁止时 fail closed | 显式 ack 的私人本地 raw 日线/日历，`normalized_current` only |
 | AkShare | 北交所与缺失字段备用候选 | 免费、无 key | PyPI：MIT | 各网页上游条款逐端点待审；存在限流和结构变化风险 | 本地原型、current 研究、小型 fixture、内部展示 |
 | Futu OpenQuoteContext | 可选沪深行情只读候选 | 本地 OpenD、行情权限；不读取账户 | SDK/数据条款分离 | 行情权限、2018+ 覆盖、保存期限和再分发权仍需操作者核对；明确禁止时 fail closed | 显式 ack 的私人本地 raw 日线，`normalized_current` only；无账户/交易能力 |
+| BaoStock + AkShare/CNInfo 组合身份源 | 沪深当前身份与 CSI 历史成分执行源 | 免费、无 key | 客户端分别为 BSD/MIT；数据条款分离 | CNInfo/BaoStock 端点保存边界、限流和结构变化仍需操作者核对 | `--all-a-share` + 显式 ack 的私人本地身份/Universe，`normalized_current` only |
 | 上交所/深交所/北交所 | 身份、挂牌、日历、规则、公司行动权威核验 | 公开页面/API，频率不统一 | 不适用 | 保存期限和再分发条款待逐站点审查 | 权威核验、小样本证据 |
 | 巨潮/交易所/公司披露 | P3 公告权威源 | 公开页面/API，频率不统一 | 不适用 | P3 建立 license/retention policy | P3 公告证据，不在 P2 冒充新闻或 PIT 财务 |
 | Tushare Pro | 备用商业候选 | Token/积分/可能付费 | 客户端与数据条款分离 | 未评审、未配置 | 当前不启用 |
@@ -66,5 +67,6 @@
 |---|---|---|---|---|
 | `baostock_sdk` | `raw_daily_bar`、`trading_calendar` | XSHG/XSHE | `frequency=d`、`adjustflag=3`、显式 ack/symbol/domain/DSN/Parquet root | XBSE、Security Master、历史 Universe、股本、公司行动 |
 | `futu_quote` | `raw_daily_bar` | XSHG/XSHE | `OpenQuoteContext`、`AuType.NONE`、显式 ack/symbol/domain/DSN/Parquet root | 日历、Security Master、历史 Universe、股本、公司行动、所有账户与交易能力 |
+| `a_share_identity_universe` | `security_master`、`universe` | XSHG/XSHE | `--all-a-share`、显式 ack/domain/DSN/Parquet root；法定名称缺失拒绝；当前字段用真实观察日 | XBSE、历史法定名称/代码证据、历史可交易状态、股本、公司行动、PIT 可用时间 |
 
-`financial-data-hub` 是来源选择与对照入口；它不会绕过 `ProviderRegistry`、许可门或 canonical sink。当前没有把 donor AkShare 接入 raw sink，因为其已审计历史端点均为 qfq。
+`financial-data-hub` 是来源选择与对照入口；它不会绕过 `ProviderRegistry`、许可门或 canonical sink。AkShare 仅在组合身份源中调用 CNInfo 公司资料端点，没有把 donor 已审计的 qfq 历史价接入 raw sink。

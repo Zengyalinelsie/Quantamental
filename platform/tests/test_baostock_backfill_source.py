@@ -125,6 +125,7 @@ class BaostockBackfillSourceTest(unittest.TestCase):
         batch = source.fetch(unit, plan)
 
         self.assertIsInstance(batch.payload, TradingCalendarPayload)
+        self.assertEqual(batch.metadata.adjustment_mode, "not_applicable")
         payload = batch.payload
         assert isinstance(payload, TradingCalendarPayload)
         self.assertFalse(payload.rows[0].is_open)

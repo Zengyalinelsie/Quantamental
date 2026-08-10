@@ -139,15 +139,23 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --provider 
 
 - `baostock_sdk`：沪深 raw 日线和交易日历；测试锁定 `frequency="d"` 与 `adjustflag="3"`；
 - `futu_quote`：沪深 raw 日线；只创建 `OpenQuoteContext`、使用 `AuType.NONE`，代码级测试继续禁止任何账户或交易上下文；
+- `a_share_identity_universe`：BaoStock 当前挂牌/行业 + AkShare CNInfo 法定名称，以及带日期的 CSI300/500 每交易日成员；只允许 `--all-a-share` 的 `security_master`/`universe`；
 - canonical sink：先注册 DatasetVersion，再写 raw bar Parquet、partition manifest、daily market state、calendar、checkpoint、质量和覆盖率；Listing 代码映射缺失/歧义会阻断；
-- 断点恢复跳过已经成功的 checkpoint，不重复请求或写入该 checkpoint。
+- 断点恢复跳过已经成功的 checkpoint，不重复请求或写入该 checkpoint；CLI 重启时沿用数据库中首次计划的 `created_at`；
+- PostgreSQL 只接受 loopback/Unix socket，Parquet 只允许写入 `platform/var/private-research/`；
+- UniverseVersion 持久化 `normalized_current`、provider/source、retrieved/system time 和 DatasetVersion lineage，严格 PIT view 不接收该数据；
+- CSI 每日快照要求非空、合理成分数量、合理日变化和可信 `updateDate`；Security Master 设最低行数/法定名覆盖率，并对重复代码和 CNInfo 代码不匹配 fail closed；所有真实请求有显式限流和单次超时。
 
 执行门示例见 README。默认 dry-run 无网络和数据库写入；本轮自动化全部使用 fake SDK/connection，没有替用户下载真实行情或写真实数据库。
 
 最初回填规划扩展新增 14 个定向单元测试；ADR-0003 执行扩展又增加 14 个定向测试，覆盖私人用途/retention 硬门、显式 symbol/domain 计划、BaoStock raw/calendar、Futu quote-only staging、DatasetVersion FK 顺序、canonical sink、CLI ack/DSN 门和成功 checkpoint 恢复。当前仍未执行真实批量回填，因此业务数据行和 Parquet 增量均为 0；这不是用 fixture 冒充真实数据。
 
-仍未完成的真实数据域：A 股全市场 Security Master、沪深 300/中证 500 历史 Universe、2018+ 股本和公司行动。donor 的 AkShare 历史价三路均为 qfq，current stock index 也不是历史 Universe，因此没有为追求表面覆盖而接入。该能力不改变前述 P2 Gate 判断，也不证明任何模型科学有效。
+新增自动采集能力仍未替用户执行真实下载或入库。当前 Security Master 执行范围仅 XSHG/XSHE，XBSE、可靠历史代码/名称、2018+ 股本和公司行动仍未完成；CSI 历史成员是检索时获得的带日期快照，固定为 `normalized_current`，且历史可交易状态未验证前 `tradable_eligible=false`。donor 的 AkShare 历史价三路均为 qfq，current stock index 也不是历史 Universe，因此没有为追求表面覆盖而接入 raw/PIT。该能力不改变前述 P2 Gate 判断，也不证明任何模型科学有效。
+
+恢复边界保持显式：成功并已提交的 checkpoint 可跨 CLI 重启跳过；若 source 在 DatasetVersion 注册和 batch 落库前失败，本次尚未成功的 fetch 会重取。真实 CSI 长区间因此建议按年度使用独立 plan id 执行，避免把“有 checkpoint 键”误写成任意故障点都具有 payload staging。
 
 本工作包最终验证：Python unittest `166 passed`，compileall 通过，Ruff 通过，mypy `62 source files` 通过。所有 provider、数据库和 CLI execute 测试使用 fake/injected runtime；这些测试证明合同与程序行为，不证明供应商稳定性、真实数据覆盖或模型科学有效。
 
 主代理在本机隔离 PostgreSQL `127.0.0.1:55432` 复验：首次运行 migration 输出 `0005_data_backfill`，二次运行无输出且退出码为 0。`ingestion_jobs`、`ingestion_checkpoints`、`dataset_quality_reports` 和 `dataset_coverage_reports` 均为 0 行，说明 schema 已持久化，但没有用 fixture 或未获许可数据填充开发库。
+
+ADR-0004 组合身份/Universe 与审查修复后的自动化结果为：Python unittest `195 passed`，compileall 通过，Ruff 通过，mypy `63 source files` 通过，`git diff --check` 通过。新增 dry-run 生成 20 个 work units（2 个当前 Security Master 市场快照 + 2 个指数 × 9 个年度区间），明确输出 XSHG/XSHE、`normalized_current`、`private_local_research` 和 `writes_performed=false`。隔离开发 PostgreSQL 已验证到 `0009_nullable_industry_code`；`0010_canonical_universe_lineage` 的实库 smoke 与真实 backfill 仍将在本提交之后单独执行并记录。本轮代码提交前没有执行 backfill `--execute`，没有发真实供应商请求，也没有写入真实业务数据。

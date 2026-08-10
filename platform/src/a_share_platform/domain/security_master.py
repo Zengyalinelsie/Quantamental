@@ -172,7 +172,7 @@ class ListingStatePeriod:
 class IndustryMembership:
     security_id: str
     taxonomy: str
-    industry_code: str
+    industry_code: str | None
     industry_name: str
     valid_from: date
     valid_to: date | None
@@ -182,11 +182,12 @@ class IndustryMembership:
         for value, field in (
             (self.security_id, "security_id"),
             (self.taxonomy, "taxonomy"),
-            (self.industry_code, "industry_code"),
             (self.industry_name, "industry_name"),
             (self.source_id, "source_id"),
         ):
             _require_id(value, field)
+        if self.industry_code is not None:
+            _require_id(self.industry_code, "industry_code")
         _validate_interval(self.valid_from, self.valid_to)
 
 

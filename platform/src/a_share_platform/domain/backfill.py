@@ -143,6 +143,7 @@ class BackfillPlan:
     provider_use: ProviderUse = ProviderUse.RAW_BULK_PERSISTENCE
     symbols: tuple[str, ...] = ()
     markets: tuple[str, ...] = ("XSHG", "XSHE", "XBSE")
+    all_a_share: bool = False
 
     def __post_init__(self) -> None:
         _required(self.plan_id, "plan_id")
@@ -165,6 +166,12 @@ class BackfillPlan:
         object.__setattr__(self, "provider_use", ProviderUse(self.provider_use))
         object.__setattr__(self, "symbols", tuple(self.symbols))
         object.__setattr__(self, "markets", tuple(self.markets))
+        if type(self.all_a_share) is not bool:
+            raise TypeError("all_a_share must be a boolean")
+        if self.all_a_share and self.symbols:
+            raise ValueError("all_a_share and explicit symbols are mutually exclusive")
+        if self.all_a_share and self.provider_use is not ProviderUse.PRIVATE_LOCAL_RESEARCH:
+            raise ValueError("all_a_share is restricted to private_local_research")
         if len(self.symbols) != len(set(self.symbols)):
             raise ValueError("backfill symbols must be unique")
         for symbol in self.symbols:

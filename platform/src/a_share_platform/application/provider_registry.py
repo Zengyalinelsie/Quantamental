@@ -21,6 +21,7 @@ PROTOTYPE_USES = frozenset(
     }
 )
 PRIVATE_LOCAL_USES = PROTOTYPE_USES | frozenset({ProviderUse.PRIVATE_LOCAL_RESEARCH})
+COMPOSED_IDENTITY_USES = frozenset({ProviderUse.PRIVATE_LOCAL_RESEARCH})
 AUTHORITY_USES = frozenset(
     {
         ProviderUse.LOCAL_FIXTURE,
@@ -138,6 +139,26 @@ def build_p2_provider_registry() -> ProviderRegistry:
                 DataField.TRADING_CALENDAR,
                 DataField.RAW_DAILY_BAR,
                 DataField.TRADING_STATUS,
+            )
+        ),
+        *(
+            _policy(
+                "a_share_identity_universe",
+                field,
+                ProviderTier.FALLBACK,
+                sh_sz,
+                uses=COMPOSED_IDENTITY_USES,
+                warning=(
+                    "composed BaoStock/CNInfo observations are normalized_current only; "
+                    "historical membership retrieval does not establish PIT availability"
+                ),
+            )
+            for field in (
+                DataField.SECURITY_IDENTITY,
+                DataField.IDENTIFIER_HISTORY,
+                DataField.LISTING_STATUS,
+                DataField.INDUSTRY_MEMBERSHIP,
+                DataField.BENCHMARK_MEMBERSHIP,
             )
         ),
         *(

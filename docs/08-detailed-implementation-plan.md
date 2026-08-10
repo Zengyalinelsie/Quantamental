@@ -337,10 +337,14 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 - [x] BaoStock SDK 沪深 raw 日线/日历 source；
 - [x] Futu `OpenQuoteContext` 沪深 raw 日线 source，不含账户或交易能力；
 - [x] PostgreSQL + Parquet canonical sink 和恢复测试；
+- [x] `--all-a-share` 独立执行门、BaoStock/CNInfo 当前沪深 Security Master 采集与 canonical persistence；
+- [x] 沪深 300/中证 500 每交易日历史快照采集、半开区间压缩与 research-only persistence；
 - [ ] 真实 A 股全市场 Security Master 回填；
 - [ ] 沪深 300/中证 500 历史 Universe 持久化；
 - [ ] 2018+ 股本和公司行动合格来源与入库；
 - [ ] Data Operator 在确认具体数据条款后执行真实小样本并保存质量/覆盖率证据。
+
+前两项未勾选表示尚未执行真实下载/入库：当前代码能力只覆盖 XSHG/XSHE，XBSE 仍缺；历史成员仍为 `normalized_current`，且在可交易状态未验证前 `tradable_eligible=false`。
 
 ### Gate P2
 

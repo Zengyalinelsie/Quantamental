@@ -53,8 +53,38 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0006_disclosure_evidence.sql",
                 "0007_canonical_metrics.sql",
                 "0008_financial_facts.sql",
+                "0009_nullable_industry_code.sql",
+                "0010_canonical_universe_lineage.sql",
             ),
         )
+
+    def test_missing_provider_industry_code_remains_null_instead_of_a_sentinel(self) -> None:
+        sql = (PLATFORM_ROOT / "migrations" / "0009_nullable_industry_code.sql").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("ALTER COLUMN industry_code DROP NOT NULL", sql)
+
+    def test_canonical_universe_lineage_is_complete_and_strict_pit_isolated(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0010_canonical_universe_lineage.sql"
+        ).read_text(encoding="utf-8")
+        for contract in (
+            "ALTER COLUMN special_treatment DROP NOT NULL",
+            "ADD COLUMN trust_state TEXT NOT NULL",
+            "ADD COLUMN provider_id TEXT NOT NULL",
+            "ADD COLUMN source_ids JSONB NOT NULL",
+            "ADD COLUMN retrieved_at TIMESTAMPTZ NOT NULL",
+            "ADD COLUMN system_as_of TIMESTAMPTZ NOT NULL",
+            "ADD COLUMN available_at TIMESTAMPTZ",
+            "dataset_version_id",
+            "trust_state = 'pit_verified'",
+            "trust_state = 'normalized_current'",
+            "CREATE VIEW strict_pit_universe_versions",
+            "WHERE trust_state = 'pit_verified'",
+            "jsonb_typeof(metadata) = 'object'",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, sql)
 
     def test_disclosure_migration_preserves_raw_evidence_and_public_versions(self) -> None:
         sql = (PLATFORM_ROOT / "migrations" / "0006_disclosure_evidence.sql").read_text(
