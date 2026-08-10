@@ -473,13 +473,19 @@ Timing、任何因子或模型科学有效。P2 的多尺寸浏览器视觉证�
 
 ### P4-W01：Feature Definition 与 Snapshot
 
-- [ ] FeatureDefinition 纯函数合同；
-- [ ] unit/currency/period 兼容；
-- [ ] missing policy；
-- [ ] winsorization/standardization；
-- [ ] industry/size neutralization；
-- [ ] FeatureSnapshot hash；
-- [ ] label schema 与生产 API 物理隔离。
+- [x] FeatureDefinition 纯函数合同；
+- [x] unit/currency/period 兼容；
+- [x] missing policy；
+- [ ] winsorization/standardization 执行；
+- [ ] industry/size neutralization 执行；
+- [x] FeatureSnapshot hash；
+- [x] label schema、类型与 namespace 隔离合同；
+- [ ] label 与生产 API 的物理持久化隔离。
+
+状态（2026-08-10）：P4-W00 严格 PIT 数据资格门和 P4-W01 首批领域合同已分别提交为
+`6cde9ef`、`6948073`。W01 尚未实现横截面 winsorize、standardize、neutralization 的统计
+执行器，也没有 FeatureSnapshot/Label 的物理 repository、migration 或生产 API，因此
+W01 仍未整体完成。证据和当前阻断见 `docs/15-p4-implementation-evidence.md`。
 
 ### P4-W02：行业模板 V0
 
