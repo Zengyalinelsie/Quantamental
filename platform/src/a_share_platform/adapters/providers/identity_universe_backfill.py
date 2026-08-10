@@ -240,9 +240,12 @@ class IdentityUniverseBackfillSource:
         )
         if len(basic_codes) != len(set(basic_codes)):
             raise ProviderBackfillUnavailable("security master contains duplicate codes")
-        if requested and set(basic_codes) != requested:
+        missing_symbols = tuple(sorted(requested.difference(basic_codes)))
+        if missing_symbols:
             raise ProviderBackfillUnavailable(
-                "security master provider omitted requested symbols"
+                "security master provider omitted requested symbols: "
+                f"missing_count={len(missing_symbols)}; "
+                f"missing_symbols={','.join(missing_symbols)}"
             )
         industry_result = self._provider_call(
             "industry membership",
@@ -507,7 +510,7 @@ class IdentityUniverseBackfillSource:
     def _is_a_share_code(value: str) -> bool:
         code = value.lower()
         if code.startswith("sh."):
-            return code[3:6] in {"600", "601", "603", "605", "688"}
+            return code[3:6] in {"600", "601", "603", "605", "688", "689"}
         if code.startswith("sz."):
             return code[3:6] in {"000", "001", "002", "003", "300", "301"}
         return False
@@ -523,7 +526,7 @@ class IdentityUniverseBackfillSource:
     @staticmethod
     def _board(code: str) -> Board:
         digits = code.split(".", 1)[1]
-        if code.startswith("SH.") and digits.startswith("688"):
+        if code.startswith("SH.") and digits.startswith(("688", "689")):
             return Board.STAR
         if code.startswith("SZ.") and digits.startswith(("300", "301")):
             return Board.CHINEXT

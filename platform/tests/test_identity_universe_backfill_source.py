@@ -57,6 +57,7 @@ class FakeAkshare:
     def stock_profile_cninfo(self, *, symbol: str) -> FakeFrame:
         names = {
             "600519": "贵州茅台酒股份有限公司",
+            "689009": "九号有限公司",
             "000001": "平安银行股份有限公司",
         }
         return FakeFrame([{"公司名称": names[symbol], "A股代码": symbol}])
@@ -200,12 +201,36 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
         self.assertEqual(batch.row_count, 1)
         BackfillService._validate_batch(plan, unit, batch)
 
+    def test_star_market_cdr_identity_is_not_dropped(self) -> None:
+        class StarCdrBasic(FakeBaostock):
+            def query_stock_basic(self) -> FakeResult:
+                return FakeResult(
+                    ["code", "code_name", "ipoDate", "outDate", "type", "status"],
+                    [["sh.689009", "九号公司-WD", "2020-10-29", "", "1", "1"]],
+                )
+
+        plan = explicit_identity_plan("SH.689009")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = self.source(baostock=StarCdrBasic()).fetch(unit, plan)
+
+        payload = batch.payload
+        assert isinstance(payload, SecurityMasterPayload)
+        self.assertEqual([row.code for row in payload.rows], ["SH.689009"])
+        self.assertEqual(payload.rows[0].board, Board.STAR)
+        BackfillService._validate_batch(plan, unit, batch)
+
     def test_explicit_security_master_requires_every_requested_symbol(self) -> None:
         plan = explicit_identity_plan("SH.600519", "SH.601318")
         unit = BackfillPlanner().work_units(plan)[0]
 
-        with self.assertRaisesRegex(ProviderBackfillUnavailable, "requested symbols"):
+        with self.assertRaises(ProviderBackfillUnavailable) as caught:
             self.source().fetch(unit, plan)
+        self.assertEqual(
+            str(caught.exception),
+            "security master provider omitted requested symbols: "
+            "missing_count=1; missing_symbols=SH.601318",
+        )
 
     def test_explicit_symbols_cannot_fetch_universe(self) -> None:
         plan = explicit_identity_plan("SH.600519", domain=BackfillDataDomain.UNIVERSE)
