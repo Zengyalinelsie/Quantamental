@@ -4,17 +4,24 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from enum import Enum
+from itertools import pairwise
 from zoneinfo import ZoneInfo
 
 from .pit import DataTrustState
-from .run_context import RunContext
+from .run_context import DataMode, RunContext
 
 _SHANGHAI = ZoneInfo("Asia/Shanghai")
 _REQUIRED_HORIZONS = (1, 5, 20, 60)
 _ZERO = Decimal(0)
 _ONE = Decimal(1)
+SUPPORTED_TIMING_BENCHMARK_IDS = frozenset({"index:000300", "index:000905"})
+PASSIVE_VOLATILITY_LOOKBACK_RETURNS = 20
+PASSIVE_VOLATILITY_ANNUALIZATION_SESSIONS = 244
+PASSIVE_VOLATILITY_FORMULA_VERSION = (
+    "unadjusted-close-log-return-sample-std-20-sqrt244-v1"
+)
 
 
 def _require_text(value: str, field_name: str) -> str:
@@ -46,6 +53,129 @@ def _ratio(value: Decimal, field_name: str) -> Decimal:
     if not _ZERO <= value <= _ONE:
         raise ValueError(f"{field_name} must be in [0, 1]")
     return value
+
+
+def _supported_benchmark(value: str) -> str:
+    value = _require_text(value, "benchmark_id")
+    if value not in SUPPORTED_TIMING_BENCHMARK_IDS:
+        raise ValueError("benchmark_id must be a supported CSI benchmark")
+    return value
+
+
+@dataclass(frozen=True)
+class BenchmarkCloseObservation:
+    """One current-normalized, unadjusted benchmark close."""
+
+    benchmark_id: str
+    session_date: date
+    unadjusted_close: Decimal
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "benchmark_id", _supported_benchmark(self.benchmark_id))
+        if not isinstance(self.session_date, date) or isinstance(self.session_date, datetime):
+            raise TypeError("session_date must be a date")
+        close = _decimal(self.unadjusted_close, "unadjusted_close")
+        if close <= _ZERO:
+            raise ValueError("unadjusted_close must be positive")
+        object.__setattr__(self, "unadjusted_close", close)
+
+
+@dataclass(frozen=True)
+class BenchmarkCloseBatch:
+    """The exact 21-close input used by the P3 passive baseline."""
+
+    benchmark_id: str
+    rows: tuple[BenchmarkCloseObservation, ...]
+    provider_id: str
+    retrieved_at: datetime
+    adjustment_mode: str
+    trust_state: DataTrustState
+    data_mode: DataMode
+
+    def __post_init__(self) -> None:
+        benchmark_id = _supported_benchmark(self.benchmark_id)
+        object.__setattr__(self, "benchmark_id", benchmark_id)
+        rows = tuple(self.rows)
+        if len(rows) != PASSIVE_VOLATILITY_LOOKBACK_RETURNS + 1:
+            raise ValueError("passive volatility input requires exactly 21 closes")
+        if any(not isinstance(row, BenchmarkCloseObservation) for row in rows):
+            raise TypeError("rows must contain BenchmarkCloseObservation values")
+        if any(row.benchmark_id != benchmark_id for row in rows):
+            raise ValueError("all close rows must match benchmark_id")
+        dates = tuple(row.session_date for row in rows)
+        if any(current <= previous for previous, current in pairwise(dates)):
+            raise ValueError("benchmark close dates must be strictly increasing")
+        object.__setattr__(self, "rows", rows)
+        _require_text(self.provider_id, "provider_id")
+        _require_aware(self.retrieved_at, "retrieved_at")
+        if self.adjustment_mode != "unadjusted":
+            raise ValueError("timing benchmark closes must be unadjusted")
+        trust = DataTrustState(self.trust_state)
+        if trust is not DataTrustState.NORMALIZED_CURRENT:
+            raise ValueError("timing benchmark batch must remain normalized_current")
+        object.__setattr__(self, "trust_state", trust)
+        data_mode = DataMode(self.data_mode)
+        if data_mode is not DataMode.CURRENT_RESEARCH:
+            raise ValueError("timing benchmark batch must remain current_research")
+        object.__setattr__(self, "data_mode", data_mode)
+
+    @property
+    def effective_session(self) -> date:
+        return self.rows[-1].session_date
+
+
+@dataclass(frozen=True)
+class PassiveVolatilityEstimate:
+    annualized_volatility_ratio: Decimal
+    lookback_return_count: int
+    annualization_sessions: int
+    formula_version: str
+    effective_session: date
+
+    def __post_init__(self) -> None:
+        value = _decimal(
+            self.annualized_volatility_ratio,
+            "annualized_volatility_ratio",
+        )
+        if value < _ZERO:
+            raise ValueError("annualized_volatility_ratio cannot be negative")
+        object.__setattr__(self, "annualized_volatility_ratio", value)
+        if self.lookback_return_count != PASSIVE_VOLATILITY_LOOKBACK_RETURNS:
+            raise ValueError("lookback_return_count must equal 20")
+        if self.annualization_sessions != PASSIVE_VOLATILITY_ANNUALIZATION_SESSIONS:
+            raise ValueError("annualization_sessions must equal 244")
+        if self.formula_version != PASSIVE_VOLATILITY_FORMULA_VERSION:
+            raise ValueError("formula_version does not match the P3 baseline contract")
+
+
+def estimate_passive_volatility(batch: BenchmarkCloseBatch) -> PassiveVolatilityEstimate:
+    """Calculate sample volatility from 20 close-to-close log returns."""
+
+    if not isinstance(batch, BenchmarkCloseBatch):
+        raise TypeError("batch must be a BenchmarkCloseBatch")
+    with localcontext() as context:
+        context.prec = 40
+        closes = tuple(row.unadjusted_close for row in batch.rows)
+        returns = tuple(
+            (current / previous).ln()
+            for previous, current in pairwise(closes)
+        )
+        count = len(returns)
+        mean = sum(returns, start=Decimal(0)) / Decimal(count)
+        sample_variance = sum(
+            ((value - mean) ** 2 for value in returns),
+            start=Decimal(0),
+        ) / Decimal(count - 1)
+        annualized = sample_variance.sqrt() * Decimal(
+            PASSIVE_VOLATILITY_ANNUALIZATION_SESSIONS
+        ).sqrt()
+    return PassiveVolatilityEstimate(
+        annualized_volatility_ratio=annualized,
+        lookback_return_count=count,
+        annualization_sessions=PASSIVE_VOLATILITY_ANNUALIZATION_SESSIONS,
+        formula_version=PASSIVE_VOLATILITY_FORMULA_VERSION,
+        effective_session=batch.effective_session,
+    )
 
 
 class TimingEstimateStatus(str, Enum):

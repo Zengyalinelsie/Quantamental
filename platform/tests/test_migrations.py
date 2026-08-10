@@ -58,6 +58,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0011_domain_aware_checkpoint_adjustment.sql",
                 "0012_timing_shadow_ledger.sql",
                 "0013_disclosure_time_precision.sql",
+                "0015_timing_benchmark_bars.sql",
             ),
         )
 
