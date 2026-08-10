@@ -29,6 +29,41 @@ def _text(value: str, field: str) -> str:
     return value
 
 
+def _finite_decimal(
+    value: Decimal,
+    field: str,
+    *,
+    positive: bool,
+) -> Decimal:
+    if not isinstance(value, Decimal) or not value.is_finite():
+        raise TypeError(f"{field} must be a finite Decimal")
+    if positive and value <= 0:
+        raise ValueError(f"{field} must be positive")
+    if not positive and value < 0:
+        raise ValueError(f"{field} must not be negative")
+    return value
+
+
+def _symbol_exchange(code: str, exchange: Exchange | str) -> Exchange:
+    if _SYMBOL.fullmatch(code) is None:
+        raise ValueError("code must use SH.000000, SZ.000000, or BJ.000000")
+    selected = Exchange(exchange)
+    if _SYMBOL_EXCHANGE[code[:2]] is not selected:
+        raise ValueError("code prefix and exchange disagree")
+    return selected
+
+
+def _unique_provider_records(
+    rows: tuple[
+        StagedShareCapitalObservation | StagedCorporateActionObservation,
+        ...,
+    ],
+) -> None:
+    keys = tuple((row.code, row.provider_record_id) for row in rows)
+    if len(keys) != len(set(keys)):
+        raise ValueError("payload contains duplicate provider records")
+
+
 @dataclass(frozen=True)
 class StagedSecurityIdentity:
     code: str
@@ -236,3 +271,131 @@ class TradingCalendarPayload:
         object.__setattr__(self, "rows", tuple(self.rows))
         if any(not isinstance(row, StagedTradingCalendarDay) for row in self.rows):
             raise TypeError("calendar payload rows must be staged calendar days")
+
+
+@dataclass(frozen=True)
+class StagedShareCapitalObservation:
+    """A dated provider observation, not a fabricated PIT validity interval."""
+
+    code: str
+    exchange: Exchange
+    effective_on: date
+    announced_on: date | None
+    total_shares: Decimal
+    circulating_shares: Decimal | None
+    restricted_shares: Decimal | None
+    free_float_shares: Decimal | None
+    provider_record_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "exchange", _symbol_exchange(self.code, self.exchange))
+        if not isinstance(self.effective_on, date):
+            raise TypeError("effective_on must be a date")
+        if self.announced_on is not None and not isinstance(self.announced_on, date):
+            raise TypeError("announced_on must be a date or None")
+        _finite_decimal(self.total_shares, "total_shares", positive=True)
+        components = (
+            (self.circulating_shares, "circulating_shares"),
+            (self.restricted_shares, "restricted_shares"),
+            (self.free_float_shares, "free_float_shares"),
+        )
+        for value, field in components:
+            if value is not None:
+                _finite_decimal(value, field, positive=False)
+                if value > self.total_shares:
+                    raise ValueError(f"{field} cannot exceed total_shares")
+        if (
+            self.circulating_shares is not None
+            and self.restricted_shares is not None
+            and self.circulating_shares + self.restricted_shares > self.total_shares
+        ):
+            raise ValueError("circulating and restricted shares cannot exceed total_shares")
+        if self.free_float_shares is not None:
+            if self.circulating_shares is None:
+                raise ValueError("free_float_shares requires circulating_shares")
+            if self.free_float_shares > self.circulating_shares:
+                raise ValueError("free_float_shares cannot exceed circulating_shares")
+        _text(self.provider_record_id, "provider_record_id")
+        _text(self.source_id, "source_id")
+
+
+@dataclass(frozen=True)
+class ShareCapitalPayload:
+    rows: tuple[StagedShareCapitalObservation, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "rows", tuple(self.rows))
+        if any(not isinstance(row, StagedShareCapitalObservation) for row in self.rows):
+            raise TypeError("share-capital payload rows must be staged observations")
+        _unique_provider_records(self.rows)
+
+
+@dataclass(frozen=True)
+class StagedCorporateActionObservation:
+    """Provider distribution terms kept separate until canonical mapping is approved."""
+
+    code: str
+    exchange: Exchange
+    announced_on: date | None
+    record_date: date | None
+    ex_date: date | None
+    cash_per_share: Decimal | None
+    bonus_shares_per_share: Decimal | None
+    capitalization_shares_per_share: Decimal | None
+    rights_shares_per_share: Decimal | None
+    rights_subscription_price: Decimal | None
+    currency: str
+    provider_record_id: str
+    source_id: str
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "exchange", _symbol_exchange(self.code, self.exchange))
+        for date_value, date_field in (
+            (self.announced_on, "announced_on"),
+            (self.record_date, "record_date"),
+            (self.ex_date, "ex_date"),
+        ):
+            if date_value is not None and not isinstance(date_value, date):
+                raise TypeError(f"{date_field} must be a date or None")
+        if (
+            self.record_date is not None
+            and self.ex_date is not None
+            and self.record_date > self.ex_date
+        ):
+            raise ValueError("record_date cannot follow ex_date")
+        terms = (
+            (self.cash_per_share, "cash_per_share"),
+            (self.bonus_shares_per_share, "bonus_shares_per_share"),
+            (
+                self.capitalization_shares_per_share,
+                "capitalization_shares_per_share",
+            ),
+            (self.rights_shares_per_share, "rights_shares_per_share"),
+            (self.rights_subscription_price, "rights_subscription_price"),
+        )
+        for term_value, term_field in terms:
+            if term_value is not None:
+                _finite_decimal(term_value, term_field, positive=True)
+        if not any(value is not None for value, _field in terms):
+            raise ValueError("corporate action requires at least one economic term")
+        if (self.rights_shares_per_share is None) != (
+            self.rights_subscription_price is None
+        ):
+            raise ValueError("rights issue requires both ratio and subscription price")
+        if not isinstance(self.currency, str) or len(self.currency) != 3:
+            raise ValueError("currency must be an ISO 4217 code")
+        object.__setattr__(self, "currency", self.currency.upper())
+        _text(self.provider_record_id, "provider_record_id")
+        _text(self.source_id, "source_id")
+
+
+@dataclass(frozen=True)
+class CorporateActionPayload:
+    rows: tuple[StagedCorporateActionObservation, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "rows", tuple(self.rows))
+        if any(not isinstance(row, StagedCorporateActionObservation) for row in self.rows):
+            raise TypeError("corporate-action payload rows must be staged observations")
+        _unique_provider_records(self.rows)
