@@ -10,7 +10,13 @@
 
 ## 当前状态
 
-P0 领域合同已在提交 `0c32725` 完成；P1 工程底座、治理账本、设计系统、六导航应用 Shell 和只读 API 骨架已在提交 `ebbe025` 通过 Capability Gate。P2 数据底座已在提交 `923f678` 完成；当前已增加显式 ack 的私人本地 `normalized_current` 行情/日历回填，以及沪深当前 Security Master/CSI300/500 历史成分采集能力，但 320/768/1024/1440 浏览器视觉证据、XBSE 和真实全范围回填仍未完成，因此暂不宣称 P2 Capability Gate 通过。P3-W01–W03 已建立不可变官方披露证据链、Canonical Metric Registry 和双时间 PIT Financial Repository；P3-W05 已接通数据管理、披露/事实时间线、current/strict 对比、mismatch 和证据 Drawer。P3-W04 真实样本与 W06 每日 Timing 记录仍在进行。
+P0 领域合同和 P1 工程底座已通过 Capability Gate。P2 代码底座已完成，真实库已有
+CSI800 当前 Security Master 799/800、CSI500 当日 Universe 500/500 和私人本地
+`normalized_current` 数据；但多尺寸浏览器证据、完整历史 Universe、XBSE、2018+ 全范围行情、
+股本和公司行动仍未完成，因此不宣称 P2 Gate 通过。P3 已完成 4 家公司、8 份官方 PDF、
+2 条修订链、双时财务、真实数据诊断页面和首条 CSI500 被动波动率 Shadow baseline，
+Capability Gate 通过。主动 Timing 仍 `unavailable`；700–800 家财务回填是 P3 Gate 后、P4 大规模
+科学研究前的 Scale-up，尚未完成。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -54,6 +60,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P2 数据来源覆盖矩阵](docs/11-p2-data-source-coverage-matrix.md)
 - [P2 实现与验证证据](docs/12-p2-implementation-evidence.md)
 - [P3 实现与验证证据](docs/13-p3-implementation-evidence.md)
+- [数据源总清单与 Agent 选择路由](docs/14-data-source-catalog-and-agent-routing.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)
@@ -94,11 +101,12 @@ PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
   --parquet-root ./var/private-research/parquet \
   --private-local-research-ack --execute
 
-# 沪深当前 Security Master + 2018 年以来 CSI300/CSI500 历史成分；不含 XBSE，仍非 PIT
+# 可独立分片：沪深当前 Security Master + 当日 CSI500；不含 XBSE，仍非 PIT
 PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
   --provider a_share_identity_universe \
-  --start 2018-01-01 --end 2026-08-08 \
+  --start 2026-08-10 --end 2026-08-10 \
   --all-a-share \
+  --benchmarks 000905 \
   --domains security_master universe \
   --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
   --parquet-root ./var/private-research/parquet \
@@ -127,14 +135,33 @@ PYTHONPATH=src .venv/bin/python -m unittest \
   tests.test_identity_universe_backfill_source -v
 ```
 
-P3 Timing Shadow Ledger 当前实现 immutable schema、cutoff、被动波动率基线公式和
-append-only 持久化门；尚未接入每日调度，也不会把测试 fixture 写进运行时。定向验证：
+P3 Timing Shadow Ledger 已以真实 CSI500 当日 Universe 和 21 条 BaoStock 未复权收盘价
+追加首条 `current_research + shadow + normalized_current` 被动波动率 baseline。worker 默认
+dry-run，且同日重跑不再访问供应商或写库；它是可调度入口，不代表本仓库已配置常驻调度器。
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.timing_baseline \
+  --benchmark-id index:000905 \
+  --universe-version-id '<persisted-universe-version-id>' \
+  --session 2026-08-10 \
+  --target-volatility-ratio 0.12 \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --code-version git:<commit>
+```
+
+上述命令不带 `--execute`时不写数据；真实本地执行还要加
+`--private-local-research-ack --execute`。主动预测、风险预测和主动调仓仍显式 `unavailable`。定向验证：
 
 ```bash
 cd platform
 PYTHONPATH=src .venv/bin/python -m unittest \
   tests.test_timing_shadow_ledger \
   tests.test_postgres_timing \
+  tests.test_timing_baseline_math \
+  tests.test_timing_baseline_runner \
+  tests.test_timing_baseline_persistence \
+  tests.test_timing_baseline_cli \
   tests.test_migrations -v
 ```
 

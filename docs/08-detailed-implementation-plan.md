@@ -396,15 +396,15 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 至少包括：
 
-- [ ] 正常盘后年报；
-- [ ] 盘前公告；
-- [ ] 周末公告；
-- [ ] 财报更正；
-- [ ] 同一报告期多版本；
-- [ ] 单位/币种冲突；
-- [ ] 缺失字段；
-- [ ] 一次性项目；
-- [ ] 供应商值与官方披露不一致。
+- [x] 正常盘后年报；
+- [x] 盘前公告；
+- [x] 周末公告；
+- [x] 财报更正；
+- [x] 同一报告期多版本；
+- [x] 单位/币种冲突；
+- [x] 缺失字段；
+- [x] 一次性项目；
+- [x] 供应商值与官方披露不一致。
 
 每个 fixture 保存原始证据和人工期望值。
 
@@ -418,29 +418,26 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 - [x] 原始证据 Drawer；
 - [x] coverage 和阻断原因。
 
-状态（2026-08-10）：W05a 已实现 System 四个只读面板、PostgreSQL `READ ONLY`
-reader、真实空态和任务内 coverage/checkpoint/失败原因；开发库端到端返回 9 个
-DatasetVersion、26 份质量报告、14 个任务，Lineage 当前 0 行并显示真实空态。浏览器控制
-当前没有可用实例，视觉截图仍待补齐；Disclosure/Fact timeline、current/strict 对比、
-mismatch queue 和原始证据 Drawer 留在 W05b。证据见 `docs/13-p3-implementation-evidence.md`。
-
-W05b 已补齐上述诊断页面和 PostgreSQL 只读 reader；真实开发库相关表当前为 0 行，页面
-显示真实空态，没有注入测试公告或财务事实。浏览器视觉截图限制仍保留，不影响继续补
-W04 真实 fixture，但 P3 Gate 在真实样本和页面原文追溯证据完成前仍不通过。
+状态（2026-08-10）：W05a/W05b 已实现 System 四个只读面板和财务证据诊断。开发库当前
+显示 13 个 DatasetVersion、28 份质量报告、19 个 ingestion job 和 55 条 lineage；浏览器
+在 `http://127.0.0.1:5173/` 验证了真实五粮液披露/事实修订、Current/Strict 阻断差异、
+Mismatch Queue 和只显示治理元数据的 Raw Evidence Drawer。页面没有注入运行时演示值；
+证据见 `docs/13-p3-implementation-evidence.md`。
 
 ### P3-W06：Timing Shadow Ledger 基础
 
 为了不等 Timing 模型完成才开始积累：
 
 - [x] 定义 TimingForecast immutable schema；
-- [ ] 每日记录静态满仓与被动波动率基线，标记 `data_mode=current_research`、`deployment_stage=shadow`；
+- [x] 每日记录静态满仓与被动波动率基线，标记 `data_mode=current_research`、`deployment_stage=shadow`；
 - [x] 保存市场标签未来计算所需 cutoff；
 - [x] 只作为 baseline/shadow，不声称主动模型已完成。
 
-状态（2026-08-10）：immutable schema、append-only PostgreSQL ledger、cutoff 和
-baseline/shadow 服务端门已完成；开发库 `timing_forecasts=0`。在真实 CSI benchmark
-行情 DatasetVersion 和每日调度接线完成前，“每日记录”仍不勾选，也不以测试 fixture
-冒充运行记录。证据见 `docs/13-p3-implementation-evidence.md`。
+状态（2026-08-10）：真实 CSI500 当日 UniverseVersion（500 个有效成员）已绑定；worker
+读取 21 个 BaoStock 未复权收盘价，按 20 日对数收益样本标准差乘 `sqrt(244)` 追加首条
+`current_research + shadow + normalized_current` baseline。重跑返回 `created=false` 且不再
+访问供应商；forecast、bars 均有 UPDATE/DELETE trigger。主动预测继续为 `unavailable`，
+P7 前不能影响生产仓位。证据见 `docs/13-p3-implementation-evidence.md`。
 
 ### Gate P3
 
@@ -450,6 +447,23 @@ baseline/shadow 服务端门已完成；开发库 `timing_forecasts=0`。在真�
 - 页面每个事实可追原文/版本；
 - baseline Timing ledger 开始追加且不可修改；
 - SPEC-006、013–015、027 的公告部分通过。
+
+状态（2026-08-10）：上述 P3 Capability 条件已有代码、真实小样本、数据库和浏览器证据，
+P3 Gate 通过。该判断只证明 P3 证据/双时间/诊断/基线能力，不证明全市场财务覆盖、主动
+Timing、任何因子或模型科学有效。P2 的多尺寸浏览器视觉证据、完整历史 Universe、XBSE、
+股本和公司行动仍是独立未完成项。
+
+### Gate 后数据扩容（P3.5，不是 P3 Gate 条件）
+
+700–800 家三表不是“不用导入”，正式时点为 P3 Gate 后、P4 大规模科学研究前。该扩容不
+倒改 P3 Gate 结论，但 P4 不得在所需公司/报告期覆盖和质量未达标时宣称广覆盖因子研究完成。
+
+- [ ] Factor Service/iFinD/THS 完成新凭证、live metadata、本地批量保存和缓存副作用资格审查；
+- [ ] Wind 完成接口、许可、修订和时间语义审查，在此之前保持 candidate；
+- [ ] 3–5 家 live 结构化三表 pilot 与官方 PDF 抽样对账；
+- [ ] 按 CSI300 → CSI500 分阶段入库，每个工作单元持久化 DatasetVersion、checkpoint、quality、
+  coverage 和 lineage；
+- [ ] 批量 current 数据保持 `normalized_current`；strict 只从官方版本链和独立治理运行晋升。
 
 ## 8. P4：行业模板、特征工程和正式 Factor Lab
 

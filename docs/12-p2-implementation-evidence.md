@@ -113,7 +113,8 @@ P2-W02 和 P2-W03 已分别验证首次执行与二次幂等。所有新表保�
 
 自动化证据已覆盖：任意 fixture 历史日重建、研究/可交易池分离、行业/挂牌、退市/ST/停牌/代码名称变化、价格/复权/市值抽样，以及组件测试中页面不隐藏退市样本。
 
-尚未完成：多尺寸真实浏览器视觉回归及截图。因此 P2 Capability Gate 当前为待验证，不是通过。
+尚未完成：多尺寸真实浏览器视觉回归及截图、完整历史 Universe、XBSE、2018+
+全范围行情、股本和公司行动。因此 P2 Capability Gate 当前为待验证，不是通过。
 
 此外，P2 没有 PIT 财务、公告修订、因子、估值、改善、择时、组合、回测、事件 Agent、Paper OMS 或真实执行；这些属于 P3 及以后阶段。新闻模块按计划在 P8 接入，本阶段没有提前加入新闻情绪或 Agent 新闻信号。
 
@@ -229,3 +230,28 @@ Security Master、历史 Universe、2018+ 行情、股本或公司行动全部�
 `normalized_current`，不能用于 strict historical 或被晋升为 `pit_verified`。这些覆盖与质量
 证据只证明这三个 ingestion batch 的工程运行结果，不证明供应商数据科学正确、策略盈利或
 模型科学有效。
+
+## 12. CSI500 当日 Universe 成功与历史范围阻断
+
+为不让 CSI300 或长时间段中的单点身份错误阻止独立合法的范围，CLI 已支持
+`--benchmarks 000300/000905` 显式分片。该参数只收窄用户选择的 benchmark，不会放宽质量、
+许可、身份或 PIT 门。
+
+2026-08-10 单日 CSI500 真实运行成功：
+
+- 任务 `job:private-local:a_share_identity_universe:7a76b4bb2bf71c0f15d1` 为 `succeeded`；
+- 实际落库 UniverseVersion 含 500 个成员，与该日供应商返回的 500 个成员一致；
+- quality report 为 `passed`、`checks_passed=1`、`checks_failed=0`；
+- UniverseVersion、DatasetVersion 和 lineage 已持久化，信任上限仍为
+  `normalized_current`，成员默认 `tradable_eligible=false`。
+
+同时，两个 2026 年长范围运行按 fail-closed 失败并保留原因：
+
+- CSI300：成员返回包含 `SZ.302132`，它与旧代码 `SZ.300114` 属同一上市主体，
+  现有 current code 派生 Listing ID 与 SPEC-010 稳定 Listing ID 冲突；任务未静默剔除该成员；
+- CSI500：历史退出成员 `SH.600079` 在 2026-01-05 无唯一可兼容 current-known identity，
+  canonical sink 失败并整事务回滚，没有留下部分年度 Universe。
+
+因此当前准确状态是：CSI800 当前 Security Master 目标 799/800；CSI500 当日 Universe
+500/500；完整历史 CSI300/CSI500 Universe 仍未完成。单日成功记录可供 P3 当日被动 Timing
+baseline 绑定，但不能代替历史 Universe，更不能用于 `strict_historical`。

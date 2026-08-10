@@ -30,13 +30,13 @@ Provider Registry、许可、canonical sink 或 PIT 门。
 |---|---|---|---|---|---|
 | `a_share_mcp_baostock` | 沪深身份探针、日历、日线、状态、行业、指数成员样本 | 原型查询可用 | `normalized_current` | 小样本、current 研究、交叉核验 | 无公告可用时间；不直接批量持久化 |
 | `baostock_sdk` | 沪深 raw 日线、交易日历 | 已实现并真实落库日历 | `normalized_current` | 经显式 ack 的私人本地研究 | 日线必须 `adjustflag=3`；不含北交所和完整公司行动 |
-| `a_share_identity_universe` | 沪深 Security Master、行业、CSI300/500 成分 | 代码收尾，尚未真实执行 | `normalized_current` | 经显式 ack 的私人本地研究 | current 身份和历史检索不等于 PIT；不含北交所 |
+| `a_share_identity_universe` | 沪深 Security Master、行业、CSI300/500 成分 | 真实 CSI800 当前身份 799/800；CSI500 当日 Universe 500；历史 Universe 未完成 | `normalized_current` | 经显式 ack 的私人本地研究 | current 身份和历史检索不等于 PIT；不含北交所 |
 | `akshare` / CNInfo 网页端点 | 身份补充、指数、财务、宏观、新闻、公告候选 | fallback 候选；部分用于组合身份源 | `normalized_current` | current 研究、小型 fixture、补字段 | 网页结构/限流/端点条款逐项审查；不得接入 qfq 结果作为 raw bar |
 | `futu_quote` | 沪深 raw 日线；未来可评估只读资讯 | raw 日线 adapter 已实现 | `normalized_current` | 私人本地研究备源 | 只允许 `OpenQuoteContext`；禁止账户、持仓、订单和交易上下文 |
 | Wind | 身份、行情、三表、预期、行业、指数、公司行动等候选 | 用户有能力，接口和许可待提供 | 待资格审查 | 高优先级结构化候选 | 不因付费自动获得 PIT；需确认历史修订、可用时间和本地保存权 |
 | Factor Service / iFinD/THS | A 股三表、日行情、股本、市值、汇率、宏观等 | 文档可用；live metadata 未验证 | `normalized_current` | 结构化 current 主候选、交叉对账 | 部分查询有 read-through cache 写入；字段数、覆盖和 PIT 时间存在冲突 |
 | SneAgent | PDF 主表/notes 抽取，报告聚焦港股五表 | 内部服务候选 | `raw` / `normalized_current` | 缺字段、notes、复杂版式、冲突复核 | 内部 `verified` 不等于 `pit_verified`；单份约 7–13 分钟 |
-| 巨潮/交易所/公司披露 | 公告、PDF、发布时间、更正/撤回、原始证据 | P3 官方证据合同已实现 | `raw`；治理后可形成 PIT 观察 | 公告与财务事实权威证据 | 保存/再分发逐站点审查；日期精度不可靠时用保守时间 |
+| 巨潮/交易所/公司披露 | 公告、PDF、发布时间、更正/撤回、原始证据 | P3 合同已实现；4 家/8 份 PDF/2 修订链真实小样本已落库 | `raw`；治理后可形成 PIT 观察 | 公告与财务事实权威证据 | 保存/再分发逐站点审查；日期精度不可靠时用保守时间 |
 | 上交所/深交所/北交所 | 身份、挂牌、日历、规则、公司行动 | 权威核验候选 | `raw` | 权威抽样和争议核验 | API/页面不统一，端点许可待审 |
 | 中证指数公司 | CSI300/500 定义和成员 | 权威核验候选 | `raw` | Universe 版本核验 | 历史文件、下载许可和有效区间需固化 |
 | XE（经 Factor Service） | HKD/CNY/USD 交叉汇率 | 文档称 2021–2026 已入库 | `normalized_current` | current 估值/换算候选 | 必须保存货币对、日期、source；不能把 current 汇率回填历史 |
@@ -299,8 +299,10 @@ Official disclosure adapter ┘        v
 - current/strict 查询必须在修订前后产生预期差异；
 - 供应商与官方不一致时保留冲突并阻断，而不是用 PDF 或供应商值静默覆盖另一方。
 
-在 Factor Service live metadata、Wind 合同和可重放样例到位前，P3-W04 可以继续建设
-adapter 合同、离线 TDD 和官方证据样例，但 P3 Capability Gate 不应宣称通过。
+这是 W04a/W04b 完成时的阻断判断。后续 W04c 已以 4 家公司、8 份官方 PDF、2 条真实更正链和
+阻断型供应商冲突完成 P3 小样本条件，因此 P3 Capability Gate 可按 `docs/13-p3-implementation-evidence.md`
+的完整证据判定通过。这不会自动批准 Factor Service 或 Wind；它们的 live metadata、合同、许可和
+可重放样例仍是 P3.5 批量三表入库的前置门。
 
 ## 11. 下一步资产补齐
 
@@ -309,7 +311,8 @@ adapter 合同、离线 TDD 和官方证据样例，但 P3 Capability Gate 不�
    `columns/search` 响应为测试 fixture，禁止在单元测试中触发第三方查询；
 3. 确认 Factor Service 三表实际日期字段、当前字段数和近 5 年缓存的精确起止/成员范围；
 4. 为 Factor Service、Wind、SneAgent 各写一份 provider qualification 记录；
-5. 先用 3–5 家真实公司做交叉对账，再决定 A 股三表主源和 fallback 顺序；
+5. 先用 3–5 家真实公司的 live 结构化响应与已落库官方证据做交叉对账，再决定
+   A 股三表主源和 fallback 顺序；
 6. 所有凭证只进入本地密钥管理或环境变量，不进入 Git、日志、fixture 或文档。
 
 上述工作只证明来源和系统合同是否可用，不证明任何因子、模型或策略科学有效。
@@ -334,6 +337,12 @@ Anspire、MiniMax、Brave、SearXNG，并使用网页正文解析、缓存、超
 版本和许可；时间不可信时必须显式降级，文章更正或撤回不能覆盖旧版本。
 
 ## 13. A 股财务大规模入库预案
+
+这项扩容不是“不用导入”，也不应在 P3 小样本 Gate 前无门全量运行。正式时点是
+**P3 Capability Gate 通过后、P4 大规模科学研究前**的数据扩容工作，可称为“P3.5 Scale-up”。
+它要求结构化主源先通过新凭证、本地批量保存许可、时间语义、字段映射和 3–5 家 live
+pilot，再按 CSI300 → CSI500 分阶段入库。入库过程可与 P4 前置工程并行，但 P4 的广覆盖因子试验不得
+在所需公司/报告期覆盖和质量未达标时宣称完成。
 
 ### 13.1 目标来源层级
 

@@ -2,7 +2,7 @@
 
 日期：2026-08-10
 
-范围：`docs/08-detailed-implementation-plan.md` 的 P3-W01 至 P3-W06。本文件随每个工作包追加；在 Gate 证据完整前不宣称 P3 完成。
+范围：`docs/08-detailed-implementation-plan.md` 的 P3-W01 至 P3-W06。本文件保留每个工作包完成时的历史证据；当前 Gate 结论见文末。
 
 该阶段建立 PIT 财务、官方披露和数据证据链。Capability 测试通过不代表因子、估值、择时或投资模型科学有效，不代表可盈利，也不授权真实交易、真实下单或真实账户连接。
 
@@ -172,12 +172,40 @@ PYTHONPATH=src .venv/bin/python -m \
 命令行、仓库或 fixture。未加 `--allow-read-through-cache` 时 query 显式 skipped，进程以 2
 退出，不能被误当成完整 qualification。
 
-本工作包仍未取得合法新凭证、真实三表响应、本地批量保存许可、3–5 家真实公司人工期望值
-或两个修订案例，因此 Factor Service 保持 candidate，P3-W04 和 P3 Gate 均未完成。
+本工作包完成时仍未取得合法新凭证、真实三表响应或本地批量保存许可，因此
+Factor Service 仍保持 candidate。后续 W04c 以官方披露完成了 4 家真实小样本和两个修订
+链，但没有因此将 Factor Service 晋升为合格批量主源。
 
 工作包完成时证据：定向 `8 passed`；共享工作树全量 `225 passed`；compileall、Ruff、mypy
 （66 source files）通过，`git diff --check` 通过。测试通过只证明 adapter/probe 合同，不证明
 同花顺当前可达、字段值正确、覆盖完整、许可已批准或模型科学有效。
+
+## P3-W04c：真实 PIT 小样本与修订链
+
+在不将 current 供应商值冒充 PIT 的前提下，已建立可重放的真实小样本包：
+
+- 4 家公司：平安银行、五粮液、赛隆药业和立华股份；
+- 8 份巨潮官方 PDF，每份保存 source URL、SHA-256、publication/available/
+  first-tradable/retrieval time、时间精度和 retention；
+- 五粮液和立华股份各 1 条原始/更正链，同一报告期旧版不被覆盖；
+- 覆盖正常盘后年报、盘前可用、周末公告、财报更正、同期多版、单位/币种冲突、
+  缺失字段、一次性项目和供应商/官方不一致九类场景；
+- 时间元数据明确分为 5 条 `exact` 和 3 条 `date_only`；`date_only` 不伪造盘前或
+  盘后精确时刻；
+- 12 条官方观察为 `pit_verified/passed`；1 条来自 AkShare/Sina 的当前供应商
+  观察为 `normalized_current/blocked`，不能进入 strict historical；
+- 五粮液 2025 Q1 营业收入 current 因供应商时间/精度/单位冲突显式 blocked，
+  strict 从官方更正版选中 `17085765657.95 CNY`。
+
+真实开发库读取结果为 `raw_objects=11`、`official_disclosures=8`、
+`financial_fact_observations=13`、`lineage_edges=55`、`dataset_versions=13`、
+`dataset_quality_reports=28`、`ingestion_jobs=19`。fixture import 要求显式私人本地研究确认和
+loopback PostgreSQL；原文只保存在 `platform/var/private-research/`，禁止外分发，没有加入
+默认运行时演示数据。
+
+本工作包解除的是 W04 真实样本与泄漏套件门；它不代表 700–800 家财务回填已完成，
+也不会将未通过资格审查的 Factor Service、Wind、BaoStock 或 Futu 数值晋升为
+`pit_verified`。
 
 ## P3-W05a：Catalog / Quality / Lineage / Jobs
 
@@ -239,13 +267,15 @@ PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache .venv/bin/python -m compileall
 - API 和页面查询需要显式 company/fact identity，不默认选公司，也不使用运行时演示数据。
 
 TDD 红灯先表现为 financial evidence reader 和 `SystemEvidenceScreen` 不存在；随后加入纯选择、
-多源冲突、PostgreSQL 只读事务、API、Drawer 和 UI current/strict 负向测试。全量验证：Python
-`256 passed`、前端 `26 passed`、Ruff、mypy（80 source files）、compileall、生产构建和
-`git diff --check` 通过。真实开发库端到端结果为 disclosures/fact revisions/mismatches 均
-HTTP 200、0 行，证明空表接线但不证明真实数据已经摄取。
+多源冲突、PostgreSQL 只读事务、API、Drawer 和 UI current/strict 负向测试。工作包初次完成时，
+全量验证为 Python `256 passed`、前端 `26 passed`，Ruff、mypy（80 source files）、compileall、
+生产构建和 `git diff --check` 通过；当时开发库为真实空表。
 
-浏览器控制仍无可用实例，不能把 jsdom 结果冒充视觉截图；W04 的 3–5 家真实公司、两个修订
-案例和 W06 每日 Timing 记录仍是 P3 Gate 阻断项。测试通过不证明财务数据正确、因子有效、
+后续 W04c 完成真实小样本导入后，已在真实浏览器复验 Dataset Catalog、五粮液披露时间线、
+`date_only/exact`、事实修订、current blocked / strict selected、2 条 blocking mismatch、Raw Evidence
+Drawer 和 W04/Timing lineage。Drawer 只展示 hash/provider/license/retention/source 治理元数据，
+禁止再分发时不回传 PDF 内容。开发端口是前端 `5173`、后端 `8010`，没有占用用户的
+`8000`。这些证据证明页面与真实小样本链路可读，不证明财务数据全市场覆盖、因子有效、
 策略盈利或模型科学有效。
 
 ## P3-W06a：Timing Shadow Ledger 合同与持久化
@@ -275,11 +305,10 @@ TDD 红灯先表现为 timing domain、repository 和 `0012` migration 均不存
 `0012_timing_shadow_ledger`，二次运行无输出；migration 记录为 1、append-only trigger
 存在。
 
-当前限制保持显式：开发库 `timing_forecasts=0`。本地只有 2018 年 30 家个股样本行情，
-没有可绑定的 CSI300/CSI500 benchmark 行情 DatasetVersion，因此没有用测试值或临时网络值
-伪造第一条每日 Shadow 记录。P3-W06 的“每日记录”仍未完成；需要先把真实 benchmark
-raw bars、波动率定义版本和 scheduler 接线后再开始追加。P7 才实现、验证和晋级主动择时。
-本工作包不证明主动模型存在、择时有效、策略可盈利或模型科学有效。
+本工作包初次完成时开发库 `timing_forecasts=0`，因为当时尚无可绑定的真实 CSI benchmark
+行情 DatasetVersion；没有用测试值或临时网络值伪造第一条 Shadow 记录。后续 W06b 已接入
+真实 raw bars、固定波动率公式版本和可重运 CLI，并追加首条 baseline。P7 才实现、验证和晋级
+主动择时；W06a/W06b 均不证明主动模型存在、择时有效、策略可盈利或模型科学有效。
 
 验证命令：
 
@@ -294,3 +323,74 @@ PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache .venv/bin/python -m compileall
 .venv/bin/ruff check src tests
 PYTHONPATH=src .venv/bin/mypy src
 ```
+
+## P3-W06b：真实 CSI 被动波动率 baseline
+
+在 W06a 不可变 ledger 之上，已补齐真实输入和日运行链路：
+
+- `0015_timing_benchmark_bars.sql` 持久化 CSI300/CSI500 未复权收盘价，仅接受
+  `normalized_current + current_research`，UPDATE/DELETE trigger 禁止修改；
+- 公式版本固定为 `unadjusted-close-log-return-sample-std-20-sqrt244-v1`：21 个正收盘价
+  得到 20 个对数收益，使用样本标准差乘 `sqrt(244)`；
+- 运行前验证 UniverseVersion 属于请求的 benchmark，且至少一个成员在该交易日的
+  `[valid_from, valid_to)` 区间内有效；错配在访问供应商前阻断；
+- `normalized_current` 不能回填旧日 baseline；只允许当日上海时间 15:05 后运行，并强制
+  `decision_time >= retrieved_at`；
+- 每条记录绑定 DatasetVersion、运行环境/代码版本、RunRecord 和两条 lineage；
+- 同一 benchmark/Universe/交易日第二次运行在供应商访问前返回已有记录，CLI 如实输出
+  `created=false` 和 `writes_performed=false`。
+
+真实开发库首条记录绑定 2026-08-10 的 CSI500 UniverseVersion，该版本含 500 个有效成员；
+BaoStock 输入为 2026-07-13 至 2026-08-10 的 21 条未复权收盘价。实际 ledger 值：
+
+```text
+benchmark=index:000905
+effective_session=2026-08-10
+observed_volatility=0.4131876026996083818592030658211309651764
+passive_exposure=0.2904249769740580256028179546
+active_adjustment=unavailable
+data_mode=current_research
+deployment_stage=shadow
+input_trust_state=normalized_current
+code_version=git:b6f9634
+```
+
+开发库含 21 条 benchmark bars、1 条 TimingForecast、1 条 run 和 2 条对应 lineage。BaoStock
+guard 当日账本为 185 次真实供应商调用、0 次 blocked attempt；11 次 login 和 11 次 logout
+均正常完成，没有并发连接或 cooldown。
+
+范围阻断仍保持可见：2026 年 CSI300 因 `SZ.302132` 代码变更/唯一 Listing 冲突失败；
+2026 年 CSI500 因历史退出成员 `SH.600079` 缺当时可用 Security Master 失败并整事务回滚。
+首条 baseline 只使用已合法落库的当日 CSI500 Universe，没有忽略这两个错误。
+
+真实运行命令仍默认 dry-run：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.timing_baseline \
+  --benchmark-id index:000905 \
+  --universe-version-id '<persisted-universe-version-id>' \
+  --session 2026-08-10 \
+  --target-volatility-ratio 0.12 \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --code-version git:<commit>
+```
+
+只有加上 `--private-local-research-ack --execute` 才会写本地数据库；禁止用于生产决策、真实交易
+或账户连接。主动收益、风险预测和主动仓位调整仍显式 `unavailable`，P7 前不得影响生产仓位。
+
+## P3 Capability Gate 结论
+
+截至 2026-08-10，P3 Capability Gate 通过：
+
+- 4 家真实公司、8 份官方 PDF、2 条修订链和九类泄漏/冲突场景可重放；
+- RawObject、Canonical Metric、双时事实、authority/conflict 和 current/strict 选择可追溯；
+- Catalog、Quality、Lineage、Jobs、披露/事实时间线、Mismatch Queue 和 Raw Evidence
+  Drawer 已在真实浏览器对真实小样本验证；
+- 首条真实 `current_research + shadow` 被动 Timing baseline 已追加且不可修改；
+- 数据类型、质量、来源、时间精度、版本、运行和血缘的阻断信息没有被默认值或页面演示数据隐藏。
+
+该 Gate 只证明 P3 的证据、双时、诊断和被动 baseline 工程能力达到阶段要求。它不证明
+700–800 家财务覆盖已完成，不证明任何财务数据、因子、估值、Timing、组合或策略科学有效，
+不授权真实交易、下单、撤单或账户连接。P2 的多尺寸视觉证据、完整历史 Universe、XBSE、
+2018+ 全范围行情、股本和公司行动仍是独立未完成项。
