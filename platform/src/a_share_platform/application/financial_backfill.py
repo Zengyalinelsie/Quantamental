@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -20,11 +21,117 @@ from a_share_platform.domain.financial_backfill import (
     FinancialBackfillBatchResult,
     FinancialBackfillPlan,
     FinancialBackfillWorkUnit,
+    FinancialMappingResult,
+    FinancialProviderBatch,
+    MappedFinancialRow,
 )
 from a_share_platform.domain.financial_sources import (
     FinancialSourcePermissionError,
     FinancialSourceProfile,
 )
+from a_share_platform.domain.governance import LineageEdge
+from a_share_platform.domain.metrics import MappingMethod, MetricUnit, UnmappedProviderField
+from a_share_platform.ports.financial_backfill import (
+    FinancialBackfillSource,
+    FinancialBackfillUnitOfWork,
+)
+from a_share_platform.ports.metrics import MetricRegistryRepository
+
+
+class FinancialBackfillBlockedError(PermissionError):
+    """The immutable plan/profile pair is not qualified for execution."""
+
+
+@dataclass(frozen=True)
+class FinancialBackfillRunOutcome:
+    checkpoint: BackfillCheckpoint
+    dataset_version_id: str | None
+    observation_ids: tuple[str, ...]
+    skipped: bool
+
+
+class FinancialBackfillMapper:
+    """Resolve explicit versioned mappings without losing Decimal/evidence semantics."""
+
+    def __init__(self, repository: MetricRegistryRepository) -> None:
+        self._repository = repository
+
+    def map(self, batch: FinancialProviderBatch) -> FinancialMappingResult:
+        version = self._repository.get_mapping_version(batch.work_unit.mapping_version_id)
+        if version is None:
+            raise ValueError(
+                f"mapping version does not exist: {batch.work_unit.mapping_version_id}"
+            )
+        if version.provider_id != batch.work_unit.provider_id:
+            raise ValueError("mapping version provider does not match financial work unit")
+        mapped_rows: list[MappedFinancialRow] = []
+        unmapped_ids: list[str] = []
+        for row in batch.rows:
+            mappings = self._repository.find_mappings(
+                provider_id=row.provider_id,
+                statement_type=row.statement_type,
+                source_field=row.provider_field,
+                mapping_version_id=batch.work_unit.mapping_version_id,
+            )
+            if len(mappings) > 1:
+                raise ValueError("multiple mappings match one provider financial field")
+            if not mappings:
+                unmapped_digest = hashlib.sha256(
+                    f"{row.row_id}|{batch.work_unit.mapping_version_id}".encode()
+                ).hexdigest()[:24]
+                self._repository.enqueue_unmapped_field(
+                    UnmappedProviderField(
+                        unmapped_field_id=f"unmapped-financial-field:{unmapped_digest}",
+                        provider_id=row.provider_id,
+                        statement_type=row.statement_type,
+                        source_field=row.provider_field,
+                        mapping_version_id=batch.work_unit.mapping_version_id,
+                        discovered_at=batch.retrieved_at,
+                        raw_object_id=row.raw_object_id,
+                    )
+                )
+                unmapped_ids.append(row.row_id)
+                continue
+            mapping = mappings[0]
+            if not mapping.production_allowed or mapping.method is MappingMethod.FUZZY:
+                raise PermissionError("provider financial mapping is not production_allowed")
+            if mapping.method is MappingMethod.FORMULA:
+                raise ValueError("formula financial mappings require an explicit formula evaluator")
+            metric = self._repository.get_metric(mapping.metric_code)
+            if metric is None:
+                raise ValueError(f"canonical metric does not exist: {mapping.metric_code}")
+            if metric.statement_type is not row.statement_type:
+                raise ValueError("mapped metric statement does not match provider row")
+            currency_units = {MetricUnit.CURRENCY, MetricUnit.CURRENCY_PER_SHARE}
+            if metric.unit in currency_units and row.currency is None:
+                raise ValueError("currency-valued mapped financial row requires currency")
+            if metric.unit not in currency_units and row.currency is not None:
+                raise ValueError("non-currency mapped financial row must not carry currency")
+            mapped_digest = hashlib.sha256(
+                f"{row.row_id}|{mapping.mapping_id}|{mapping.metric_code}".encode()
+            ).hexdigest()[:24]
+            mapped_rows.append(
+                MappedFinancialRow(
+                    mapped_row_id=f"mapped-financial-row:{mapped_digest}",
+                    source_row=row,
+                    mapping_id=mapping.mapping_id,
+                    mapping_version_id=mapping.mapping_version_id,
+                    metric_code=mapping.metric_code,
+                    value=row.scaled_numeric_value,
+                    unit=metric.unit,
+                    currency=row.currency,
+                    trust_state=batch.trust_state,
+                )
+            )
+        warnings: tuple[str, ...] = ()
+        if unmapped_ids:
+            warnings = (f"unmapped_provider_field_count={len(unmapped_ids)}",)
+        return FinancialMappingResult(
+            provider_batch=batch,
+            mapped_rows=tuple(mapped_rows),
+            unmapped_row_ids=tuple(unmapped_ids),
+            warnings=warnings,
+        )
 
 
 @dataclass(frozen=True)
@@ -223,3 +330,177 @@ class FinancialBackfillPlanner:
             warnings=coverage_warnings,
         )
         return quality, coverage
+
+
+class FinancialBackfillRunner:
+    """Execute one work unit with durable running/terminal checkpoint boundaries."""
+
+    def __init__(
+        self,
+        *,
+        planner: FinancialBackfillPlanner,
+        mapper: FinancialBackfillMapper,
+        unit_of_work: FinancialBackfillUnitOfWork,
+        clock: Callable[[], datetime],
+    ) -> None:
+        self._planner = planner
+        self._mapper = mapper
+        self._unit_of_work = unit_of_work
+        self._clock = clock
+
+    def run_unit(
+        self,
+        *,
+        plan: FinancialBackfillPlan,
+        profile: FinancialSourceProfile,
+        job_id: str,
+        work_unit: FinancialBackfillWorkUnit,
+        source: FinancialBackfillSource,
+    ) -> FinancialBackfillRunOutcome:
+        preview = self._planner.preview(plan, profile)
+        if not preview.qualification.permitted:
+            raise FinancialBackfillBlockedError("; ".join(preview.qualification.blockers))
+        matching_units = tuple(unit for unit in preview.work_units if unit == work_unit)
+        if len(matching_units) != 1:
+            raise ValueError("financial work unit is not part of the immutable plan")
+        if source.provider_id != plan.provider_id:
+            raise ValueError("financial source provider does not match immutable plan")
+
+        checkpoint = self._unit_of_work.get_checkpoint(job_id, work_unit.checkpoint_key)
+        if checkpoint is not None and checkpoint.status is BackfillCheckpointStatus.SUCCEEDED:
+            persisted = self._unit_of_work.get_persist_result(
+                job_id,
+                work_unit.checkpoint_key,
+            )
+            if persisted is None:
+                raise RuntimeError(
+                    "succeeded financial checkpoint is missing its persist result"
+                )
+            return FinancialBackfillRunOutcome(
+                checkpoint=checkpoint,
+                dataset_version_id=persisted.dataset_version_id,
+                observation_ids=persisted.observation_ids,
+                skipped=True,
+            )
+        if checkpoint is None:
+            checkpoint = self._planner.pending_checkpoint(
+                job_id=job_id,
+                unit=work_unit,
+                at=self._clock(),
+            )
+            checkpoint = self._unit_of_work.save_checkpoint(checkpoint)
+            self._unit_of_work.commit()
+        if checkpoint.status in {
+            BackfillCheckpointStatus.PENDING,
+            BackfillCheckpointStatus.FAILED,
+        }:
+            checkpoint = checkpoint.transition(
+                BackfillCheckpointStatus.RUNNING,
+                at=self._clock(),
+            )
+            checkpoint = self._unit_of_work.save_checkpoint(checkpoint)
+            self._unit_of_work.commit()
+
+        try:
+            batch = source.fetch(
+                work_unit,
+                allow_read_through_cache=plan.allow_read_through_cache,
+            )
+            if batch.work_unit != work_unit:
+                raise ValueError("financial source batch does not match work unit")
+            if batch.trust_state is not plan.output_trust_state:
+                raise ValueError("financial source batch trust does not match immutable plan")
+            mapping_result = self._mapper.map(batch)
+            if not mapping_result.mapped_rows:
+                raise ValueError("financial work unit produced no mapped observations")
+            persisted = self._unit_of_work.persist(mapping_result)
+            if len(persisted.observation_ids) != len(mapping_result.mapped_rows):
+                raise ValueError("financial sink did not persist every mapped observation")
+
+            missing_security_count = len(work_unit.symbols) - len(batch.accepted_symbols)
+            issue_counts = tuple(
+                (code, count)
+                for code, count in (
+                    ("missing_provider_value", batch.missing_value_count),
+                    ("unmapped_provider_field", len(mapping_result.unmapped_row_ids)),
+                    ("missing_security", missing_security_count),
+                )
+                if count
+            )
+            warnings = tuple(
+                dict.fromkeys(
+                    (*batch.warnings, *mapping_result.warnings, *persisted.warnings)
+                )
+            )
+            result = FinancialBackfillBatchResult(
+                work_unit=work_unit,
+                retrieved_at=batch.retrieved_at,
+                provider_cutoff_date=batch.retrieved_at.date(),
+                content_hash=batch.content_hash,
+                processed_provider_rows=batch.provider_record_count,
+                canonical_observations=len(mapping_result.mapped_rows),
+                rejected_rows=max(
+                    0,
+                    batch.provider_record_count - len(batch.accepted_symbols),
+                ),
+                accepted_symbols=batch.accepted_symbols,
+                quality_status=(
+                    DatasetQualityStatus.PASSED
+                    if not issue_counts
+                    else DatasetQualityStatus.WARNED
+                ),
+                issue_counts=issue_counts,
+                warnings=warnings,
+            )
+            succeeded = self._planner.complete_checkpoint(
+                checkpoint,
+                result=result,
+                at=self._clock(),
+            )
+            quality, coverage = self._planner.build_reports(
+                job_id=job_id,
+                dataset_version_id=persisted.dataset_version_id,
+                result=result,
+                created_at=self._clock(),
+            )
+            for upstream_id, relation in (
+                (batch.raw_object_id, "evidence_for"),
+                (plan.mapping_version_id, "mapped_by"),
+                (plan.universe_version_id, "scoped_by"),
+            ):
+                self._unit_of_work.register_lineage(
+                    LineageEdge(
+                        upstream_id=upstream_id,
+                        downstream_id=persisted.dataset_version_id,
+                        relation=relation,
+                    )
+                )
+            for observation_id in persisted.observation_ids:
+                self._unit_of_work.register_lineage(
+                    LineageEdge(
+                        upstream_id=persisted.dataset_version_id,
+                        downstream_id=observation_id,
+                        relation="contains",
+                    )
+                )
+            self._unit_of_work.save_checkpoint(succeeded)
+            self._unit_of_work.save_quality_report(quality)
+            self._unit_of_work.save_coverage_report(coverage)
+            self._unit_of_work.commit()
+            return FinancialBackfillRunOutcome(
+                checkpoint=succeeded,
+                dataset_version_id=persisted.dataset_version_id,
+                observation_ids=persisted.observation_ids,
+                skipped=False,
+            )
+        except Exception as error:
+            self._unit_of_work.rollback()
+            if checkpoint.status is not BackfillCheckpointStatus.SUCCEEDED:
+                failed = checkpoint.transition(
+                    BackfillCheckpointStatus.FAILED,
+                    at=self._clock(),
+                    error=f"{type(error).__name__}: {error}",
+                )
+                self._unit_of_work.save_checkpoint(failed)
+                self._unit_of_work.commit()
+            raise

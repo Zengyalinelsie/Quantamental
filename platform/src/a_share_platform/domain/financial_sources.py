@@ -65,6 +65,7 @@ class AvailabilityMethod(str, Enum):
 class FinancialStatementScope(str, Enum):
     CONSOLIDATED = "consolidated"
     PARENT_COMPANY = "parent_company"
+    UNKNOWN = "unknown"
 
 
 class FinancialValueBasis(str, Enum):
@@ -78,6 +79,7 @@ class ReportVersionType(str, Enum):
     ORIGINAL = "original"
     CORRECTED = "corrected"
     RESTATED = "restated"
+    UNKNOWN = "unknown"
 
 
 class FinancialSourcePermissionError(PermissionError):

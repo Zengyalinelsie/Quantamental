@@ -5,10 +5,13 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from datetime import date, datetime
+from decimal import Decimal
 from enum import Enum
 
 from .backfill import BackfillDataDomain, DatasetQualityStatus
-from .metrics import StatementType
+from .disclosure import RawObject, RetentionPolicy
+from .financial_sources import ProviderFinancialRow
+from .metrics import MetricUnit, StatementType
 from .pit import DataTrustState
 from .run_context import DataMode
 
@@ -256,6 +259,201 @@ class FinancialBackfillBatchResult:
         if status is DatasetQualityStatus.FAILED and not any(count for _, count in issues):
             raise ValueError("failed quality result requires at least one issue")
         object.__setattr__(self, "issue_counts", issues)
+        warnings = tuple(self.warnings)
+        for warning in warnings:
+            _text(warning, "warning")
+        object.__setattr__(self, "warnings", warnings)
+
+
+@dataclass(frozen=True)
+class FinancialProviderBatch:
+    """One evidence-bound staged provider batch; values remain provider rows."""
+
+    work_unit: FinancialBackfillWorkUnit
+    evidence: RawObject
+    rows: tuple[ProviderFinancialRow, ...]
+    provider_record_count: int
+    missing_value_count: int
+    accepted_symbols: tuple[str, ...]
+    trust_state: DataTrustState
+    warnings: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.work_unit, FinancialBackfillWorkUnit):
+            raise TypeError("work_unit must be a FinancialBackfillWorkUnit")
+        if not isinstance(self.evidence, RawObject):
+            raise TypeError("evidence must be a RawObject")
+        if self.evidence.provider_id != self.work_unit.provider_id:
+            raise ValueError("evidence provider does not match financial work unit")
+        if self.evidence.retention_policy is RetentionPolicy.METADATA_ONLY:
+            raise ValueError("financial provider rows require retained response evidence")
+        rows = tuple(self.rows)
+        for row in rows:
+            if not isinstance(row, ProviderFinancialRow):
+                raise TypeError("rows must contain ProviderFinancialRow values")
+            if row.provider_id != self.work_unit.provider_id:
+                raise ValueError("provider row provider does not match work unit")
+            if row.provider_table != self.work_unit.provider_table:
+                raise ValueError("provider row table does not match work unit")
+            if row.statement_type is not self.work_unit.statement_type:
+                raise ValueError("provider row statement does not match work unit")
+            if row.report_period_end != self.work_unit.report_period_end:
+                raise ValueError("provider row report period does not match work unit")
+            if (row.raw_object_id, row.raw_object_hash) != (
+                self.evidence.raw_object_id,
+                self.evidence.content_hash,
+            ):
+                raise ValueError("provider row evidence does not match batch evidence")
+        row_ids = tuple(row.row_id for row in rows)
+        if len(row_ids) != len(set(row_ids)):
+            raise ValueError("provider batch row identifiers must be unique")
+        object.__setattr__(self, "rows", rows)
+        for value, field_name in (
+            (self.provider_record_count, "provider_record_count"),
+            (self.missing_value_count, "missing_value_count"),
+        ):
+            if type(value) is not int or value < 0:
+                raise ValueError(f"{field_name} must be a non-negative integer")
+        provider_record_ids = {row.provider_record_id for row in rows}
+        if len(provider_record_ids) > self.provider_record_count:
+            raise ValueError("provider rows exceed the declared provider record count")
+        accepted = tuple(self.accepted_symbols)
+        if len(accepted) != len(set(accepted)):
+            raise ValueError("accepted_symbols must be unique")
+        if not set(accepted).issubset(self.work_unit.symbols):
+            raise ValueError("accepted_symbols must belong to the work unit")
+        if len(accepted) > self.provider_record_count:
+            raise ValueError("accepted symbols cannot exceed provider record count")
+        object.__setattr__(self, "accepted_symbols", tuple(sorted(accepted)))
+        trust = DataTrustState(self.trust_state)
+        if trust is not DataTrustState.NORMALIZED_CURRENT:
+            raise ValueError("financial provider batch must remain normalized_current")
+        object.__setattr__(self, "trust_state", trust)
+        warnings = tuple(self.warnings)
+        for warning in warnings:
+            _text(warning, "warning")
+        object.__setattr__(self, "warnings", warnings)
+
+    @property
+    def content_hash(self) -> str:
+        return self.evidence.content_hash
+
+    @property
+    def raw_object_id(self) -> str:
+        return self.evidence.raw_object_id
+
+    @property
+    def retrieved_at(self) -> datetime:
+        return self.evidence.retrieved_at
+
+
+@dataclass(frozen=True)
+class MappedFinancialRow:
+    """Canonical Decimal value that still preserves its full provider observation."""
+
+    mapped_row_id: str
+    source_row: ProviderFinancialRow
+    mapping_id: str
+    mapping_version_id: str
+    metric_code: str
+    value: Decimal
+    unit: MetricUnit
+    currency: str | None
+    trust_state: DataTrustState
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "mapped_row_id",
+            "mapping_id",
+            "mapping_version_id",
+            "metric_code",
+        ):
+            _text(getattr(self, field_name), field_name)
+        if not isinstance(self.source_row, ProviderFinancialRow):
+            raise TypeError("source_row must be a ProviderFinancialRow")
+        if not isinstance(self.value, Decimal):
+            raise TypeError("mapped financial value must use Decimal")
+        if not self.value.is_finite():
+            raise ValueError("mapped financial value must be finite")
+        object.__setattr__(self, "unit", MetricUnit(self.unit))
+        trust = DataTrustState(self.trust_state)
+        if trust is not DataTrustState.NORMALIZED_CURRENT:
+            raise ValueError("mapped provider financial rows remain normalized_current")
+        object.__setattr__(self, "trust_state", trust)
+
+    @property
+    def provider_id(self) -> str:
+        return self.source_row.provider_id
+
+    @property
+    def statement_type(self) -> StatementType:
+        return self.source_row.statement_type
+
+    @property
+    def raw_object_id(self) -> str:
+        return self.source_row.raw_object_id
+
+    @property
+    def raw_object_hash(self) -> str:
+        return self.source_row.raw_object_hash
+
+
+@dataclass(frozen=True)
+class FinancialMappingResult:
+    provider_batch: FinancialProviderBatch
+    mapped_rows: tuple[MappedFinancialRow, ...]
+    unmapped_row_ids: tuple[str, ...]
+    warnings: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.provider_batch, FinancialProviderBatch):
+            raise TypeError("provider_batch must be a FinancialProviderBatch")
+        mapped = tuple(self.mapped_rows)
+        source_ids = {row.row_id for row in self.provider_batch.rows}
+        if any(row.source_row.row_id not in source_ids for row in mapped):
+            raise ValueError("mapped rows must originate from the provider batch")
+        mapped_ids = tuple(row.mapped_row_id for row in mapped)
+        if len(mapped_ids) != len(set(mapped_ids)):
+            raise ValueError("mapped financial row identifiers must be unique")
+        if any(
+            row.mapping_version_id != self.provider_batch.work_unit.mapping_version_id
+            or row.provider_id != self.provider_batch.work_unit.provider_id
+            or row.trust_state is not self.provider_batch.trust_state
+            for row in mapped
+        ):
+            raise ValueError("mapped rows do not match the immutable provider batch")
+        object.__setattr__(self, "mapped_rows", mapped)
+        unmapped = tuple(self.unmapped_row_ids)
+        if len(unmapped) != len(set(unmapped)) or not set(unmapped).issubset(source_ids):
+            raise ValueError("unmapped_row_ids must be unique provider batch rows")
+        if set(unmapped).intersection(row.source_row.row_id for row in mapped):
+            raise ValueError("one provider row cannot be both mapped and unmapped")
+        mapped_source_ids = tuple(row.source_row.row_id for row in mapped)
+        if len(mapped_source_ids) != len(set(mapped_source_ids)):
+            raise ValueError("one provider row cannot produce multiple direct mappings")
+        if set(mapped_source_ids).union(unmapped) != source_ids:
+            raise ValueError("every provider row must be classified as mapped or unmapped")
+        object.__setattr__(self, "unmapped_row_ids", unmapped)
+        warnings = tuple(self.warnings)
+        for warning in warnings:
+            _text(warning, "warning")
+        object.__setattr__(self, "warnings", warnings)
+
+
+@dataclass(frozen=True)
+class FinancialPersistResult:
+    dataset_version_id: str
+    observation_ids: tuple[str, ...]
+    warnings: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        _text(self.dataset_version_id, "dataset_version_id")
+        observations = tuple(self.observation_ids)
+        if not observations or len(observations) != len(set(observations)):
+            raise ValueError("observation_ids must be non-empty and unique")
+        for observation_id in observations:
+            _text(observation_id, "observation_id")
+        object.__setattr__(self, "observation_ids", observations)
         warnings = tuple(self.warnings)
         for warning in warnings:
             _text(warning, "warning")
