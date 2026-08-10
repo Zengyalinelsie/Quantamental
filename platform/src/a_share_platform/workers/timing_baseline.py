@@ -107,7 +107,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(json.dumps(output, ensure_ascii=False, indent=2, sort_keys=True))
         return 1
     output.update(result)
-    output["writes_performed"] = True
+    output["writes_performed"] = bool(result.get("created"))
     print(json.dumps(output, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
 

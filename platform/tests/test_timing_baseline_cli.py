@@ -95,6 +95,38 @@ class TimingBaselineCliTest(unittest.TestCase):
         self.assertTrue(payload["writes_performed"])
         execute.assert_called_once()
 
+    def test_idempotent_execute_reports_that_no_new_write_was_performed(self) -> None:
+        output = io.StringIO()
+        with patch(
+            "a_share_platform.workers.timing_baseline._execute",
+            return_value={
+                "execution_status": "succeeded",
+                "forecast_id": "timing:000905:2026-08-10:test",
+                "created": False,
+            },
+        ), redirect_stdout(output):
+            exit_code = main(
+                [
+                    "--benchmark-id",
+                    "index:000905",
+                    "--universe-version-id",
+                    "universe:000905:test",
+                    "--session",
+                    "2026-08-10",
+                    "--database-url",
+                    "postgresql://127.0.0.1/research",
+                    "--code-version",
+                    "git:test",
+                    "--private-local-research-ack",
+                    "--execute",
+                ]
+            )
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertFalse(payload["created"])
+        self.assertFalse(payload["writes_performed"])
+
     def test_cli_and_runtime_contain_no_account_or_execution_adapter(self) -> None:
         root = (
             Path(__file__).resolve().parents[1]
