@@ -32,6 +32,7 @@ from .backfill_payloads import (
     UniverseMembershipPayload,
 )
 from .baostock_backfill import ProviderBackfillUnavailable
+from .baostock_guard import BaostockGuard, BaostockSession
 
 _EXCHANGES = {"XSHG": Exchange.XSHG, "XSHE": Exchange.XSHE}
 _SOURCE_METHODS = {
@@ -66,6 +67,7 @@ class IdentityUniverseBackfillSource:
         membership_update_max_age_days: int = 370,
         request_interval_seconds: float = 0.05,
         call_timeout_seconds: float = 30.0,
+        baostock_guard: BaostockGuard | None = None,
     ) -> None:
         if type(profile_attempts) is not int or profile_attempts < 1:
             raise ValueError("profile_attempts must be a positive integer")
@@ -109,37 +111,42 @@ class IdentityUniverseBackfillSource:
         self._membership_update_max_age_days = membership_update_max_age_days
         self._request_interval_seconds = request_interval_seconds
         self._call_timeout_seconds = call_timeout_seconds
+        self._baostock_guard = baostock_guard or BaostockGuard()
 
     def fetch(self, unit: BackfillWorkUnit, plan: BackfillPlan) -> BackfillBatch:
         self._validate_request(unit, plan)
         retrieved_at = self._clock()
         baostock = cast(Any, self._baostock_module_loader("baostock"))
-        login = self._provider_call("login", baostock.login)
-        self._require_success(login, "login")
         rejected_rows = 0
         issues: Counter[str] = Counter()
         expected_rows: int | None = None
         payload: SecurityMasterPayload | UniverseMembershipPayload
         cutoff_date: date | None
-        try:
-            if unit.domain is BackfillDataDomain.SECURITY_MASTER:
-                akshare = cast(Any, self._akshare_module_loader("akshare"))
-                payload, rejected_rows, issues, expected_rows = self._security_master_payload(
-                    baostock,
-                    akshare,
-                    unit,
-                    retrieved_at.date(),
-                    requested_symbols=plan.symbols,
-                )
-                units = (("identity", "record"),)
-                cutoff_date = retrieved_at.date()
-            else:
-                payload = self._universe_payload(baostock, unit, plan)
-                units = (("benchmark_membership", "boolean"),)
-                cutoff_date = unit.end_date
-                expected_rows = None
-        finally:
-            self._provider_call("logout", baostock.logout)
+        with self._baostock_guard.session() as session:
+            login = self._baostock_call(session, "login", baostock.login)
+            self._require_success(login, "login")
+            try:
+                if unit.domain is BackfillDataDomain.SECURITY_MASTER:
+                    akshare = cast(Any, self._akshare_module_loader("akshare"))
+                    payload, rejected_rows, issues, expected_rows = (
+                        self._security_master_payload(
+                            session,
+                            baostock,
+                            akshare,
+                            unit,
+                            retrieved_at.date(),
+                            requested_symbols=plan.symbols,
+                        )
+                    )
+                    units = (("identity", "record"),)
+                    cutoff_date = retrieved_at.date()
+                else:
+                    payload = self._universe_payload(session, baostock, unit, plan)
+                    units = (("benchmark_membership", "boolean"),)
+                    cutoff_date = unit.end_date
+                    expected_rows = None
+            finally:
+                self._baostock_call(session, "logout", baostock.logout)
 
         warnings = [
             "private local research only; external redistribution is prohibited",
@@ -199,6 +206,7 @@ class IdentityUniverseBackfillSource:
 
     def _security_master_payload(
         self,
+        session: BaostockSession,
         baostock: Any,
         akshare: Any,
         unit: BackfillWorkUnit,
@@ -210,8 +218,9 @@ class IdentityUniverseBackfillSource:
             raise ProviderBackfillUnavailable(
                 f"identity source does not support market={unit.market}"
             )
-        basic_result = self._provider_call(
-            "security master",
+        basic_result = self._baostock_call(
+            session,
+            "query_stock_basic",
             baostock.query_stock_basic,
         )
         self._require_success(basic_result, "security master")
@@ -247,8 +256,9 @@ class IdentityUniverseBackfillSource:
                 f"missing_count={len(missing_symbols)}; "
                 f"missing_symbols={','.join(missing_symbols)}"
             )
-        industry_result = self._provider_call(
-            "industry membership",
+        industry_result = self._baostock_call(
+            session,
+            "query_stock_industry",
             lambda: baostock.query_stock_industry(date=observed_on.isoformat()),
         )
         self._require_success(industry_result, "industry membership")
@@ -323,6 +333,7 @@ class IdentityUniverseBackfillSource:
 
     def _universe_payload(
         self,
+        session: BaostockSession,
         baostock: Any,
         unit: BackfillWorkUnit,
         plan: BackfillPlan,
@@ -335,8 +346,9 @@ class IdentityUniverseBackfillSource:
                 f"unsupported benchmark scope={unit.scope_id}"
             ) from error
         query_end = min(plan.end_date, unit.end_date + timedelta(days=14))
-        calendar = self._provider_call(
-            "universe trading calendar",
+        calendar = self._baostock_call(
+            session,
+            "query_trade_dates",
             lambda: baostock.query_trade_dates(
                 start_date=unit.start_date.isoformat(),
                 end_date=query_end.isoformat(),
@@ -371,8 +383,9 @@ class IdentityUniverseBackfillSource:
         query_members = getattr(baostock, method_name)
         previous_members: set[str] | None = None
         for trading_date in checkpoint_dates:
-            result = self._provider_call(
-                f"{benchmark_code} membership",
+            result = self._baostock_call(
+                session,
+                method_name,
                 partial(query_members, date=trading_date.isoformat()),
                 paced=True,
             )
@@ -511,6 +524,7 @@ class IdentityUniverseBackfillSource:
         worker.start()
         worker.join(self._call_timeout_seconds)
         if worker.is_alive():
+            worker.join()
             raise ProviderBackfillUnavailable(
                 f"{operation} timed out after {self._call_timeout_seconds:g} seconds"
             )
@@ -519,6 +533,19 @@ class IdentityUniverseBackfillSource:
             assert isinstance(value, BaseException)
             raise ProviderBackfillUnavailable(f"{operation} failed: {value}") from value
         return cast(_T, value)
+
+    def _baostock_call(
+        self,
+        session: BaostockSession,
+        operation: str,
+        action: Callable[[], _T],
+        *,
+        paced: bool = False,
+    ) -> _T:
+        return session.call(
+            operation,
+            lambda: self._provider_call(operation, action, paced=paced),
+        )
 
     @staticmethod
     def _security_market(row: Mapping[str, object]) -> str | None:

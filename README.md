@@ -117,6 +117,16 @@ PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
 
 第一个 execute 示例先回填不依赖 Listing FK 的交易日历。raw 日线必须先存在对应 symbol 在各日期唯一有效的 Security Master/Listing 映射，否则 canonical sink 会 fail closed。组合身份命令会逐证券查询 CNInfo 法定名称，可能较慢；显式 symbols 快速路径要求每个请求代码都存在且法定名全部通过，不允许用于 Universe。缺法定名称、代码复用或挂牌区间不兼容会显式失败/拒绝。历史指数成员默认仅可研究，`tradable_eligible=false`。Futu 可将 provider 改为 `futu_quote`，但当前只支持 `raw_daily_bar`，且只使用 `OpenQuoteContext`。这些数据禁止外部分发、`strict_historical`、生产决策和 `pit_verified`；测试没有替用户执行真实下载或入库。
 
+两个直接使用 BaoStock SDK 的 source 共用本机 fail-closed guard：同一时刻只允许一个会话，所有 `login/query/logout` 都进入按上海自然日持久化的调用账本；平台每日硬上限 40,000 次、默认最小间隔 0.25 秒，供应商黑名单/限流信号触发至少 6 小时冻结并在重复信号后累加。guard 只以 OS 文件锁判断活会话，不会被数据库里遗留的 `running` 状态误阻断。guard 启用前的历史调用量无法精确追溯，不得补造。运行定向安全测试：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_baostock_guard \
+  tests.test_baostock_backfill_source \
+  tests.test_identity_universe_backfill_source -v
+```
+
 本地 PostgreSQL 使用专用主机端口 `55432`，避免与机器上已有的 PostgreSQL `5432` 冲突：
 
 ```bash

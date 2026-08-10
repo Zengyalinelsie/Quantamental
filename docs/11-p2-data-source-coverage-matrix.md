@@ -70,3 +70,19 @@
 | `a_share_identity_universe` | `security_master`、`universe` | XSHG/XSHE | `--all-a-share`、显式 ack/domain/DSN/Parquet root；法定名称缺失拒绝；当前字段用真实观察日 | XBSE、历史法定名称/代码证据、历史可交易状态、股本、公司行动、PIT 可用时间 |
 
 `financial-data-hub` 是来源选择与对照入口；它不会绕过 `ProviderRegistry`、许可门或 canonical sink。AkShare 仅在组合身份源中调用 CNInfo 公司资料端点，没有把 donor 已审计的 qfq 历史价接入 raw sink。
+
+## 6. BaoStock 单会话、配额与冻结门
+
+`baostock_sdk` 和 `a_share_identity_universe` 的全部 BaoStock SDK
+`login`、查询与 `logout` 调用共用同一个 fail-closed guard：
+
+- `fcntl.flock` 文件锁与同进程互斥锁保证本机同一时刻最多一个 BaoStock 会话；活性只由 OS 锁判断，数据库中遗留的 `running` Job/Checkpoint 不代表活会话；
+- SQLite 调用账本按 `Asia/Shanghai` 自然日持久化，平台硬上限为每日 40,000 次，给同机平台外调用保留至少 20% 余量；被配额或冻结挡住的尝试单独计数，不调用供应商；
+- 相邻 SDK 尝试默认至少间隔 0.25 秒；供应商返回黑名单、访问限制或频率限制信号后，首次冻结至少 6 小时，重复限制信号在已有截止时间上继续累加；
+- Identity/Universe 的超时检测不会在仍运行的 SDK 线程旁并发执行 `logout`；检测到超时后先等待该调用退出，再报告超时并清理会话。这优先保证供应商单连接安全，不把不可取消的线程伪装成已终止；
+- guard 启用前没有持久化调用账本，因此此前真实日调用数无法精确追溯，文档和数据库都不得补造该历史计数。
+
+默认本地 guard 状态位于
+`platform/var/private-research/baostock-guard/`。Futu 仍是独立的只读行情候选，
+只允许 `OpenQuoteContext`；donor 始终只读，`financial-data-hub` 仍只负责选源与对照，
+三者都不能绕过该运行时边界或把 current 数据晋升为 PIT。

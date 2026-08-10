@@ -160,3 +160,35 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --provider 
 主代理在本机隔离 PostgreSQL `127.0.0.1:55432` 复验：首次运行 migration 输出 `0005_data_backfill`，二次运行无输出且退出码为 0。`ingestion_jobs`、`ingestion_checkpoints`、`dataset_quality_reports` 和 `dataset_coverage_reports` 均为 0 行，说明 schema 已持久化，但没有用 fixture 或未获许可数据填充开发库。
 
 ADR-0004 组合身份/Universe 与审查修复后的自动化结果为：Python unittest `195 passed`，compileall 通过，Ruff 通过，mypy `63 source files` 通过，`git diff --check` 通过。新增 dry-run 生成 20 个 work units（2 个当前 Security Master 市场快照 + 2 个指数 × 9 个年度区间），明确输出 XSHG/XSHE、`normalized_current`、`private_local_research` 和 `writes_performed=false`。隔离开发 PostgreSQL 已验证到 `0009_nullable_industry_code`；`0010_canonical_universe_lineage` 的实库 smoke 与真实 backfill 仍将在本提交之后单独执行并记录。本轮代码提交前没有执行 backfill `--execute`，没有发真实供应商请求，也没有写入真实业务数据。
+
+## 10. BaoStock 供应商安全 guard
+
+真实 XSHG 身份回填结束后，供应商补充了每日不超过 50,000 次、禁止并发连接、
+首次黑名单/限流至少冻结 6 小时且重复信号累加的运行约束。平台采用更保守的
+40,000 次硬上限，为同机平台外调用保留 20% 余量，并新增：
+
+- 跨进程非阻塞文件锁与同进程互斥锁，保证一个本地 BaoStock 会话；
+- `Asia/Shanghai` 自然日 SQLite 调用账本，分别记录真实供应商调用与被阻断尝试；
+- 默认 0.25 秒最小调用间隔；
+- 黑名单/限流响应识别、至少 6 小时冻结与重复信号累加；
+- `BaostockBackfillSource` 和 `IdentityUniverseBackfillSource` 的全部
+  `login/query/logout` 接线；
+- Identity/Universe 超时后等待活跃 SDK 调用真正退出，再执行 `logout`，禁止
+  超时线程与清理调用并发；
+- 只用 OS 文件锁判断会话活性，不把数据库遗留 `running` 状态当作活进程。
+
+TDD 红灯先证明 guard 模块不存在及两个 source 尚不接受 guard；绿灯定向验证
+`24 tests`。本工作包最终验证为：Python unittest `230 passed`、Ruff `src tests`
+通过、mypy `67 source files` 通过、compileall 通过、`git diff --check` 通过。
+测试覆盖跨进程争锁、上海日界、调用额度、阻断计数、调用间隔、冻结累加、
+两个 source 的 ledger operation 序列及 timeout/logout 不并发。
+
+guard 启用前没有调用账本，因此此前真实日调用数无法精确追溯，不会用估算值
+补造历史。XSHE 失败计划在本安全提交前没有重启；恢复时仍必须单会话运行，并对
+供应商遗漏的目标代码（包括 `SZ.302132`）保留明确错误与原始返回证据，不得静默
+剔除。该工作包只改变后端供应商运行安全，没有可见 UI 变化，因而没有用截图冒充
+验证；它也不改变 P2 浏览器证据缺口，更不证明任何模型科学有效。
+
+选源边界保持不变：`financial-data-hub` 负责路由和交叉核验，Futu 只允许
+`OpenQuoteContext` 行情，`sources/daily_stock_analysis` 永久只读且仅借鉴容错模式。
+所有免费源输出最多为 `normalized_current`，不得冒充 PIT。

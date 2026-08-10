@@ -1,6 +1,8 @@
+import tempfile
 import time
 import unittest
 from datetime import UTC, date, datetime
+from pathlib import Path
 
 from a_share_platform.adapters.providers.backfill_payloads import (
     SecurityMasterPayload,
@@ -9,6 +11,7 @@ from a_share_platform.adapters.providers.backfill_payloads import (
 from a_share_platform.adapters.providers.baostock_backfill import (
     ProviderBackfillUnavailable,
 )
+from a_share_platform.adapters.providers.baostock_guard import BaostockGuard
 from a_share_platform.adapters.providers.identity_universe_backfill import (
     IdentityUniverseBackfillSource,
 )
@@ -150,6 +153,10 @@ def explicit_identity_plan(*symbols: str, domain: BackfillDataDomain = BackfillD
 
 
 class IdentityUniverseBackfillSourceTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+
     def source(
         self,
         *,
@@ -166,6 +173,11 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
             },
             "maximum_membership_change_ratio": 1.0,
             "request_interval_seconds": 0,
+            "baostock_guard": BaostockGuard(
+                state_directory=Path(self.temp.name),
+                clock=lambda: NOW,
+                minimum_interval_seconds=0,
+            ),
         }
         options.update(overrides)
         return IdentityUniverseBackfillSource(  # type: ignore[arg-type]
@@ -176,6 +188,11 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
         )
 
     def test_full_market_security_master_preserves_legal_name_listing_and_industry(self) -> None:
+        guard = BaostockGuard(
+            state_directory=Path(self.temp.name),
+            clock=lambda: NOW,
+            minimum_interval_seconds=0,
+        )
         plan = plan_for(BackfillDataDomain.SECURITY_MASTER)
         unit = next(
             item
@@ -183,7 +200,7 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
             if item.market == "XSHG"
         )
 
-        batch = self.source().fetch(unit, plan)
+        batch = self.source(baostock_guard=guard).fetch(unit, plan)
 
         self.assertIsInstance(batch.payload, SecurityMasterPayload)
         payload = batch.payload
@@ -196,6 +213,10 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
         self.assertEqual(row.board, Board.MAIN)
         self.assertEqual(row.industry_name, "酒、饮料和精制茶制造业")
         self.assertEqual(batch.metadata.adjustment_mode, "not_applicable")
+        self.assertEqual(
+            [item.operation for item in guard.attempts(date(2026, 8, 10))],
+            ["login", "query_stock_basic", "query_stock_industry", "logout"],
+        )
         BackfillService._validate_batch(plan, unit, batch)
 
     def test_explicit_security_master_fetches_only_requested_symbols(self) -> None:
@@ -404,11 +425,21 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
         with self.assertRaisesRegex(ProviderBackfillUnavailable, "future updateDate"):
             self.source(baostock=FutureUpdate()).fetch(unit, plan)
 
-    def test_provider_call_timeout_is_bounded(self) -> None:
+    def test_provider_timeout_waits_for_call_before_logout(self) -> None:
         class HangingMembership(FakeBaostock):
+            def __init__(self) -> None:
+                super().__init__()
+                self.events: list[str] = []
+
             def query_hs300_stocks(self, *, date: str) -> FakeResult:
+                self.events.append("query_started")
                 time.sleep(0.05)
-                return super().query_hs300_stocks(date=date)
+                result = super().query_hs300_stocks(date=date)
+                self.events.append("query_finished")
+                return result
+
+            def logout(self) -> None:
+                self.events.append("logout")
 
         plan = plan_for(BackfillDataDomain.UNIVERSE)
         unit = next(
@@ -417,10 +448,12 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
             if item.scope_id == "index:000300"
         )
 
+        baostock = HangingMembership()
         with self.assertRaisesRegex(ProviderBackfillUnavailable, "timed out"):
-            self.source(baostock=HangingMembership(), call_timeout_seconds=0.001).fetch(
+            self.source(baostock=baostock, call_timeout_seconds=0.001).fetch(
                 unit, plan
             )
+        self.assertEqual(baostock.events, ["query_started", "query_finished", "logout"])
 
     def test_daily_membership_requests_are_rate_limited(self) -> None:
         delays: list[float] = []

@@ -1,5 +1,7 @@
+import tempfile
 import unittest
 from datetime import UTC, date, datetime
+from pathlib import Path
 
 from a_share_platform.adapters.providers.backfill_payloads import (
     DailyObservationPayload,
@@ -9,6 +11,7 @@ from a_share_platform.adapters.providers.baostock_backfill import (
     BaostockBackfillSource,
     ProviderBackfillUnavailable,
 )
+from a_share_platform.adapters.providers.baostock_guard import BaostockGuard
 from a_share_platform.application.backfill import (
     BackfillPlanner,
     build_private_local_backfill_plan,
@@ -91,14 +94,30 @@ def plan_for(domain: BackfillDataDomain):
 
 
 class BaostockBackfillSourceTest(unittest.TestCase):
-    def test_fetches_raw_daily_bars_with_unadjusted_flag_and_provenance(self) -> None:
-        module = FakeBaostock()
-        plan = plan_for(BackfillDataDomain.RAW_DAILY_BAR)
-        unit = BackfillPlanner().work_units(plan)[0]
-        source = BaostockBackfillSource(
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+
+    def guard(self) -> BaostockGuard:
+        return BaostockGuard(
+            state_directory=Path(self.temp.name),
+            clock=lambda: NOW,
+            minimum_interval_seconds=0,
+        )
+
+    def source(self, module: FakeBaostock, guard: BaostockGuard) -> BaostockBackfillSource:
+        return BaostockBackfillSource(
             module_loader=lambda _name: module,
             clock=lambda: NOW,
+            baostock_guard=guard,
         )
+
+    def test_fetches_raw_daily_bars_with_unadjusted_flag_and_provenance(self) -> None:
+        module = FakeBaostock()
+        guard = self.guard()
+        plan = plan_for(BackfillDataDomain.RAW_DAILY_BAR)
+        unit = BackfillPlanner().work_units(plan)[0]
+        source = self.source(module, guard)
 
         batch = source.fetch(unit, plan)
 
@@ -112,15 +131,17 @@ class BaostockBackfillSourceTest(unittest.TestCase):
         self.assertEqual(module.history_calls[0]["adjustflag"], "3")
         self.assertEqual(module.history_calls[0]["frequency"], "d")
         self.assertTrue(module.logged_out)
+        self.assertEqual(
+            [item.operation for item in guard.attempts(date(2026, 8, 10))],
+            ["login", "query_history_k_data_plus", "logout"],
+        )
 
     def test_fetches_calendar_without_inventing_holiday_names(self) -> None:
         module = FakeBaostock()
+        guard = self.guard()
         plan = plan_for(BackfillDataDomain.TRADING_CALENDAR)
         unit = BackfillPlanner().work_units(plan)[0]
-        source = BaostockBackfillSource(
-            module_loader=lambda _name: module,
-            clock=lambda: NOW,
-        )
+        source = self.source(module, guard)
 
         batch = source.fetch(unit, plan)
 
@@ -131,15 +152,17 @@ class BaostockBackfillSourceTest(unittest.TestCase):
         self.assertFalse(payload.rows[0].is_open)
         self.assertEqual(payload.rows[0].closure_reason, "provider_reported_closed")
         self.assertTrue(payload.rows[1].is_open)
+        self.assertEqual(
+            [item.operation for item in guard.attempts(date(2026, 8, 10))],
+            ["login", "query_trade_dates", "logout"],
+        )
 
     def test_unsupported_domain_is_explicitly_unavailable(self) -> None:
         module = FakeBaostock()
+        guard = self.guard()
         plan = plan_for(BackfillDataDomain.CORPORATE_ACTION)
         unit = BackfillPlanner().work_units(plan)[0]
-        source = BaostockBackfillSource(
-            module_loader=lambda _name: module,
-            clock=lambda: NOW,
-        )
+        source = self.source(module, guard)
         with self.assertRaisesRegex(ProviderBackfillUnavailable, "corporate_action"):
             source.fetch(unit, plan)
 

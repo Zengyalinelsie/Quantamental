@@ -8,6 +8,7 @@ import json
 from collections.abc import Callable, Mapping
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
+from functools import partial
 from typing import Any, cast
 
 from a_share_platform.domain.backfill import (
@@ -28,6 +29,7 @@ from .backfill_payloads import (
     StagedTradingCalendarDay,
     TradingCalendarPayload,
 )
+from .baostock_guard import BaostockGuard, BaostockSession
 
 _FIELDS = (
     "date",
@@ -58,9 +60,11 @@ class BaostockBackfillSource:
         *,
         clock: Callable[[], datetime],
         module_loader: Callable[[str], object] = importlib.import_module,
+        baostock_guard: BaostockGuard | None = None,
     ) -> None:
         self._clock = clock
         self._module_loader = module_loader
+        self._baostock_guard = baostock_guard or BaostockGuard()
 
     def fetch(self, unit: BackfillWorkUnit, plan: BackfillPlan) -> BackfillBatch:
         if plan.provider_id != self.provider_id:
@@ -77,30 +81,31 @@ class BaostockBackfillSource:
                 f"baostock_sdk does not implement domain={unit.domain.value}"
             )
         module = cast(Any, self._module_loader("baostock"))
-        login = module.login()
-        self._require_success(login, "login")
         payload: DailyObservationPayload | TradingCalendarPayload
         units: tuple[tuple[str, str], ...]
         dates: list[date]
-        try:
-            if unit.domain is BackfillDataDomain.RAW_DAILY_BAR:
-                payload = self._daily_payload(module, unit, plan)
-                units = (
-                    ("open", "CNY/share"),
-                    ("high", "CNY/share"),
-                    ("low", "CNY/share"),
-                    ("close", "CNY/share"),
-                    ("preclose", "CNY/share"),
-                    ("volume", "shares"),
-                    ("amount", "CNY"),
-                )
-                dates = [row.session_date for row in payload.rows]
-            else:
-                payload = self._calendar_payload(module, unit)
-                units = (("is_trading_day", "boolean"),)
-                dates = [row.calendar_date for row in payload.rows]
-        finally:
-            module.logout()
+        with self._baostock_guard.session() as session:
+            login = session.call("login", module.login)
+            self._require_success(login, "login")
+            try:
+                if unit.domain is BackfillDataDomain.RAW_DAILY_BAR:
+                    payload = self._daily_payload(session, module, unit, plan)
+                    units = (
+                        ("open", "CNY/share"),
+                        ("high", "CNY/share"),
+                        ("low", "CNY/share"),
+                        ("close", "CNY/share"),
+                        ("preclose", "CNY/share"),
+                        ("volume", "shares"),
+                        ("amount", "CNY"),
+                    )
+                    dates = [row.session_date for row in payload.rows]
+                else:
+                    payload = self._calendar_payload(session, module, unit)
+                    units = (("is_trading_day", "boolean"),)
+                    dates = [row.calendar_date for row in payload.rows]
+            finally:
+                session.call("logout", module.logout)
         warnings = [
             "private local research only; external redistribution is prohibited",
             "provider retrieval time does not establish historical PIT availability",
@@ -139,6 +144,7 @@ class BaostockBackfillSource:
 
     def _daily_payload(
         self,
+        session: BaostockSession,
         module: Any,
         unit: BackfillWorkUnit,
         plan: BackfillPlan,
@@ -150,13 +156,17 @@ class BaostockBackfillSource:
             raise ProviderBackfillUnavailable("BaoStock SDK does not support XBSE raw bars")
         observations: list[StagedDailyObservation] = []
         for symbol in (item for item in plan.symbols if item.startswith(prefix + ".")):
-            result = module.query_history_k_data_plus(
-                code=symbol.lower(),
-                fields=",".join(_FIELDS),
-                start_date=unit.start_date.isoformat(),
-                end_date=unit.end_date.isoformat(),
-                frequency="d",
-                adjustflag="3",
+            result = session.call(
+                "query_history_k_data_plus",
+                partial(
+                    module.query_history_k_data_plus,
+                    code=symbol.lower(),
+                    fields=",".join(_FIELDS),
+                    start_date=unit.start_date.isoformat(),
+                    end_date=unit.end_date.isoformat(),
+                    frequency="d",
+                    adjustflag="3",
+                ),
             )
             self._require_success(result, f"raw daily bars for {symbol}")
             for row in self._result_rows(result):
@@ -165,6 +175,7 @@ class BaostockBackfillSource:
 
     def _calendar_payload(
         self,
+        session: BaostockSession,
         module: Any,
         unit: BackfillWorkUnit,
     ) -> TradingCalendarPayload:
@@ -172,9 +183,12 @@ class BaostockBackfillSource:
             raise ProviderBackfillUnavailable(
                 f"BaoStock calendar does not support market={unit.market}"
             )
-        result = module.query_trade_dates(
-            start_date=unit.start_date.isoformat(),
-            end_date=unit.end_date.isoformat(),
+        result = session.call(
+            "query_trade_dates",
+            lambda: module.query_trade_dates(
+                start_date=unit.start_date.isoformat(),
+                end_date=unit.end_date.isoformat(),
+            ),
         )
         self._require_success(result, f"trading calendar for {unit.market}")
         exchange = _EXCHANGES[unit.market]
