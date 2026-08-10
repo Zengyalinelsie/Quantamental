@@ -49,6 +49,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0002_security_master.sql",
                 "0003_universe.sql",
                 "0004_market_data.sql",
+                "0005_data_backfill.sql",
                 "0006_disclosure_evidence.sql",
             ),
         )

@@ -114,3 +114,28 @@ P2-W02 和 P2-W03 已分别验证首次执行与二次幂等。所有新表保�
 尚未完成：多尺寸真实浏览器视觉回归及截图。因此 P2 Capability Gate 当前为待验证，不是通过。
 
 此外，P2 没有 PIT 财务、公告修订、因子、估值、改善、择时、组合、回测、事件 Agent、Paper OMS 或真实执行；这些属于 P3 及以后阶段。新闻模块按计划在 P8 接入，本阶段没有提前加入新闻情绪或 Agent 新闻信号。
+
+## 9. 沪深 300 / 中证 500 回填准备扩展
+
+用户要求的真实数据范围已被固化为 provider-neutral `BackfillPlan`：
+
+- A 股全市场 Security Master（XSHG/XSHE/XBSE）；
+- 沪深 300 `000300` 与中证 500 `000905` 历史 Universe；
+- 2018-01-01 起的原始不复权行情、股本、公司行动和交易日历；
+- 年度确定性 checkpoint、失败状态、断点恢复键；
+- 复用既有 `dataset_versions`，并新增 ingestion job/event/checkpoint、质量报告和覆盖率持久化；
+- checkpoint 保存真实 provider、`retrieved_at`、provider cutoff、`unadjusted` 口径、单位和 warnings。
+
+默认命令只生成计划，不访问网络、不写数据库：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --end 2026-08-08
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.backfill --provider futu_quote --end 2026-08-08
+```
+
+`--execute` 也会 fail closed：当前 registry 中 Baostock、AkShare、Futu 和官方网页端点均没有获得所有目标字段的 `raw_bulk_persistence` 资格，CLI 没有配置获批 bulk source/sink，不会借机下载或写入。Futu adapter 仅是可选的无账户、小样本 quote reader，不创建交易连接、不查询账户，也不具备批量保存资格。
+
+本扩展新增 14 个定向单元测试；domain、planner、许可门、dry-run CLI、PostgreSQL repository、provider provenance 往返和 Futu raw/unadjusted 分页读取均有覆盖。当前仍未执行真实批量回填，因此业务数据行和 Parquet 增量均为 0；这不是用 fixture 冒充真实数据。要真正落库，下一步必须为每个数据域取得明确允许保存/回测的来源合同，再接入获批 source/sink 并运行小范围核验。该准备能力不改变前述 P2 Gate 判断，也不证明任何模型科学有效。
+
+主代理在本机隔离 PostgreSQL `127.0.0.1:55432` 复验：首次运行 migration 输出 `0005_data_backfill`，二次运行无输出且退出码为 0。`ingestion_jobs`、`ingestion_checkpoints`、`dataset_quality_reports` 和 `dataset_coverage_reports` 均为 0 行，说明 schema 已持久化，但没有用 fixture 或未获许可数据填充开发库。

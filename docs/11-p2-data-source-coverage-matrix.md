@@ -10,6 +10,7 @@
 |---|---|---|---|---|---|
 | a-share-mcp / Baostock | P2 沪深第一主源 | 免费、无 key | PyPI：BSD | 上游数据保存/再分发权待审 | 本地原型、current 研究、小型 fixture、内部展示 |
 | AkShare | 北交所与缺失字段备用候选 | 免费、无 key | PyPI：MIT | 各网页上游条款逐端点待审；存在限流和结构变化风险 | 本地原型、current 研究、小型 fixture、内部展示 |
+| Futu OpenQuoteContext | 可选沪深行情/日历只读候选 | 本地 OpenD、行情权限；不读取账户 | SDK/数据条款分离 | 行情权限、2018+ 覆盖、保存期限和再分发权待审 | 仅显式小样本 quote probe；禁止批量持久化和 PIT 标记 |
 | 上交所/深交所/北交所 | 身份、挂牌、日历、规则、公司行动权威核验 | 公开页面/API，频率不统一 | 不适用 | 保存期限和再分发条款待逐站点审查 | 权威核验、小样本证据 |
 | 巨潮/交易所/公司披露 | P3 公告权威源 | 公开页面/API，频率不统一 | 不适用 | P3 建立 license/retention policy | P3 公告证据，不在 P2 冒充新闻或 PIT 财务 |
 | Tushare Pro | 备用商业候选 | Token/积分/可能付费 | 客户端与数据条款分离 | 未评审、未配置 | 当前不启用 |
@@ -40,3 +41,12 @@
 - 复权因子、股本、停牌或退市缺失不得填 0；
 - 免费源之间的 fallback 不得静默覆盖主源观察；
 - 没有单独授权时不得把测试 fixture 扩大为全市场长期缓存。
+
+## 4. Donor 与回填路由审计
+
+只读审计 `sources/daily_stock_analysis/data_provider/` 后，确认 donor 对 A 股使用 AkShare、Tushare、Baostock 等来源，并具备按能力路由、可选凭据延迟启用、失败留痕和熔断经验。新平台只借鉴这些模式，不复制 fetcher，也不继承其面向 current 报告的静默 fallback：
+
+- Tushare Token 是否存在不等于数据存储、历史回测或展示权已经获批；当前仍是未启用商业候选；
+- AkShare/Baostock 的客户端开源许可不等于上游数据许可；
+- donor 的 Futu 集成读取真实账户持仓，不属于本工作包允许范围，因此没有迁移；新适配器只允许 SDK `OpenQuoteContext` 行情读取，代码级测试禁止任何交易上下文；
+- fallback 必须形成独立观察、warning 和 provenance，不能覆盖主源记录。

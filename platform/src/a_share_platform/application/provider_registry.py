@@ -100,6 +100,24 @@ def build_p2_provider_registry() -> ProviderRegistry:
             warning="2018 sample returned an empty result; fallback and reconciliation required",
         ),
         *(
+            _policy(
+                "futu_quote",
+                field,
+                ProviderTier.FALLBACK,
+                sh_sz,
+                coverage=CoverageStatus.PARTIAL,
+                warning=(
+                    "optional read-only OpenQuoteContext; OpenD entitlement, historical "
+                    "coverage, data retention terms, and PIT semantics require verification"
+                ),
+            )
+            for field in (
+                DataField.TRADING_CALENDAR,
+                DataField.RAW_DAILY_BAR,
+                DataField.TRADING_STATUS,
+            )
+        ),
+        *(
             _policy("akshare", field, ProviderTier.FALLBACK, all_a_share)
             for field in akshare_fields
         ),
