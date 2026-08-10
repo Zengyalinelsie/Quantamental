@@ -426,7 +426,7 @@ class CanonicalBackfillSink:
             )
             VALUES (%s, %s, %s, %s, NULL, %s)
             ON CONFLICT (listing_id, kind, valid_from) DO UPDATE SET
-                identifier_history_id = identifier_history.identifier_history_id
+                value = identifier_history.value
             WHERE identifier_history.value = EXCLUDED.value
               AND identifier_history.valid_to IS NULL
               AND identifier_history.source_id = EXCLUDED.source_id
@@ -468,7 +468,7 @@ class CanonicalBackfillSink:
             )
             VALUES (%s, %s, NULL, %s, %s, %s)
             ON CONFLICT (listing_id, valid_from) DO UPDATE SET
-                listing_state_period_id = listing_state_periods.listing_state_period_id
+                state = listing_state_periods.state
             WHERE listing_state_periods.state = EXCLUDED.state
               AND listing_state_periods.special_treatment IS NOT DISTINCT FROM
                   EXCLUDED.special_treatment
@@ -515,7 +515,7 @@ class CanonicalBackfillSink:
             )
             VALUES (%s, %s, %s, %s, %s, NULL, %s)
             ON CONFLICT (security_id, taxonomy, valid_from) DO UPDATE SET
-                industry_membership_id = industry_memberships.industry_membership_id
+                industry_name = industry_memberships.industry_name
             WHERE industry_memberships.industry_code IS NOT DISTINCT FROM
                   EXCLUDED.industry_code
               AND industry_memberships.industry_name = EXCLUDED.industry_name
@@ -622,7 +622,7 @@ class CanonicalBackfillSink:
                     exclusion_reasons, benchmark_member, source_id
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (universe_version_id, listing_id, valid_from) DO UPDATE SET
-                    universe_membership_id = universe_memberships.universe_membership_id
+                    benchmark_member = universe_memberships.benchmark_member
                 WHERE universe_memberships.valid_to = EXCLUDED.valid_to
                   AND universe_memberships.research_eligible = EXCLUDED.research_eligible
                   AND universe_memberships.tradable_eligible = EXCLUDED.tradable_eligible

@@ -1,3 +1,4 @@
+import inspect
 import unittest
 from dataclasses import replace
 from datetime import UTC, date, datetime
@@ -509,6 +510,18 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
                 batch_for(BackfillDataDomain.SECURITY_MASTER, payload),
                 dataset_version_id="dataset:identity:v1",
             )
+
+    def test_idempotent_upserts_never_update_generated_identity_columns(self) -> None:
+        source = inspect.getsource(CanonicalBackfillSink)
+
+        for column in (
+            "identifier_history_id",
+            "listing_state_period_id",
+            "industry_membership_id",
+            "universe_membership_id",
+        ):
+            with self.subTest(column=column):
+                self.assertNotIn(f"{column} =", source)
 
     def test_historical_universe_fallback_requires_a_compatible_listing_interval(self) -> None:
         connection = CurrentIdentityFallbackConnection()
