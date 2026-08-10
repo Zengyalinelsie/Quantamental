@@ -80,3 +80,55 @@ PYTHONPATH=src .venv/bin/mypy src
 工作包完成时证据：Python 全量 `151 passed`；compileall、Ruff、mypy通过。隔离 PostgreSQL 首次应用输出 `0008_financial_facts`，二次运行无输出且退出码为 0；`financial_fact_observations=0`、`financial_authority_rules=0`、对应 migration 记录为 1。没有把测试事实、映射或 authority rule 注入运行时。
 
 限制：本工作包证明仓储、双时间和选择合同成立，但还没有 P3-W04 的 3–5 家真实公司及两组人工核验修订案例，也没有 P3-W05 页面。它不证明财务数据正确、因子有效、模型科学有效或能够盈利。
+
+## P3-W04a：财务来源资格与路由合同
+
+结合 Wind、Factor Service/iFinD/THS、SneAgent 和官方披露资料，先完成真实 fixture
+摄取前的 fail-closed 领域合同：
+
+- `FinancialSourceProfile` 保存版本、角色、市场/三表覆盖、访问模式、资格、信任上限、
+  retention/bulk 权限、修订链和精确可用时间能力；候选源不能被当成已批准源；
+- PIT 批准必须同时具备 `pit_verified` 信任上限、精确 `available_at` 和修订历史，
+  current 来源不能因调用参数变成 strict historical；
+- `read_through_cache` 是显式访问模式，调用方未单独确认时失败关闭；retention 未批准时
+  bulk persistence 失败关闭；
+- `ProviderFinancialRow` 在映射前保存供应商 table/record/field、合并/母公司、累计/单季、
+  原始/更正/重述、公告/可用/更新时间、单位缩放、币种和 raw evidence；金额和缩放只接受
+  有限 `Decimal`，禁止 float；
+- 精确 provider/官方时间、保守 retrieval time 和 unavailable 使用不同枚举；保守检索时间
+  不能获得 strict-time 资格；
+- current 路由的假设性获批示例顺序为 Factor Service/iFinD/THS 主源、Wind 备用、官方披露
+  裁决；实际已知 Factor Service 和 Wind profile 都保持 candidate，不能进入该路由；fallback
+  必须给出非空失败原因；strict 路由只接受 PIT authority；
+- 领域层没有导入 Wind、HTTP、Factor Service 或 SneAgent SDK。
+
+来源层级、大规模入库切片、容量和上线顺序记录在
+`docs/14-data-source-catalog-and-agent-routing.md`。Factor Service 是第一资格候选，但在 live
+接口、样例、本地持久化许可和 read-through cache 副作用通过前仍是 candidate/fail-closed；
+Wind 在取得接口、样例和许可前同样是 candidate，不能自动成为 fallback；官方公告版本链
+负责 PIT 资格；SneAgent 只做 PDF/notes 补漏，其内部 `verified` 不等于平台
+`pit_verified`。任何包含过明文凭证的内部文档都不得成为代码、fixture 或仓库文档内容。
+
+TDD 红灯首先是 `a_share_platform.domain.financial_sources` 不存在；实现后定向测试覆盖
+Decimal、口径、时间方法、更正序号、PIT 资格、缓存/retention 权限、candidate 阻断和
+current/strict 主备路由，并明确验证未获批 Factor Service/Wind 无法被选中。W04a 不包含
+真实供应商 HTTP adapter、运行时假数据、3–5 家真实公司
+fixture 或 PIT 晋升；这些属于 W04b。
+
+验证命令：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest tests.test_financial_source_contract -v
+PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache .venv/bin/python -m compileall -q src
+.venv/bin/ruff check src tests
+PYTHONPATH=src .venv/bin/mypy src
+```
+
+测试通过只证明来源权限、口径和路由合同按预期失败关闭，不证明供应商长期稳定、财务数据
+正确、因子有效或模型科学有效。
+
+工作包完成时证据：定向 9 tests、Python 全量 `216 passed`；compileall、Ruff、mypy
+（64 source files）通过。Factor Service 与 Wind 的已知 profile 在测试中保持 candidate；
+只有名字明确为“假设性获批”的路由 fixture 才验证未来主备顺序。

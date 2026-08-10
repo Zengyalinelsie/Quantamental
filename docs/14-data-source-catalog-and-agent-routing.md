@@ -53,9 +53,9 @@ Provider Registry、许可、canonical sink 或 PIT 门。
 | CSI300/500 成分 | 组合身份源 | 中证指数公司、Wind | `normalized_current`；历史 PIT 尚未证明 |
 | 交易日历 | `baostock_sdk` | 交易所、AkShare | `normalized_current`；已落库 2018+ |
 | raw 日线 OHLCV | `baostock_sdk` | Futu quote、Wind、交易所抽样 | 私人本地 `normalized_current` |
-| 股本/自由流通/市值 | Factor Service 或 Wind | 公告/交易所 | 候选，尚未接入 canonical sink |
-| 公司行动 | Wind 或官方交易所/公告 | AkShare/BaoStock 候选 | 当前缺口；不得填 0 |
-| A 股三表 current | 通过资格审查的 Wind；否则 Factor Service | 官方公告抽样对账 | `normalized_current` |
+| 股本/自由流通/市值 | 第一资格候选 Factor Service/iFinD/THS | Wind 候选、公告/交易所核验 | 候选，尚未接入 canonical sink |
+| 公司行动 | 官方交易所/公告 | Factor Service、Wind、AkShare/BaoStock 候选 | 当前缺口；不得填 0 |
+| A 股三表 current | 通过资格审查的 Factor Service/iFinD/THS | Wind 候选、官方公告抽样对账 | `normalized_current` |
 | A 股三表 strict history | 具有修订和可用时间的结构化源 | 官方公告版本链 + 人工/程序核验 | 当前无通用合格源 |
 | PDF notes/缺失字段 | SneAgent | 人工复核、官方 PDF | `raw` / `normalized_current` |
 | 汇率 | Factor Service/XE 或 Wind | 官方中间价/市场来源 | current；历史需 release/cutoff 证据 |
@@ -68,7 +68,8 @@ Provider Registry、许可、canonical sink 或 PIT 门。
 
 A 股财务三表的生产摄取**不需要从 PDF 抽取起步**。当前更合适的分层是：
 
-1. Wind 或结构化 Factor Service 负责批量获取三表候选观察；
+1. 优先资格测试 Factor Service/iFinD/THS，Wind 作为另一未测试候选；任一来源只有通过
+   接口、许可、覆盖和时间语义审查后才能批量获取三表候选观察；
 2. 巨潮、交易所和公司公告负责原始证据、公告时间、修订链与争议核验；
 3. SneAgent 作为 PDF/notes 的受控补漏和交叉验证工具，不作为未经核验的数值权威；
 4. 所有来源各自产生 `FactObservation`，不得静默覆盖；只有完成时间、修订、许可、
@@ -81,8 +82,8 @@ A 股财务三表的生产摄取**不需要从 PDF 抽取起步**。当前更合
   全市场、2018+ 或 strict PIT 覆盖；
 - SneAgent 已具备复杂 PDF 与 notes 抽取能力，但发布报告聚焦港股五表，成本和延迟也
   不适合作为 A 股全市场批量主源；
-- Wind 可能是更完整的结构化主源，但在取得接口、许可、历史修订和可用时间证据前，
-  不能预先把它标为 `pit_verified`。
+- Wind 的覆盖能力尚无本次接口证据，暂时只能作为候选备用/对账源；在取得接口、许可、
+  历史修订和可用时间证据前，不能预先把它标为已批准来源或 `pit_verified`。
 
 ## 5. 本次盘点证据
 
@@ -94,10 +95,21 @@ A 股财务三表的生产摄取**不需要从 PDF 抽取起步**。当前更合
 | `Factor Service 使用文档.pdf` | 23 | `bdd9b5460f633f340e9a5309477e35c92b0f7a403c40951eaabea8f1e2decc24` | 表、字段、查询 API、缓存和错误合同 |
 | `Fin-Copliot - Agent数据需求.pdf` | 18 | `20b993a5cc7e045ec561eb209f2bd98f34cb8a2b4ddd18d775d7d162f5ec35ee` | 生产 Factor Service 元数据样例、股票/汇率/宏观资产与覆盖状态 |
 
-2026-08-10 对文档所列开发服务执行了只读 `health`、`tables`、`table/detail` 探测，
-三次连接均被服务端 reset。没有调用可能触发同花顺外部查询和本地缓存写入的
-`factor/query` 或 `table/query`。因此本文区分“文档声明”和“已在线验证”，不把接口
-示例当成当前可用性证据。
+2026-08-10 对文档所列 Factor Service 接口执行了完整的无凭证资格探针。开发地址覆盖 v1
+`health`、`table/list`、`factor/list`、单股票/单期间/单字段 `factor/query`，以及 v2
+`health`、`meta/schema`、`metadata`、`tables`、三张 A 股报表的 `table/detail`、
+`columns/search`、`table/count` 和最小 `table/query`，共 14 个入口。每个入口都能建立到
+`10.21.31.242` 的 TCP 连接，但约 5 秒后统一被对端 reset，未取得 HTTP 或业务响应；query
+探针没有返回结果，不能证明发生或未发生 read-through cache 写入。
+
+生产资料地址同样覆盖 v1/v2 的 14 个入口，另加根路由，共 15 个探针，全部由当前本机代理
+`127.0.0.1` 返回 `404 Route Not Found`。这只能证明当前代理路由不可用，不能证明生产服务
+本体或接口不存在。iFinD `edb_service` 的无凭证探针返回 HTTP 401 和 token 非法/过期业务
+错误，证明该路由存在，但没有证明数据权限、覆盖或响应合同。
+
+环境中没有 Factor Service、iFinD、THS 或 Wind 的新凭证，也没有使用文档泄露的 token。
+因此本文区分“文档声明”“无凭证可达性”和“带合法新凭证的数据合同验证”，不把 curl
+示例、TCP 建连、401 或 404 当成数据源资格通过证据。
 
 第三份文档包含明文 Factor Service Bearer token 和 iFinD access token。本文没有复制
 任何凭证，也没有用这些凭证发请求。原凭证应立即吊销/轮换；源文档应替换为环境变量
@@ -224,7 +236,7 @@ macro precision、约 83.2%–85.8% 的覆盖率，以及多个 micro 指标。�
 
 | 需求 | 首选 | 备选/核验 | 允许的初始信任状态 |
 |---|---|---|---|
-| A 股当前三表批量候选 | 通过资格审查的 Wind；否则 Factor Service 缓存 | 官方公告抽样对账 | `normalized_current` |
+| A 股当前三表批量候选 | 通过资格审查的 Factor Service/iFinD/THS | Wind 候选、官方公告抽样对账 | `normalized_current` |
 | A 股 strict historical | 具有修订与可用时间证据的结构化源 | 官方公告版本链 + 人工/程序核验 | 治理运行后才可 `pit_verified` |
 | 缺失字段/notes | SneAgent | 人工复核、官方 PDF | `raw` / `normalized_current` |
 | 供应商冲突 | 官方披露优先作为事实裁决证据 | Wind、Factor Service、SneAgent 观察并存 | 冲突解除前阻断 |
@@ -312,3 +324,81 @@ Anspire、MiniMax、Brave、SearXNG，并使用网页正文解析、缓存、超
 
 所有新闻条目至少需要 URL、source、published_at、fetched_at、available_at、hash、语言、
 版本和许可；时间不可信时必须显式降级，文章更正或撤回不能覆盖旧版本。
+
+## 13. A 股财务大规模入库预案
+
+### 13.1 目标来源层级
+
+在供应商资格证据完成后，目标路由为：
+
+1. **结构化第一资格候选：Factor Service/iFinD/THS**。现有三份内部资料、接口样例和
+   已缓存资产主要来自该体系，因此优先完成 live metadata、三表样例、许可和缓存副作用
+   测试；通过后才可成为 A 股 current 三表主源，初始上限仍为 `normalized_current`。
+2. **结构化候选备用/对账源：Wind**。用户确认有 Wind 能力，但尚无接口文档、样例、
+   批量本地保存许可和历史修订证据；在这些材料完成测试前不得排在 Factor Service 前面，
+   也不得成为已批准 fallback。
+3. **PIT 权威证据：巨潮/交易所/公司披露**。负责公告 ID、原文 hash、发布时间、修订/撤回
+   和争议裁决；不要求所有字段都以 PDF OCR 作为首个摄取路径。
+4. **文档补漏：SneAgent**。只处理 notes、结构化源缺字段、复杂版式和冲突复核；结果先作为
+   独立来源观察，不能覆盖 Wind/THS 或自动获得 `pit_verified`。
+5. **免费源：AkShare/BaoStock**。只做 current 补充和交叉核验，不承担 strict historical
+   财务主链路。
+
+当前没有已批准的结构化财务主源。Factor Service 和 Wind 都必须先形成版本化
+`FinancialSourceProfile` 资格证据；任一来源未通过许可、覆盖、可重放性或时间语义测试时，
+adapter 必须失败关闭，不能静默改变主备顺序。
+
+### 13.2 必要代码调整
+
+P3-W01 至 W03 的不可变证据、映射、双时间选择和冲突阻断保持不变；新增以下供应商接入层：
+
+- `FinancialSourceProfile`：来源角色、市场、三表覆盖、访问模式、retention、bulk 权限、
+  trust ceiling、是否提供修订和精确 available time；
+- `ProviderFinancialRow`：供应商 record/table/field、股票代码、报表范围、报告期、累计/单季
+  口径、原值、原单位、缩放、币种、公告/可用/更新时间、修订、raw evidence 和 warning；
+- 显式 `read_only` / `read_through_cache` 访问语义；后者必须由运行命令单独确认；
+- Wind、Factor Service、SneAgent 各自的只读 adapter，不在领域层 import SDK/HTTP 客户端；
+- provider-neutral mapper 将来源行转换为 canonical `FactObservation`，每个来源分别写观察；
+- financial backfill planner 按 provider/table/report-period/symbol-bucket 切分工作单元，复用
+  DatasetVersion、checkpoint、quality、coverage 和 lineage；
+- raw 响应按许可进入内容寻址对象存储；不允许保存时只登记 metadata/hash，不绕过条款；
+- current 与 strict 数据集和查询门保持隔离，PIT 晋升只能由治理运行产生新记录。
+
+现有 `FactObservation` 还需要评审是否补充：合并/母公司范围、累计/单季度口径、
+原始/更正/重述类型、provider record ID、provider updated time 和 Decimal 数值。若这些字段
+参与经济事实身份，应以新增 migration 扩展，不能塞进 warning 文本。
+
+### 13.3 回填切片和容量
+
+首批范围为 CSI300 + CSI500，2018 年以来季度和年度三表。约 800 只股票、30 多个报告期、
+数百个来源字段，转换为 long observations 后是千万级候选单元；全 A 股可能进入数千万级。
+因此不允许单请求、单事务或全量内存展开。
+
+建议工作单元：
+
+```text
+provider / statement_table / report_period_end / symbol_bucket
+```
+
+- Factor Service 单次响应上限按文档不超过 5,000 行，实际 batch 在 pilot 后确定；
+- Wind batch 以其接口配额、返回大小和许可为准，不预设与 Factor Service 相同；
+- 每个 work unit 原子提交，成功后写 checkpoint、content hash、行数、拒绝数和 provider cutoff；
+- 重试只重跑失败单元；相同 hash 幂等；不同 hash 生成新 DatasetVersion，不覆盖旧数据；
+- wide provider row 转 long 时流式处理，缺失字段进入 unavailable/unmapped，不生成 0；
+- 对账报告按公司、报告期、metric 和 provider 输出一致、容差内、冲突、缺失四类状态。
+
+### 13.4 上线顺序
+
+1. 冻结脱敏 metadata 和 3–5 家样例响应，先写失败测试；
+2. 完成 source profile、staged row 和许可/缓存副作用门；
+3. 实现 Factor Service adapter，先只读 metadata，再经新凭证和 read-through cache 确认
+   执行三表样例数据查询；通过覆盖/许可测试后才把它配置为 current primary；
+4. 取得 Wind 文档和许可后实现 Wind adapter，并做同公司同报告期交叉对账；未通过前保持
+   candidate，不自动成为 fallback；
+5. 完成九类真实 PIT fixture 与 leakage suite；
+6. pilot：3–5 家公司、两个修订链；
+7. 扩到 CSI300；质量稳定后扩到 CSI500；
+8. 最后才评估全 A 股；每级都保存覆盖、质量、失败和成本证据；
+9. strict PIT 单独执行公告版本核验和治理晋升，不因 current 全量入库成功自动开放。
+
+无论入库规模多大，数据完整性只证明工程覆盖，不证明因子、模型或策略科学有效。
