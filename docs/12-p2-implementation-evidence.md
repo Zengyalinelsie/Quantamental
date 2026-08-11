@@ -329,3 +329,42 @@ SZ.000413 SZ.000540 SZ.000627 SZ.000671 SZ.000961 SZ.002411 SZ.002450
 
 本轮 BaoStock guard 记录 343/600 次调用，343 completed、0 blocked、无 cooldown。定向测试
 `70 passed`，compileall 与 `git diff --check` 通过。这里的数据回填没有代码修改或独立提交。
+
+## 15. CSI800 股本与公司行动分域收口
+
+2026-08-11 对当前 CSI300 + CSI500 去重后的 800 家目标证券完成了 2018-01-01 至
+2026-08-11 的股本和公司行动 `normalized_current` 回填审计。该运行仅用于用户已批准的
+`private_local_research`，禁止外部分发、strict historical、生产决策和 `pit_verified`。
+
+首轮按统一 `2018-01-01` 起点的任务有 70 家失败。失败没有被隐藏或改写为成功：供应商返回了
+这些证券上市日前的股本记录，`PostgresCurrentKnownListingResolver` 因当日没有兼容 Listing
+而正确 fail closed。收口运行没有修改 resolver、没有放宽 `listed_on <= observation_date`
+约束，也没有把上市前记录绑定到当前 Listing；而是把 70 家拆成单证券、单数据域工作单元，
+每家从真实上市日开始重新获取。`SH.688256` 先完成股本和公司行动 canary，其余 69 家保持
+并发数为 1 串行执行。对没有公司行动表行且缺少单证券零观察证据的 `SH.600871`、
+`SH.601106` 和 `SZ.000629`，另以 2018-01-01 起点完成三次单域审计运行。
+
+新运行的数据库结果：
+
+- 143 个 ingestion job、143 个 DatasetVersion 全部 `succeeded`，输出信任状态全部为
+  `normalized_current`；新 plan 中没有 failed job；
+- 股本 409 个年度 checkpoint 全部成功，处理 1,780 行、拒绝 0 行；当前目标集累计
+  24,951 条 observation，覆盖 800/800 个 Listing；
+- 公司行动 436 个年度 checkpoint 全部成功，处理 346 行、拒绝 0 行；当前目标集累计
+  8,059 条 observation，覆盖 777 个 Listing；
+- 另外 23 家没有实际公司行动 observation，但每家都有成功的单证券工作单元且总处理行数为
+  0，因此以显式 zero observation/coverage 计入 800/800 链路完成，不创建数值为零的 action；
+- 全表反查 `share_capital_observations.effective_on < listings.listed_on` 为 0 行；公司行动以
+  `ex_date / record_date / announced_on` 顺序选取事件日后，早于 `listed_on` 的记录同样为 0 行；
+- 143 个 DatasetVersion 均使用 `p2-backfill-v1` schema 和 `dataset:backfill:private-local:akshare:`
+  命名空间；原先因上市前冲突失败的 job 继续保留，未被新成功任务覆盖或冒充。
+
+上述结果证明当前 CSI800 目标集的股本/公司行动 current-only 获取、分域失败隔离、
+DatasetVersion、checkpoint、质量/覆盖率和 canonical observation 链路可以运行。它不把
+`normalized_current` 提升为 PIT，不证明供应商历史修订完整，也不完成仍在进行的 CSI300/
+CSI500 全历史 Universe、XBSE 历史身份或 P2 多尺寸浏览器证据；更不证明任何因子、模型或
+策略科学有效。
+
+数据收口后运行共享分支完整 Python 回归：`593 tests` 全部通过；compileall、Ruff、mypy
+（130 个 source files）和本节 `git diff --check` 通过。本节没有为数据库运行结果修改领域或
+供应商代码，测试证明既有 fail-closed 合同没有被运行时处理绕过，不证明数据或模型科学有效。
