@@ -1,6 +1,25 @@
 {
   "components": {
     "schemas": {
+      "ApprovalDecision": {
+        "enum": [
+          "approved",
+          "rejected",
+          "request_changes"
+        ],
+        "title": "ApprovalDecision",
+        "type": "string"
+      },
+      "ApprovalScope": {
+        "enum": [
+          "research_backtest",
+          "shadow",
+          "paper",
+          "limited_live"
+        ],
+        "title": "ApprovalScope",
+        "type": "string"
+      },
       "DataMode": {
         "description": "Qualification rules for data consumed by a run.",
         "enum": [
@@ -8,6 +27,15 @@
           "strict_historical"
         ],
         "title": "DataMode",
+        "type": "string"
+      },
+      "DataTrustState": {
+        "enum": [
+          "raw",
+          "normalized_current",
+          "pit_verified"
+        ],
+        "title": "DataTrustState",
         "type": "string"
       },
       "DeploymentStage": {
@@ -426,6 +454,208 @@
         "title": "ExperimentTimeSplitInput",
         "type": "object"
       },
+      "FactorLifecycleEventInput": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_id": {
+            "title": "Actor Id",
+            "type": "string"
+          },
+          "actor_role": {
+            "title": "Actor Role",
+            "type": "string"
+          },
+          "event_id": {
+            "title": "Event Id",
+            "type": "string"
+          },
+          "evidence_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Hashes",
+            "type": "array"
+          },
+          "from_status": {
+            "$ref": "#/components/schemas/FactorLifecycleStatus"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "to_status": {
+            "$ref": "#/components/schemas/FactorLifecycleStatus"
+          }
+        },
+        "required": [
+          "event_id",
+          "from_status",
+          "to_status",
+          "actor_id",
+          "actor_role",
+          "occurred_at",
+          "reason",
+          "evidence_hashes"
+        ],
+        "title": "FactorLifecycleEventInput",
+        "type": "object"
+      },
+      "FactorLifecycleStatus": {
+        "enum": [
+          "draft",
+          "research",
+          "shadow",
+          "candidate",
+          "production",
+          "suspended",
+          "retired"
+        ],
+        "title": "FactorLifecycleStatus",
+        "type": "string"
+      },
+      "FactorReviewInput": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_id": {
+            "title": "Approval Id",
+            "type": "string"
+          },
+          "decided_at": {
+            "format": "date-time",
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/ApprovalDecision"
+          },
+          "evidence_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Hashes",
+            "type": "array"
+          },
+          "factor_version": {
+            "$ref": "#/components/schemas/FactorVersionInput"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ApprovalScope"
+          },
+          "validation_report": {
+            "$ref": "#/components/schemas/ValidationReportInput"
+          }
+        },
+        "required": [
+          "approval_id",
+          "factor_version",
+          "validation_report",
+          "scope",
+          "decision",
+          "decided_at",
+          "reason",
+          "evidence_hashes"
+        ],
+        "title": "FactorReviewInput",
+        "type": "object"
+      },
+      "FactorVersionInput": {
+        "additionalProperties": false,
+        "properties": {
+          "code_sha": {
+            "title": "Code Sha",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "dataset_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dataset Version Ids",
+            "type": "array"
+          },
+          "definition_hash": {
+            "title": "Definition Hash",
+            "type": "string"
+          },
+          "factor_id": {
+            "title": "Factor Id",
+            "type": "string"
+          },
+          "factor_version_id": {
+            "title": "Factor Version Id",
+            "type": "string"
+          },
+          "feature_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Feature Version Ids",
+            "type": "array"
+          },
+          "lifecycle_events": {
+            "items": {
+              "$ref": "#/components/schemas/FactorLifecycleEventInput"
+            },
+            "title": "Lifecycle Events",
+            "type": "array"
+          },
+          "model_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Version Ids",
+            "type": "array"
+          },
+          "promotion_bindings": {
+            "items": {
+              "$ref": "#/components/schemas/PromotionBindingInput"
+            },
+            "title": "Promotion Bindings",
+            "type": "array"
+          },
+          "semantic_version": {
+            "title": "Semantic Version",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FactorLifecycleStatus"
+          }
+        },
+        "required": [
+          "factor_version_id",
+          "factor_id",
+          "semantic_version",
+          "definition_hash",
+          "code_sha",
+          "dataset_version_ids",
+          "feature_version_ids",
+          "model_version_ids",
+          "created_by",
+          "created_at",
+          "status",
+          "lifecycle_events",
+          "promotion_bindings"
+        ],
+        "title": "FactorVersionInput",
+        "type": "object"
+      },
       "FeatureVersionBindingInput": {
         "additionalProperties": false,
         "properties": {
@@ -501,6 +731,45 @@
           "dataset_version_id"
         ],
         "title": "LabelVersionBindingInput",
+        "type": "object"
+      },
+      "PromotionBindingInput": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_hash": {
+            "title": "Approval Hash",
+            "type": "string"
+          },
+          "approval_id": {
+            "title": "Approval Id",
+            "type": "string"
+          },
+          "bound_at": {
+            "format": "date-time",
+            "title": "Bound At",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ApprovalScope"
+          },
+          "validation_report_hash": {
+            "title": "Validation Report Hash",
+            "type": "string"
+          },
+          "validation_report_id": {
+            "title": "Validation Report Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "validation_report_id",
+          "validation_report_hash",
+          "approval_id",
+          "approval_hash",
+          "scope",
+          "bound_at"
+        ],
+        "title": "PromotionBindingInput",
         "type": "object"
       },
       "ResponseContext": {
@@ -605,6 +874,64 @@
         "title": "StatementType",
         "type": "string"
       },
+      "ValidationCheckInput": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "evidence_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Hashes",
+            "type": "array"
+          },
+          "name": {
+            "$ref": "#/components/schemas/ValidationCheckName"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/ValidationOutcome"
+          },
+          "waiver": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValidationWaiverInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "outcome",
+          "evidence_hashes",
+          "detail"
+        ],
+        "title": "ValidationCheckInput",
+        "type": "object"
+      },
+      "ValidationCheckName": {
+        "enum": [
+          "pit_input_qualification",
+          "ic",
+          "rank_ic",
+          "hac_or_block_bootstrap",
+          "quantile_monotonicity",
+          "decay_turnover_coverage",
+          "industry_size_neutrality",
+          "fama_macbeth",
+          "regime_subperiod_stability",
+          "fdr",
+          "walk_forward_oos",
+          "cost_capacity"
+        ],
+        "title": "ValidationCheckName",
+        "type": "string"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -637,11 +964,130 @@
         ],
         "title": "ValidationError",
         "type": "object"
+      },
+      "ValidationOutcome": {
+        "enum": [
+          "pass",
+          "fail",
+          "waived"
+        ],
+        "title": "ValidationOutcome",
+        "type": "string"
+      },
+      "ValidationReportInput": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Artifact Hashes",
+            "type": "array"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationCheckInput"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "code_sha": {
+            "title": "Code Sha",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dataset_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dataset Version Ids",
+            "type": "array"
+          },
+          "experiment_run_id": {
+            "title": "Experiment Run Id",
+            "type": "string"
+          },
+          "factor_version_id": {
+            "title": "Factor Version Id",
+            "type": "string"
+          },
+          "input_trust_state": {
+            "$ref": "#/components/schemas/DataTrustState"
+          },
+          "report_id": {
+            "title": "Report Id",
+            "type": "string"
+          },
+          "report_version": {
+            "title": "Report Version",
+            "type": "string"
+          },
+          "run_context": {
+            "$ref": "#/components/schemas/RunContextInput"
+          }
+        },
+        "required": [
+          "report_id",
+          "report_version",
+          "factor_version_id",
+          "experiment_run_id",
+          "dataset_version_ids",
+          "code_sha",
+          "artifact_hashes",
+          "run_context",
+          "input_trust_state",
+          "checks",
+          "created_at"
+        ],
+        "title": "ValidationReportInput",
+        "type": "object"
+      },
+      "ValidationWaiverInput": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_id": {
+            "title": "Actor Id",
+            "type": "string"
+          },
+          "actor_role": {
+            "title": "Actor Role",
+            "type": "string"
+          },
+          "evidence_hashes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Hashes",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "waived_at": {
+            "format": "date-time",
+            "title": "Waived At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "actor_id",
+          "actor_role",
+          "waived_at",
+          "reason",
+          "evidence_hashes"
+        ],
+        "title": "ValidationWaiverInput",
+        "type": "object"
       }
     }
   },
   "info": {
-    "summary": "Read-only governed research data and system-management API",
+    "summary": "Governed research data, experiments, and review API",
     "title": "A-Share Platform Next",
     "version": "0.2.0"
   },
@@ -1185,6 +1631,209 @@
           }
         },
         "summary": "Experiment Run"
+      }
+    },
+    "/api/factors/reviews": {
+      "get": {
+        "operationId": "factor_promotion_reviews_api_factors_reviews_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Factor Promotion Reviews"
+      },
+      "post": {
+        "operationId": "create_factor_promotion_review_api_factors_reviews_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactorReviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Factor Promotion Review"
+      }
+    },
+    "/api/factors/reviews/{review_id}": {
+      "get": {
+        "operationId": "factor_promotion_review_api_factors_reviews__review_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "review_id",
+            "required": true,
+            "schema": {
+              "title": "Review Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Factor Promotion Review"
       }
     },
     "/api/health": {

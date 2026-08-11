@@ -40,6 +40,8 @@ export interface paths {
   "/api/datasets": { get: ReadOperation };
   "/api/experiments/runs": { get: ReadOperation };
   "/api/experiments/runs/{run_id}": { get: ReadOperation };
+  "/api/factors/reviews": { get: ReadOperation };
+  "/api/factors/reviews/{review_id}": { get: ReadOperation };
   "/api/health": { get: ReadOperation };
   "/api/identity": { get: ReadOperation };
   "/api/listings/resolve": { get: ReadOperation };

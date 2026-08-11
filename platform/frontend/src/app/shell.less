@@ -208,6 +208,32 @@
   margin: 16px 0;
 }
 
+.factorFailure {
+  display: grid;
+  gap: 8px;
+}
+
+.factorFailureDetails {
+  padding: 9px 12px;
+  border: 1px solid @border;
+  border-radius: @radius;
+  background: @layout;
+  color: @secondary-text;
+  font-size: 12px;
+}
+
+.factorFailureDetails summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.factorFailureDetails p {
+  margin: 10px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+}
+
 .factorChartGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

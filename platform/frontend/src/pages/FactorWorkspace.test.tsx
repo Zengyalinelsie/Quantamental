@@ -159,4 +159,64 @@ describe('FactorWorkspace', () => {
     expect(screen.getByText('未绑定')).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: '分位数组合收益图' })).not.toBeInTheDocument()
   })
+
+  it('summarizes persisted qualification failures without hiding immutable details', async () => {
+    const detailedFailure = [
+      'financial_fact coverage 0.001 is below required 0.950',
+      'historical_universe is unavailable',
+      'forward_return_label is unavailable',
+    ].join(' | ')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [
+          {
+            run_id: 'experiment-run:quality:csi800:failed-qualification-001',
+            status: 'failed',
+            spec: {
+              spec_id: 'experiment-spec:quality:csi800:v1',
+              research_question: 'Can Quality V0 pass the frozen PIT input gate?',
+              run_context: {
+                data_mode: 'strict_historical',
+                deployment_stage: 'research',
+              },
+              feature_bindings: [
+                { feature_id: 'factor:quality:v0', version: 'v0', definition_hash: 'a'.repeat(64) },
+              ],
+            },
+            metrics: [],
+            artifacts: [],
+            failure: {
+              stage: 'data_preparation',
+              error_type: 'FactorStudyNotReady',
+              message: detailedFailure,
+              occurred_at: '2026-08-11T05:00:00Z',
+              retryable: false,
+            },
+          },
+        ],
+        context: {
+          system_as_of: '2026-08-11T05:01:00Z',
+          data_mode: 'current_research',
+          deployment_stage: 'research',
+        },
+      }),
+    }))
+
+    renderWorkspace('/factors?tab=experiments')
+
+    expect(await screen.findByText('PIT 输入资格未通过')).toBeInTheDocument()
+    expect(screen.getByText('3 项阻断 · data_preparation')).toBeInTheDocument()
+    expect(screen.getByText('查看完整失败证据')).toBeInTheDocument()
+    expect(screen.getByText(detailedFailure)).not.toBeVisible()
+  })
+
+  it('states the current P4 data blocker instead of claiming completed controls are missing', () => {
+    renderWorkspace('/factors?tab=catalog', failedSnapshot)
+
+    expect(screen.getByText(/审批生命周期与独立统计交叉验证已就绪/)).toBeInTheDocument()
+    expect(screen.getByText(/缺少满足冻结窗口的 pit_verified 输入/)).toBeInTheDocument()
+    expect(screen.queryByText(/独立统计交叉验证、审批生命周期和真实广覆盖数据仍未齐备/))
+      .not.toBeInTheDocument()
+  })
 })

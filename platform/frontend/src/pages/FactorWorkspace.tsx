@@ -52,6 +52,8 @@ export interface FactorExperimentView {
   factorName: string
   status: FactorRunStatus
   failureReason: string | null
+  failureStage?: string | null
+  failureErrorType?: string | null
   sampleLabel: 'in_sample' | 'validation' | 'out_of_sample' | 'unbound'
   multipleTestingFamily: string | null
   statistics: FactorStatisticView
@@ -137,6 +139,8 @@ function mapExperiment(run: ExperimentRunEntry): FactorExperimentView {
     factorName: run.spec.feature_bindings[0]?.feature_id ?? '未绑定因子',
     status: run.status,
     failureReason: run.failure?.message ?? null,
+    failureStage: run.failure?.stage ?? null,
+    failureErrorType: run.failure?.error_type ?? null,
     sampleLabel: sampleLabel === 'in_sample'
       || sampleLabel === 'validation'
       || sampleLabel === 'out_of_sample'
@@ -156,6 +160,20 @@ function mapExperiment(run: ExperimentRunEntry): FactorExperimentView {
     quantiles: [],
     decay: [],
   }
+}
+
+function failureSummary(experiment: FactorExperimentView) {
+  if (experiment.failureErrorType === 'FactorStudyNotReady') {
+    return 'PIT 输入资格未通过'
+  }
+  if (experiment.failureErrorType) {
+    return `实验执行失败 · ${experiment.failureErrorType}`
+  }
+  return '实验执行失败'
+}
+
+function failureBlockerCount(reason: string) {
+  return reason.split(/\s+\|\s+/).filter(Boolean).length
 }
 
 function mapExperimentEnvelope(
@@ -307,7 +325,18 @@ function ExperimentsPanel({
             size="small"
           />
           {experiment.failureReason ? (
-            <Alert showIcon title={experiment.failureReason} type="error" />
+            <section className="factorFailure" aria-label="实验失败证据">
+              <Alert
+                description={`${failureBlockerCount(experiment.failureReason)} 项阻断 · ${experiment.failureStage ?? '未标记阶段'}`}
+                showIcon
+                title={failureSummary(experiment)}
+                type="error"
+              />
+              <details className="factorFailureDetails">
+                <summary>查看完整失败证据</summary>
+                <p>{experiment.failureReason}</p>
+              </details>
+            </section>
           ) : null}
           {experiment.quantiles.length > 0 || experiment.decay.length > 0 ? (
             <>
@@ -449,7 +478,7 @@ export function FactorWorkspace({ snapshot }: { snapshot?: FactorWorkspaceSnapsh
       <Alert
         className="factorGateAlert"
         title="P4 Capability Gate 尚未通过"
-        description="当前实现属于工程 baseline；完整 PIT 截面、独立统计交叉验证、审批生命周期和真实广覆盖数据仍未齐备。"
+        description="审批生命周期与独立统计交叉验证已就绪；三类因子仍缺少满足冻结窗口的 pit_verified 输入，资格审计已失败关闭，当前没有可晋级因子。"
         showIcon
         type="warning"
       />
