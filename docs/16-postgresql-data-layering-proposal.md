@@ -1,8 +1,9 @@
-# PostgreSQL 数据分层方案（待批准）
+# PostgreSQL 数据分层设计与迁移记录
 
-- 状态：Proposed，**尚未批准、尚未实施**
+- 状态：Accepted，影子库迁移实施中
 - 日期：2026-08-11
 - 范围：`platform/` 的 PostgreSQL 表、迁移、repository 和只读 API
+- 决策记录：`docs/adr/0005-shadow-layered-database-migration.md`
 
 ## 1. 问题判断
 
@@ -71,23 +72,24 @@ V1 可以先用应用层 repository 和数据库 grant 双重约束，不引入�
 
 ## 5. 实施方式
 
-若批准，建议拆成六个可独立回滚、每包都跑全量测试的工作包：
+批准后的实施采用影子库，而不是在旧库原地搬表：
 
-1. **ADR 与守卫**：确认 schema 名称/表归属；新增“所有持久 SQL 必须 schema-qualified”测试，
-   不移动数据。
-2. **Schema/role bootstrap**：创建六个 schema、显式 migration table 路径和最小 grant；业务表
-   仍留在 `public`。
-3. **Governance + Evidence**：用事务内 `ALTER TABLE ... SET SCHEMA` 移动第一批表并更新
-   repository；该操作保留 PostgreSQL object identity 和 FK，不复制数据。
-4. **Observation + Canonical**：按 identity/universe、market、financial 三个小批次迁移，每批
-   更新 SQL、FK/trigger 测试和 PIT replay。
-5. **Research**：迁移 feature/label/experiment/validation/review 对象，复验 append-only、RBAC、
-   Qlib exchange 和失败实验可见性。
-6. **Serving + 收口**：建立稳定只读 views，API 改读 `serving`；一个兼容窗口后删除 `public`
-   compatibility views。
+1. **合同与守卫**：冻结 49 张表的唯一 schema 归属；运行时代码全部使用 schema-qualified SQL；
+   `public.schema_migrations` 是唯一 bootstrap 例外。
+2. **一致性克隆**：从只读的 `a_share_platform_dev` 做 PostgreSQL 一致性 dump/restore，目标固定为
+   `a_share_platform_layered_dev`。旧库保持不变，作为可验证回滚源。
+3. **原子物理迁移**：只在影子库用 migration 0029 创建六层 schema，并在单一事务中通过
+   `ALTER TABLE/VIEW/FUNCTION ... SET SCHEMA` 移动对象。该步骤不改业务行、不重算 DatasetVersion、
+   不产生 trust promotion；失败则整个 migration 回滚。
+4. **双库对账**：核对 49 张表 row count/内容摘要、DatasetVersion/trust 分布、FK、index、trigger、
+   function、view 和二次 migration 幂等性；任何不一致都阻止切换。
+5. **显式切换**：验证通过后，开发 API 才切到影子库。旧库不删除、不双写；回滚只需恢复旧 DSN。
 
-明确禁止：一次性搬完 49 张表、复制表后长期双写、用 view 自动填零/改 trust、在同一提交同时
-改数据语义和物理层、为了 DBeaver 好看重命名领域术语。
+明确禁止：在旧库原地执行 0029、复制后长期双写、用 view 自动填零或改变 trust、在物理迁移中
+顺便修改数据语义、为了 DBeaver 展示效果重命名领域术语。
+
+本轮先完成物理职责层和应用 SQL 合同。最小权限 group role/独立登录凭证需要单独的凭证与部署
+决策；在此之前本地开发连接仍沿用现有 role，因此不得宣称数据库 RBAC 已完成。
 
 ## 6. 每个迁移包的验收证据
 
@@ -99,10 +101,8 @@ V1 可以先用应用层 repository 和数据库 grant 双重约束，不引入�
 - 没有数据 trust 晋级、没有测试 fixture/运行时假数据入库；
 - DBeaver 中只需展开六个 schema 即可理解职责，`public` 最终只保留必要 extension 或兼容入口。
 
-## 7. 建议决策
+## 7. 决策
 
-建议批准上述六层命名和“先 schema-qualified repository，再逐域 `ALTER TABLE SET SCHEMA`，最后
-serving views”的迁移路线。不建议把层直接命名为 `ods/dwd/dws/ads`，因为那会掩盖本平台最
-关键的 evidence、PIT trust、research label 和 governance 边界。
-
-本文件获批前不得创建 schema、搬表、双写或修改运行时连接的 `search_path`。
+已批准六层命名和影子库迁移路线。不采用 `ods/dwd/dws/ads` 作为正式 schema 名，因为它会
+掩盖 evidence、PIT trust、research label 和 governance 边界。实现不得依赖运行时
+`search_path`，不得修改旧库，也不得因搬入 `canonical` 或 `research` 而提升可信等级。

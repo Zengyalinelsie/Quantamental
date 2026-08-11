@@ -64,8 +64,8 @@ class PostgresFinancialCohortAuditRepository:
                        COALESCE(SUM(checkpoints.rejected_rows), 0) AS rejected_rows,
                        MAX(checkpoints.updated_at) AS completed_at
                 FROM requested_jobs
-                JOIN ingestion_checkpoints AS checkpoints USING (job_id)
-                JOIN financial_backfill_persist_receipts AS receipts
+                JOIN governance.ingestion_checkpoints AS checkpoints USING (job_id)
+                JOIN governance.financial_backfill_persist_receipts AS receipts
                   ON receipts.job_id = checkpoints.job_id
                  AND receipts.checkpoint_key = checkpoints.checkpoint_key
                 WHERE checkpoints.data_domain = 'financial_statement'
@@ -78,7 +78,7 @@ class PostgresFinancialCohortAuditRepository:
                            ARRAY[]::TEXT[]
                        ) AS observed_symbols
                 FROM requested_jobs
-                JOIN normalized_current_financial_observations AS observations
+                JOIN observation.normalized_current_financial_observations AS observations
                   USING (job_id)
             ), quality AS (
                 SELECT COUNT(*) AS quality_report_count,
@@ -89,7 +89,7 @@ class PostgresFinancialCohortAuditRepository:
                        COUNT(*) FILTER (WHERE reports.status = 'failed')
                            AS failed_quality_reports
                 FROM requested_jobs
-                JOIN dataset_quality_reports AS reports USING (job_id)
+                JOIN governance.dataset_quality_reports AS reports USING (job_id)
             ), coverage AS (
                 SELECT COUNT(*) AS coverage_report_count,
                        COUNT(*) FILTER (WHERE reports.coverage_ratio = 1.0)
@@ -101,7 +101,7 @@ class PostgresFinancialCohortAuditRepository:
                        COUNT(*) FILTER (WHERE reports.coverage_ratio = 0.0)
                            AS zero_coverage_reports
                 FROM requested_jobs
-                JOIN dataset_coverage_reports AS reports USING (job_id)
+                JOIN governance.dataset_coverage_reports AS reports USING (job_id)
             )
             SELECT completed.completed_work_units,
                    completed.receipt_observation_count,
@@ -132,7 +132,7 @@ class PostgresFinancialCohortAuditRepository:
                 SELECT issues.key AS issue_code,
                        SUM(issues.value::INTEGER) AS issue_count
                 FROM requested_jobs
-                JOIN dataset_quality_reports AS reports USING (job_id)
+                JOIN governance.dataset_quality_reports AS reports USING (job_id)
                 CROSS JOIN LATERAL JSONB_EACH_TEXT(reports.issue_counts) AS issues
                 GROUP BY issues.key
             )
@@ -181,7 +181,7 @@ class PostgresFinancialCohortAuditRepository:
     def register_lineage(self, value: LineageEdge) -> LineageEdge:
         self._connection.execute(
             """
-            INSERT INTO lineage_edges (upstream_id, downstream_id, relation)
+            INSERT INTO governance.lineage_edges (upstream_id, downstream_id, relation)
             VALUES (%s, %s, %s)
             ON CONFLICT (upstream_id, downstream_id, relation) DO NOTHING
             """,

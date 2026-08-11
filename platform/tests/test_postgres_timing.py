@@ -103,7 +103,7 @@ class PostgresTimingForecastRepositoryTest(unittest.TestCase):
             for query, params in connection.calls
             if query.lstrip().startswith("INSERT")
         )
-        self.assertIn("INSERT INTO timing_forecasts", query)
+        self.assertIn("INSERT INTO research.timing_forecasts", query)
         self.assertIn("ON CONFLICT (forecast_id) DO NOTHING", query)
         self.assertNotIn("UPDATE", query)
         self.assertEqual(params[0], value.forecast_id)

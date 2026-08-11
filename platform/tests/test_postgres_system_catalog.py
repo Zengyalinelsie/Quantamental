@@ -45,17 +45,17 @@ class FakeConnection(AbstractContextManager["FakeConnection"]):
 
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append(query)
-        if "FROM dataset_versions" in query:
+        if "FROM governance.dataset_versions" in query:
             return FakeResult(self._rows.get("datasets", []))
-        if "FROM dataset_quality_reports" in query:
+        if "FROM governance.dataset_quality_reports" in query:
             return FakeResult(self._rows.get("quality", []))
-        if "FROM dataset_coverage_reports" in query:
+        if "FROM governance.dataset_coverage_reports" in query:
             return FakeResult(self._rows.get("coverage", []))
-        if "FROM ingestion_checkpoints" in query:
+        if "FROM governance.ingestion_checkpoints" in query:
             return FakeResult(self._rows.get("checkpoints", []))
-        if "FROM ingestion_jobs" in query:
+        if "FROM governance.ingestion_jobs" in query:
             return FakeResult(self._rows.get("jobs", []))
-        if "FROM lineage_edges" in query:
+        if "FROM governance.lineage_edges" in query:
             return FakeResult(self._rows.get("lineage", []))
         return FakeResult([])
 

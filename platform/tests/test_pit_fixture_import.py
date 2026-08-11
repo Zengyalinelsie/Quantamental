@@ -7,6 +7,7 @@ from unittest.mock import patch
 from a_share_platform.adapters.postgres.pit_fixture_import import (
     PostgresPITFixtureImporter,
 )
+from a_share_platform.adapters.postgres.schema_layers import qualified_table
 from a_share_platform.domain.governance import VersionConflictError
 from a_share_platform.domain.pit_fixtures import PITFixturePack
 
@@ -35,10 +36,10 @@ class FakeConnection:
 
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
-        if "FROM identifier_history" in query:
+        if "FROM canonical.identifier_history" in query:
             code = str(params[0])
             return FakeResult([(f"company:{code}", f"security:{code}")])
-        if self.conflict_table and f"INSERT INTO {self.conflict_table}" in query:
+        if self.conflict_table and f"INSERT INTO {qualified_table(self.conflict_table)}" in query:
             return FakeResult([])
         if "RETURNING" in query:
             return FakeResult([(params[0],)])
@@ -92,7 +93,7 @@ class PostgresPITFixtureImporterTest(unittest.TestCase):
             "ingestion_jobs",
             "dataset_quality_reports",
         ):
-            self.assertIn(f"INSERT INTO {table}", sql)
+            self.assertIn(f"INSERT INTO {qualified_table(table)}", sql)
         self.assertGreater(summary.persisted_fact_count, summary.official_fact_count)
         self.assertGreater(summary.blocking_mismatch_count, 0)
         self.assertEqual(connection.commits, 1)
@@ -118,12 +119,12 @@ class PostgresPITFixtureImporterTest(unittest.TestCase):
                 self.bootstrapped = False
 
             def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
-                if "FROM identifier_history" in query or "FROM listings listing" in query:
+                if "FROM canonical.identifier_history" in query or "FROM canonical.listings listing" in query:
                     code = str(params[0]).removeprefix("listing:XSHE:")
                     if code == "002898" and not self.bootstrapped:
                         self.calls.append((query, params))
                         return FakeResult([])
-                if "INSERT INTO companies" in query and "002898" in str(params[0]):
+                if "INSERT INTO canonical.companies" in query and "002898" in str(params[0]):
                     self.bootstrapped = True
                 return super().execute(query, params)
 
@@ -153,9 +154,9 @@ class PostgresPITFixtureImporterTest(unittest.TestCase):
             with patch.object(PITFixturePack, "verify_raw_evidence"):
                 importer.execute(connection, private_local_research_ack=True)
         sql = "\n".join(query for query, _ in connection.calls)
-        self.assertIn("INSERT INTO companies", sql)
-        self.assertIn("INSERT INTO securities", sql)
-        self.assertIn("INSERT INTO listings", sql)
+        self.assertIn("INSERT INTO canonical.companies", sql)
+        self.assertIn("INSERT INTO canonical.securities", sql)
+        self.assertIn("INSERT INTO canonical.listings", sql)
         self.assertIn("normalized_current", str(connection.calls))
         self.assertTrue(connection.bootstrapped)
 

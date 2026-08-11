@@ -344,8 +344,8 @@ class PostgresFinancialBackfillJobRepositoryTest(unittest.TestCase):
 
         self.assertEqual(restored, value)
         query, params = connection.calls[0]
-        self.assertIn("INSERT INTO ingestion_jobs", query)
-        self.assertIn("INSERT INTO ingestion_job_events", query)
+        self.assertIn("INSERT INTO governance.ingestion_jobs", query)
+        self.assertIn("INSERT INTO governance.ingestion_job_events", query)
         self.assertEqual(params[7], "not_applicable")
         self.assertEqual(json_value(params[4]), repository.plan_json(value.plan))
         self.assertEqual(

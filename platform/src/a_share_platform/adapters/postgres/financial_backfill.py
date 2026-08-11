@@ -104,9 +104,9 @@ class PostgresFinancialIdentityResolver:
         rows = self._connection.execute(
             """
             SELECT securities.company_id, securities.security_id, listings.listing_id
-            FROM identifier_history
-            JOIN listings ON listings.listing_id = identifier_history.listing_id
-            JOIN securities ON securities.security_id = listings.security_id
+            FROM canonical.identifier_history
+            JOIN canonical.listings ON listings.listing_id = identifier_history.listing_id
+            JOIN canonical.securities ON securities.security_id = listings.security_id
             WHERE listings.exchange = %s
               AND identifier_history.kind = 'code'
               AND identifier_history.value = %s
@@ -208,7 +208,7 @@ class PostgresFinancialBackfillUnitOfWork:
     def register_lineage(self, value: LineageEdge) -> LineageEdge:
         self._connection.execute(
             """
-            INSERT INTO lineage_edges (upstream_id, downstream_id, relation)
+            INSERT INTO governance.lineage_edges (upstream_id, downstream_id, relation)
             VALUES (%s, %s, %s)
             ON CONFLICT (upstream_id, downstream_id, relation) DO NOTHING
             """,
@@ -288,7 +288,7 @@ class PostgresFinancialBackfillUnitOfWork:
             """
             SELECT dataset_version_id, observation_ids, warnings,
                    identity_resolution_method
-            FROM financial_backfill_persist_receipts
+            FROM governance.financial_backfill_persist_receipts
             WHERE job_id = %s AND checkpoint_key = %s
             """,
             (job_id, checkpoint_key),
@@ -565,7 +565,7 @@ class PostgresFinancialBackfillUnitOfWork:
         )
         self._connection.execute(
             """
-            INSERT INTO raw_objects (
+            INSERT INTO evidence.raw_objects (
                 raw_object_id, object_kind, content_hash, source_url, provider_id,
                 retrieved_at, media_type, storage_uri, license_id, retention_policy,
                 retention_until, redistribution_allowed, parent_raw_object_id
@@ -579,7 +579,7 @@ class PostgresFinancialBackfillUnitOfWork:
             SELECT raw_object_id, object_kind, content_hash, source_url, provider_id,
                    retrieved_at, media_type, storage_uri, license_id, retention_policy,
                    retention_until, redistribution_allowed, parent_raw_object_id
-            FROM raw_objects WHERE raw_object_id = %s
+            FROM evidence.raw_objects WHERE raw_object_id = %s
             """,
             (value.raw_object_id,),
         ).fetchone()
@@ -606,7 +606,7 @@ class PostgresFinancialBackfillUnitOfWork:
         )
         self._connection.execute(
             """
-            INSERT INTO financial_backfill_work_units (
+            INSERT INTO governance.financial_backfill_work_units (
                 job_id, checkpoint_key, plan_id, provider_id, provider_profile_version,
                 benchmark_id, universe_version_id, mapping_version_id, statement_type,
                 provider_table, report_period_end, symbol_bucket_id, symbols, symbol_count
@@ -627,7 +627,7 @@ class PostgresFinancialBackfillUnitOfWork:
                    provider_profile_version, benchmark_id, universe_version_id,
                    mapping_version_id, statement_type, provider_table,
                    report_period_end, symbol_bucket_id, symbols, symbol_count
-            FROM financial_backfill_work_units
+            FROM governance.financial_backfill_work_units
             WHERE job_id = %s AND checkpoint_key = %s
             """,
             (self._job_id, unit.checkpoint_key),
@@ -643,7 +643,7 @@ class PostgresFinancialBackfillUnitOfWork:
         row = self._observation_row(value)
         self._connection.execute(
             """
-            INSERT INTO normalized_current_financial_observations (
+            INSERT INTO observation.normalized_current_financial_observations (
                 observation_id, dataset_version_id, job_id, checkpoint_key,
                 company_id, security_id, listing_id, canonical_symbol, identity_as_of,
                 mapped_row_id, provider_id, provider_table, provider_record_id,
@@ -684,7 +684,7 @@ class PostgresFinancialBackfillUnitOfWork:
     ) -> None:
         self._connection.execute(
             """
-            INSERT INTO financial_backfill_persist_receipts (
+            INSERT INTO governance.financial_backfill_persist_receipts (
                 job_id, checkpoint_key, dataset_version_id, observation_count,
                 observation_ids, warnings, trust_state, created_at,
                 identity_resolution_method
@@ -765,7 +765,7 @@ class PostgresFinancialBackfillUnitOfWork:
                    availability_method, provider_updated_at, retrieved_at, raw_object_id,
                    raw_object_hash, source_url, mapping_id, mapping_version_id, metric_code,
                    trust_state, data_mode, identity_resolution_method, warnings
-            FROM normalized_current_financial_observations
+            FROM observation.normalized_current_financial_observations
         """
 
     @staticmethod

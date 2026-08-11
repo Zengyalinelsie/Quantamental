@@ -111,7 +111,7 @@ class PostgresFinancialFactRepositoryTest(unittest.TestCase):
         value = observation()
         repository.save(value)
         query, params = connection.calls[-1]
-        self.assertIn("INSERT INTO financial_fact_observations", query)
+        self.assertIn("INSERT INTO canonical.financial_fact_observations", query)
         self.assertIn("ON CONFLICT (fact_id) DO NOTHING", query)
         self.assertEqual(params[0], value.fact_id)
         self.assertEqual(params[1], value.company_id)
@@ -155,7 +155,7 @@ class PostgresFinancialFactRepositoryTest(unittest.TestCase):
         closed_at = KNOWN + timedelta(days=1)
         repository.close_system_interval(value.fact_id, closed_at)
         query, params = connection.calls[-1]
-        self.assertIn("UPDATE financial_fact_observations", query)
+        self.assertIn("UPDATE canonical.financial_fact_observations", query)
         self.assertIn("known_to IS NULL", query)
         self.assertEqual(params, (closed_at, value.fact_id, closed_at))
 

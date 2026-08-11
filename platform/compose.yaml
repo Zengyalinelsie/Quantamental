@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: a_share_platform_dev
+      POSTGRES_DB: a_share_platform_layered_dev
       POSTGRES_USER: a_share_platform_dev
       POSTGRES_PASSWORD: local-only
     ports:

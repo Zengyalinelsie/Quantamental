@@ -7,6 +7,7 @@ from collections.abc import Callable
 from datetime import date
 from typing import Protocol
 
+from a_share_platform.adapters.postgres.schema_layers import qualified_table
 from a_share_platform.adapters.providers.backfill_payloads import (
     CorporateActionPayload,
     ShareCapitalPayload,
@@ -52,8 +53,8 @@ class PostgresCurrentKnownListingResolver:
         effective = self._connection.execute(
             """
             SELECT DISTINCT identifiers.listing_id
-            FROM identifier_history AS identifiers
-            JOIN listings ON listings.listing_id = identifiers.listing_id
+            FROM canonical.identifier_history AS identifiers
+            JOIN canonical.listings ON listings.listing_id = identifiers.listing_id
             WHERE identifiers.kind = 'code'
               AND identifiers.value = %s
               AND identifiers.valid_from <= %s
@@ -75,8 +76,8 @@ class PostgresCurrentKnownListingResolver:
         current_known = self._connection.execute(
             """
             SELECT DISTINCT identifiers.listing_id
-            FROM identifier_history AS identifiers
-            JOIN listings ON listings.listing_id = identifiers.listing_id
+            FROM canonical.identifier_history AS identifiers
+            JOIN canonical.listings ON listings.listing_id = identifiers.listing_id
             WHERE identifiers.kind = 'code'
               AND identifiers.value = %s
               AND listings.exchange = %s
@@ -191,7 +192,7 @@ class PostgresMarketStructureObservationSink:
         observation_id = self._observation_id("share-capital", semantic_values)
         result = self._connection.execute(
             """
-            INSERT INTO share_capital_observations (
+            INSERT INTO observation.share_capital_observations (
                 observation_id, listing_id, provider_id, provider_record_id,
                 effective_on, announced_on, total_shares, circulating_shares,
                 restricted_shares, free_float_shares, source_id, retrieved_at,
@@ -242,7 +243,7 @@ class PostgresMarketStructureObservationSink:
         observation_id = self._observation_id("corporate-action", semantic_values)
         result = self._connection.execute(
             """
-            INSERT INTO corporate_action_observations (
+            INSERT INTO observation.corporate_action_observations (
                 observation_id, listing_id, provider_id, provider_record_id,
                 announced_on, record_date, ex_date, cash_per_share,
                 bonus_shares_per_share, capitalization_shares_per_share,
@@ -285,10 +286,11 @@ class PostgresMarketStructureObservationSink:
             "corporate_action_observations",
         }:
             raise AssertionError("unexpected market-structure observation table")
+        qualified = qualified_table(table)
         existing = self._connection.execute(
             f"""
             SELECT observation_id
-            FROM {table}
+            FROM {qualified}
             WHERE provider_id = %s
               AND provider_record_id = %s
               AND dataset_version_id = %s

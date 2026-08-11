@@ -76,21 +76,21 @@ class FakeConnection:
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
         normalized = " ".join(query.split())
-        if normalized.startswith("INSERT INTO experiment_specs"):
+        if normalized.startswith("INSERT INTO research.experiment_specs"):
             spec_id = str(params[0])
             self.spec_rows.setdefault(spec_id, params)
             return FakeResult()
-        if normalized.startswith("INSERT INTO experiment_runs"):
+        if normalized.startswith("INSERT INTO research.experiment_runs"):
             run_id = str(params[0])
             self.run_rows.setdefault(run_id, params)
             return FakeResult()
-        if "FROM experiment_specs" in normalized:
+        if "FROM research.experiment_specs" in normalized:
             row = self.spec_rows.get(str(params[0]))
             return FakeResult([] if row is None else [row])
-        if "FROM experiment_runs" in normalized and "WHERE run_id" in normalized:
+        if "FROM research.experiment_runs" in normalized and "WHERE run_id" in normalized:
             row = self.run_rows.get(str(params[0]))
             return FakeResult([] if row is None else [row])
-        if "FROM experiment_runs" in normalized:
+        if "FROM research.experiment_runs" in normalized:
             return FakeResult([self.run_rows[key] for key in sorted(self.run_rows)])
         return FakeResult()
 
@@ -112,10 +112,10 @@ class PostgresExperimentRunRepositoryTest(unittest.TestCase):
         self.assertEqual(self.repository.get_run(value.run_id), value)
 
         spec_query, spec_params = next(
-            call for call in self.connection.calls if "INSERT INTO experiment_specs" in call[0]
+            call for call in self.connection.calls if "INSERT INTO research.experiment_specs" in call[0]
         )
         run_query, run_params = next(
-            call for call in self.connection.calls if "INSERT INTO experiment_runs" in call[0]
+            call for call in self.connection.calls if "INSERT INTO research.experiment_runs" in call[0]
         )
         self.assertIn("ON CONFLICT (spec_id) DO NOTHING", spec_query)
         self.assertIn("ON CONFLICT (run_id) DO NOTHING", run_query)

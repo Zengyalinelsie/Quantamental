@@ -112,7 +112,7 @@ class PostgresTimingForecastRepository:
         )
         self._connection.execute(
             """
-            INSERT INTO timing_forecasts (
+            INSERT INTO research.timing_forecasts (
                 forecast_id, benchmark_id, universe_version_id, effective_session,
                 decision_time, data_cutoff_at, created_at, data_mode, deployment_stage,
                 horizon_forecasts, risk_forecast, static_exposure_ratio,
@@ -185,7 +185,7 @@ class PostgresTimingForecastRepository:
 
     @classmethod
     def _select(cls) -> str:
-        return "SELECT " + cls._columns() + " FROM timing_forecasts"
+        return "SELECT " + cls._columns() + " FROM research.timing_forecasts"
 
     @staticmethod
     def to_row(value: TimingForecast) -> tuple[object, ...]:

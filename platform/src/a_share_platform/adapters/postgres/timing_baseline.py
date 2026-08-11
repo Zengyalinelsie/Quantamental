@@ -56,14 +56,14 @@ class PostgresTimingBaselineStore:
         row = self._connection.execute(
             """
             SELECT 1
-            FROM universe_versions AS version
-            JOIN universe_definitions AS definition
+            FROM canonical.universe_versions AS version
+            JOIN canonical.universe_definitions AS definition
               ON definition.definition_id = version.definition_id
             WHERE version.universe_version_id = %s
               AND definition.benchmark_id = %s
               AND EXISTS (
                   SELECT 1
-                  FROM universe_memberships AS membership
+                  FROM canonical.universe_memberships AS membership
                   WHERE membership.universe_version_id = version.universe_version_id
                     AND membership.valid_from <= %s
                     AND (membership.valid_to IS NULL OR %s < membership.valid_to)
@@ -94,7 +94,7 @@ class PostgresTimingBaselineStore:
         for row in batch.rows:
             self._connection.execute(
                 """
-                INSERT INTO timing_benchmark_bars (
+                INSERT INTO observation.timing_benchmark_bars (
                     benchmark_id, session_date, unadjusted_close, provider_id,
                     retrieved_at, adjustment_mode, trust_state, data_mode,
                     dataset_version_id
@@ -122,7 +122,7 @@ class PostgresTimingBaselineStore:
     def register_run(self, value: RunRecord) -> RunRecord:
         self._connection.execute(
             """
-            INSERT INTO run_records (
+            INSERT INTO governance.run_records (
                 run_id, run_kind, status, data_mode, deployment_stage,
                 started_at, finished_at, failure_reason, code_version,
                 environment_fingerprint
@@ -136,7 +136,7 @@ class PostgresTimingBaselineStore:
             SELECT run_id, run_kind, status, data_mode, deployment_stage,
                    started_at, finished_at, failure_reason, code_version,
                    environment_fingerprint
-            FROM run_records WHERE run_id = %s
+            FROM governance.run_records WHERE run_id = %s
             """,
             (value.run_id,),
         ).fetchone()
@@ -150,7 +150,7 @@ class PostgresTimingBaselineStore:
     def register_lineage(self, value: LineageEdge) -> LineageEdge:
         self._connection.execute(
             """
-            INSERT INTO lineage_edges (upstream_id, downstream_id, relation)
+            INSERT INTO governance.lineage_edges (upstream_id, downstream_id, relation)
             VALUES (%s, %s, %s)
             ON CONFLICT (upstream_id, downstream_id, relation) DO NOTHING
             """,
@@ -163,7 +163,7 @@ class PostgresTimingBaselineStore:
             """
             SELECT benchmark_id, session_date, unadjusted_close, provider_id,
                    retrieved_at, adjustment_mode, trust_state, data_mode
-            FROM timing_benchmark_bars
+            FROM observation.timing_benchmark_bars
             WHERE dataset_version_id = %s
             ORDER BY session_date
             """,

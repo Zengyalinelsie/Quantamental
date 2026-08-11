@@ -132,19 +132,19 @@ class FakeConnection:
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
         sql = " ".join(query.split())
-        if sql.startswith("INSERT INTO canonical_metrics"):
+        if sql.startswith("INSERT INTO governance.canonical_metrics"):
             self.metrics.setdefault(str(params[0]), params)
-        elif "FROM canonical_metrics" in sql:
+        elif "FROM governance.canonical_metrics" in sql:
             row = self.metrics.get(str(params[0]))
             return FakeResult([] if row is None else [row])
-        elif sql.startswith("INSERT INTO metric_mapping_versions"):
+        elif sql.startswith("INSERT INTO governance.metric_mapping_versions"):
             self.versions.setdefault(str(params[0]), params)
-        elif "FROM metric_mapping_versions" in sql:
+        elif "FROM governance.metric_mapping_versions" in sql:
             row = self.versions.get(str(params[0]))
             return FakeResult([] if row is None else [row])
-        elif sql.startswith("INSERT INTO provider_field_mappings"):
+        elif sql.startswith("INSERT INTO governance.provider_field_mappings"):
             self.mappings.setdefault(str(params[0]), params)
-        elif "FROM provider_field_mappings" in sql:
+        elif "FROM governance.provider_field_mappings" in sql:
             if "WHERE mapping_id = %s" in sql:
                 row = self.mappings.get(str(params[0]))
                 return FakeResult([] if row is None else [row])
@@ -157,17 +157,17 @@ class FakeConnection:
                 and row[1] == params[3]
             ]
             return FakeResult(sorted(rows, key=lambda row: str(row[0])))
-        elif sql.startswith("INSERT INTO financial_quality_rules"):
+        elif sql.startswith("INSERT INTO governance.financial_quality_rules"):
             self.rules.setdefault(
                 str(params[0]),
                 (*params[:3], _json(params[3]), *params[4:]),
             )
-        elif "FROM financial_quality_rules" in sql:
+        elif "FROM governance.financial_quality_rules" in sql:
             row = self.rules.get(str(params[0]))
             return FakeResult([] if row is None else [row])
-        elif sql.startswith("INSERT INTO unmapped_metric_fields"):
+        elif sql.startswith("INSERT INTO governance.unmapped_metric_fields"):
             self.unmapped.setdefault(str(params[0]), params)
-        elif "FROM unmapped_metric_fields" in sql:
+        elif "FROM governance.unmapped_metric_fields" in sql:
             if "WHERE unmapped_field_id = %s" in sql:
                 row = self.unmapped.get(str(params[0]))
                 return FakeResult([] if row is None else [row])
@@ -241,7 +241,7 @@ class PostgresMetricRegistryRepositoryTest(unittest.TestCase):
         insert = next(
             params
             for query, params in self.connection.calls
-            if "INSERT INTO provider_field_mappings" in query
+            if "INSERT INTO governance.provider_field_mappings" in query
         )
         self.assertIsInstance(insert[8], list)
         self.assertEqual(
@@ -276,7 +276,7 @@ class PostgresMetricRegistryRepositoryTest(unittest.TestCase):
         insert = next(
             params
             for query, params in self.connection.calls
-            if "INSERT INTO financial_quality_rules" in query
+            if "INSERT INTO governance.financial_quality_rules" in query
         )
         terms = _json(insert[3])
         self.assertEqual(terms[0]["coefficient"], "1.000000000000000001")  # type: ignore[index]

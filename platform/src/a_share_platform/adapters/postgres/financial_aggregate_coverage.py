@@ -53,7 +53,7 @@ class PostgresFinancialAggregateCoverageRepository:
         SELECT coverage_report_id, dataset_version_id, job_id, scope_id,
                data_domain, start_date, end_date, expected_rows, observed_rows,
                coverage_ratio, warnings, created_at
-        FROM dataset_coverage_reports
+        FROM governance.dataset_coverage_reports
     """
 
     def __init__(self, connection: Connection) -> None:
@@ -73,8 +73,8 @@ class PostgresFinancialAggregateCoverageRepository:
                        COALESCE(SUM(receipts.observation_count), 0)
                            AS receipt_observation_count,
                        MAX(checkpoints.updated_at) AS completed_at
-                FROM ingestion_checkpoints AS checkpoints
-                JOIN financial_backfill_persist_receipts AS receipts
+                FROM governance.ingestion_checkpoints AS checkpoints
+                JOIN governance.financial_backfill_persist_receipts AS receipts
                   ON receipts.job_id = checkpoints.job_id
                  AND receipts.checkpoint_key = checkpoints.checkpoint_key
                 WHERE checkpoints.job_id = %s
@@ -87,7 +87,7 @@ class PostgresFinancialAggregateCoverageRepository:
                            ARRAY_AGG(DISTINCT canonical_symbol ORDER BY canonical_symbol),
                            ARRAY[]::TEXT[]
                        ) AS observed_symbols
-                FROM normalized_current_financial_observations
+                FROM observation.normalized_current_financial_observations
                 WHERE job_id = %s
             )
             SELECT completed.job_id, completed.completed_work_units,

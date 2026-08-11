@@ -104,15 +104,15 @@ class FakeConnection:
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
         normalized = " ".join(query.split())
-        if normalized.startswith("INSERT INTO feature_snapshots"):
+        if normalized.startswith("INSERT INTO research.feature_snapshots"):
             self.feature_row = params
             return FakeResult()
-        if normalized.startswith("INSERT INTO research_labels"):
+        if normalized.startswith("INSERT INTO research.research_labels"):
             self.label_row = params
             return FakeResult()
-        if "FROM feature_snapshots" in normalized:
+        if "FROM research.feature_snapshots" in normalized:
             return FakeResult([] if self.feature_row is None else [self.feature_row])
-        if "FROM research_labels" in normalized:
+        if "FROM research.research_labels" in normalized:
             return FakeResult([] if self.label_row is None else [self.label_row])
         return FakeResult()
 
@@ -126,7 +126,7 @@ class PostgresFeatureSnapshotRepositoryTest(unittest.TestCase):
         self.assertEqual(repository.save_snapshot(value), value)
 
         query, params = next(
-            call for call in connection.calls if "INSERT INTO feature_snapshots" in call[0]
+            call for call in connection.calls if "INSERT INTO research.feature_snapshots" in call[0]
         )
         self.assertIn("ON CONFLICT (snapshot_id) DO NOTHING", query)
         self.assertNotIn("UPDATE", query)
@@ -157,7 +157,7 @@ class PostgresResearchLabelRepositoryTest(unittest.TestCase):
         self.assertEqual(repository.save_label(value), value)
 
         query, params = next(
-            call for call in connection.calls if "INSERT INTO research_labels" in call[0]
+            call for call in connection.calls if "INSERT INTO research.research_labels" in call[0]
         )
         self.assertNotIn("feature_snapshots", query)
         self.assertIn("ON CONFLICT (content_hash) DO NOTHING", query)

@@ -96,8 +96,8 @@ class PostgresListingResolver:
         official_rows = self._connection.execute(
             """
             SELECT aliases.listing_id
-            FROM official_identifier_aliases AS aliases
-            JOIN listings ON listings.listing_id = aliases.listing_id
+            FROM canonical.official_identifier_aliases AS aliases
+            JOIN canonical.listings ON listings.listing_id = aliases.listing_id
             WHERE aliases.kind = 'code'
               AND aliases.value = %s
               AND aliases.valid_from <= %s
@@ -115,8 +115,8 @@ class PostgresListingResolver:
         known_official_rows = self._connection.execute(
             """
             SELECT aliases.listing_id
-            FROM official_identifier_aliases AS aliases
-            JOIN listings ON listings.listing_id = aliases.listing_id
+            FROM canonical.official_identifier_aliases AS aliases
+            JOIN canonical.listings ON listings.listing_id = aliases.listing_id
             WHERE aliases.kind = 'code'
               AND aliases.value = %s
               AND listings.exchange = %s
@@ -131,8 +131,8 @@ class PostgresListingResolver:
         rows = self._connection.execute(
             """
             SELECT identifiers.listing_id
-            FROM identifier_history AS identifiers
-            JOIN listings ON listings.listing_id = identifiers.listing_id
+            FROM canonical.identifier_history AS identifiers
+            JOIN canonical.listings ON listings.listing_id = identifiers.listing_id
             WHERE identifiers.kind = 'code'
               AND identifiers.value = %s
               AND identifiers.valid_from <= %s
@@ -161,8 +161,8 @@ class PostgresListingResolver:
         correction_rows = self._connection.execute(
             """
             SELECT corrections.listing_id
-            FROM provider_identifier_corrections AS corrections
-            JOIN listings ON listings.listing_id = corrections.listing_id
+            FROM canonical.provider_identifier_corrections AS corrections
+            JOIN canonical.listings ON listings.listing_id = corrections.listing_id
             WHERE corrections.provider_id = %s
               AND corrections.kind = 'code'
               AND corrections.observed_value = %s
@@ -184,8 +184,8 @@ class PostgresListingResolver:
         known_correction_rows = self._connection.execute(
             """
             SELECT corrections.listing_id
-            FROM provider_identifier_corrections AS corrections
-            JOIN listings ON listings.listing_id = corrections.listing_id
+            FROM canonical.provider_identifier_corrections AS corrections
+            JOIN canonical.listings ON listings.listing_id = corrections.listing_id
             WHERE corrections.provider_id = %s
               AND corrections.kind = 'code'
               AND corrections.observed_value = %s
@@ -281,7 +281,7 @@ class CanonicalBackfillSink:
                    created_at, trust_state, provider_id, source_ids,
                    retrieved_at, system_as_of, available_at
                    , observation_mode, observed_dates, unobserved_intervals
-            FROM universe_versions
+            FROM canonical.universe_versions
             WHERE universe_version_id = %s
             """,
             (universe_version_id,),
@@ -362,7 +362,7 @@ class CanonicalBackfillSink:
         for state in states:
             self._connection.execute(
                 """
-                INSERT INTO daily_market_states (
+                INSERT INTO observation.daily_market_states (
                     listing_id, session_date, is_trading, is_suspended,
                     listing_state, special_treatment, source_id,
                     dataset_version_id, trust_state
@@ -406,7 +406,7 @@ class CanonicalBackfillSink:
         partition_id = f"partition:{hashlib.sha256(partition_key).hexdigest()[:24]}"
         self._connection.execute(
             """
-            INSERT INTO market_data_partitions (
+            INSERT INTO observation.market_data_partitions (
                 partition_id, dataset_version_id, data_type, storage_uri,
                 content_hash, exchange, start_date, end_date, row_count, created_at
             ) VALUES (%s, %s, 'daily_bar', %s, %s, %s, %s, %s, %s, %s)
@@ -429,7 +429,7 @@ class CanonicalBackfillSink:
         for row in payload.rows:
             self._connection.execute(
                 """
-                INSERT INTO exchange_calendar_days (
+                INSERT INTO canonical.exchange_calendar_days (
                     exchange, calendar_date, is_open, closure_reason, source_id
                 ) VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (exchange, calendar_date, source_id) DO NOTHING
@@ -455,7 +455,7 @@ class CanonicalBackfillSink:
             )
             self._connection.execute(
                 """
-                INSERT INTO companies (
+                INSERT INTO canonical.companies (
                     company_id, legal_name, legal_name_source_id, observed_on,
                     dataset_version_id, trust_state
                 ) VALUES (%s, %s, %s, %s, %s, %s)
@@ -479,7 +479,7 @@ class CanonicalBackfillSink:
             )
             self._connection.execute(
                 """
-                INSERT INTO securities (
+                INSERT INTO canonical.securities (
                     security_id, company_id, security_class, currency
                 ) VALUES (%s, %s, 'a_share', 'CNY')
                 ON CONFLICT (security_id) DO NOTHING
@@ -488,7 +488,7 @@ class CanonicalBackfillSink:
             )
             self._connection.execute(
                 """
-                INSERT INTO listings (
+                INSERT INTO canonical.listings (
                     listing_id, security_id, exchange, board, listed_on, delisted_on
                 ) VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (listing_id) DO UPDATE SET
@@ -547,7 +547,7 @@ class CanonicalBackfillSink:
     ) -> None:
         self._connection.execute(
             """
-            UPDATE identifier_history
+            UPDATE canonical.identifier_history
             SET valid_to = %s
             WHERE listing_id = %s AND kind = %s AND valid_to IS NULL
               AND valid_from < %s
@@ -556,7 +556,7 @@ class CanonicalBackfillSink:
         )
         result = self._connection.execute(
             """
-            INSERT INTO identifier_history (
+            INSERT INTO canonical.identifier_history (
                 listing_id, kind, value, valid_from, valid_to, source_id
             )
             VALUES (%s, %s, %s, %s, NULL, %s)
@@ -590,7 +590,7 @@ class CanonicalBackfillSink:
     ) -> None:
         self._connection.execute(
             """
-            UPDATE listing_state_periods
+            UPDATE canonical.listing_state_periods
             SET valid_to = %s
             WHERE listing_id = %s AND valid_to IS NULL AND valid_from < %s
             """,
@@ -598,7 +598,7 @@ class CanonicalBackfillSink:
         )
         result = self._connection.execute(
             """
-            INSERT INTO listing_state_periods (
+            INSERT INTO canonical.listing_state_periods (
                 listing_id, valid_from, valid_to, state, special_treatment, source_id
             )
             VALUES (%s, %s, NULL, %s, %s, %s)
@@ -630,7 +630,7 @@ class CanonicalBackfillSink:
     ) -> None:
         self._connection.execute(
             """
-            UPDATE industry_memberships
+            UPDATE canonical.industry_memberships
             SET valid_to = %s
             WHERE security_id = %s AND taxonomy = %s AND valid_to IS NULL
               AND valid_from < %s
@@ -644,7 +644,7 @@ class CanonicalBackfillSink:
         )
         result = self._connection.execute(
             """
-            INSERT INTO industry_memberships (
+            INSERT INTO canonical.industry_memberships (
                 security_id, taxonomy, industry_name, industry_code,
                 valid_from, valid_to, source_id
             )
@@ -714,7 +714,7 @@ class CanonicalBackfillSink:
         system_as_of = batch.metadata.retrieved_at
         definition_result = self._connection.execute(
             """
-            INSERT INTO universe_definitions (
+            INSERT INTO canonical.universe_definitions (
                 definition_id, name, ruleset_version, benchmark_id
             ) VALUES (%s, %s, 'provider_snapshot_v1', %s)
             ON CONFLICT (definition_id) DO UPDATE SET
@@ -732,7 +732,7 @@ class CanonicalBackfillSink:
         )
         version_result = self._connection.execute(
             """
-            INSERT INTO universe_versions (
+            INSERT INTO canonical.universe_versions (
                 universe_version_id, definition_id, dataset_version_id, created_at,
                 trust_state, provider_id, source_ids, retrieved_at, system_as_of,
                 available_at, observation_mode, observed_dates, unobserved_intervals
@@ -786,7 +786,7 @@ class CanonicalBackfillSink:
             warnings.update(resolution.warnings)
             membership_result = self._connection.execute(
                 """
-                INSERT INTO universe_memberships (
+                INSERT INTO canonical.universe_memberships (
                     universe_version_id, listing_id, valid_from, valid_to,
                     research_eligible, tradable_eligible, inclusion_reasons,
                     exclusion_reasons, benchmark_member, source_id
@@ -848,7 +848,7 @@ class CanonicalBackfillSink:
             rows = self._connection.execute(
                 """
                 SELECT listing_id
-                FROM listings
+                FROM canonical.listings
                 WHERE listing_id = %s
                   AND exchange = %s
                   AND listed_on <= %s

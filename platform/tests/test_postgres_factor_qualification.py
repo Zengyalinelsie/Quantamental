@@ -82,7 +82,7 @@ class SourceConnection(AbstractContextManager["SourceConnection"]):
                     ("universe:csi300:current:v1", "dataset:csi300:v1", 300),
                 ]
             )
-        if "JOIN financial_fact_observations AS facts" in sql:
+        if "JOIN canonical.financial_fact_observations AS facts" in sql:
             return Result(
                 [
                     (
@@ -95,23 +95,23 @@ class SourceConnection(AbstractContextManager["SourceConnection"]):
                     )
                 ]
             )
-        if "FROM universe_versions AS versions" in sql:
+        if "FROM canonical.universe_versions AS versions" in sql:
             return Result([(29600, 800, START, END, ["dataset:universe:v1"], ["csi"])])
-        if "JOIN industry_memberships AS observed" in sql:
+        if "JOIN canonical.industry_memberships AS observed" in sql:
             return Result([unavailable])
-        if "FROM industry_memberships" in sql:
+        if "FROM canonical.industry_memberships" in sql:
             return Result(
                 [(1258, date(2026, 8, 10), date(2026, 8, 11))]
             )
-        if "JOIN daily_market_states AS observed" in sql:
+        if "JOIN observation.daily_market_states AS observed" in sql:
             return Result([(7177, 30, START, date(2018, 12, 31), *observed[4:])])
-        if "JOIN share_capital_observations AS observed" in sql:
+        if "JOIN observation.share_capital_observations AS observed" in sql:
             return Result([(24951, 800, START, END, *observed[4:])])
         if "FROM covered_action_universe" in sql:
             return Result([(8059, 800, START, END, *observed[4:])])
-        if "FROM timing_benchmark_bars" in sql:
+        if "FROM observation.timing_benchmark_bars" in sql:
             return Result([unavailable])
-        if "JOIN research_labels AS labels" in sql:
+        if "JOIN research.research_labels AS labels" in sql:
             return Result([unavailable])
         if "SELECT DISTINCT metric_code" in sql:
             return Result(
@@ -153,34 +153,34 @@ class RepositoryConnection(AbstractContextManager["RepositoryConnection"]):
     def execute(self, query: str, params: tuple[object, ...] = ()) -> Result:
         self.calls.append((query, params))
         sql = " ".join(query.split())
-        if sql.startswith("INSERT INTO dataset_versions"):
+        if sql.startswith("INSERT INTO governance.dataset_versions"):
             self.datasets.setdefault(
                 str(params[0]),
                 (*params[:4], _json_value(params[4])),
             )
             return Result()
-        if "FROM dataset_versions WHERE dataset_version_id" in sql:
+        if "FROM governance.dataset_versions WHERE dataset_version_id" in sql:
             row = self.datasets.get(str(params[0]))
             return Result([] if row is None else [row])
-        if sql.startswith("INSERT INTO factor_validation_reports"):
+        if sql.startswith("INSERT INTO research.factor_validation_reports"):
             self.reports.setdefault(
                 str(params[0]),
                 (params[1], params[3], False),
             )
             return Result()
-        if "FROM factor_validation_reports WHERE report_id" in sql:
+        if "FROM research.factor_validation_reports WHERE report_id" in sql:
             row = self.reports.get(str(params[0]))
             return Result([] if row is None else [row])
-        if sql.startswith("INSERT INTO factor_qualification_audits"):
+        if sql.startswith("INSERT INTO research.factor_qualification_audits"):
             self.audits.setdefault(
                 str(params[0]),
                 (params[1], params[8], params[9], params[11]),
             )
             return Result()
-        if "FROM factor_qualification_audits WHERE audit_id" in sql:
+        if "FROM research.factor_qualification_audits WHERE audit_id" in sql:
             row = self.audits.get(str(params[0]))
             return Result([] if row is None else [row])
-        if sql.startswith("INSERT INTO lineage_edges"):
+        if sql.startswith("INSERT INTO governance.lineage_edges"):
             return Result()
         raise AssertionError(f"unexpected qualification persistence query: {sql}")
 
@@ -295,7 +295,7 @@ class PostgresFactorQualificationTest(unittest.TestCase):
         self.assertEqual(len(connection.reports), 1)
         self.assertEqual(len(connection.audits), 1)
         self.assertEqual(len(experiments.runs), 1)
-        self.assertTrue(any("INSERT INTO lineage_edges" in query for query, _ in connection.calls))
+        self.assertTrue(any("INSERT INTO governance.lineage_edges" in query for query, _ in connection.calls))
         self.assertFalse(any("UPDATE" in query or "DELETE" in query for query, _ in connection.calls))
 
 

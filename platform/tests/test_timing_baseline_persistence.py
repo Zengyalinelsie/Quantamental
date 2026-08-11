@@ -41,7 +41,7 @@ class TimingBaselinePersistenceTest(unittest.TestCase):
 
         query, params = connection.calls[-1]
         self.assertIn("definition.benchmark_id = %s", query)
-        self.assertIn("FROM universe_memberships", query)
+        self.assertIn("FROM canonical.universe_memberships", query)
         self.assertIn("membership.valid_from <= %s", query)
         self.assertIn("%s < membership.valid_to", query)
         self.assertEqual(

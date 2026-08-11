@@ -69,7 +69,7 @@ class PostgresBackfillRepository:
         self._connection.execute(
             """
             WITH inserted AS (
-                INSERT INTO ingestion_jobs (
+                INSERT INTO governance.ingestion_jobs (
                     job_id, plan_id, provider_id, status, plan, qualification,
                     output_trust_state, adjustment_mode, start_date, end_date,
                     created_at, updated_at, dataset_version_id, failure_reasons
@@ -79,7 +79,7 @@ class PostgresBackfillRepository:
                 ON CONFLICT (job_id) DO NOTHING
                 RETURNING job_id
             )
-            INSERT INTO ingestion_job_events (
+            INSERT INTO governance.ingestion_job_events (
                 job_id, status, recorded_at, failure_reasons, dataset_version_id
             )
             SELECT %s, %s, %s, %s, %s FROM inserted
@@ -112,13 +112,13 @@ class PostgresBackfillRepository:
         self._connection.execute(
             """
             WITH updated AS (
-                UPDATE ingestion_jobs
+                UPDATE governance.ingestion_jobs
                 SET status = %s, updated_at = %s, dataset_version_id = %s,
                     failure_reasons = %s
                 WHERE job_id = %s
                 RETURNING job_id
             )
-            INSERT INTO ingestion_job_events (
+            INSERT INTO governance.ingestion_job_events (
                 job_id, status, recorded_at, failure_reasons, dataset_version_id
             )
             SELECT job_id, %s, %s, %s, %s FROM updated
@@ -142,7 +142,7 @@ class PostgresBackfillRepository:
             """
             SELECT job_id, plan, qualification, status, created_at, updated_at,
                    dataset_version_id, failure_reasons
-            FROM ingestion_jobs WHERE job_id = %s
+            FROM governance.ingestion_jobs WHERE job_id = %s
             """,
             (job_id,),
         ).fetchone()
@@ -153,7 +153,7 @@ class PostgresBackfillRepository:
             """
             SELECT job_id, plan, qualification, status, created_at, updated_at,
                    dataset_version_id, failure_reasons
-            FROM ingestion_jobs ORDER BY created_at, job_id
+            FROM governance.ingestion_jobs ORDER BY created_at, job_id
             """
         ).fetchall()
         return tuple(self._job_from_row(row) for row in rows)
@@ -162,7 +162,7 @@ class PostgresBackfillRepository:
         metadata = value.retrieval_metadata
         self._connection.execute(
             """
-            INSERT INTO ingestion_checkpoints (
+            INSERT INTO governance.ingestion_checkpoints (
                 job_id, checkpoint_key, scope_id, data_domain, market,
                 start_date, end_date, status, cursor, processed_rows, rejected_rows,
                 content_hash, provider_id, provider_cutoff_date, retrieved_at, adjustment_mode,
@@ -233,7 +233,7 @@ class PostgresBackfillRepository:
     def save_quality_report(self, value: DatasetQualityReport) -> DatasetQualityReport:
         self._connection.execute(
             """
-            INSERT INTO dataset_quality_reports (
+            INSERT INTO governance.dataset_quality_reports (
                 quality_report_id, dataset_version_id, job_id, status,
                 checks_passed, checks_failed, issue_counts, warnings, created_at
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -259,7 +259,7 @@ class PostgresBackfillRepository:
     ) -> DatasetCoverageReport:
         self._connection.execute(
             """
-            INSERT INTO dataset_coverage_reports (
+            INSERT INTO governance.dataset_coverage_reports (
                 coverage_report_id, dataset_version_id, job_id, scope_id,
                 data_domain, start_date, end_date, expected_rows, observed_rows,
                 coverage_ratio, warnings, created_at
@@ -290,7 +290,7 @@ class PostgresBackfillRepository:
                    start_date, end_date, status, updated_at, processed_rows,
                    rejected_rows, content_hash, cursor, error,
                    provider_id, provider_cutoff_date, retrieved_at, adjustment_mode, units, warnings
-            FROM ingestion_checkpoints
+            FROM governance.ingestion_checkpoints
         """
 
     @staticmethod

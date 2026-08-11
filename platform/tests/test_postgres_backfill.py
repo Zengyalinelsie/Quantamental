@@ -99,7 +99,7 @@ class PostgresBackfillTest(unittest.TestCase):
         job = BackfillJob.blocked(value, qualification)
         repository.save_job(job)
         query, params = connection.calls[-1]
-        self.assertIn("INSERT INTO ingestion_jobs", query)
+        self.assertIn("INSERT INTO governance.ingestion_jobs", query)
         self.assertIn("ON CONFLICT (job_id) DO NOTHING", query)
         self.assertEqual(params[0], job.job_id)
         self.assertEqual(params[2], "a_share_mcp_baostock")

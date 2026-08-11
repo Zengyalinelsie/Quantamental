@@ -104,14 +104,14 @@ _CANDIDATE_QUERY = """
                    PARTITION BY uv.definition_id ORDER BY uv.created_at DESC,
                    uv.universe_version_id DESC
                ) AS rank
-        FROM universe_versions AS uv
+        FROM canonical.universe_versions AS uv
         WHERE uv.definition_id IN ('csi:000300', 'csi:000905')
           AND uv.observation_mode = 'continuous_daily'
     )
     SELECT ranked.universe_version_id, ranked.dataset_version_id,
            COUNT(memberships.listing_id) AS member_count
     FROM ranked
-    JOIN universe_memberships AS memberships USING (universe_version_id)
+    JOIN canonical.universe_memberships AS memberships USING (universe_version_id)
     WHERE ranked.rank = 1
     GROUP BY ranked.universe_version_id, ranked.dataset_version_id
     ORDER BY member_count DESC, ranked.universe_version_id
@@ -124,14 +124,14 @@ _TARGET_CTE = """
                    PARTITION BY uv.definition_id ORDER BY uv.created_at DESC,
                    uv.universe_version_id DESC
                ) AS rank
-        FROM universe_versions AS uv
+        FROM canonical.universe_versions AS uv
         WHERE uv.definition_id IN ('csi:000300', 'csi:000905')
           AND uv.observation_mode = 'continuous_daily'
     ), target AS (
         SELECT DISTINCT memberships.listing_id, listings.security_id
         FROM ranked
-        JOIN universe_memberships AS memberships USING (universe_version_id)
-        JOIN listings USING (listing_id)
+        JOIN canonical.universe_memberships AS memberships USING (universe_version_id)
+        JOIN canonical.listings USING (listing_id)
         WHERE ranked.rank = 1
     )
 """
@@ -174,7 +174,7 @@ class PostgresFactorQualificationSource:
             metric_rows = connection.execute(
                 """
                 SELECT DISTINCT metric_code
-                FROM financial_fact_observations
+                FROM canonical.financial_fact_observations
                 WHERE trust_state = 'pit_verified'
                   AND quality_state = 'passed'
                   AND available_at <= %s
@@ -188,7 +188,7 @@ class PostgresFactorQualificationSource:
                 """
                 SELECT requested.feature_id, COUNT(snapshots.snapshot_id)
                 FROM UNNEST(%s::TEXT[]) AS requested(feature_id)
-                LEFT JOIN feature_snapshots AS snapshots
+                LEFT JOIN research.feature_snapshots AS snapshots
                   ON snapshots.feature_id = requested.feature_id
                  AND snapshots.as_of::DATE BETWEEN %s AND %s
                 GROUP BY requested.feature_id
@@ -253,7 +253,7 @@ class PostgresFactorQualificationSource:
                 """
                 SELECT COUNT(*), MIN(valid_from),
                        MAX(COALESCE(valid_to, valid_from))
-                FROM industry_memberships
+                FROM canonical.industry_memberships
                 """
             ).fetchone()
             if current_industry is not None and int(cast(int, current_industry[0])) > 0:
@@ -318,7 +318,7 @@ class PostgresFactorQualificationSource:
                        ARRAY_AGG(DISTINCT facts.provider_id)
                            FILTER (WHERE facts.provider_id IS NOT NULL)
                 FROM target
-                JOIN financial_fact_observations AS facts
+                JOIN canonical.financial_fact_observations AS facts
                   ON facts.security_id = target.security_id
                 WHERE facts.trust_state = 'pit_verified'
                   AND facts.quality_state = 'passed'
@@ -344,8 +344,8 @@ class PostgresFactorQualificationSource:
                        ARRAY_AGG(DISTINCT versions.dataset_version_id),
                        ARRAY_AGG(DISTINCT memberships.source_id)
                            FILTER (WHERE memberships.source_id IS NOT NULL)
-                FROM universe_versions AS versions
-                JOIN universe_memberships AS memberships USING (universe_version_id)
+                FROM canonical.universe_versions AS versions
+                JOIN canonical.universe_memberships AS memberships USING (universe_version_id)
                 WHERE versions.definition_id IN ('csi:000300', 'csi:000905')
                 """,
                 (),
@@ -362,8 +362,8 @@ class PostgresFactorQualificationSource:
                                WHEN 'XBSE' THEN 'BJ.'
                            END || identifiers.value AS provider_symbol
                     FROM target
-                    JOIN listings USING (listing_id)
-                    JOIN identifier_history AS identifiers USING (listing_id)
+                    JOIN canonical.listings USING (listing_id)
+                    JOIN canonical.identifier_history AS identifiers USING (listing_id)
                     WHERE identifiers.kind = 'code'
                       AND identifiers.valid_from <= %s
                       AND (
@@ -376,9 +376,9 @@ class PostgresFactorQualificationSource:
                                WHERE checkpoints.processed_rows = 0
                            ) AS zero_checkpoint_count
                     FROM target_codes
-                    JOIN ingestion_jobs AS jobs
+                    JOIN governance.ingestion_jobs AS jobs
                       ON jobs.plan->'symbols' ? target_codes.provider_symbol
-                    JOIN ingestion_checkpoints AS checkpoints
+                    JOIN governance.ingestion_checkpoints AS checkpoints
                       ON checkpoints.job_id = jobs.job_id
                      AND checkpoints.data_domain = 'corporate_action'
                      AND checkpoints.status = 'succeeded'
@@ -394,7 +394,7 @@ class PostgresFactorQualificationSource:
                 ), observed_actions AS (
                     SELECT actions.*
                     FROM target
-                    JOIN corporate_action_observations AS actions
+                    JOIN observation.corporate_action_observations AS actions
                       ON actions.listing_id = target.listing_id
                     WHERE actions.ex_date BETWEEN %s AND %s
                 )
@@ -434,7 +434,7 @@ class PostgresFactorQualificationSource:
             )
         table_contracts = {
             FactorDataRole.INDUSTRY_CLASSIFICATION: (
-                "industry_memberships",
+                "canonical.industry_memberships",
                 "industry_membership_id",
                 "security_id",
                 "valid_from",
@@ -443,7 +443,7 @@ class PostgresFactorQualificationSource:
                 "source_id",
             ),
             FactorDataRole.RAW_DAILY_BAR: (
-                "daily_market_states",
+                "observation.daily_market_states",
                 "daily_market_state_id",
                 "listing_id",
                 "session_date",
@@ -452,7 +452,7 @@ class PostgresFactorQualificationSource:
                 "source_id",
             ),
             FactorDataRole.SHARE_CAPITAL: (
-                "share_capital_observations",
+                "observation.share_capital_observations",
                 "observation_id",
                 "listing_id",
                 "effective_on",
@@ -502,7 +502,7 @@ class PostgresFactorQualificationSource:
                        MIN(session_date), MAX(session_date),
                        ARRAY_AGG(DISTINCT dataset_version_id),
                        ARRAY_AGG(DISTINCT provider_id)
-                FROM timing_benchmark_bars
+                FROM observation.timing_benchmark_bars
                 WHERE benchmark_id = %s AND session_date BETWEEN %s AND %s
                 """,
                 (request.benchmark_id, *window),
@@ -515,7 +515,7 @@ class PostgresFactorQualificationSource:
                        MIN(labels.as_of::DATE), MAX(labels.as_of::DATE),
                        ARRAY_AGG(DISTINCT labels.dataset_version_id), NULL::TEXT[]
                 FROM target
-                JOIN research_labels AS labels
+                JOIN research.research_labels AS labels
                   ON labels.entity_id IN (target.listing_id, target.security_id)
                 WHERE labels.label_id = 'label:forward-return-20d'
                   AND labels.as_of::DATE BETWEEN %s AND %s
@@ -576,14 +576,14 @@ class PostgresFactorQualificationRepository:
                 """
                 SELECT content_hash, experiment_run_id, validation_report_id,
                        artifact_hash
-                FROM factor_qualification_audits WHERE audit_id = %s
+                FROM research.factor_qualification_audits WHERE audit_id = %s
                 """,
                 (value.audit_id,),
             ).fetchone()
             created = existing is None
             connection.execute(
                 """
-                INSERT INTO factor_qualification_audits (
+                INSERT INTO research.factor_qualification_audits (
                     audit_id, content_hash, factor_key, factor_version_id,
                     factor_version_hash, factor_lifecycle_status, study_id,
                     snapshot_hash, readiness_permitted, experiment_run_id,
@@ -601,7 +601,7 @@ class PostgresFactorQualificationRepository:
                 """
                 SELECT content_hash, experiment_run_id, validation_report_id,
                        artifact_hash
-                FROM factor_qualification_audits WHERE audit_id = %s
+                FROM research.factor_qualification_audits WHERE audit_id = %s
                 """,
                 (value.audit_id,),
             ).fetchone()
@@ -621,7 +621,7 @@ class PostgresFactorQualificationRepository:
         document = PostgresFactorQualificationRepository._report_document(value)
         connection.execute(
             """
-            INSERT INTO factor_validation_reports (
+            INSERT INTO research.factor_validation_reports (
                 report_id, content_hash, report_kind, factor_version_id,
                 experiment_run_id, input_trust_state, passes_promotion_gate,
                 report_document, created_at
@@ -641,7 +641,7 @@ class PostgresFactorQualificationRepository:
         stored = connection.execute(
             """
             SELECT content_hash, experiment_run_id, passes_promotion_gate
-            FROM factor_validation_reports WHERE report_id = %s
+            FROM research.factor_validation_reports WHERE report_id = %s
             """,
             (value.report_id,),
         ).fetchone()
@@ -746,7 +746,7 @@ class PostgresFactorQualificationRepository:
         for upstream_id, downstream_id, relation in sorted(edges):
             connection.execute(
                 """
-                INSERT INTO lineage_edges (upstream_id, downstream_id, relation)
+                INSERT INTO governance.lineage_edges (upstream_id, downstream_id, relation)
                 VALUES (%s, %s, %s)
                 ON CONFLICT (upstream_id, downstream_id, relation) DO NOTHING
                 """,

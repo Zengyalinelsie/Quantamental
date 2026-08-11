@@ -70,7 +70,7 @@ class PostgresMetricRegistryRepository:
             raise TypeError("value must be a CanonicalMetric")
         self._connection.execute(
             """
-            INSERT INTO canonical_metrics (
+            INSERT INTO governance.canonical_metrics (
                 metric_code, canonical_name, statement_type, unit,
                 currency_requirement, sign_convention, description
             ) VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -90,7 +90,7 @@ class PostgresMetricRegistryRepository:
             """
             SELECT metric_code, canonical_name, statement_type, unit,
                    currency_requirement, sign_convention, description
-            FROM canonical_metrics WHERE metric_code = %s
+            FROM governance.canonical_metrics WHERE metric_code = %s
             """,
             (metric_code,),
         ).fetchone()
@@ -101,7 +101,7 @@ class PostgresMetricRegistryRepository:
             raise TypeError("value must be a MappingVersion")
         self._connection.execute(
             """
-            INSERT INTO metric_mapping_versions (
+            INSERT INTO governance.metric_mapping_versions (
                 mapping_version_id, provider_id, created_at, content_hash, code_version
             ) VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT DO NOTHING
@@ -119,7 +119,7 @@ class PostgresMetricRegistryRepository:
         row = self._connection.execute(
             """
             SELECT mapping_version_id, provider_id, created_at, content_hash, code_version
-            FROM metric_mapping_versions WHERE mapping_version_id = %s
+            FROM governance.metric_mapping_versions WHERE mapping_version_id = %s
             """,
             (mapping_version_id,),
         ).fetchone()
@@ -130,7 +130,7 @@ class PostgresMetricRegistryRepository:
             raise TypeError("value must be a ProviderFieldMapping")
         self._connection.execute(
             """
-            INSERT INTO provider_field_mappings (
+            INSERT INTO governance.provider_field_mappings (
                 mapping_id, mapping_version_id, provider_id, statement_type,
                 source_field, metric_code, method, formula, allowed_use_scopes
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -157,7 +157,7 @@ class PostgresMetricRegistryRepository:
             """
             SELECT mapping_id, mapping_version_id, provider_id, statement_type,
                    source_field, metric_code, method, formula, allowed_use_scopes
-            FROM provider_field_mappings
+            FROM governance.provider_field_mappings
             WHERE provider_id = %s
               AND statement_type = %s
               AND source_field = %s
@@ -185,7 +185,7 @@ class PostgresMetricRegistryRepository:
         ]
         self._connection.execute(
             """
-            INSERT INTO financial_quality_rules (
+            INSERT INTO governance.financial_quality_rules (
                 rule_id, name, rule_kind, terms, tolerance, severity
             ) VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT DO NOTHING
@@ -209,7 +209,7 @@ class PostgresMetricRegistryRepository:
             raise TypeError("value must be an UnmappedProviderField")
         self._connection.execute(
             """
-            INSERT INTO unmapped_metric_fields (
+            INSERT INTO governance.unmapped_metric_fields (
                 unmapped_field_id, provider_id, statement_type, source_field,
                 mapping_version_id, discovered_at, raw_object_id, status,
                 resolved_mapping_id, resolution_reason
@@ -231,7 +231,7 @@ class PostgresMetricRegistryRepository:
             SELECT unmapped_field_id, provider_id, statement_type, source_field,
                    mapping_version_id, discovered_at, raw_object_id, status,
                    resolved_mapping_id, resolution_reason
-            FROM unmapped_metric_fields
+            FROM governance.unmapped_metric_fields
             ORDER BY status, discovered_at, unmapped_field_id
             """
         ).fetchall()
@@ -242,7 +242,7 @@ class PostgresMetricRegistryRepository:
             """
             SELECT mapping_id, mapping_version_id, provider_id, statement_type,
                    source_field, metric_code, method, formula, allowed_use_scopes
-            FROM provider_field_mappings WHERE mapping_id = %s
+            FROM governance.provider_field_mappings WHERE mapping_id = %s
             """,
             (mapping_id,),
         ).fetchone()
@@ -252,7 +252,7 @@ class PostgresMetricRegistryRepository:
         row = self._connection.execute(
             """
             SELECT rule_id, name, rule_kind, terms, tolerance, severity
-            FROM financial_quality_rules WHERE rule_id = %s
+            FROM governance.financial_quality_rules WHERE rule_id = %s
             """,
             (rule_id,),
         ).fetchone()
@@ -264,7 +264,7 @@ class PostgresMetricRegistryRepository:
             SELECT unmapped_field_id, provider_id, statement_type, source_field,
                    mapping_version_id, discovered_at, raw_object_id, status,
                    resolved_mapping_id, resolution_reason
-            FROM unmapped_metric_fields WHERE unmapped_field_id = %s
+            FROM governance.unmapped_metric_fields WHERE unmapped_field_id = %s
             """,
             (unmapped_field_id,),
         ).fetchone()

@@ -106,7 +106,7 @@ class PostgresFactorReviewRepository:
                 row = self.to_row(value)
                 connection.execute(
                     """
-                    INSERT INTO factor_promotion_reviews (
+                    INSERT INTO governance.factor_promotion_reviews (
                         review_id, content_hash, factor_version_id,
                         factor_lifecycle_status, factor_version_hash,
                         validation_report_id, scientific_gate_passed, scope,
@@ -177,7 +177,7 @@ class PostgresFactorReviewRepository:
                    validation_report_id, scientific_gate_passed, scope,
                    decision, reviewer_id, reviewer_role,
                    validation_report_hash, decided_at, reason, evidence_hashes
-            FROM factor_promotion_reviews
+            FROM governance.factor_promotion_reviews
         """
 
     @staticmethod

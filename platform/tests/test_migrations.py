@@ -27,9 +27,9 @@ class FakeConnection:
         self.calls.append((query, params))
         if self.fail_sql and self.fail_sql in query:
             raise RuntimeError("migration failed")
-        if query.startswith("SELECT version"):
+        if query.startswith("SELECT version FROM public.schema_migrations"):
             return FakeResult(params[0] if str(params[0]) in self.applied else None)
-        if query.startswith("INSERT INTO schema_migrations"):
+        if query.startswith("INSERT INTO public.schema_migrations"):
             self.applied.add(str(params[0]))
         return FakeResult()
 
@@ -41,6 +41,18 @@ class FakeConnection:
 
 
 class MigrationRunnerTest(unittest.TestCase):
+    def test_migration_ledger_is_explicitly_kept_in_public(self) -> None:
+        connection = FakeConnection()
+        with tempfile.TemporaryDirectory() as directory:
+            migration = Path(directory) / "0001_initial.sql"
+            migration.write_text("SELECT 1", encoding="utf-8")
+            apply_migrations(connection, Path(directory))
+
+        sql = "\n".join(query for query, _params in connection.calls)
+        self.assertIn("CREATE TABLE IF NOT EXISTS public.schema_migrations", sql)
+        self.assertIn("SELECT version FROM public.schema_migrations", sql)
+        self.assertIn("INSERT INTO public.schema_migrations", sql)
+
     def test_platform_migrations_are_versioned_in_order(self) -> None:
         self.assertEqual(
             tuple(path.name for path in discover_migrations(PLATFORM_ROOT / "migrations")),
@@ -72,6 +84,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0026_empty_financial_periods.sql",
                 "0027_factor_promotion_reviews.sql",
                 "0028_factor_qualification_audits.sql",
+                "0029_layered_schemas.sql",
             ),
         )
 
@@ -231,10 +244,10 @@ class MigrationRunnerTest(unittest.TestCase):
             normalized_sql.index("CREATE TRIGGER provider_identifier_corrections_append_only"),
         )
         for forbidden_data_mutation in (
-            "UPDATE official_identifier_aliases SET",
-            "DELETE FROM official_identifier_aliases",
-            "UPDATE provider_identifier_corrections SET",
-            "DELETE FROM provider_identifier_corrections",
+            "UPDATE canonical.official_identifier_aliases SET",
+            "DELETE FROM canonical.official_identifier_aliases",
+            "UPDATE canonical.provider_identifier_corrections SET",
+            "DELETE FROM canonical.provider_identifier_corrections",
         ):
             with self.subTest(forbidden_data_mutation=forbidden_data_mutation):
                 self.assertNotIn(forbidden_data_mutation, normalized_sql)

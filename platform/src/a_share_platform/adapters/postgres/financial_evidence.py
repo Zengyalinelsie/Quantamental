@@ -99,7 +99,7 @@ class PostgresFinancialEvidenceReader:
                    published_at, available_at, first_tradable_at,
                    publication_time_precision, version_sequence,
                    status, raw_object_id, supersedes_disclosure_id, status_reason
-            FROM official_disclosures {where}
+            FROM evidence.official_disclosures {where}
             ORDER BY document_key, version_sequence, published_at
             LIMIT 500
             """,
@@ -152,7 +152,7 @@ class PostgresFinancialEvidenceReader:
         rule_rows = self._read(
             """
             SELECT rule_version, provider_priority
-            FROM financial_authority_rules WHERE rule_version = %s
+            FROM governance.financial_authority_rules WHERE rule_version = %s
             """,
             (query.authority_rule_version,),
         )
@@ -169,7 +169,7 @@ class PostgresFinancialEvidenceReader:
         unmapped = self._read(
             """
             SELECT unmapped_field_id, provider_id, source_field, raw_object_id
-            FROM unmapped_metric_fields WHERE status = 'pending'
+            FROM governance.unmapped_metric_fields WHERE status = 'pending'
             ORDER BY discovered_at DESC, unmapped_field_id LIMIT 500
             """
         )
@@ -242,7 +242,7 @@ class PostgresFinancialEvidenceReader:
             SELECT raw_object_id, object_kind, content_hash, source_url, provider_id,
                    retrieved_at, media_type, license_id, retention_policy,
                    retention_until, redistribution_allowed
-            FROM raw_objects WHERE raw_object_id = %s
+            FROM evidence.raw_objects WHERE raw_object_id = %s
             """,
             (raw_object_id,),
         )
@@ -271,7 +271,7 @@ class PostgresFinancialEvidenceReader:
                    known_from, known_to, revision_sequence, provider_id, source_field,
                    raw_object_hash, trust_state, quality_state, mapping_version_id,
                    source_object_id, dataset_version_id, quality_issue_ids
-            FROM financial_fact_observations
+            FROM canonical.financial_fact_observations
         """
 
     @staticmethod

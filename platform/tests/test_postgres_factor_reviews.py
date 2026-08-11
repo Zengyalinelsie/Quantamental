@@ -41,13 +41,13 @@ class FakeConnection:
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
         normalized = " ".join(query.split())
-        if normalized.startswith("INSERT INTO factor_promotion_reviews"):
+        if normalized.startswith("INSERT INTO governance.factor_promotion_reviews"):
             self.rows.setdefault(str(params[0]), params)
             return FakeResult()
-        if "FROM factor_promotion_reviews" in normalized and "WHERE review_id" in normalized:
+        if "FROM governance.factor_promotion_reviews" in normalized and "WHERE review_id" in normalized:
             row = self.rows.get(str(params[0]))
             return FakeResult([] if row is None else [row])
-        if "FROM factor_promotion_reviews" in normalized:
+        if "FROM governance.factor_promotion_reviews" in normalized:
             return FakeResult([self.rows[key] for key in sorted(self.rows)])
         return FakeResult()
 
@@ -82,7 +82,7 @@ class PostgresFactorReviewRepositoryTest(unittest.TestCase):
         self.assertEqual(self.repository.get_review(value.review_id), value)
         self.assertEqual(self.repository.list_reviews(), (value,))
         insert_query, params = next(
-            call for call in self.connection.calls if "INSERT INTO factor_promotion_reviews" in call[0]
+            call for call in self.connection.calls if "INSERT INTO governance.factor_promotion_reviews" in call[0]
         )
         self.assertIn("ON CONFLICT (review_id) DO NOTHING", insert_query)
         self.assertFalse(any("UPDATE" in query for query, _ in self.connection.calls))

@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Protocol
 
+from a_share_platform.adapters.postgres.schema_layers import qualified_table
 from a_share_platform.domain.governance import VersionConflictError
 from a_share_platform.domain.pit_fixtures import (
     FixtureEvidence,
@@ -318,10 +319,10 @@ class PostgresPITFixtureImporter:
         rows = connection.execute(
             """
             SELECT DISTINCT company.company_id, security.security_id
-            FROM identifier_history identifier
-            JOIN listings listing ON listing.listing_id = identifier.listing_id
-            JOIN securities security ON security.security_id = listing.security_id
-            JOIN companies company ON company.company_id = security.company_id
+            FROM canonical.identifier_history identifier
+            JOIN canonical.listings listing ON listing.listing_id = identifier.listing_id
+            JOIN canonical.securities security ON security.security_id = listing.security_id
+            JOIN canonical.companies company ON company.company_id = security.company_id
             WHERE identifier.kind = 'code' AND identifier.value = %s
               AND identifier.valid_from <= %s
               AND (identifier.valid_to IS NULL OR identifier.valid_to > %s)
@@ -341,9 +342,9 @@ class PostgresPITFixtureImporter:
         fallback = connection.execute(
             """
             SELECT company.company_id, security.security_id
-            FROM listings listing
-            JOIN securities security ON security.security_id = listing.security_id
-            JOIN companies company ON company.company_id = security.company_id
+            FROM canonical.listings listing
+            JOIN canonical.securities security ON security.security_id = listing.security_id
+            JOIN canonical.companies company ON company.company_id = security.company_id
             WHERE listing.listing_id = %s
               AND listing.listed_on <= %s
               AND (listing.delisted_on IS NULL OR %s <= listing.delisted_on)
@@ -511,7 +512,7 @@ class PostgresPITFixtureImporter:
             )
             identifier = connection.execute(
                 """
-                INSERT INTO identifier_history (
+                INSERT INTO canonical.identifier_history (
                     listing_id, kind, value, valid_from, valid_to, source_id
                 ) VALUES (%s, 'code', %s, %s, %s, %s)
                 ON CONFLICT (listing_id, kind, valid_from) DO UPDATE SET
@@ -536,7 +537,7 @@ class PostgresPITFixtureImporter:
             state_from = row.delisted_on or snapshot.retrieved_at.date()
             state = connection.execute(
                 """
-                INSERT INTO listing_state_periods (
+                INSERT INTO canonical.listing_state_periods (
                     listing_id, valid_from, valid_to, state, special_treatment, source_id
                 ) VALUES (%s, %s, NULL, %s, NULL, %s)
                 ON CONFLICT (listing_id, valid_from) DO UPDATE SET
@@ -1247,7 +1248,7 @@ class PostgresPITFixtureImporter:
     ) -> None:
         connection.execute(
             """
-            INSERT INTO lineage_edges (upstream_id, downstream_id, relation)
+            INSERT INTO governance.lineage_edges (upstream_id, downstream_id, relation)
             VALUES (%s, %s, %s)
             ON CONFLICT (upstream_id, downstream_id, relation)
             DO UPDATE SET relation = EXCLUDED.relation
@@ -1266,12 +1267,13 @@ class PostgresPITFixtureImporter:
     ) -> None:
         if columns[0] != primary_key or len(columns) != len(values):
             raise AssertionError("immutable insert declaration is invalid")
+        qualified = qualified_table(table)
         column_sql = ", ".join(columns)
         placeholders = ", ".join("%s" for _ in columns)
         comparisons = ", ".join(f"{table}.{column}" for column in columns[1:])
         excluded = ", ".join(f"EXCLUDED.{column}" for column in columns[1:])
         query = f"""
-            INSERT INTO {table} ({column_sql})
+            INSERT INTO {qualified} AS {table} ({column_sql})
             VALUES ({placeholders})
             ON CONFLICT ({primary_key}) DO UPDATE
             SET {primary_key} = {table}.{primary_key}

@@ -8,6 +8,7 @@ from pathlib import Path
 from a_share_platform.adapters.postgres.dataset_versions import (
     PostgresDatasetVersionRepository,
 )
+from a_share_platform.adapters.postgres.schema_layers import qualified_table
 from a_share_platform.adapters.providers.backfill_payloads import (
     DailyObservationPayload,
     SecurityMasterPayload,
@@ -76,9 +77,9 @@ class CurrentIdentityFallbackConnection(FakeConnection):
         self.calls.append((query, params))
         if "RETURNING" in query:
             return FakeResult((True,))
-        if "FROM identifier_history AS identifiers" in query:
+        if "FROM canonical.identifier_history AS identifiers" in query:
             return FakeResult()
-        if "FROM listings" in query and "listed_on <=" in query:
+        if "FROM canonical.listings" in query and "listed_on <=" in query:
             return FakeResult(("listing:XSHG:600519",))
         return FakeResult()
 
@@ -88,7 +89,7 @@ class ProviderCorrectionConnection(FakeConnection):
         self.calls.append((query, params))
         if "RETURNING" in query:
             return FakeResult((True,))
-        if "FROM provider_identifier_corrections" in query:
+        if "FROM canonical.provider_identifier_corrections" in query:
             if "corrections.valid_from <=" in query:
                 return FakeResult(("listing:XSHE:302132",))
             return FakeResult()
@@ -166,7 +167,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
 
         self.assertEqual(repository.register_dataset(value, metadata=metadata), value)
         self.assertEqual(repository.dataset_metadata(value.dataset_version_id), metadata)
-        self.assertIn("INSERT INTO dataset_versions", connection.calls[0][0])
+        self.assertIn("INSERT INTO governance.dataset_versions", connection.calls[0][0])
         self.assertIn("metadata", connection.calls[0][0])
         self.assertIn("SELECT dataset_version_id", connection.calls[1][0])
 
@@ -233,8 +234,8 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         self.assertEqual(len(parquet.bars), 1)
         self.assertEqual(parquet.bars[0].trust_state, DataTrustState.NORMALIZED_CURRENT)
         sql = "\n".join(query for query, _params in connection.calls)
-        self.assertIn("INSERT INTO daily_market_states", sql)
-        self.assertIn("INSERT INTO market_data_partitions", sql)
+        self.assertIn("INSERT INTO observation.daily_market_states", sql)
+        self.assertIn("INSERT INTO observation.market_data_partitions", sql)
 
     def test_normalized_current_bars_use_unique_current_known_listing_with_warning(self) -> None:
         connection = CurrentIdentityFallbackConnection()
@@ -275,7 +276,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         fallback_query, fallback_params = next(
             (query, params)
             for query, params in connection.calls
-            if "FROM listings" in query and "listed_on <=" in query
+            if "FROM canonical.listings" in query and "listed_on <=" in query
         )
         self.assertIn("exchange = %s", fallback_query)
         self.assertEqual(
@@ -321,7 +322,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         correction_params = next(
             params
             for query, params in connection.calls
-            if "FROM provider_identifier_corrections" in query
+            if "FROM canonical.provider_identifier_corrections" in query
             and "corrections.valid_from <=" in query
         )
         self.assertEqual(correction_params[0], "baostock_sdk")
@@ -339,9 +340,9 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
                 self, query: str, params: tuple[object, ...] = ()
             ) -> FakeResult:
                 self.calls.append((query, params))
-                if "FROM identifier_history AS identifiers" in query:
+                if "FROM canonical.identifier_history AS identifiers" in query:
                     return FakeResult()
-                if "FROM listings" in query and "listed_on <=" in query:
+                if "FROM canonical.listings" in query and "listed_on <=" in query:
                     return MultipleRowsResult()
                 return FakeResult((True,)) if "RETURNING" in query else FakeResult()
 
@@ -421,7 +422,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         )
 
         query, params = connection.calls[-1]
-        self.assertIn("INSERT INTO exchange_calendar_days", query)
+        self.assertIn("INSERT INTO canonical.exchange_calendar_days", query)
         self.assertEqual(params[3], "provider_reported_closed")
 
     def test_persists_current_security_identity_without_inventing_industry_code(self) -> None:
@@ -467,21 +468,21 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             "listing_state_periods",
             "industry_memberships",
         ):
-            self.assertIn(f"INSERT INTO {table}", sql)
+            self.assertIn(f"INSERT INTO {qualified_table(table)}", sql)
         industry_call = next(
-            params for query, params in connection.calls if "INSERT INTO industry_memberships" in query
+            params for query, params in connection.calls if "INSERT INTO canonical.industry_memberships" in query
         )
         self.assertIsNone(industry_call[3])
         listing_state_call = next(
             params
             for query, params in connection.calls
-            if "INSERT INTO listing_state_periods" in query
+            if "INSERT INTO canonical.listing_state_periods" in query
         )
         self.assertIsNone(listing_state_call[3])
         listing_state_sql = next(
             query
             for query, _params in connection.calls
-            if "INSERT INTO listing_state_periods" in query
+            if "INSERT INTO canonical.listing_state_periods" in query
         )
         self.assertNotIn("'none'", listing_state_sql)
 
@@ -511,10 +512,10 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         )
 
         sql = "\n".join(query for query, _params in connection.calls)
-        self.assertIn("INSERT INTO universe_definitions", sql)
-        self.assertIn("INSERT INTO universe_versions", sql)
+        self.assertIn("INSERT INTO canonical.universe_definitions", sql)
+        self.assertIn("INSERT INTO canonical.universe_versions", sql)
         version = next(
-            params for query, params in connection.calls if "INSERT INTO universe_versions" in query
+            params for query, params in connection.calls if "INSERT INTO canonical.universe_versions" in query
         )
         self.assertEqual(version[2], "dataset:universe:v1")
         self.assertEqual(version[4], DataTrustState.NORMALIZED_CURRENT.value)
@@ -524,7 +525,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         self.assertEqual(version[8], NOW)
         self.assertIsNone(version[9])
         membership = next(
-            params for query, params in connection.calls if "INSERT INTO universe_memberships" in query
+            params for query, params in connection.calls if "INSERT INTO canonical.universe_memberships" in query
         )
         self.assertTrue(membership[4])
         self.assertFalse(membership[5])
@@ -562,7 +563,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         version = next(
             params
             for query, params in connection.calls
-            if "INSERT INTO universe_versions" in query
+            if "INSERT INTO canonical.universe_versions" in query
         )
         self.assertEqual(version[10], "discrete_month_end")
         self.assertIn("2018-01-31", str(version[11]))
@@ -607,8 +608,8 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             )
 
         sql = "\n".join(query for query, _params in connection.calls)
-        self.assertNotIn("INSERT INTO universe_definitions", sql)
-        self.assertNotIn("INSERT INTO universe_versions", sql)
+        self.assertNotIn("INSERT INTO canonical.universe_definitions", sql)
+        self.assertNotIn("INSERT INTO canonical.universe_versions", sql)
 
     def test_normalized_current_universe_is_rejected_by_strict_pit_reader(self) -> None:
         row = (
@@ -632,7 +633,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
                 self, query: str, params: tuple[object, ...] = ()
             ) -> FakeResult:
                 self.calls.append((query, params))
-                if "FROM universe_versions" in query:
+                if "FROM canonical.universe_versions" in query:
                     return FakeResult(row)
                 return FakeResult()
 
@@ -716,7 +717,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         versions = [
             params
             for query, params in connection.calls
-            if "INSERT INTO universe_versions" in query
+            if "INSERT INTO canonical.universe_versions" in query
         ]
         self.assertEqual(len(versions), 3)
         self.assertNotEqual(versions[0][0], versions[1][0])
@@ -734,7 +735,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
                 self, query: str, params: tuple[object, ...] = ()
             ) -> FakeResult:
                 self.calls.append((query, params))
-                if "RETURNING" in query and "INSERT INTO identifier_history" in query:
+                if "RETURNING" in query and "INSERT INTO canonical.identifier_history" in query:
                     return FakeResult()
                 if "RETURNING" in query:
                     return FakeResult((True,))
@@ -813,7 +814,7 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             any("listed_on <=" in query for query, _params in connection.calls)
         )
         membership = next(
-            params for query, params in connection.calls if "INSERT INTO universe_memberships" in query
+            params for query, params in connection.calls if "INSERT INTO canonical.universe_memberships" in query
         )
         self.assertEqual(membership[1], "listing:XSHG:600519")
 

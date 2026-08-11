@@ -33,7 +33,7 @@ def apply_migrations(connection: MigrationConnection, directory: Path) -> tuple[
 
     connection.execute(
         """
-        CREATE TABLE IF NOT EXISTS schema_migrations (
+        CREATE TABLE IF NOT EXISTS public.schema_migrations (
             version TEXT PRIMARY KEY,
             applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
@@ -44,14 +44,14 @@ def apply_migrations(connection: MigrationConnection, directory: Path) -> tuple[
         for path in discover_migrations(directory):
             version = path.stem
             existing = connection.execute(
-                "SELECT version FROM schema_migrations WHERE version = %s",
+                "SELECT version FROM public.schema_migrations WHERE version = %s",
                 (version,),
             )
             if existing.fetchone() is not None:
                 continue
             connection.execute(path.read_text(encoding="utf-8"))
             connection.execute(
-                "INSERT INTO schema_migrations(version) VALUES (%s)",
+                "INSERT INTO public.schema_migrations(version) VALUES (%s)",
                 (version,),
             )
             applied.append(version)

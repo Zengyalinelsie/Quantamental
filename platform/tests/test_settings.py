@@ -25,7 +25,7 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(
             settings.database_url,
             "postgresql://a_share_platform_dev:local-only@localhost:55432/"
-            "a_share_platform_dev",
+            "a_share_platform_layered_dev",
         )
 
     def test_production_requires_explicit_database_and_object_store(self) -> None:

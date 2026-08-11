@@ -72,7 +72,7 @@ class PostgresDatasetVersionRepository:
         )
         self._connection.execute(
             """
-            INSERT INTO dataset_versions (
+            INSERT INTO governance.dataset_versions (
                 dataset_version_id, content_hash, created_at, schema_version, metadata
             ) VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (dataset_version_id) DO NOTHING
@@ -88,7 +88,7 @@ class PostgresDatasetVersionRepository:
         row = self._connection.execute(
             """
             SELECT dataset_version_id, content_hash, created_at, schema_version, metadata
-            FROM dataset_versions WHERE dataset_version_id = %s
+            FROM governance.dataset_versions WHERE dataset_version_id = %s
             """,
             (value.dataset_version_id,),
         ).fetchone()
@@ -111,7 +111,7 @@ class PostgresDatasetVersionRepository:
         row = self._connection.execute(
             """
             SELECT dataset_version_id, content_hash, created_at, schema_version, metadata
-            FROM dataset_versions WHERE dataset_version_id = %s
+            FROM governance.dataset_versions WHERE dataset_version_id = %s
             """,
             (dataset_version_id,),
         ).fetchone()
@@ -123,7 +123,7 @@ class PostgresDatasetVersionRepository:
         rows = self._connection.execute(
             """
             SELECT dataset_version_id, content_hash, created_at, schema_version
-            FROM dataset_versions ORDER BY dataset_version_id
+            FROM governance.dataset_versions ORDER BY dataset_version_id
             """
         ).fetchall()
         return tuple(self._from_row(row) for row in rows)

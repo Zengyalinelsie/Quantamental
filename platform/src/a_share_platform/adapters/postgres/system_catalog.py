@@ -84,7 +84,7 @@ class PostgresSystemCatalogReader:
         rows = self._read(
             """
             SELECT dataset_version_id, content_hash, created_at, schema_version, metadata
-            FROM dataset_versions ORDER BY created_at DESC, dataset_version_id
+            FROM governance.dataset_versions ORDER BY created_at DESC, dataset_version_id
             """
         )
         return tuple(
@@ -106,7 +106,7 @@ class PostgresSystemCatalogReader:
             """
             SELECT quality_report_id, dataset_version_id, job_id, status,
                    checks_passed, checks_failed, issue_counts, warnings, created_at
-            FROM dataset_quality_reports ORDER BY created_at DESC, quality_report_id
+            FROM governance.dataset_quality_reports ORDER BY created_at DESC, quality_report_id
             """
         )
 
@@ -116,7 +116,7 @@ class PostgresSystemCatalogReader:
             SELECT coverage_report_id, dataset_version_id, job_id, scope_id,
                    data_domain, start_date, end_date, expected_rows, observed_rows,
                    coverage_ratio, warnings, created_at
-            FROM dataset_coverage_reports ORDER BY created_at DESC, coverage_report_id
+            FROM governance.dataset_coverage_reports ORDER BY created_at DESC, coverage_report_id
             """
         )
 
@@ -124,7 +124,7 @@ class PostgresSystemCatalogReader:
         rows = self._read(
             """
             SELECT upstream_id, downstream_id, relation
-            FROM lineage_edges ORDER BY upstream_id, downstream_id, relation
+            FROM governance.lineage_edges ORDER BY upstream_id, downstream_id, relation
             """
         )
         return tuple(
@@ -142,14 +142,14 @@ class PostgresSystemCatalogReader:
             SELECT job_id, plan_id, provider_id, status, output_trust_state,
                    start_date, end_date, created_at, updated_at, dataset_version_id,
                    failure_reasons
-            FROM ingestion_jobs ORDER BY created_at DESC, job_id
+            FROM governance.ingestion_jobs ORDER BY created_at DESC, job_id
             """
         )
         checkpoint_rows = self._read(
             """
             SELECT job_id, checkpoint_key, scope_id, data_domain, market, status,
                    processed_rows, rejected_rows, provider_id, updated_at, error, warnings
-            FROM ingestion_checkpoints ORDER BY job_id, checkpoint_key
+            FROM governance.ingestion_checkpoints ORDER BY job_id, checkpoint_key
             """
         )
         quality_rows = self._quality_rows()

@@ -46,15 +46,15 @@ class ResolverConnection:
 
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
-        if "FROM official_identifier_aliases" in query:
+        if "FROM canonical.official_identifier_aliases" in query:
             if "aliases.valid_from <=" in query:
                 return FakeResult(self.effective_official)
             return FakeResult(self.known_official)
-        if "FROM provider_identifier_corrections" in query:
+        if "FROM canonical.provider_identifier_corrections" in query:
             if "corrections.valid_from <=" in query:
                 return FakeResult(self.effective_correction)
             return FakeResult(self.known_correction)
-        if "FROM identifier_history AS identifiers" in query:
+        if "FROM canonical.identifier_history AS identifiers" in query:
             return FakeResult(self.identifier_history)
         return FakeResult()
 
@@ -213,7 +213,7 @@ class PostgresIdentityTest(unittest.TestCase):
         select_query, select_params = connection.calls[1]
         self.assertIn("ON CONFLICT DO NOTHING", insert_query)
         self.assertNotIn("DO UPDATE", insert_query)
-        self.assertIn("FROM official_identifier_aliases", select_query)
+        self.assertIn("FROM canonical.official_identifier_aliases", select_query)
         self.assertEqual(select_params, insert_params)
 
     def test_repository_rejects_conflicting_same_boundary_write(self) -> None:

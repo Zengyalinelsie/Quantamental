@@ -76,7 +76,7 @@ class PostgresFinancialBackfillJobRepository:
         SELECT job_id, plan_id, plan, qualification, status, created_at, updated_at,
                dataset_version_id, failure_reasons, provider_id, output_trust_state,
                adjustment_mode, start_date, end_date
-        FROM ingestion_jobs
+        FROM governance.ingestion_jobs
     """
 
     def __init__(self, connection: Connection) -> None:
@@ -103,7 +103,7 @@ class PostgresFinancialBackfillJobRepository:
         self._connection.execute(
             """
             WITH inserted AS (
-                INSERT INTO ingestion_jobs (
+                INSERT INTO governance.ingestion_jobs (
                     job_id, plan_id, provider_id, status, plan, qualification,
                     output_trust_state, adjustment_mode, start_date, end_date,
                     created_at, updated_at, dataset_version_id, failure_reasons
@@ -113,7 +113,7 @@ class PostgresFinancialBackfillJobRepository:
                 ON CONFLICT DO NOTHING
                 RETURNING job_id
             )
-            INSERT INTO ingestion_job_events (
+            INSERT INTO governance.ingestion_job_events (
                 job_id, status, recorded_at, failure_reasons, dataset_version_id
             )
             SELECT %s, %s, %s, %s, %s FROM inserted
@@ -170,13 +170,13 @@ class PostgresFinancialBackfillJobRepository:
         self._connection.execute(
             """
             WITH updated AS (
-                UPDATE ingestion_jobs
+                UPDATE governance.ingestion_jobs
                 SET status = %s, updated_at = %s, dataset_version_id = %s,
                     failure_reasons = %s
                 WHERE job_id = %s AND status = %s
                 RETURNING job_id
             )
-            INSERT INTO ingestion_job_events (
+            INSERT INTO governance.ingestion_job_events (
                 job_id, status, recorded_at, failure_reasons, dataset_version_id
             )
             SELECT job_id, %s, %s, %s, %s FROM updated
@@ -214,11 +214,11 @@ class PostgresFinancialBackfillJobRepository:
                    datasets.content_hash,
                    receipts.observation_count,
                    checkpoints.updated_at
-            FROM ingestion_checkpoints AS checkpoints
-            JOIN financial_backfill_persist_receipts AS receipts
+            FROM governance.ingestion_checkpoints AS checkpoints
+            JOIN governance.financial_backfill_persist_receipts AS receipts
               ON receipts.job_id = checkpoints.job_id
              AND receipts.checkpoint_key = checkpoints.checkpoint_key
-            JOIN dataset_versions AS datasets
+            JOIN governance.dataset_versions AS datasets
               ON datasets.dataset_version_id = receipts.dataset_version_id
             WHERE checkpoints.job_id = %s
               AND checkpoints.data_domain = 'financial_statement'

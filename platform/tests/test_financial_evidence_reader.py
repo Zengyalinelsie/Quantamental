@@ -104,15 +104,15 @@ class FakeConnection(AbstractContextManager["FakeConnection"]):
 
     def execute(self, sql: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append(sql)
-        if "FROM official_disclosures" in sql:
+        if "FROM evidence.official_disclosures" in sql:
             return FakeResult(self.rows.get("disclosures", []))
-        if "FROM financial_authority_rules" in sql:
+        if "FROM governance.financial_authority_rules" in sql:
             return FakeResult(self.rows.get("authority", []))
-        if "FROM financial_fact_observations" in sql:
+        if "FROM canonical.financial_fact_observations" in sql:
             return FakeResult(self.rows.get("facts", []))
-        if "FROM unmapped_metric_fields" in sql:
+        if "FROM governance.unmapped_metric_fields" in sql:
             return FakeResult(self.rows.get("unmapped", []))
-        if "FROM raw_objects" in sql:
+        if "FROM evidence.raw_objects" in sql:
             return FakeResult(self.rows.get("evidence", []))
         return FakeResult([])
 

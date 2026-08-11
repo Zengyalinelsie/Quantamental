@@ -54,7 +54,7 @@ class PostgresFinancialFactRepository:
             return existing
         self._connection.execute(
             """
-            INSERT INTO financial_fact_observations (
+            INSERT INTO canonical.financial_fact_observations (
                 fact_id, company_id, security_id, metric_code, fact_value, unit, currency,
                 report_period_end, period_type, statement_type, announced_at, available_at,
                 known_from, known_to, revision_sequence, provider_id, source_field,
@@ -110,7 +110,7 @@ class PostgresFinancialFactRepository:
         row = self._connection.execute(
             self._select(
                 prefix="""
-                UPDATE financial_fact_observations
+                UPDATE canonical.financial_fact_observations
                 SET known_to = %s
                 WHERE fact_id = %s AND known_to IS NULL AND known_from < %s
                 RETURNING
@@ -168,7 +168,7 @@ class PostgresFinancialFactRepository:
     @classmethod
     def _select(cls, *, prefix: str = "SELECT") -> str:
         if prefix == "SELECT":
-            return "SELECT " + cls._columns() + " FROM financial_fact_observations"
+            return "SELECT " + cls._columns() + " FROM canonical.financial_fact_observations"
         return prefix + cls._columns()
 
     @staticmethod

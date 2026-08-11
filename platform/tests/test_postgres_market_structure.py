@@ -141,7 +141,7 @@ class PostgresMarketStructureObservationSinkTest(unittest.TestCase):
 
         self.assertEqual(self.resolutions, [("SZ.000858", date(2018, 5, 10))])
         query, params = self.connection.calls[0]
-        self.assertIn("INSERT INTO share_capital_observations", query)
+        self.assertIn("INSERT INTO observation.share_capital_observations", query)
         self.assertIn("dataset:p2:share:v1", params)
         self.assertIn("normalized_current", params)
         self.assertIn(None, params)
@@ -175,7 +175,7 @@ class PostgresMarketStructureObservationSinkTest(unittest.TestCase):
         sink.persist(batch(BackfillDataDomain.CORPORATE_ACTION, payload), dataset_version_id="dataset:p2:action:v1")
 
         query, params = self.connection.calls[0]
-        self.assertIn("INSERT INTO corporate_action_observations", query)
+        self.assertIn("INSERT INTO observation.corporate_action_observations", query)
         self.assertIn(Decimal("0.1"), params)
         self.assertIn(Decimal("0.2"), params)
 
@@ -204,6 +204,8 @@ class PostgresMarketStructureObservationSinkTest(unittest.TestCase):
 
         with self.assertRaisesRegex(RuntimeError, "conflicts"):
             sink.persist(batch(BackfillDataDomain.SHARE_CAPITAL, payload), dataset_version_id="dataset:p2:share:v1")
+        conflict_lookup, _params = connection.calls[1]
+        self.assertIn("FROM observation.share_capital_observations", conflict_lookup)
 
     def test_migration_uses_append_only_observation_tables_without_available_at(self) -> None:
         migration = (ROOT / "migrations" / "0020_market_structure_observations.sql").read_text()

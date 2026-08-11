@@ -29,11 +29,16 @@ class Settings:
         if environment is Environment.PRODUCTION:
             raise ValueError("production requires explicit environment configuration")
         suffix = "test" if environment is Environment.TEST else "dev"
+        database_name = (
+            "a_share_platform_test"
+            if environment is Environment.TEST
+            else "a_share_platform_layered_dev"
+        )
         return cls(
             environment=environment,
             database_url=(
                 f"postgresql://a_share_platform_{suffix}:local-only@localhost:55432/"
-                f"a_share_platform_{suffix}"
+                f"{database_name}"
             ),
             object_store_url="http://localhost:9000",
             object_store_bucket=f"a-share-platform-{suffix}",

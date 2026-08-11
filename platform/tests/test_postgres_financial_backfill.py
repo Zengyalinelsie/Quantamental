@@ -249,29 +249,29 @@ class PersistingFakeConnection:
     def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
         self.calls.append((query, params))
         sql = " ".join(query.split())
-        if sql.startswith("INSERT INTO raw_objects"):
+        if sql.startswith("INSERT INTO evidence.raw_objects"):
             self.raw_row = params
-        elif "FROM raw_objects" in sql:
+        elif "FROM evidence.raw_objects" in sql:
             return FakeResult([] if self.raw_row is None else [self.raw_row])
-        elif sql.startswith("INSERT INTO dataset_versions"):
+        elif sql.startswith("INSERT INTO governance.dataset_versions"):
             self.dataset_row = (*params[:4], _json(params[4]))
-        elif "FROM dataset_versions" in sql:
+        elif "FROM governance.dataset_versions" in sql:
             return FakeResult([] if self.dataset_row is None else [self.dataset_row])
-        elif sql.startswith("INSERT INTO financial_backfill_work_units"):
+        elif sql.startswith("INSERT INTO governance.financial_backfill_work_units"):
             self.work_unit_row = (*params[:12], _json(params[12]), params[13])
-        elif "FROM financial_backfill_work_units" in sql:
+        elif "FROM governance.financial_backfill_work_units" in sql:
             return FakeResult(
                 [] if self.work_unit_row is None else [self.work_unit_row]
             )
-        elif sql.startswith("INSERT INTO normalized_current_financial_observations"):
+        elif sql.startswith("INSERT INTO observation.normalized_current_financial_observations"):
             self.observation_row = params
-        elif "FROM normalized_current_financial_observations" in sql:
+        elif "FROM observation.normalized_current_financial_observations" in sql:
             return FakeResult(
                 [] if self.observation_row is None else [self.observation_row]
             )
-        elif sql.startswith("INSERT INTO financial_backfill_persist_receipts"):
+        elif sql.startswith("INSERT INTO governance.financial_backfill_persist_receipts"):
             self.receipt_row = params
-        elif "FROM financial_backfill_persist_receipts" in sql:
+        elif "FROM governance.financial_backfill_persist_receipts" in sql:
             if self.receipt_row is None:
                 return FakeResult()
             return FakeResult(
@@ -465,13 +465,13 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
         checkpoint_params = next(
             params
             for query, params in connection.calls
-            if "INSERT INTO ingestion_checkpoints" in query
+            if "INSERT INTO governance.ingestion_checkpoints" in query
         )
         self.assertEqual(checkpoint_params[3], "financial_statement")
         self.assertEqual(checkpoint_params[15], "not_applicable")
-        self.assertTrue(any("INSERT INTO dataset_quality_reports" in q for q, _ in connection.calls))
-        self.assertTrue(any("INSERT INTO dataset_coverage_reports" in q for q, _ in connection.calls))
-        self.assertTrue(any("INSERT INTO lineage_edges" in q for q, _ in connection.calls))
+        self.assertTrue(any("INSERT INTO governance.dataset_quality_reports" in q for q, _ in connection.calls))
+        self.assertTrue(any("INSERT INTO governance.dataset_coverage_reports" in q for q, _ in connection.calls))
+        self.assertTrue(any("INSERT INTO governance.lineage_edges" in q for q, _ in connection.calls))
         self.assertEqual(connection.commits, 1)
         self.assertEqual(connection.rollbacks, 1)
 
@@ -502,7 +502,7 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
         observation_call = next(
             call
             for call in connection.calls
-            if "INSERT INTO normalized_current_financial_observations" in call[0]
+            if "INSERT INTO observation.normalized_current_financial_observations" in call[0]
         )
         query, params = observation_call
         self.assertIn("ON CONFLICT (observation_id) DO NOTHING", query)
@@ -523,7 +523,7 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
         receipt_params = next(
             params
             for query, params in connection.calls
-            if "INSERT INTO financial_backfill_persist_receipts" in query
+            if "INSERT INTO governance.financial_backfill_persist_receipts" in query
         )
         self.assertEqual(_json(receipt_params[4]), list(receipt.observation_ids))
         self.assertEqual(receipt_params[6], "normalized_current")

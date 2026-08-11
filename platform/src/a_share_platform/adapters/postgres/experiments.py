@@ -173,7 +173,7 @@ class PostgresExperimentRunRepository:
                 run_row = self.to_run_row(value)
                 connection.execute(
                     """
-                    INSERT INTO experiment_runs (
+                    INSERT INTO research.experiment_runs (
                         run_id, content_hash, spec_hash, spec_id, status, started_at,
                         metrics, artifacts, finished_at, failure_evidence
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -248,7 +248,7 @@ class PostgresExperimentRunRepository:
         row = self.to_spec_row(value)
         connection.execute(
             """
-            INSERT INTO experiment_specs (
+            INSERT INTO research.experiment_specs (
                 spec_id, content_hash, data_mode, deployment_stage,
                 universe_version_id, spec_document
             ) VALUES (%s, %s, %s, %s, %s, %s)
@@ -289,7 +289,7 @@ class PostgresExperimentRunRepository:
         return """
             SELECT spec_id, content_hash, data_mode, deployment_stage,
                    universe_version_id, spec_document
-            FROM experiment_specs
+            FROM research.experiment_specs
         """
 
     @staticmethod
@@ -297,7 +297,7 @@ class PostgresExperimentRunRepository:
         return """
             SELECT run_id, content_hash, spec_hash, spec_id, status, started_at,
                    metrics, artifacts, finished_at, failure_evidence
-            FROM experiment_runs
+            FROM research.experiment_runs
         """
 
     @staticmethod

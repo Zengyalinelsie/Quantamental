@@ -43,7 +43,7 @@ class PostgresIdentityAliasRepository:
         )
         result = self._connection.execute(
             """
-            INSERT INTO official_identifier_aliases (
+            INSERT INTO canonical.official_identifier_aliases (
                 listing_id, kind, value, valid_from, valid_to, source_id,
                 evidence_url, published_on
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
@@ -57,7 +57,7 @@ class PostgresIdentityAliasRepository:
         existing = self._connection.execute(
             """
             SELECT official_identifier_alias_id
-            FROM official_identifier_aliases
+            FROM canonical.official_identifier_aliases
             WHERE listing_id = %s
               AND kind = %s
               AND value = %s
@@ -91,7 +91,7 @@ class PostgresIdentityAliasRepository:
         )
         result = self._connection.execute(
             """
-            INSERT INTO provider_identifier_corrections (
+            INSERT INTO canonical.provider_identifier_corrections (
                 provider_id, listing_id, kind, observed_value, valid_from,
                 valid_to, source_id, reason
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
@@ -105,7 +105,7 @@ class PostgresIdentityAliasRepository:
         existing = self._connection.execute(
             """
             SELECT provider_identifier_correction_id
-            FROM provider_identifier_corrections
+            FROM canonical.provider_identifier_corrections
             WHERE provider_id = %s
               AND listing_id = %s
               AND kind = %s

@@ -81,7 +81,7 @@ class PostgresFeatureSnapshotRepository:
         )
         self._connection.execute(
             """
-            INSERT INTO feature_snapshots (
+            INSERT INTO research.feature_snapshots (
                 snapshot_id, content_hash, feature_id, feature_version,
                 feature_definition_hash, formula_version, missing_policy_version,
                 winsorization_version, standardization_version, neutralization_version,
@@ -125,7 +125,7 @@ class PostgresFeatureSnapshotRepository:
 
     @classmethod
     def _select(cls) -> str:
-        return "SELECT " + cls._columns() + " FROM feature_snapshots"
+        return "SELECT " + cls._columns() + " FROM research.feature_snapshots"
 
     @staticmethod
     def to_row(value: FeatureSnapshot) -> tuple[object, ...]:
@@ -202,7 +202,7 @@ class PostgresResearchLabelRepository:
             return existing
         self._connection.execute(
             """
-            INSERT INTO research_labels (
+            INSERT INTO research.research_labels (
                 content_hash, label_id, label_version, schema_hash, horizon_sessions,
                 unit, currency, period, label_value, entity_id, as_of,
                 dataset_version_id
@@ -236,7 +236,7 @@ class PostgresResearchLabelRepository:
 
     @classmethod
     def _select(cls) -> str:
-        return "SELECT " + cls._columns() + " FROM research_labels"
+        return "SELECT " + cls._columns() + " FROM research.research_labels"
 
     @staticmethod
     def to_row(value: LabelValue) -> tuple[object, ...]:
