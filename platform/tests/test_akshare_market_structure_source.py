@@ -201,6 +201,102 @@ class AkshareMarketStructureSourceTest(unittest.TestCase):
         self.assertEqual(first.quality_status, DatasetQualityStatus.PASSED)
         BackfillService._validate_batch(plan, units[1], second)
 
+    def test_dividend_dataframe_schema_error_falls_back_to_raw_cninfo_records(self) -> None:
+        class BrokenDividendFrame(FakeAkshare):
+            def stock_dividend_cninfo(self, *, symbol: str) -> FakeFrame:
+                self.dividend_calls.append(symbol)
+                raise KeyError("实施方案公告日期")
+
+        raw_calls: list[str] = []
+
+        def raw_records(symbol: str) -> tuple[dict[str, object], ...]:
+            raw_calls.append(symbol)
+            return (
+                {
+                    "F006D": "2019-06-15",
+                    "F044V": "年度分红",
+                    "F010N": 1,
+                    "F011N": 2,
+                    "F012N": 5,
+                    "F018D": "2019-06-20",
+                    "F020D": "2019-06-21",
+                    "F001V": "2018年报",
+                },
+            )
+
+        module = BrokenDividendFrame()
+        source = AkshareMarketStructureSource(
+            clock=lambda: NOW,
+            akshare_module_loader=lambda _name: module,
+            dividend_raw_records_loader=raw_records,
+            minimum_interval_seconds=0,
+            maximum_attempts=1,
+            sleeper=lambda _seconds: None,
+        )
+        plan = plan_for(BackfillDataDomain.CORPORATE_ACTION, "SH.688256")
+        unit = BackfillPlanner().work_units(plan)[-1]
+
+        batch = source.fetch(unit, plan)
+
+        self.assertEqual(module.dividend_calls, ["688256"])
+        self.assertEqual(raw_calls, ["688256"])
+        self.assertEqual(batch.row_count, 1)
+        payload = batch.payload
+        assert isinstance(payload, CorporateActionPayload)
+        row = payload.rows[0]
+        self.assertEqual(str(row.cash_per_share), "0.5")
+        self.assertEqual(str(row.bonus_shares_per_share), "0.1")
+        self.assertEqual(str(row.capitalization_shares_per_share), "0.2")
+        self.assertEqual(row.source_id, "akshare.stock_dividend_cninfo")
+
+    def test_explicit_empty_raw_dividend_fallback_remains_zero_observation(self) -> None:
+        class BrokenEmptyDividendFrame(FakeAkshare):
+            def stock_dividend_cninfo(self, *, symbol: str) -> FakeFrame:
+                raise KeyError("实施方案公告日期")
+
+        source = AkshareMarketStructureSource(
+            clock=lambda: NOW,
+            akshare_module_loader=lambda _name: BrokenEmptyDividendFrame(),
+            dividend_raw_records_loader=lambda _symbol: (),
+            minimum_interval_seconds=0,
+            maximum_attempts=1,
+            sleeper=lambda _seconds: None,
+        )
+        plan = plan_for(BackfillDataDomain.CORPORATE_ACTION, "SH.688777")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = source.fetch(unit, plan)
+
+        self.assertEqual(batch.row_count, 0)
+        self.assertEqual(batch.payload, CorporateActionPayload(()))
+        self.assertIn("no corporate action was returned for this interval", batch.warnings)
+
+    def test_unrelated_dividend_key_error_still_fails_closed(self) -> None:
+        class OtherSchemaFailure(FakeAkshare):
+            def stock_dividend_cninfo(self, *, symbol: str) -> FakeFrame:
+                raise KeyError("unexpected-provider-field")
+
+        fallback_calls: list[str] = []
+
+        def unexpected_fallback(symbol: str) -> tuple[dict[str, object], ...]:
+            fallback_calls.append(symbol)
+            return ()
+
+        source = AkshareMarketStructureSource(
+            clock=lambda: NOW,
+            akshare_module_loader=lambda _name: OtherSchemaFailure(),
+            dividend_raw_records_loader=unexpected_fallback,
+            minimum_interval_seconds=0,
+            maximum_attempts=1,
+            sleeper=lambda _seconds: None,
+        )
+        plan = plan_for(BackfillDataDomain.CORPORATE_ACTION, "SH.688777")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        with self.assertRaisesRegex(RuntimeError, "unexpected-provider-field"):
+            source.fetch(unit, plan)
+        self.assertEqual(fallback_calls, [])
+
     def test_xbse_identity_requires_exact_legal_company_profile(self) -> None:
         module = FakeAkshare()
         source = self.source(module)

@@ -40,6 +40,19 @@ _SUPPORTED_DOMAINS = {
     BackfillDataDomain.CORPORATE_ACTION,
 }
 _MARKET_PREFIX = {"XSHG": "SH", "XSHE": "SZ", "XBSE": "BJ"}
+_RAW_DIVIDEND_FIELDS = {
+    "F006D": "实施方案公告日期",
+    "F044V": "分红类型",
+    "F011N": "转增比例",
+    "F010N": "送股比例",
+    "F012N": "派息比例",
+    "F018D": "股权登记日",
+    "F020D": "除权日",
+    "F023D": "派息日",
+    "F025D": "股份到账日",
+    "F007V": "实施方案分红说明",
+    "F001V": "报告时间",
+}
 
 
 class AkshareMarketStructureSource:
@@ -60,6 +73,9 @@ class AkshareMarketStructureSource:
         normalizer: CninfoMarketStructureNormalizer | None = None,
         sleeper: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
+        dividend_raw_records_loader: (
+            Callable[[str], Sequence[Mapping[str, object]]] | None
+        ) = None,
         minimum_interval_seconds: float = 0.5,
         maximum_attempts: int = 3,
         retry_delay_seconds: float = 1.0,
@@ -75,6 +91,9 @@ class AkshareMarketStructureSource:
         self._normalizer = normalizer or CninfoMarketStructureNormalizer()
         self._sleeper = sleeper
         self._monotonic = monotonic
+        self._dividend_raw_records_loader = (
+            dividend_raw_records_loader or self._load_cninfo_dividend_raw_records
+        )
         self._minimum_interval_seconds = float(minimum_interval_seconds)
         self._maximum_attempts = maximum_attempts
         self._retry_delay_seconds = float(retry_delay_seconds)
@@ -246,17 +265,8 @@ class AkshareMarketStructureSource:
         for code in self._unit_symbols(unit, plan):
             cached = self._action_cache.get(code)
             if cached is None:
-                def fetch_actions(current_code: str = code) -> object:
-                    return akshare.stock_dividend_cninfo(
-                        symbol=current_code.split(".", 1)[1]
-                    )
-
-                response = self._call(
-                    "stock_dividend_cninfo",
-                    fetch_actions,
-                )
+                records = self._dividend_records(akshare, code)
                 retrieved_at = self._clock()
-                records = self._records(response)
                 rows = self._normalizer.corporate_actions(code=code, records=records).rows
                 cached = (retrieved_at, rows)
                 self._action_cache[code] = cached
@@ -285,6 +295,95 @@ class AkshareMarketStructureSource:
             ),
             max(retrieved_times),
         )
+
+    def _dividend_records(
+        self,
+        akshare: Any,
+        code: str,
+    ) -> tuple[Mapping[str, object], ...]:
+        digits = code.split(".", 1)[1]
+
+        def fetch_actions() -> object:
+            return akshare.stock_dividend_cninfo(symbol=digits)
+
+        try:
+            response = self._call("stock_dividend_cninfo", fetch_actions)
+            return self._records(response)
+        except ProviderBackfillUnavailable as error:
+            cause = error.__cause__
+            if not isinstance(cause, KeyError) or cause.args != ("实施方案公告日期",):
+                raise
+
+        raw = self._call(
+            "stock_dividend_cninfo_raw",
+            lambda: self._dividend_raw_records_loader(digits),
+        )
+        if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes, bytearray)):
+            raise ProviderBackfillUnavailable(
+                "CNInfo raw dividend records must be a sequence"
+            )
+        normalized: list[Mapping[str, object]] = []
+        for item in raw:
+            if not isinstance(item, Mapping):
+                raise ProviderBackfillUnavailable(
+                    "CNInfo raw dividend records must be mappings"
+                )
+            normalized.append(
+                {
+                    output_name: item.get(provider_name)
+                    for provider_name, output_name in _RAW_DIVIDEND_FIELDS.items()
+                }
+            )
+        return tuple(normalized)
+
+    @staticmethod
+    def _load_cninfo_dividend_raw_records(
+        symbol: str,
+    ) -> tuple[Mapping[str, object], ...]:
+        """Read the same CNInfo endpoint when AkShare cannot shape an empty/schema row."""
+
+        module = cast(
+            Any,
+            importlib.import_module("akshare.stock.stock_dividend_cninfo"),
+        )
+        javascript = module.py_mini_racer.MiniRacer()
+        javascript.eval(module._get_file_content_ths("cninfo.js"))
+        mcode = javascript.call("getResCode1")
+        response = module.requests.post(
+            "https://webapi.cninfo.com.cn/api/sysapi/p_sysapi1139",
+            params={"scode": symbol},
+            headers={
+                "Accept": "*/*",
+                "Accept-Enckey": mcode,
+                "Content-Length": "0",
+                "Host": "webapi.cninfo.com.cn",
+                "Origin": "http://webapi.cninfo.com.cn",
+                "Referer": "http://webapi.cninfo.com.cn/",
+                "User-Agent": "Mozilla/5.0",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            timeout=30,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if not isinstance(payload, Mapping):
+            raise ProviderBackfillUnavailable("CNInfo dividend payload must be an object")
+        records = payload.get("records")
+        if not isinstance(records, Sequence) or isinstance(
+            records,
+            (str, bytes, bytearray),
+        ):
+            raise ProviderBackfillUnavailable(
+                "CNInfo dividend payload must contain a records sequence"
+            )
+        selected: list[Mapping[str, object]] = []
+        for item in records:
+            if not isinstance(item, Mapping):
+                raise ProviderBackfillUnavailable(
+                    "CNInfo raw dividend records must be mappings"
+                )
+            selected.append(cast(Mapping[str, object], item))
+        return tuple(selected)
 
     def _xbse_security_master(
         self,
