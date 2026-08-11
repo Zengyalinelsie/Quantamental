@@ -1,5 +1,14 @@
 """Authoritative domain core for A-Share Platform Next."""
 
+from .domain.expected_return import (
+    ExpectedReturnCalibrationRecord,
+    ExpectedReturnCompileRequest,
+    ExpectedReturnCompilerV0,
+    ExpectedReturnResidual,
+    ExpectedReturnUnavailable,
+    InvestmentHorizon,
+    InvestmentViewOutcome,
+)
 from .domain.investment_view import (
     ExpectedReturnDistribution,
     InvestmentComponent,
@@ -24,14 +33,21 @@ __all__ = [
     "DataQualityState",
     "DataTrustState",
     "DeploymentStage",
+    "ExpectedReturnCalibrationRecord",
+    "ExpectedReturnCompileRequest",
+    "ExpectedReturnCompilerV0",
     "ExpectedReturnDistribution",
+    "ExpectedReturnResidual",
+    "ExpectedReturnUnavailable",
     "FactObservation",
     "FactSelection",
     "FinancialPeriodType",
     "InvalidRunContextError",
     "InvestmentComponent",
     "InvestmentComponentStatus",
+    "InvestmentHorizon",
     "InvestmentView",
+    "InvestmentViewOutcome",
     "PointInTimeConflictError",
     "RunContext",
     "select_fact_as_of",
