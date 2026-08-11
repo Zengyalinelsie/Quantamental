@@ -95,7 +95,9 @@ export function AlphaModelReadinessPanel({ projection }: AlphaModelReadinessPane
       <Descriptions bordered className="alphaModelBinding" column={{ xs: 1, sm: 1, md: 2 }} size="small">
         <Descriptions.Item label="ModelVersion"><code>{projection.model.model_version_id}</code></Descriptions.Item>
         <Descriptions.Item label="CodeVersion"><code>{projection.model.code_version}</code></Descriptions.Item>
-        <Descriptions.Item label="Model content hash" span={{ xs: 1, sm: 1, md: 2 }}><code>{projection.model.content_hash}</code></Descriptions.Item>
+        <Descriptions.Item label="Environment"><code>{projection.model.environment_id}</code></Descriptions.Item>
+        <Descriptions.Item label="InvestmentView"><code>{projection.model.investment_view_id}</code></Descriptions.Item>
+        <Descriptions.Item label="InvestmentView hash" span={{ xs: 1, sm: 1, md: 2 }}><code>{projection.model.investment_view_hash}</code></Descriptions.Item>
         <Descriptions.Item label="Data mode">{projection.data_mode}</Descriptions.Item>
         <Descriptions.Item label="Deployment stage">{projection.deployment_stage}</Descriptions.Item>
       </Descriptions>

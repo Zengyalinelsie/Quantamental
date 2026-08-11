@@ -35,7 +35,9 @@ const ready: AlphaModelReadinessProjection = {
   model: {
     model_version_id: 'expected-return-compiler:v0',
     code_version: '1'.repeat(40),
-    content_hash: 'a'.repeat(64),
+    environment_id: 'environment:p5:research:v1',
+    investment_view_id: 'investment-view:600519:v1',
+    investment_view_hash: 'a'.repeat(64),
   },
   factors: [
     {
@@ -81,6 +83,8 @@ describe('AlphaModelReadinessPanel', () => {
 
     const panel = screen.getByTestId('approved-alpha-model')
     expect(within(panel).getByText('expected-return-compiler:v0')).toBeInTheDocument()
+    expect(within(panel).getByText('investment-view:600519:v1')).toBeInTheDocument()
+    expect(within(panel).getByText('environment:p5:research:v1')).toBeInTheDocument()
     expect(within(panel).getByText('factor-version:quality:v1')).toBeInTheDocument()
     expect(within(panel).getByText('validation-report:quality:v1')).toBeInTheDocument()
     expect(within(panel).getAllByText('approval:quality:research-backtest:v1')).toHaveLength(2)

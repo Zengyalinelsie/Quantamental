@@ -1,0 +1,129 @@
+@import '../design/tokens.less';
+
+.researchP5Screen {
+  display: grid;
+  gap: 14px;
+}
+
+.researchUniverseWorkspace {
+  display: grid;
+  gap: 18px;
+}
+
+.researchUniverseModule {
+  display: grid;
+  gap: 12px;
+}
+
+.researchUniverseModule > header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid @border;
+}
+
+.researchUniverseModule > header p,
+.researchUniverseModule > header h2,
+.researchUniverseModule > header span {
+  margin: 0;
+}
+
+.researchUniverseModule > header p {
+  color: @primary;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.researchUniverseModule > header h2 {
+  margin-top: 3px;
+  color: @text;
+  font-size: 17px;
+}
+
+.researchUniverseModule > header span {
+  display: block;
+  margin-top: 3px;
+  color: @secondary-text;
+  font-size: 11px;
+}
+
+.researchP5Context {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid @secondary-border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.researchP5Context .ant-tag {
+  margin: 0;
+}
+
+.researchP5Context > strong {
+  margin-right: 3px;
+  color: @secondary-text;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.researchP5Context span {
+  margin-left: auto;
+  color: @tertiary-text;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.researchP5Blockers {
+  display: grid;
+  gap: 8px;
+}
+
+.researchP5Blockers article {
+  padding: 11px 12px;
+  border: 1px solid @secondary-border;
+  border-left: 3px solid @severity-critical;
+  border-radius: @radius;
+  background: @container;
+}
+
+.researchP5Blockers header,
+.researchP5Blockers article > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.researchP5Blockers .ant-tag {
+  margin: 0;
+}
+
+.researchP5Blockers p {
+  margin: 8px 0;
+  color: @secondary-text;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.researchP5Blockers code,
+.researchP5Blockers span {
+  color: @tertiary-text;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .researchP5Context {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .researchP5Context span {
+    width: 100%;
+    margin: 3px 0 0;
+  }
+}

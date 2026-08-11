@@ -92,7 +92,7 @@ export interface InvestmentViewVersionsProjection {
   code_version: string
   environment_id: string
   content_hash: string
-  artifact_id: string
+  artifact_id: string | null
 }
 
 export interface InvestmentViewProjection {

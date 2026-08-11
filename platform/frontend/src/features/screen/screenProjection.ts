@@ -138,7 +138,9 @@ export type AlphaModelReadinessProjection =
     model: {
       model_version_id: string
       code_version: string
-      content_hash: string
+      environment_id: string
+      investment_view_id: string
+      investment_view_hash: string
     }
     factors: ApprovedAlphaFactorProjection[]
   })

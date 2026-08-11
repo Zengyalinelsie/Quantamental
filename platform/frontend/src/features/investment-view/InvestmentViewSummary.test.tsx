@@ -219,4 +219,18 @@ describe('InvestmentViewSummary', () => {
     expect(screen.getByText(/不具备历史 available_at/)).toBeInTheDocument()
     expect(screen.getByText('禁止用于 strict_historical 或生产决策。')).toBeInTheDocument()
   })
+
+  it('states that no Frozen Artifact was generated instead of reusing the view id', () => {
+    render(
+      <InvestmentViewSummary
+        projection={{
+          ...projection,
+          versions: { ...projection.versions, artifact_id: null },
+        }}
+      />,
+    )
+
+    const binding = screen.getByText('Frozen Artifact：未生成')
+    expect(binding).not.toHaveTextContent(projection.view_id)
+  })
 })

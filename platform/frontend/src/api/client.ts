@@ -1,3 +1,9 @@
+import type { InvestmentViewProjection } from '../features/investment-view/investmentViewProjection'
+import type {
+  AlphaModelReadinessProjection,
+  ScreenRankingProjection,
+} from '../features/screen/screenProjection'
+
 export interface ResponseContext {
   as_of: string
   system_as_of: string
@@ -14,6 +20,21 @@ export interface ResponseContext {
 export interface Envelope<T> {
   data: T
   context: ResponseContext
+}
+
+export interface ResearchWorkspaceBlocker {
+  code: string
+  reason: string
+  affected_binding: string
+  evidence_ids: string[]
+}
+
+export interface ResearchWorkspaceData {
+  status: 'ready' | 'partial' | 'unavailable'
+  blockers: ResearchWorkspaceBlocker[]
+  screen: ScreenRankingProjection | null
+  investment_view: InvestmentViewProjection | null
+  alpha_model: AlphaModelReadinessProjection
 }
 
 export interface UniverseVersion {
@@ -340,6 +361,13 @@ export function getFinancialMismatches(signal?: AbortSignal) {
 
 export function getExperimentRuns(signal?: AbortSignal) {
   return getEnvelope<ExperimentRunEntry[]>('/api/experiments/runs', signal)
+}
+
+export function getResearchWorkspace(securityId?: string, signal?: AbortSignal) {
+  const query = securityId === undefined || securityId === ''
+    ? ''
+    : `?security_id=${encodeURIComponent(securityId)}`
+  return getEnvelope<ResearchWorkspaceData>(`/api/research/workspace${query}`, signal)
 }
 
 export function getRawEvidence(rawObjectId: string, signal?: AbortSignal) {

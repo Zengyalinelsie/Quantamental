@@ -96,7 +96,13 @@ export function InvestmentViewSummary({ projection }: InvestmentViewSummaryProps
           <Descriptions.Item label="CodeVersion"><code>{projection.versions.code_version}</code></Descriptions.Item>
           <Descriptions.Item label="Environment"><code>{projection.versions.environment_id}</code></Descriptions.Item>
           <Descriptions.Item label="Content hash" span={{ xs: 1, sm: 1, md: 2 }}><code>{projection.versions.content_hash}</code></Descriptions.Item>
-          <Descriptions.Item label="Frozen Artifact" span={{ xs: 1, sm: 1, md: 2 }}><code>{projection.versions.artifact_id}</code></Descriptions.Item>
+          <Descriptions.Item label="Artifact" span={{ xs: 1, sm: 1, md: 2 }}>
+            {projection.versions.artifact_id === null ? (
+              <span className="versionUnavailable">Frozen Artifact：未生成</span>
+            ) : (
+              <span>Frozen Artifact：<code>{projection.versions.artifact_id}</code></span>
+            )}
+          </Descriptions.Item>
         </Descriptions>
       </section>
     </article>
