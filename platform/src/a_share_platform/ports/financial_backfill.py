@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import date, datetime
 from typing import Protocol
 
 from a_share_platform.domain.backfill import (
@@ -14,6 +14,7 @@ from a_share_platform.domain.backfill import (
 from a_share_platform.domain.disclosure import RawObject
 from a_share_platform.domain.financial_backfill import (
     FinancialBackfillWorkUnit,
+    FinancialListingIdentity,
     FinancialMappingResult,
     FinancialPersistResult,
     FinancialProviderBatch,
@@ -42,6 +43,17 @@ class FinancialBackfillSource(Protocol):
         *,
         allow_read_through_cache: bool,
     ) -> FinancialProviderBatch: ...
+
+
+class FinancialIdentityResolver(Protocol):
+    """Resolve provider symbols through effective-dated Security Master records."""
+
+    def resolve(
+        self,
+        canonical_symbol: str,
+        *,
+        as_of: date,
+    ) -> FinancialListingIdentity: ...
 
 
 class FinancialBackfillUnitOfWork(Protocol):

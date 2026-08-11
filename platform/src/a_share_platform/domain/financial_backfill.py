@@ -10,9 +10,15 @@ from enum import Enum
 
 from .backfill import BackfillDataDomain, DatasetQualityStatus
 from .disclosure import RawObject, RetentionPolicy
-from .financial_sources import ProviderFinancialRow
+from .financial_sources import (
+    AvailabilityMethod,
+    FinancialStatementScope,
+    FinancialValueBasis,
+    ProviderFinancialRow,
+    ReportVersionType,
+)
 from .metrics import MetricUnit, StatementType
-from .pit import DataTrustState
+from .pit import DataTrustState, FinancialPeriodType
 from .run_context import DataMode
 
 _CANONICAL_SYMBOL = re.compile(r"^(SH|SZ)\.\d{6}$")
@@ -50,6 +56,24 @@ class FinancialBackfillCohort(str, Enum):
             self.CSI_300: "index:000300",
             self.CSI_500: "index:000905",
         }[self]
+
+
+@dataclass(frozen=True)
+class FinancialListingIdentity:
+    """Stable master-data identity resolved for a canonical symbol and date."""
+
+    canonical_symbol: str
+    company_id: str
+    security_id: str
+    listing_id: str
+    resolved_as_of: date
+
+    def __post_init__(self) -> None:
+        if _CANONICAL_SYMBOL.fullmatch(self.canonical_symbol) is None:
+            raise ValueError("canonical_symbol must use SH.000000 or SZ.000000 form")
+        for field_name in ("company_id", "security_id", "listing_id"):
+            _text(getattr(self, field_name), field_name)
+        _plain_date(self.resolved_as_of, "resolved_as_of")
 
 
 @dataclass(frozen=True)
@@ -434,6 +458,147 @@ class FinancialMappingResult:
         if set(mapped_source_ids).union(unmapped) != source_ids:
             raise ValueError("every provider row must be classified as mapped or unmapped")
         object.__setattr__(self, "unmapped_row_ids", unmapped)
+        warnings = tuple(self.warnings)
+        for warning in warnings:
+            _text(warning, "warning")
+        object.__setattr__(self, "warnings", warnings)
+
+
+@dataclass(frozen=True)
+class NormalizedCurrentFinancialObservation:
+    """Lossless current-only financial observation persisted outside the PIT fact table."""
+
+    observation_id: str
+    dataset_version_id: str
+    job_id: str
+    checkpoint_key: str
+    company_id: str
+    security_id: str
+    listing_id: str
+    canonical_symbol: str
+    identity_as_of: date
+    mapped_row_id: str
+    provider_id: str
+    provider_table: str
+    provider_record_id: str
+    provider_field: str
+    statement_type: StatementType
+    statement_scope: FinancialStatementScope
+    report_period_start: date
+    report_period_end: date
+    period_type: FinancialPeriodType
+    value_basis: FinancialValueBasis
+    raw_value: Decimal
+    provider_unit: str
+    scale_to_canonical: Decimal
+    canonical_value: Decimal
+    canonical_unit: MetricUnit
+    currency: str | None
+    report_version_type: ReportVersionType
+    revision_sequence: int
+    announced_at: datetime | None
+    available_at: datetime | None
+    availability_method: AvailabilityMethod
+    provider_updated_at: datetime | None
+    retrieved_at: datetime
+    raw_object_id: str
+    raw_object_hash: str
+    source_url: str
+    mapping_id: str
+    mapping_version_id: str
+    metric_code: str
+    trust_state: DataTrustState
+    data_mode: DataMode
+    warnings: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "observation_id",
+            "dataset_version_id",
+            "job_id",
+            "checkpoint_key",
+            "company_id",
+            "security_id",
+            "listing_id",
+            "mapped_row_id",
+            "provider_id",
+            "provider_table",
+            "provider_record_id",
+            "provider_field",
+            "provider_unit",
+            "raw_object_id",
+            "source_url",
+            "mapping_id",
+            "mapping_version_id",
+            "metric_code",
+        ):
+            _text(getattr(self, field_name), field_name)
+        if _CANONICAL_SYMBOL.fullmatch(self.canonical_symbol) is None:
+            raise ValueError("canonical_symbol must use SH.000000 or SZ.000000 form")
+        identity_as_of = _plain_date(self.identity_as_of, "identity_as_of")
+        start = _plain_date(self.report_period_start, "report_period_start")
+        end = _plain_date(self.report_period_end, "report_period_end")
+        if end < start:
+            raise ValueError("report_period_end cannot precede report_period_start")
+        if identity_as_of != end:
+            raise ValueError("financial identity must be resolved as of report_period_end")
+
+        object.__setattr__(self, "statement_type", StatementType(self.statement_type))
+        object.__setattr__(
+            self,
+            "statement_scope",
+            FinancialStatementScope(self.statement_scope),
+        )
+        object.__setattr__(self, "period_type", FinancialPeriodType(self.period_type))
+        object.__setattr__(self, "value_basis", FinancialValueBasis(self.value_basis))
+        object.__setattr__(
+            self,
+            "report_version_type",
+            ReportVersionType(self.report_version_type),
+        )
+        object.__setattr__(
+            self,
+            "availability_method",
+            AvailabilityMethod(self.availability_method),
+        )
+        object.__setattr__(self, "canonical_unit", MetricUnit(self.canonical_unit))
+
+        for numeric_value, field_name in (
+            (self.raw_value, "raw_value"),
+            (self.scale_to_canonical, "scale_to_canonical"),
+            (self.canonical_value, "canonical_value"),
+        ):
+            if not isinstance(numeric_value, Decimal):
+                raise TypeError(f"{field_name} must use Decimal")
+            if not numeric_value.is_finite():
+                raise ValueError(f"{field_name} must be finite")
+        if self.scale_to_canonical == 0:
+            raise ValueError("scale_to_canonical must be non-zero")
+        if self.raw_value * self.scale_to_canonical != self.canonical_value:
+            raise ValueError("canonical_value must equal raw_value * scale_to_canonical")
+        if type(self.revision_sequence) is not int or self.revision_sequence < 0:
+            raise ValueError("revision_sequence must be a non-negative integer")
+
+        for timestamp, field_name in (
+            (self.announced_at, "announced_at"),
+            (self.available_at, "available_at"),
+            (self.provider_updated_at, "provider_updated_at"),
+        ):
+            if timestamp is not None:
+                _aware(timestamp, field_name)
+        _aware(self.retrieved_at, "retrieved_at")
+        if not isinstance(self.raw_object_hash, str) or _SHA256.fullmatch(
+            self.raw_object_hash
+        ) is None:
+            raise ValueError("raw_object_hash must use sha256:<64 lowercase hex chars>")
+        trust_state = DataTrustState(self.trust_state)
+        data_mode = DataMode(self.data_mode)
+        if trust_state is not DataTrustState.NORMALIZED_CURRENT:
+            raise ValueError("financial observation must remain normalized_current")
+        if data_mode is not DataMode.CURRENT_RESEARCH:
+            raise ValueError("financial observation must remain current_research")
+        object.__setattr__(self, "trust_state", trust_state)
+        object.__setattr__(self, "data_mode", data_mode)
         warnings = tuple(self.warnings)
         for warning in warnings:
             _text(warning, "warning")
