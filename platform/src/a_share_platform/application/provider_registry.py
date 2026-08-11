@@ -82,6 +82,17 @@ def build_p2_provider_registry() -> ProviderRegistry:
         DataField.INDUSTRY_MEMBERSHIP,
         DataField.BENCHMARK_MEMBERSHIP,
         DataField.CORPORATE_ACTION,
+        DataField.SHARE_CAPITAL,
+    )
+    akshare_private_local_fields = frozenset(
+        {
+            DataField.SECURITY_IDENTITY,
+            DataField.IDENTIFIER_HISTORY,
+            DataField.LISTING_STATUS,
+            DataField.INDUSTRY_MEMBERSHIP,
+            DataField.CORPORATE_ACTION,
+            DataField.SHARE_CAPITAL,
+        }
     )
     policies = [
         *(
@@ -162,7 +173,24 @@ def build_p2_provider_registry() -> ProviderRegistry:
             )
         ),
         *(
-            _policy("akshare", field, ProviderTier.FALLBACK, all_a_share)
+            _policy(
+                "akshare",
+                field,
+                ProviderTier.FALLBACK,
+                all_a_share,
+                uses=(
+                    PRIVATE_LOCAL_USES
+                    if field in akshare_private_local_fields
+                    else PROTOTYPE_USES
+                ),
+                warning=(
+                    "user-approved private local research persistence remains "
+                    "normalized_current and prohibits strict historical, production, "
+                    "or external redistribution"
+                    if field in akshare_private_local_fields
+                    else ""
+                ),
+            )
             for field in akshare_fields
         ),
         *(

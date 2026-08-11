@@ -19,6 +19,13 @@ from a_share_platform.adapters.postgres.backfill import PostgresBackfillReposito
 from a_share_platform.adapters.postgres.dataset_versions import (
     PostgresDatasetVersionRepository,
 )
+from a_share_platform.adapters.postgres.market_structure import (
+    PostgresCurrentKnownListingResolver,
+    PostgresMarketStructureObservationSink,
+)
+from a_share_platform.adapters.providers.akshare_market_structure_source import (
+    AkshareMarketStructureSource,
+)
 from a_share_platform.adapters.providers.baostock_backfill import BaostockBackfillSource
 from a_share_platform.adapters.providers.futu_backfill import FutuQuoteBackfillSource
 from a_share_platform.adapters.providers.futu_quote import FutuQuoteDailyReader
@@ -26,6 +33,7 @@ from a_share_platform.adapters.providers.identity_universe_backfill import (
     IdentityUniverseBackfillSource,
 )
 from a_share_platform.adapters.sinks.canonical_backfill import CanonicalBackfillSink
+from a_share_platform.adapters.sinks.routing import DomainRoutingBackfillSink
 from a_share_platform.application.backfill import (
     BackfillService,
     build_csi_backfill_plan,
@@ -33,7 +41,7 @@ from a_share_platform.application.backfill import (
 )
 from a_share_platform.application.provider_registry import build_p2_provider_registry
 from a_share_platform.domain.backfill import BackfillDataDomain, BackfillPlan
-from a_share_platform.ports.backfill import BackfillSource
+from a_share_platform.ports.backfill import BackfillSink, BackfillSource
 
 PRIVATE_LOCAL_STORAGE_ROOT = (
     Path(__file__).resolve().parents[3] / "var" / "private-research"
@@ -64,6 +72,12 @@ def _parser() -> argparse.ArgumentParser:
         nargs="+",
         choices=("000300", "000905"),
         help="explicit CSI benchmark subset for an all-A-share universe backfill",
+    )
+    parser.add_argument(
+        "--markets",
+        nargs="+",
+        choices=("XSHG", "XSHE", "XBSE"),
+        help="explicit market slice; required for provider-specific all-market jobs",
     )
     parser.add_argument("--database-url", help="explicit local PostgreSQL DSN")
     parser.add_argument("--parquet-root", type=Path, help="explicit local Parquet root")
@@ -160,6 +174,7 @@ def _default_plan_id(args: argparse.Namespace, private_request: bool) -> str:
             ",".join(args.symbols or ()),
             ",".join(args.domains),
             ",".join(args.benchmarks or ("000300", "000905")),
+            ",".join(args.markets or ()),
             "all_a_share" if args.all_a_share else "explicit_symbols",
         )
     ).encode("utf-8")
@@ -185,6 +200,7 @@ def _build_plan(
             universe_benchmark_codes=(
                 None if args.benchmarks is None else tuple(args.benchmarks)
             ),
+            markets=(None if args.markets is None else tuple(args.markets)),
         )
     return build_csi_backfill_plan(
         plan_id=plan_id,
@@ -226,6 +242,11 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
             BackfillDataDomain.SECURITY_MASTER.value,
             BackfillDataDomain.UNIVERSE.value,
         },
+        "akshare": {
+            BackfillDataDomain.SECURITY_MASTER.value,
+            BackfillDataDomain.SHARE_CAPITAL.value,
+            BackfillDataDomain.CORPORATE_ACTION.value,
+        },
     }
     if args.provider not in supported:
         blockers.append(f"provider={args.provider} has no executable private-local source")
@@ -242,8 +263,25 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
                 "provider=a_share_identity_universe with explicit symbols supports "
                 "only security_master; Universe requires --all-a-share"
             )
-    if args.all_a_share and args.provider != "a_share_identity_universe":
-        blockers.append("--all-a-share requires provider=a_share_identity_universe")
+    if args.all_a_share:
+        if args.provider == "a_share_identity_universe":
+            if args.markets is not None and set(args.markets).difference({"XSHG", "XSHE"}):
+                blockers.append(
+                    "provider=a_share_identity_universe supports only XSHG/XSHE"
+                )
+        elif args.provider == "akshare":
+            if set(args.domains or ()) != {BackfillDataDomain.SECURITY_MASTER.value}:
+                blockers.append(
+                    "provider=akshare --all-a-share supports only security_master"
+                )
+            if args.markets != ["XBSE"]:
+                blockers.append(
+                    "provider=akshare --all-a-share requires --markets XBSE"
+                )
+        else:
+            blockers.append(
+                "--all-a-share requires provider=a_share_identity_universe or akshare"
+            )
     return blockers
 
 
@@ -337,14 +375,29 @@ def _execute_backfill(
             )
         elif plan.provider_id == "a_share_identity_universe":
             source = IdentityUniverseBackfillSource(clock=lambda: datetime.now(UTC))
+        elif plan.provider_id == "akshare":
+            source = AkshareMarketStructureSource(clock=lambda: datetime.now(UTC))
         else:  # protected by the CLI gate and retained as defense in depth
             raise ValueError(f"unsupported executable provider: {plan.provider_id}")
         assert args.parquet_root is not None
-        sink = CanonicalBackfillSink(
+        canonical_sink = CanonicalBackfillSink(
             connection=connection,
             parquet_store=ParquetMarketDataStore(args.parquet_root),
             clock=lambda: datetime.now(UTC),
         )
+        sink: BackfillSink = canonical_sink
+        if plan.provider_id == "akshare":
+            observation_sink = PostgresMarketStructureObservationSink(
+                connection=connection,
+                listing_resolver=PostgresCurrentKnownListingResolver(connection),
+            )
+            sink = DomainRoutingBackfillSink(
+                default_sink=canonical_sink,
+                routes={
+                    BackfillDataDomain.SHARE_CAPITAL: observation_sink,
+                    BackfillDataDomain.CORPORATE_ACTION: observation_sink,
+                },
+            )
         job = service.start(plan, source=source, sink=sink)
         return {
             "execution_status": job.status.value,

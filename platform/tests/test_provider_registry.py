@@ -74,7 +74,7 @@ class ProviderRegistryTest(unittest.TestCase):
         for policy in self.registry.policies_for(DataField.RAW_DAILY_BAR):
             self.assertIsNot(policy.trust_ceiling, DataTrustState.PIT_VERIFIED)
 
-    def test_coverage_gaps_remain_visible(self) -> None:
+    def test_coverage_gaps_and_private_local_approval_remain_visible(self) -> None:
         adjustment = self.registry.policy(
             "a_share_mcp_baostock",
             DataField.ADJUSTMENT_FACTOR,
@@ -82,12 +82,21 @@ class ProviderRegistryTest(unittest.TestCase):
         self.assertTrue(adjustment.is_partial)
         self.assertIn("empty result", adjustment.warning)
 
-        with self.assertRaises(ProviderPermissionDenied):
-            self.registry.require(
-                DataField.SHARE_CAPITAL,
-                ProviderUse.CURRENT_RESEARCH,
-                market="XSHG",
-            )
+        share_capital = self.registry.require(
+            DataField.SHARE_CAPITAL,
+            ProviderUse.PRIVATE_LOCAL_RESEARCH,
+            market="XSHG",
+        )
+        self.assertEqual(share_capital.provider_id, "akshare")
+        self.assertIs(share_capital.trust_ceiling, DataTrustState.NORMALIZED_CURRENT)
+        self.assertIn("private local", share_capital.warning)
+        for use in (
+            ProviderUse.STRICT_HISTORICAL,
+            ProviderUse.EXTERNAL_REDISTRIBUTION,
+            ProviderUse.PRODUCTION_DECISION,
+        ):
+            with self.subTest(use=use), self.assertRaises(ProviderPermissionDenied):
+                self.registry.require(DataField.SHARE_CAPITAL, use, market="XSHG")
 
 
 if __name__ == "__main__":

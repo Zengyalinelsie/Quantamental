@@ -61,6 +61,8 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0015_timing_benchmark_bars.sql",
                 "0016_financial_backfill_dimensions.sql",
                 "0017_feature_snapshots_and_research_labels.sql",
+                "0018_normalized_current_financial_backfill.sql",
+                "0020_market_structure_observations.sql",
             ),
         )
 

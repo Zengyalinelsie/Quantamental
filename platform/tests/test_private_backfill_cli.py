@@ -194,6 +194,79 @@ class PrivateBackfillCliTest(unittest.TestCase):
         )
         execute.assert_not_called()
 
+    def test_akshare_market_structure_execution_is_explicit_and_private_local_only(self) -> None:
+        output = io.StringIO()
+        args = [
+            "--provider",
+            "akshare",
+            "--start",
+            "2018-01-01",
+            "--end",
+            "2026-08-10",
+            "--symbols",
+            "SH.600519",
+            "SZ.000858",
+            "--domains",
+            "share_capital",
+            "corporate_action",
+            "--database-url",
+            "postgresql://localhost/research",
+            "--parquet-root",
+            str(PRIVATE_LOCAL_STORAGE_ROOT / "test-market-structure"),
+            "--private-local-research-ack",
+            "--execute",
+        ]
+        with patch(
+            "a_share_platform.workers.backfill._execute_backfill",
+            return_value={
+                "execution_status": "succeeded",
+                "dataset_version_id": "dataset:market-structure:v1",
+            },
+        ) as execute, redirect_stdout(output):
+            exit_code = main(args)
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["provider_id"], "akshare")
+        self.assertEqual(payload["output_trust_state"], "normalized_current")
+        execute.assert_called_once()
+
+    def test_xbse_full_current_identity_requires_explicit_market_slice(self) -> None:
+        output = io.StringIO()
+        args = [
+            "--provider",
+            "akshare",
+            "--start",
+            "2018-01-01",
+            "--end",
+            "2026-08-10",
+            "--all-a-share",
+            "--markets",
+            "XBSE",
+            "--domains",
+            "security_master",
+            "--database-url",
+            "postgresql://localhost/research",
+            "--parquet-root",
+            str(PRIVATE_LOCAL_STORAGE_ROOT / "test-xbse-identity"),
+            "--private-local-research-ack",
+            "--execute",
+        ]
+        with patch(
+            "a_share_platform.workers.backfill._execute_backfill",
+            return_value={
+                "execution_status": "succeeded",
+                "dataset_version_id": "dataset:xbse:v1",
+            },
+        ) as execute, redirect_stdout(output):
+            exit_code = main(args)
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["markets"], ["XBSE"])
+        self.assertEqual(payload["work_unit_count"], 1)
+        execute.assert_called_once()
+
     def test_execute_rejects_remote_postgres_and_parquet_outside_controlled_root(self) -> None:
         cases = (
             (

@@ -108,6 +108,7 @@ def build_private_local_backfill_plan(
     created_at: datetime,
     all_a_share: bool = False,
     universe_benchmark_codes: tuple[str, ...] | None = None,
+    markets: tuple[str, ...] | None = None,
 ) -> BackfillPlan:
     """Build an explicitly bounded, non-PIT private local research plan."""
 
@@ -143,15 +144,25 @@ def build_private_local_backfill_plan(
         "SZ": "XSHE",
         "BJ": "XBSE",
     }
-    markets = (
-        _INDEX_MARKETS
-        if all_a_share
-        else tuple(
-            market
-            for market in _MARKETS
-            if any(symbol_markets.get(symbol[:2]) == market for symbol in selected_symbols)
+    symbol_market_set = {
+        symbol_markets[symbol[:2]]
+        for symbol in selected_symbols
+    }
+    selected_markets = (
+        tuple(markets)
+        if markets is not None
+        else (
+            _INDEX_MARKETS
+            if all_a_share
+            else tuple(market for market in _MARKETS if market in symbol_market_set)
         )
     )
+    if not selected_markets or len(selected_markets) != len(set(selected_markets)):
+        raise ValueError("private local markets must be non-empty and unique")
+    if any(market not in _MARKETS for market in selected_markets):
+        raise ValueError("private local markets must be XSHG, XSHE, or XBSE")
+    if selected_symbols and set(selected_markets) != symbol_market_set:
+        raise ValueError("explicit-symbol markets must exactly match symbol prefixes")
     scopes: list[BackfillScope] = []
     if any(
         domain in {BackfillDataDomain.SECURITY_MASTER, BackfillDataDomain.TRADING_CALENDAR}
@@ -190,7 +201,7 @@ def build_private_local_backfill_plan(
         price_adjustment=PriceAdjustment.UNADJUSTED,
         provider_use=ProviderUse.PRIVATE_LOCAL_RESEARCH,
         symbols=selected_symbols,
-        markets=markets,
+        markets=selected_markets,
         all_a_share=all_a_share,
     )
 
