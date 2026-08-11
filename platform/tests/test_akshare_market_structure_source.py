@@ -16,7 +16,7 @@ from a_share_platform.application.backfill import (
     build_private_local_backfill_plan,
 )
 from a_share_platform.domain.backfill import BackfillDataDomain, DatasetQualityStatus
-from a_share_platform.domain.security_master import Board, Exchange
+from a_share_platform.domain.security_master import Board, Exchange, ListingState
 
 NOW = datetime(2026, 8, 11, 2, 0, tzinfo=UTC)
 
@@ -363,6 +363,31 @@ class AkshareMarketStructureSourceTest(unittest.TestCase):
         self.assertEqual(row.exchange, Exchange.XSHE)
         self.assertEqual(row.board, Board.CHINEXT)
         self.assertEqual(row.listed_on, date(2010, 8, 27))
+        self.assertEqual(batch.expected_rows, 1)
+        BackfillService._validate_batch(plan, unit, batch)
+
+    def test_explicit_delisted_identity_uses_bounded_official_evidence(self) -> None:
+        module = FakeAkshare()
+        source = self.source(module)
+        plan = plan_for(BackfillDataDomain.SECURITY_MASTER, "SZ.000046")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = source.fetch(unit, plan)
+
+        self.assertEqual(module.profile_calls, [])
+        payload = batch.payload
+        assert isinstance(payload, SecurityMasterPayload)
+        row = payload.rows[0]
+        self.assertEqual(row.company_legal_name, "泛海控股股份有限公司")
+        self.assertEqual(row.security_name, "*ST泛海")
+        self.assertEqual(row.listed_on, date(1994, 9, 12))
+        self.assertEqual(row.delisted_on, date(2024, 2, 7))
+        self.assertEqual(row.listing_state, ListingState.TERMINATED)
+        self.assertEqual(row.identity_source_id, "szse.delisted_company_list")
+        self.assertEqual(
+            row.legal_name_source_id,
+            "cninfo.2018_annual_report_cover:SZ.000046:1206041336",
+        )
         self.assertEqual(batch.expected_rows, 1)
         BackfillService._validate_batch(plan, unit, batch)
 

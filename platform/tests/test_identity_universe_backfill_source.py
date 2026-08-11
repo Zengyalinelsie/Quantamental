@@ -15,6 +15,9 @@ from a_share_platform.adapters.providers.baostock_guard import BaostockGuard
 from a_share_platform.adapters.providers.identity_universe_backfill import (
     IdentityUniverseBackfillSource,
 )
+from a_share_platform.adapters.providers.official_delisted_identities import (
+    CSI_HISTORICAL_DELISTED_IDENTITIES,
+)
 from a_share_platform.application.backfill import (
     BackfillPlanner,
     BackfillService,
@@ -331,8 +334,186 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
             item for item in BackfillPlanner().work_units(plan) if item.market == "XSHG"
         )
 
-        with self.assertRaisesRegex(ProviderBackfillUnavailable, "coverage"):
+        with self.assertRaises(ProviderBackfillUnavailable) as caught:
             self.source(akshare=EmptyAkshare()).fetch(unit, plan)
+        self.assertIn("coverage", str(caught.exception))
+        self.assertIn("missing_legal_name_count=1", str(caught.exception))
+        self.assertIn("SH.600519", str(caught.exception))
+
+    def test_official_delisted_evidence_fills_cninfo_profile_gap(self) -> None:
+        class DelistedBasic(FakeBaostock):
+            def query_stock_basic(self) -> FakeResult:
+                return FakeResult(
+                    ["code", "code_name", "ipoDate", "outDate", "type", "status"],
+                    [
+                        [
+                            "sh.600068",
+                            "葛洲坝",
+                            "1997-05-26",
+                            "2021-09-13",
+                            "1",
+                            "0",
+                        ]
+                    ],
+                )
+
+        class EmptyAkshare:
+            def stock_profile_cninfo(self, *, symbol: str) -> FakeFrame:
+                raise AssertionError(f"official evidence should avoid CNInfo retry: {symbol}")
+
+        plan = explicit_identity_plan("SH.600068")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = self.source(baostock=DelistedBasic(), akshare=EmptyAkshare()).fetch(
+            unit,
+            plan,
+        )
+
+        payload = batch.payload
+        assert isinstance(payload, SecurityMasterPayload)
+        self.assertEqual(len(payload.rows), 1)
+        row = payload.rows[0]
+        self.assertEqual(row.company_legal_name, "中国葛洲坝集团股份有限公司")
+        self.assertEqual(row.listed_on, date(1997, 5, 26))
+        self.assertEqual(row.delisted_on, date(2021, 9, 13))
+        self.assertEqual(row.legal_name_source_id, "sse.delisted_company_list")
+        self.assertEqual(
+            row.identity_source_id,
+            "baostock_sdk.query_stock_basic+sse.delisted_company_list",
+        )
+
+    def test_official_delist_date_wins_over_provider_last_trading_date(self) -> None:
+        class ConflictingDelistedBasic(FakeBaostock):
+            def query_stock_basic(self) -> FakeResult:
+                return FakeResult(
+                    ["code", "code_name", "ipoDate", "outDate", "type", "status"],
+                    [
+                        [
+                            "sz.000413",
+                            "ST旭电",
+                            "1996-09-25",
+                            "2024-10-10",
+                            "1",
+                            "0",
+                        ]
+                    ],
+                )
+
+        plan = explicit_identity_plan("SZ.000413")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = self.source(baostock=ConflictingDelistedBasic()).fetch(unit, plan)
+
+        payload = batch.payload
+        assert isinstance(payload, SecurityMasterPayload)
+        self.assertEqual(payload.rows[0].delisted_on, date(2024, 10, 11))
+        self.assertEqual(batch.quality_status.value, "warned")
+        self.assertIn(("official_delisted_date_override", 1), batch.issue_counts)
+
+    def test_official_delisted_evidence_rejects_listing_date_conflict(self) -> None:
+        class ConflictingDelistedBasic(FakeBaostock):
+            def query_stock_basic(self) -> FakeResult:
+                return FakeResult(
+                    ["code", "code_name", "ipoDate", "outDate", "type", "status"],
+                    [
+                        [
+                            "sz.000413",
+                            "ST旭电",
+                            "1996-09-26",
+                            "2024-10-11",
+                            "1",
+                            "0",
+                        ]
+                    ],
+                )
+
+        plan = explicit_identity_plan("SZ.000413")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        with self.assertRaisesRegex(
+            ProviderBackfillUnavailable,
+            "official delisted identity conflicts",
+        ):
+            self.source(baostock=ConflictingDelistedBasic()).fetch(unit, plan)
+
+    def test_csi_historical_delisted_evidence_is_complete_and_bounded(self) -> None:
+        expected = {
+            "SH.600068",
+            "SH.600074",
+            "SH.600297",
+            "SH.600485",
+            "SH.600705",
+            "SH.600804",
+            "SH.600837",
+            "SH.601989",
+            "SZ.000413",
+            "SZ.000046",
+            "SZ.000540",
+            "SZ.000627",
+            "SZ.000671",
+            "SZ.000961",
+            "SZ.002411",
+            "SZ.002450",
+            "SH.600086",
+            "SH.600122",
+            "SH.600240",
+            "SH.600260",
+            "SH.600270",
+            "SH.600277",
+            "SH.600291",
+            "SH.600317",
+            "SH.600393",
+            "SH.600466",
+            "SH.600565",
+            "SH.600614",
+            "SH.600687",
+            "SH.600811",
+            "SH.600823",
+            "SH.600978",
+            "SH.603056",
+            "SZ.000418",
+            "SZ.000587",
+            "SZ.000662",
+            "SZ.000667",
+            "SZ.000732",
+            "SZ.000806",
+            "SZ.000939",
+            "SZ.000979",
+            "SZ.002002",
+            "SZ.002013",
+            "SZ.002018",
+            "SZ.002118",
+            "SZ.002147",
+            "SZ.002280",
+            "SZ.002308",
+            "SZ.002325",
+            "SZ.002359",
+            "SZ.002477",
+            "SZ.002503",
+            "SZ.002505",
+            "SZ.002509",
+            "SZ.002665",
+            "SZ.002699",
+            "SZ.300116",
+            "SZ.300156",
+            "SZ.300202",
+            "SZ.300273",
+            "SZ.300297",
+            "SZ.300630",
+        }
+
+        self.assertEqual(set(CSI_HISTORICAL_DELISTED_IDENTITIES), expected)
+        for code, evidence in CSI_HISTORICAL_DELISTED_IDENTITIES.items():
+            self.assertEqual(evidence.code, code)
+            self.assertLess(evidence.listed_on, evidence.delisted_on)
+            self.assertTrue(evidence.legal_name)
+            self.assertIn(
+                evidence.listing_source_id,
+                {"sse.delisted_company_list", "szse.delisted_company_list"},
+            )
+            if code.startswith("SZ."):
+                self.assertTrue(evidence.legal_name_source_id.startswith("cninfo."))
+                self.assertIn(code, evidence.legal_name_source_id)
 
     def test_cninfo_legal_name_must_match_requested_a_share_code(self) -> None:
         class MismatchedAkshare:

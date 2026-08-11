@@ -33,6 +33,7 @@ from .backfill_payloads import (
     StagedShareCapitalObservation,
 )
 from .baostock_backfill import ProviderBackfillUnavailable
+from .official_delisted_identities import official_delisted_identity
 
 _SUPPORTED_DOMAINS = {
     BackfillDataDomain.SECURITY_MASTER,
@@ -158,7 +159,7 @@ class AkshareMarketStructureSource:
 
         metadata_warnings = (
             "private local research only; external redistribution is prohibited",
-            "AkShare/CNInfo/BSE observations remain normalized_current",
+            "AkShare/CNInfo/BSE/official-exchange observations remain normalized_current",
             "retrieval time and date-only fields do not establish PIT availability",
         )
         return BackfillBatch(
@@ -494,6 +495,32 @@ class AkshareMarketStructureSource:
         accepted: list[StagedSecurityIdentity] = []
         retrieved_times: list[datetime] = []
         for code in codes:
+            evidence = official_delisted_identity(code)
+            if evidence is not None and evidence.security_name is not None:
+                retrieved_at = self._clock()
+                retrieved_times.append(retrieved_at)
+                accepted.append(
+                    StagedSecurityIdentity(
+                        code=code,
+                        company_legal_name=evidence.legal_name,
+                        security_name=evidence.security_name,
+                        exchange=(
+                            Exchange.XSHE if unit.market == "XSHE" else Exchange.XSHG
+                        ),
+                        board=self._board(code),
+                        listed_on=evidence.listed_on,
+                        delisted_on=evidence.delisted_on,
+                        listing_state=ListingState.TERMINATED,
+                        observed_on=retrieved_at.date(),
+                        industry_taxonomy=None,
+                        industry_code=None,
+                        industry_name=None,
+                        identity_source_id=evidence.listing_source_id,
+                        legal_name_source_id=evidence.legal_name_source_id,
+                        industry_source_id=None,
+                    )
+                )
+                continue
             digits = code.split(".", 1)[1]
             profile, retrieved_at = self._profile(akshare, digits)
             retrieved_times.append(retrieved_at)

@@ -34,6 +34,7 @@ from .backfill_payloads import (
 )
 from .baostock_backfill import ProviderBackfillUnavailable
 from .baostock_guard import BaostockGuard, BaostockSession
+from .official_delisted_identities import official_delisted_identity
 
 _EXCHANGES = {"XSHG": Exchange.XSHG, "XSHE": Exchange.XSHE}
 _SOURCE_METHODS = {
@@ -289,18 +290,35 @@ class IdentityUniverseBackfillSource:
         accepted: list[StagedSecurityIdentity] = []
         rejected = 0
         issues: Counter[str] = Counter()
+        missing_legal_name_codes: list[str] = []
         for raw in basic_rows:
             code = self._canonical_code(self._text(raw, "code"))
             listed_on = self._date(raw, "ipoDate")
-            legal_name = self._legal_name(akshare, code, listed_on)
-            if legal_name is None:
-                rejected += 1
-                issues["legal_name_unavailable"] += 1
-                continue
             delisted_on = self._optional_date(raw, "outDate")
             status = self._text(raw, "status")
             if status not in {"0", "1"}:
                 raise ProviderBackfillUnavailable("security status must be 0 or 1")
+            legal_identity = self._resolve_legal_identity(
+                akshare,
+                code,
+                listed_on,
+                delisted_on,
+                status,
+            )
+            if legal_identity is None:
+                rejected += 1
+                issues["legal_name_unavailable"] += 1
+                missing_legal_name_codes.append(code)
+                continue
+            (
+                legal_name,
+                legal_name_source_id,
+                identity_source_id,
+                canonical_delisted_on,
+                official_delisted_date_override,
+            ) = legal_identity
+            if official_delisted_date_override:
+                issues["official_delisted_date_override"] += 1
             industry = industries.get(code)
             taxonomy = None
             industry_name = None
@@ -319,7 +337,7 @@ class IdentityUniverseBackfillSource:
                     exchange=_EXCHANGES[unit.market],
                     board=self._board(code),
                     listed_on=listed_on,
-                    delisted_on=delisted_on,
+                    delisted_on=canonical_delisted_on,
                     listing_state=(
                         ListingState.ACTIVE if status == "1" else ListingState.TERMINATED
                     ),
@@ -327,8 +345,8 @@ class IdentityUniverseBackfillSource:
                     industry_taxonomy=taxonomy,
                     industry_code=None,
                     industry_name=industry_name,
-                    identity_source_id="baostock_sdk.query_stock_basic",
-                    legal_name_source_id="akshare.stock_profile_cninfo",
+                    identity_source_id=identity_source_id,
+                    legal_name_source_id=legal_name_source_id,
                     industry_source_id=(
                         None
                         if taxonomy is None
@@ -340,7 +358,9 @@ class IdentityUniverseBackfillSource:
         required_coverage = 1.0 if requested else self._minimum_security_coverage_ratio
         if coverage_ratio < required_coverage:
             raise ProviderBackfillUnavailable(
-                "security master accepted-row coverage is below the configured minimum"
+                "security master accepted-row coverage is below the configured minimum; "
+                f"missing_legal_name_count={len(missing_legal_name_codes)}; "
+                f"missing_legal_name_codes={','.join(missing_legal_name_codes)}"
             )
         return SecurityMasterPayload(tuple(accepted)), rejected, issues, len(basic_rows)
 
@@ -545,6 +565,46 @@ class IdentityUniverseBackfillSource:
             if attempt + 1 < self._profile_attempts:
                 self._sleeper(self._profile_retry_delay_seconds * (2**attempt))
         return None
+
+    def _resolve_legal_identity(
+        self,
+        akshare: Any,
+        code: str,
+        listed_on: date,
+        delisted_on: date | None,
+        status: str,
+    ) -> tuple[str, str, str, date | None, bool] | None:
+        evidence = official_delisted_identity(code)
+        if evidence is not None:
+            if (
+                status != "0"
+                or listed_on != evidence.listed_on
+            ):
+                raise ProviderBackfillUnavailable(
+                    "official delisted identity conflicts with provider status or dates: "
+                    f"code={code}; provider_status={status}; "
+                    f"provider_listed_on={listed_on.isoformat()}; "
+                    f"provider_delisted_on={delisted_on}; "
+                    f"official_listed_on={evidence.listed_on.isoformat()}; "
+                    f"official_delisted_on={evidence.delisted_on.isoformat()}"
+                )
+            return (
+                evidence.legal_name,
+                evidence.legal_name_source_id,
+                "baostock_sdk.query_stock_basic+" + evidence.listing_source_id,
+                evidence.delisted_on,
+                delisted_on != evidence.delisted_on,
+            )
+        legal_name = self._legal_name(akshare, code, listed_on)
+        if legal_name is None:
+            return None
+        return (
+            legal_name,
+            "akshare.stock_profile_cninfo",
+            "baostock_sdk.query_stock_basic",
+            delisted_on,
+            False,
+        )
 
     @classmethod
     def _validate_cninfo_identity(
