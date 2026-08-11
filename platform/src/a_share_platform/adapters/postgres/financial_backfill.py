@@ -229,6 +229,8 @@ class PostgresFinancialBackfillUnitOfWork:
         work_unit = batch.work_unit
         if batch.trust_state is not DataTrustState.NORMALIZED_CURRENT:
             raise ValueError("PostgreSQL financial sink only accepts normalized_current")
+        if not value.mapped_rows and batch.rows:
+            raise ValueError("financial work unit has provider rows but no mapped observations")
 
         resolved = self._resolve_identities(value.mapped_rows, work_unit.symbols)
         dataset, metadata = self._dataset(value, resolved)

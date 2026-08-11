@@ -15,10 +15,11 @@ CSI800 当前 Security Master 799/800、CSI500 当日 Universe 500/500 和私人
 `normalized_current` 数据；但多尺寸浏览器证据、完整历史 Universe、XBSE、2018+ 全范围行情、
 股本和公司行动仍未完成，因此不宣称 P2 Gate 通过。P3 已完成 4 家公司、8 份官方 PDF、
 2 条修订链、双时财务、真实数据诊断页面和首条 CSI500 被动波动率 Shadow baseline，
-Capability Gate 通过。主动 Timing 仍 `unavailable`；700–800 家财务回填是 P3 Gate 后、P4 大规模
-科学研究前的 Scale-up，尚未完成。当前 AkShare current-only 试运行已完成 CSI300 中 30 家、
-2018–2025、三表的 720/720 工作单元，写入 2,120 条 `normalized_current` 观测；该批次不能
-用于 strict historical，也不代表 700–800 家扩容或 PIT 治理完成。P4 已有严格数据资格门、
+Capability Gate 通过。主动 Timing 仍 `unavailable`；P3.5 已完成 CSI500 当前 500 家、
+2018–2025 年末三表的 12,000/12,000 工作单元，写入 35,505 条 `normalized_current` 观测，
+其中 78 个合法空期显式保存且未填零。另有 CSI300 中 30 家的 720/720 工作单元和 2,120 条
+观测；这些 current-only 批次不能用于 strict historical，也不代表 CSI300+CSI500 去重后的
+700–800 家扩容或 PIT 治理完成。P4 已有严格数据资格门、
 行业模板、partial Quality baseline 和 Fundamental Improvement V0；统计验证、生命周期与完整
 Factor Workspace 仍未完成，因此 P4 Gate 未通过。
 
@@ -139,6 +140,23 @@ PYTHONPATH=src .venv/bin/python -m unittest \
   tests.test_baostock_backfill_source \
   tests.test_identity_universe_backfill_source -v
 ```
+
+多个已完成财务计划可以用 cohort audit 合并核对。命令默认只读；只有增加本地研究确认和
+`--execute` 才持久化不可变 audit DatasetVersion 与 component/mapping/Universe lineage：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.financial_cohort_audit \
+  --job-ids \
+    job:financial-backfill:csi500:akshare-pilot-3:2018-2025:v1 \
+    job:financial-backfill:csi500:akshare-remaining-497:2018-2025:v1 \
+  --expected-security-count 500 \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev
+```
+
+该审计同时核对 checkpoint/receipt、normalized observations、12,000 份 coverage report、
+12,000 份 quality report、证券并集、拒绝行和显式空期。非空 provider rows 若全部未映射会
+失败关闭，不能伪装成合法空期。
 
 P3 Timing Shadow Ledger 已以真实 CSI500 当日 Universe 和 21 条 BaoStock 未复权收盘价
 追加首条 `current_research + shadow + normalized_current` 被动波动率 baseline。worker 默认

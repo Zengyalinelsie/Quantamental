@@ -429,6 +429,10 @@ class FinancialBackfillRunner:
             if batch.trust_state is not plan.output_trust_state:
                 raise ValueError("financial source batch trust does not match immutable plan")
             mapping_result = self._mapper.map(batch, data_mode=plan.data_mode)
+            if not mapping_result.mapped_rows and batch.rows:
+                raise ValueError(
+                    "financial work unit has provider rows but no mapped observations"
+                )
             persisted = self._unit_of_work.persist(mapping_result)
             if len(persisted.observation_ids) != len(mapping_result.mapped_rows):
                 raise ValueError("financial sink did not persist every mapped observation")

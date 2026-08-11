@@ -583,6 +583,26 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
             "no_observations",
         )
 
+    def test_nonempty_unmapped_rows_cannot_use_the_no_observations_receipt(self) -> None:
+        populated = mapping_result()
+        unmapped = replace(
+            populated,
+            mapped_rows=(),
+            unmapped_row_ids=(populated.provider_batch.rows[0].row_id,),
+        )
+        connection = PersistingFakeConnection()
+        uow = PostgresFinancialBackfillUnitOfWork(
+            connection,
+            job_id="job:financial:csi300:2024:v1",
+            identity_resolver=StubIdentityResolver(),
+        )
+
+        with self.assertRaisesRegex(ValueError, "provider rows but no mapped"):
+            uow.persist(unmapped)
+
+        self.assertIsNone(connection.dataset_row)
+        self.assertIsNone(connection.receipt_row)
+
     def test_current_identity_date_uses_utc_across_a_shanghai_midnight(self) -> None:
         shanghai = timezone(timedelta(hours=8))
         retrieved_at = datetime(2026, 8, 11, 0, 30, tzinfo=shanghai)

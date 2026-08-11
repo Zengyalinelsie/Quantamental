@@ -434,6 +434,38 @@ class FinancialBackfillRunnerTest(unittest.TestCase):
         self.assertIn(("missing_security", 1), unit_of_work.quality[0].issue_counts)
         self.assertIn(EMPTY_FINANCIAL_WORK_UNIT_WARNING, unit_of_work.quality[0].warnings)
 
+    def test_nonempty_unmapped_provider_rows_cannot_masquerade_as_an_empty_period(self) -> None:
+        nonempty = replace(
+            provider_batch(),
+            rows=(replace(provider_batch().rows[0], provider_field="unknown_provider_field"),),
+        )
+        source = StubSource(nonempty)
+        unit_of_work = MemoryUnitOfWork()
+        value, _repository = mapper()
+        runner = FinancialBackfillRunner(
+            planner=FinancialBackfillPlanner(),
+            mapper=value,
+            unit_of_work=unit_of_work,
+            clock=lambda: NOW,
+        )
+
+        with self.assertRaisesRegex(ValueError, "provider rows but no mapped"):
+            runner.run_unit(
+                plan=plan(),
+                profile=profile(),
+                job_id="job:financial:csi300:2024:v1",
+                work_unit=nonempty.work_unit,
+                source=source,
+            )
+
+        self.assertEqual(unit_of_work.persisted, [])
+        checkpoint = unit_of_work.get_checkpoint(
+            "job:financial:csi300:2024:v1",
+            nonempty.work_unit.checkpoint_key,
+        )
+        assert checkpoint is not None
+        self.assertEqual(checkpoint.status, BackfillCheckpointStatus.FAILED)
+
     def test_provider_failure_rolls_back_unit_and_durably_marks_checkpoint_failed(self) -> None:
         source = FailingSource(provider_batch())
         unit_of_work = MemoryUnitOfWork()

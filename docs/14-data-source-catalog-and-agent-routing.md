@@ -464,7 +464,7 @@ provider / statement_table / report_period_end / symbol_bucket
 
 ### 13.5 2026-08-11 current-only 执行证据
 
-AkShare fallback 已完成两级真实本地运行：
+AkShare fallback 已完成三级真实本地运行：
 
 - 5 家 × 2024 × 三表 pilot：15/15 checkpoint 成功，42 条观测；幂等重跑 15/15 skipped；
 - CSI300 中 30 家 × 2018–2025 × 三表：720/720 checkpoint 成功，2,120 条观测，30 家、3 张表、
@@ -472,6 +472,25 @@ AkShare fallback 已完成两级真实本地运行：
 - 第二批持久化 720 份 quality report、720 份 coverage report，aggregate DatasetVersion 为
   `dataset:financial-backfill:47133fabd59aacb8daba70a8:aggregate:v1`；
 - balance sheet 720、cash flow 720、income statement 680；来源缺失保持缺失，不补零。
+- CSI500 pilot-3 与 remaining-497 合计 500 家，2018–2025 年末、三表，12,000/12,000
+  checkpoint/receipt 成功，35,505 条观测，500/500 家至少有观测，0 failed checkpoint、
+  0 rejected row；78 个 provider 合法空期使用 `no_observations` receipt 显式保存，没有填零；
+- 12,000 份 coverage report 中 11,922 份 full、0 份 partial、78 份 zero；12,000 份 quality
+  report 中 11,661 份 passed、339 份 warned、0 份 failed。warning 汇总为
+  `missing_security=78`、`missing_provider_value=261`，不能把 warned 解读成数据科学有效；
+- 最终 cross-job cohort audit DatasetVersion 为
+  `dataset:financial-cohort-audit:csi500:1b7148a5833e096f8e52ee6a:v2`，绑定两个 component
+  aggregate DatasetVersion、`metric-mapping:akshare-eastmoney:v1` 和真实 CSI500
+  UniverseVersion 共 4 条 lineage；首次 execute 写入，幂等重跑 `writes_performed=false`。
+
+append-only 开发库另保留预审 v1 `dataset:financial-cohort-audit:csi500:f78e1cde856759c388c33253:v1`；
+它没有逐份 coverage report 分布核验，不作为最终验收产物，最终验收以 v2 为准。
+
+cohort audit 在持久化前重新从 PostgreSQL 独立聚合 checkpoint/receipt、observation、coverage、
+quality 和证券并集。它要求 component plans 的 provider/profile/mapping/Universe/报告期/三表
+一致、symbols 不重叠、12,000 个工作单元完整、receipt 数与 observation 数一致、coverage 和
+quality 报告齐全、无 failed quality、无 rejected row。非空 provider rows 即使全部未映射也会
+失败关闭，只有 provider batch 本身为空才允许 `no_observations`。
 
 执行 worker 使用 2 秒全局串行门、有限重试、checkpoint 恢复、append-only receipt 和本机
 PostgreSQL 边界。aggregate metadata 明确保存 `data_mode=current_research`、

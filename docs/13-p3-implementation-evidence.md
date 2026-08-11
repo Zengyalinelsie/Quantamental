@@ -379,6 +379,53 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.timing_baseline \
 只有加上 `--private-local-research-ack --execute` 才会写本地数据库；禁止用于生产决策、真实交易
 或账户连接。主动收益、风险预测和主动仓位调整仍显式 `unavailable`，P7 前不得影响生产仓位。
 
+## P3.5：CSI500 current-only 三表全量与 cohort audit
+
+2026-08-11 使用经用户批准的 AkShare 私人本地研究链路完成 CSI500 当前 500 家、2018–2025
+年末三表入库。pilot-3 为 72/72 工作单元和 216 条观测；remaining-497 为 11,928/11,928
+工作单元和 35,289 条观测；合计 12,000/12,000、35,505 条观测、500/500 家、三表、八个
+报告期。worker 保持单进程和 2 秒跨进程请求门，失败 checkpoint 可幂等恢复，没有并发 claim
+竞争。
+
+合法空报告期合同通过 `0026_empty_financial_periods.sql` 扩展：receipt 可以保存 0 条观测，
+但必须使用 `identity_resolution_method=no_observations` 并携带“未填零”warning；非空 provider
+rows 全部未映射时 runner 和 PostgreSQL sink 均失败关闭，不能把 mapping 缺口伪装成 provider
+空期。实库共有 78 个显式空期、0 rejected row。
+
+最终 cross-job audit 独立核对两个 completed jobs，结果为：
+
+- checkpoint/receipt：12,000/12,000；receipt observation sum 与持久化 observation 均为
+  35,505；
+- coverage：11,922 full、0 partial、78 zero；quality：11,661 passed、339 warned、0 failed；
+- issue 汇总：`missing_security=78`、`missing_provider_value=261`；缺失值没有填零；
+- aggregate DatasetVersion：
+  `dataset:financial-cohort-audit:csi500:1b7148a5833e096f8e52ee6a:v2`；
+- lineage：两个 component aggregate DatasetVersion 使用 `aggregated_into`，mapping 使用
+  `mapped_by`，CSI500 UniverseVersion 使用 `scoped_by`，共 4 条；
+- `data_mode=current_research`、`trust_state=normalized_current`、`pit_verified=false`、
+  `redistribution_allowed=false`；首次 execute 写入，二次 execute `writes_performed=false`。
+
+开发库还保留 append-only 的预审 v1 DatasetVersion
+`dataset:financial-cohort-audit:csi500:f78e1cde856759c388c33253:v1`。它是在加入逐份 coverage report
+分布核验前生成的可追溯中间产物，未删除或覆盖；本次验收只认包含 12,000 份 coverage/quality
+对账的 v2 DatasetVersion。
+
+定向验证命令：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_financial_cohort_audit \
+  tests.test_postgres_financial_cohort_audit \
+  tests.test_financial_cohort_audit_cli \
+  tests.test_financial_backfill_runner \
+  tests.test_postgres_financial_backfill -v
+```
+
+该完成状态只证明 CSI500 current-only 数据工程覆盖、可恢复性和审计闭合，不把 current 数据
+晋升为 PIT，不代表 CSI300+CSI500 去重后的 700–800 家扩容完成，也不证明财务值、因子、模型、
+Timing、组合或策略科学有效。
+
 ## P3 Capability Gate 结论
 
 截至 2026-08-10，P3 Capability Gate 通过：
