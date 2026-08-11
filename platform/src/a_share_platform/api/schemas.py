@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
 from a_share_platform.domain.experiments import (
     ExperimentArtifact,
@@ -56,6 +56,298 @@ class ResponseContext(BaseModel):
 class Envelope(BaseModel):
     data: Any
     context: ResponseContext
+
+
+class StrictResponse(BaseModel):
+    """Fail-closed response contract for server-owned P5 projections."""
+
+    model_config = ConfigDict(extra="forbid", use_enum_values=True)
+
+
+class ResearchWorkspaceBlocker(StrictResponse):
+    code: str
+    reason: str
+    affected_binding: str
+    evidence_ids: list[str]
+
+
+class ScreenProjectedValue(StrictResponse):
+    raw: str
+    display: str
+
+
+class ScreenRankProjection(StrictResponse):
+    value: int
+    display: str
+
+
+class ScreenNullableRankProjection(StrictResponse):
+    value: int | None
+    display: str | None
+    unavailable_reason: str | None
+
+
+class ScreenRankChangeProjection(ScreenNullableRankProjection):
+    direction: Literal["up", "down", "flat", "unavailable"]
+
+
+class ScreenSecurityIdentityProjection(StrictResponse):
+    security_id: str
+    symbol: str
+    display_name: str
+    exchange: str
+
+
+class ScreenIndustryProjection(StrictResponse):
+    code: str
+    display_name: str
+
+
+class ScreenUniverseProjection(StrictResponse):
+    universe_version_id: str
+    display_name: str
+    universe_size: int
+
+
+class ScreenRankingRowProjection(StrictResponse):
+    snapshot_id: str
+    security: ScreenSecurityIdentityProjection
+    industry: ScreenIndustryProjection
+    rank: ScreenRankProjection
+    previous_rank: ScreenNullableRankProjection
+    rank_change: ScreenRankChangeProjection
+    score: ScreenProjectedValue
+    expected_return: ScreenProjectedValue
+    confidence: ScreenProjectedValue
+    investment_view_id: str
+    trust_state: Literal["normalized_current", "pit_verified"]
+    content_hash: str
+    selected: bool
+
+
+class SelectedScreenSecurityProjection(StrictResponse):
+    security_id: str
+    snapshot_id: str
+    display_name: str
+    symbol: str
+    industry: ScreenIndustryProjection
+
+
+class IndustryPeerProjection(StrictResponse):
+    security_id: str
+    display_name: str
+    symbol: str
+    rank: ScreenRankProjection
+    expected_return: ScreenProjectedValue
+    snapshot_id: str
+
+
+class ScreenRankingProjection(StrictResponse):
+    screen_id: str
+    universe: ScreenUniverseProjection
+    decision_time: datetime
+    data_cutoff: datetime
+    data_mode: DataMode
+    trust_state: Literal["normalized_current", "pit_verified"]
+    approval_scope: ApprovalScope
+    model_version_id: str
+    factor_version_ids: list[str]
+    dataset_version_ids: list[str]
+    feature_version_ids: list[str]
+    rows: list[ScreenRankingRowProjection]
+    selected_security: SelectedScreenSecurityProjection | None
+    industry_peers: list[IndustryPeerProjection]
+    warnings: list[str]
+
+
+class InvestmentSecurityProjection(StrictResponse):
+    security_id: str
+    symbol: str
+    exchange: str
+    display_name: str
+
+
+class WaterfallVisualProjection(StrictResponse):
+    start_percent: str
+    width_percent: str
+    direction: Literal["positive", "negative", "flat"]
+
+
+InvestmentComponentName = Literal["quality", "valuation", "revision", "event"]
+InvestmentComponentStatus = Literal[
+    "quantified",
+    "constrained",
+    "unavailable",
+    "not_applicable",
+]
+
+
+class InvestmentComponentProjection(StrictResponse):
+    component: InvestmentComponentName
+    label: str
+    status: InvestmentComponentStatus
+    contribution: ScreenProjectedValue | None
+    reason: str
+    evidence_ids: list[str]
+    visual: WaterfallVisualProjection | None
+
+
+class ResidualProjection(StrictResponse):
+    status: InvestmentComponentStatus
+    contribution: ScreenProjectedValue | None
+    reason: str
+    evidence_ids: list[str]
+    visual: WaterfallVisualProjection | None
+
+
+class ClosureProjection(StrictResponse):
+    status: Literal["passed", "failed", "unavailable"]
+    displayed_total: str | None
+    tolerance: str
+    difference: str | None
+    checked_by: str
+
+
+class ExpectedReturnDistributionProjection(StrictResponse):
+    point: ScreenProjectedValue
+    p10: ScreenProjectedValue
+    p50: ScreenProjectedValue
+    p90: ScreenProjectedValue
+    downside: ScreenProjectedValue
+
+
+class CatalystProjection(StrictResponse):
+    catalyst_id: str
+    summary: str
+    horizon: str
+    evidence_ids: list[str]
+
+
+class InvalidatorProjection(StrictResponse):
+    invalidator_id: str
+    summary: str
+    evidence_ids: list[str]
+
+
+class InvestmentEvidenceProjection(StrictResponse):
+    evidence_id: str
+    title: str
+    source_kind: str
+    available_at: datetime
+    version: str
+    source_url: str | None
+
+
+class InvestmentViewVersionsProjection(StrictResponse):
+    dataset_version_ids: list[str]
+    feature_version_ids: list[str]
+    model_version_id: str
+    run_id: str
+    code_version: str
+    environment_id: str
+    content_hash: str
+    artifact_id: str | None
+
+
+class InvestmentViewProjection(StrictResponse):
+    view_id: str
+    security: InvestmentSecurityProjection
+    decision_time: datetime
+    horizon: str
+    data_mode: DataMode
+    trust_state: Literal["normalized_current", "pit_verified"]
+    trust_reason: str
+    distribution: ExpectedReturnDistributionProjection
+    components: list[InvestmentComponentProjection]
+    residual: ResidualProjection
+    closure: ClosureProjection
+    confidence: ScreenProjectedValue
+    catalysts: list[CatalystProjection]
+    invalidators: list[InvalidatorProjection]
+    evidence: list[InvestmentEvidenceProjection]
+    versions: InvestmentViewVersionsProjection
+    warnings: list[str]
+
+
+class AlphaModelProjection(StrictResponse):
+    model_version_id: str
+    code_version: str
+    environment_id: str
+    investment_view_id: str
+    investment_view_hash: str
+
+
+class AlphaApprovalProjection(StrictResponse):
+    approval_id: str
+    approval_hash: str
+    scope: ApprovalScope
+    decision: Literal["approved"]
+    reviewer_id: str
+    reviewer_role: Literal["reviewer", "administrator"]
+    decided_at: datetime
+    reason: str
+
+
+class ApprovedAlphaFactorProjection(StrictResponse):
+    factor_version_id: str
+    factor_version_hash: str
+    lifecycle_status: Literal["production"]
+    review_id: str
+    review_hash: str
+    validation_report_id: str
+    validation_report_hash: str
+    scientific_gate_passed: Literal[True]
+    approval: AlphaApprovalProjection
+
+
+class AlphaModelReadinessContextProjection(StrictResponse):
+    requested_scope: ApprovalScope
+    data_mode: DataMode
+    deployment_stage: DeploymentStage
+    checked_at: datetime
+
+
+class AlphaModelUnavailableProjection(AlphaModelReadinessContextProjection):
+    status: Literal["unavailable"]
+    blocked_reasons: list[ResearchWorkspaceBlocker]
+
+
+class AlphaModelReadyProjection(AlphaModelReadinessContextProjection):
+    status: Literal["ready"]
+    model: AlphaModelProjection
+    factors: list[ApprovedAlphaFactorProjection]
+
+
+AlphaModelReadinessProjection = Annotated[
+    AlphaModelReadyProjection | AlphaModelUnavailableProjection,
+    Field(discriminator="status"),
+]
+
+
+class ResearchWorkspaceData(StrictResponse):
+    status: Literal["ready", "partial", "unavailable"]
+    blockers: list[ResearchWorkspaceBlocker]
+    screen: ScreenRankingProjection | None
+    investment_view: InvestmentViewProjection | None
+    alpha_model: AlphaModelReadinessProjection
+
+
+class ResearchWorkspaceResponseContext(StrictResponse):
+    as_of: datetime
+    system_as_of: datetime
+    data_mode: DataMode
+    deployment_stage: DeploymentStage
+    trust_state: str | None = None
+    dataset_version_ids: list[str] = Field(default_factory=list)
+    model_version_ids: list[str] = Field(default_factory=list)
+    run_id: str | None = None
+    coverage: dict[str, JsonValue] = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ResearchWorkspaceEnvelope(StrictResponse):
+    data: ResearchWorkspaceData
+    context: ResearchWorkspaceResponseContext
 
 
 class ProblemDetails(BaseModel):

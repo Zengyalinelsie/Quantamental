@@ -49,6 +49,7 @@ export interface paths {
   "/api/market-data/corporate-actions": { get: ReadOperation };
   "/api/market-data/quality": { get: ReadOperation };
   "/api/market-data/summary": { get: ReadOperation };
+  "/api/research/workspace": { get: ReadOperation };
   "/api/runs": { get: ReadOperation };
   "/api/securities": { get: ReadOperation };
   "/api/system/catalog": { get: ReadOperation };

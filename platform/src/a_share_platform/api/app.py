@@ -13,6 +13,9 @@ from fastapi import Depends, FastAPI, Query, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from a_share_platform.adapters.memory.expected_return import (
+    UnavailableExpectedReturnLedgerRepository,
+)
 from a_share_platform.adapters.memory.experiments import (
     UnavailableExperimentRunRepository,
 )
@@ -21,7 +24,11 @@ from a_share_platform.adapters.memory.factor_reviews import (
 )
 from a_share_platform.adapters.memory.financial_evidence import StaticFinancialEvidenceReader
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
+from a_share_platform.adapters.memory.signals import UnavailableSignalSnapshotRepository
 from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
+from a_share_platform.adapters.postgres.expected_return import (
+    PostgresExpectedReturnLedgerRepository,
+)
 from a_share_platform.adapters.postgres.experiments import (
     PostgresExperimentRunRepository,
 )
@@ -29,6 +36,7 @@ from a_share_platform.adapters.postgres.factor_reviews import (
     PostgresFactorReviewRepository,
 )
 from a_share_platform.adapters.postgres.financial_evidence import PostgresFinancialEvidenceReader
+from a_share_platform.adapters.postgres.signals import PostgresSignalSnapshotRepository
 from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
 from a_share_platform.application.experiments import ExperimentRunService
 from a_share_platform.application.factor_reviews import (
@@ -45,6 +53,9 @@ from a_share_platform.application.permissions import (
     PermissionPolicy,
     Principal,
 )
+from a_share_platform.application.research_workspace import (
+    ResearchWorkspaceProjectionService,
+)
 from a_share_platform.domain.experiments import ExperimentRunConflict
 from a_share_platform.domain.factor_reviews import FactorReviewConflict
 from a_share_platform.domain.market_data import (
@@ -57,6 +68,7 @@ from a_share_platform.domain.pit import FinancialPeriodType
 from a_share_platform.domain.run_context import DataMode, DeploymentStage, RunContext
 from a_share_platform.domain.security_master import Exchange, SecurityMaster
 from a_share_platform.domain.universe import UniverseCatalog
+from a_share_platform.ports.expected_return import ExpectedReturnLedgerRepository
 from a_share_platform.ports.experiments import (
     ExperimentRunRepository,
     ExperimentStoreUnavailable,
@@ -66,6 +78,7 @@ from a_share_platform.ports.factor_reviews import (
     FactorReviewStoreUnavailable,
 )
 from a_share_platform.ports.financial_evidence import FinancialEvidenceReader
+from a_share_platform.ports.signals import SignalSnapshotRepository
 from a_share_platform.ports.system_catalog import SystemCatalogReader
 
 from .schemas import (
@@ -73,6 +86,7 @@ from .schemas import (
     ExperimentRunInput,
     FactorReviewInput,
     ProblemDetails,
+    ResearchWorkspaceEnvelope,
     ResponseContext,
 )
 
@@ -164,6 +178,8 @@ def create_app(
     financial_evidence: FinancialEvidenceReader | None = None,
     experiment_repository: ExperimentRunRepository | None = None,
     factor_review_repository: FactorReviewRepository | None = None,
+    expected_return_repository: ExpectedReturnLedgerRepository | None = None,
+    signal_snapshot_repository: SignalSnapshotRepository | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="A-Share Platform Next",
@@ -200,8 +216,28 @@ def create_app(
             "ASP_DATABASE_URL is not configured for factor review persistence"
         )
     )
+    expected_returns = expected_return_repository or (
+        PostgresExpectedReturnLedgerRepository.from_dsn(database_url)
+        if database_url
+        else UnavailableExpectedReturnLedgerRepository(
+            "ASP_DATABASE_URL is not configured for Expected Return persistence"
+        )
+    )
+    signal_snapshots = signal_snapshot_repository or (
+        PostgresSignalSnapshotRepository.from_dsn(database_url)
+        if database_url
+        else UnavailableSignalSnapshotRepository(
+            "ASP_DATABASE_URL is not configured for SignalSnapshot persistence"
+        )
+    )
     permission_policy = PermissionPolicy.default()
     factor_review_service = FactorReviewService(factor_reviews, permission_policy)
+    research_workspace_service = ResearchWorkspaceProjectionService(
+        expected_return_repository=expected_returns,
+        signal_snapshot_repository=signal_snapshots,
+        factor_review_repository=factor_reviews,
+        security_master=master,
+    )
     app.state.governance_repository = governance
     app.state.security_master = master
     app.state.universe_catalog = universes
@@ -212,6 +248,9 @@ def create_app(
     app.state.experiment_service = experiment_service
     app.state.factor_review_repository = factor_reviews
     app.state.factor_review_service = factor_review_service
+    app.state.expected_return_repository = expected_returns
+    app.state.signal_snapshot_repository = signal_snapshots
+    app.state.research_workspace_service = research_workspace_service
     app.state.permission_policy = permission_policy
 
     @app.exception_handler(RunContextOverrideDenied)
@@ -499,6 +538,15 @@ def create_app(
         if value is None:
             raise ResourceNotFound(f"factor promotion review not found: {review_id}")
         return envelope(asdict(value), _context)
+
+    @app.get("/api/research/workspace", response_model=ResearchWorkspaceEnvelope)
+    def research_workspace(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+        security_id: Annotated[str | None, Query(max_length=256)] = None,
+    ) -> ResearchWorkspaceEnvelope:
+        projection = research_workspace_service.project(security_query=security_id)
+        response = envelope(projection, context)
+        return ResearchWorkspaceEnvelope.model_validate(response.model_dump())
 
     @app.post("/api/factors/reviews", response_model=Envelope, status_code=201)
     def create_factor_promotion_review(

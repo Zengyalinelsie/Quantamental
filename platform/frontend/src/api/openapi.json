@@ -1,6 +1,180 @@
 {
   "components": {
     "schemas": {
+      "AlphaApprovalProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_hash": {
+            "title": "Approval Hash",
+            "type": "string"
+          },
+          "approval_id": {
+            "title": "Approval Id",
+            "type": "string"
+          },
+          "decided_at": {
+            "format": "date-time",
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decision": {
+            "const": "approved",
+            "title": "Decision",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "reviewer_id": {
+            "title": "Reviewer Id",
+            "type": "string"
+          },
+          "reviewer_role": {
+            "enum": [
+              "reviewer",
+              "administrator"
+            ],
+            "title": "Reviewer Role",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/ApprovalScope"
+          }
+        },
+        "required": [
+          "approval_id",
+          "approval_hash",
+          "scope",
+          "decision",
+          "reviewer_id",
+          "reviewer_role",
+          "decided_at",
+          "reason"
+        ],
+        "title": "AlphaApprovalProjection",
+        "type": "object"
+      },
+      "AlphaModelProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "code_version": {
+            "title": "Code Version",
+            "type": "string"
+          },
+          "environment_id": {
+            "title": "Environment Id",
+            "type": "string"
+          },
+          "investment_view_hash": {
+            "title": "Investment View Hash",
+            "type": "string"
+          },
+          "investment_view_id": {
+            "title": "Investment View Id",
+            "type": "string"
+          },
+          "model_version_id": {
+            "title": "Model Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model_version_id",
+          "code_version",
+          "environment_id",
+          "investment_view_id",
+          "investment_view_hash"
+        ],
+        "title": "AlphaModelProjection",
+        "type": "object"
+      },
+      "AlphaModelReadyProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "data_mode": {
+            "$ref": "#/components/schemas/DataMode"
+          },
+          "deployment_stage": {
+            "$ref": "#/components/schemas/DeploymentStage"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/ApprovedAlphaFactorProjection"
+            },
+            "title": "Factors",
+            "type": "array"
+          },
+          "model": {
+            "$ref": "#/components/schemas/AlphaModelProjection"
+          },
+          "requested_scope": {
+            "$ref": "#/components/schemas/ApprovalScope"
+          },
+          "status": {
+            "const": "ready",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requested_scope",
+          "data_mode",
+          "deployment_stage",
+          "checked_at",
+          "status",
+          "model",
+          "factors"
+        ],
+        "title": "AlphaModelReadyProjection",
+        "type": "object"
+      },
+      "AlphaModelUnavailableProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "blocked_reasons": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchWorkspaceBlocker"
+            },
+            "title": "Blocked Reasons",
+            "type": "array"
+          },
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "data_mode": {
+            "$ref": "#/components/schemas/DataMode"
+          },
+          "deployment_stage": {
+            "$ref": "#/components/schemas/DeploymentStage"
+          },
+          "requested_scope": {
+            "$ref": "#/components/schemas/ApprovalScope"
+          },
+          "status": {
+            "const": "unavailable",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requested_scope",
+          "data_mode",
+          "deployment_stage",
+          "checked_at",
+          "status",
+          "blocked_reasons"
+        ],
+        "title": "AlphaModelUnavailableProjection",
+        "type": "object"
+      },
       "ApprovalDecision": {
         "enum": [
           "approved",
@@ -19,6 +193,146 @@
         ],
         "title": "ApprovalScope",
         "type": "string"
+      },
+      "ApprovedAlphaFactorProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "approval": {
+            "$ref": "#/components/schemas/AlphaApprovalProjection"
+          },
+          "factor_version_hash": {
+            "title": "Factor Version Hash",
+            "type": "string"
+          },
+          "factor_version_id": {
+            "title": "Factor Version Id",
+            "type": "string"
+          },
+          "lifecycle_status": {
+            "const": "production",
+            "title": "Lifecycle Status",
+            "type": "string"
+          },
+          "review_hash": {
+            "title": "Review Hash",
+            "type": "string"
+          },
+          "review_id": {
+            "title": "Review Id",
+            "type": "string"
+          },
+          "scientific_gate_passed": {
+            "const": true,
+            "title": "Scientific Gate Passed",
+            "type": "boolean"
+          },
+          "validation_report_hash": {
+            "title": "Validation Report Hash",
+            "type": "string"
+          },
+          "validation_report_id": {
+            "title": "Validation Report Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "factor_version_id",
+          "factor_version_hash",
+          "lifecycle_status",
+          "review_id",
+          "review_hash",
+          "validation_report_id",
+          "validation_report_hash",
+          "scientific_gate_passed",
+          "approval"
+        ],
+        "title": "ApprovedAlphaFactorProjection",
+        "type": "object"
+      },
+      "CatalystProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "catalyst_id": {
+            "title": "Catalyst Id",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "horizon": {
+            "title": "Horizon",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "catalyst_id",
+          "summary",
+          "horizon",
+          "evidence_ids"
+        ],
+        "title": "CatalystProjection",
+        "type": "object"
+      },
+      "ClosureProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "checked_by": {
+            "title": "Checked By",
+            "type": "string"
+          },
+          "difference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difference"
+          },
+          "displayed_total": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displayed Total"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tolerance": {
+            "title": "Tolerance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "displayed_total",
+          "tolerance",
+          "difference",
+          "checked_by"
+        ],
+        "title": "ClosureProjection",
+        "type": "object"
       },
       "DataMode": {
         "description": "Qualification rules for data consumed by a run.",
@@ -73,6 +387,35 @@
         ],
         "title": "Exchange",
         "type": "string"
+      },
+      "ExpectedReturnDistributionProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "downside": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "p10": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "p50": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "p90": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "point": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          }
+        },
+        "required": [
+          "point",
+          "p10",
+          "p50",
+          "p90",
+          "downside"
+        ],
+        "title": "ExpectedReturnDistributionProjection",
+        "type": "object"
       },
       "ExperimentArtifactInput": {
         "additionalProperties": false,
@@ -704,6 +1047,387 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "IndustryPeerProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "expected_return": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "rank": {
+            "$ref": "#/components/schemas/ScreenRankProjection"
+          },
+          "security_id": {
+            "title": "Security Id",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "security_id",
+          "display_name",
+          "symbol",
+          "rank",
+          "expected_return",
+          "snapshot_id"
+        ],
+        "title": "IndustryPeerProjection",
+        "type": "object"
+      },
+      "InvalidatorProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "invalidator_id": {
+            "title": "Invalidator Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "invalidator_id",
+          "summary",
+          "evidence_ids"
+        ],
+        "title": "InvalidatorProjection",
+        "type": "object"
+      },
+      "InvestmentComponentProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "component": {
+            "enum": [
+              "quality",
+              "valuation",
+              "revision",
+              "event"
+            ],
+            "title": "Component",
+            "type": "string"
+          },
+          "contribution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "quantified",
+              "constrained",
+              "unavailable",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "visual": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WaterfallVisualProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "component",
+          "label",
+          "status",
+          "contribution",
+          "reason",
+          "evidence_ids",
+          "visual"
+        ],
+        "title": "InvestmentComponentProjection",
+        "type": "object"
+      },
+      "InvestmentEvidenceProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "source_kind": {
+            "title": "Source Kind",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "title",
+          "source_kind",
+          "available_at",
+          "version",
+          "source_url"
+        ],
+        "title": "InvestmentEvidenceProjection",
+        "type": "object"
+      },
+      "InvestmentSecurityProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "exchange": {
+            "title": "Exchange",
+            "type": "string"
+          },
+          "security_id": {
+            "title": "Security Id",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "security_id",
+          "symbol",
+          "exchange",
+          "display_name"
+        ],
+        "title": "InvestmentSecurityProjection",
+        "type": "object"
+      },
+      "InvestmentViewProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "catalysts": {
+            "items": {
+              "$ref": "#/components/schemas/CatalystProjection"
+            },
+            "title": "Catalysts",
+            "type": "array"
+          },
+          "closure": {
+            "$ref": "#/components/schemas/ClosureProjection"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/InvestmentComponentProjection"
+            },
+            "title": "Components",
+            "type": "array"
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "data_mode": {
+            "$ref": "#/components/schemas/DataMode"
+          },
+          "decision_time": {
+            "format": "date-time",
+            "title": "Decision Time",
+            "type": "string"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/ExpectedReturnDistributionProjection"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/InvestmentEvidenceProjection"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "horizon": {
+            "title": "Horizon",
+            "type": "string"
+          },
+          "invalidators": {
+            "items": {
+              "$ref": "#/components/schemas/InvalidatorProjection"
+            },
+            "title": "Invalidators",
+            "type": "array"
+          },
+          "residual": {
+            "$ref": "#/components/schemas/ResidualProjection"
+          },
+          "security": {
+            "$ref": "#/components/schemas/InvestmentSecurityProjection"
+          },
+          "trust_reason": {
+            "title": "Trust Reason",
+            "type": "string"
+          },
+          "trust_state": {
+            "enum": [
+              "normalized_current",
+              "pit_verified"
+            ],
+            "title": "Trust State",
+            "type": "string"
+          },
+          "versions": {
+            "$ref": "#/components/schemas/InvestmentViewVersionsProjection"
+          },
+          "view_id": {
+            "title": "View Id",
+            "type": "string"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "view_id",
+          "security",
+          "decision_time",
+          "horizon",
+          "data_mode",
+          "trust_state",
+          "trust_reason",
+          "distribution",
+          "components",
+          "residual",
+          "closure",
+          "confidence",
+          "catalysts",
+          "invalidators",
+          "evidence",
+          "versions",
+          "warnings"
+        ],
+        "title": "InvestmentViewProjection",
+        "type": "object"
+      },
+      "InvestmentViewVersionsProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artifact Id"
+          },
+          "code_version": {
+            "title": "Code Version",
+            "type": "string"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "dataset_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dataset Version Ids",
+            "type": "array"
+          },
+          "environment_id": {
+            "title": "Environment Id",
+            "type": "string"
+          },
+          "feature_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Feature Version Ids",
+            "type": "array"
+          },
+          "model_version_id": {
+            "title": "Model Version Id",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset_version_ids",
+          "feature_version_ids",
+          "model_version_id",
+          "run_id",
+          "code_version",
+          "environment_id",
+          "content_hash",
+          "artifact_id"
+        ],
+        "title": "InvestmentViewVersionsProjection",
+        "type": "object"
+      },
+      "JsonValue": {},
       "LabelVersionBindingInput": {
         "additionalProperties": false,
         "properties": {
@@ -770,6 +1494,257 @@
           "bound_at"
         ],
         "title": "PromotionBindingInput",
+        "type": "object"
+      },
+      "ResearchWorkspaceBlocker": {
+        "additionalProperties": false,
+        "properties": {
+          "affected_binding": {
+            "title": "Affected Binding",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "reason",
+          "affected_binding",
+          "evidence_ids"
+        ],
+        "title": "ResearchWorkspaceBlocker",
+        "type": "object"
+      },
+      "ResearchWorkspaceData": {
+        "additionalProperties": false,
+        "properties": {
+          "alpha_model": {
+            "discriminator": {
+              "mapping": {
+                "ready": "#/components/schemas/AlphaModelReadyProjection",
+                "unavailable": "#/components/schemas/AlphaModelUnavailableProjection"
+              },
+              "propertyName": "status"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AlphaModelReadyProjection"
+              },
+              {
+                "$ref": "#/components/schemas/AlphaModelUnavailableProjection"
+              }
+            ],
+            "title": "Alpha Model"
+          },
+          "blockers": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchWorkspaceBlocker"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "investment_view": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InvestmentViewProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "screen": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenRankingProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "partial",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "blockers",
+          "screen",
+          "investment_view",
+          "alpha_model"
+        ],
+        "title": "ResearchWorkspaceData",
+        "type": "object"
+      },
+      "ResearchWorkspaceEnvelope": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/ResearchWorkspaceResponseContext"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResearchWorkspaceData"
+          }
+        },
+        "required": [
+          "data",
+          "context"
+        ],
+        "title": "ResearchWorkspaceEnvelope",
+        "type": "object"
+      },
+      "ResearchWorkspaceResponseContext": {
+        "additionalProperties": false,
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "coverage": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Coverage",
+            "type": "object"
+          },
+          "data_mode": {
+            "$ref": "#/components/schemas/DataMode"
+          },
+          "dataset_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dataset Version Ids",
+            "type": "array"
+          },
+          "deployment_stage": {
+            "$ref": "#/components/schemas/DeploymentStage"
+          },
+          "model_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Version Ids",
+            "type": "array"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "system_as_of": {
+            "format": "date-time",
+            "title": "System As Of",
+            "type": "string"
+          },
+          "trust_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trust State"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "as_of",
+          "system_as_of",
+          "data_mode",
+          "deployment_stage"
+        ],
+        "title": "ResearchWorkspaceResponseContext",
+        "type": "object"
+      },
+      "ResidualProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "contribution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "quantified",
+              "constrained",
+              "unavailable",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "visual": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WaterfallVisualProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "contribution",
+          "reason",
+          "evidence_ids",
+          "visual"
+        ],
+        "title": "ResidualProjection",
         "type": "object"
       },
       "ResponseContext": {
@@ -863,6 +1838,431 @@
           "deployment_stage"
         ],
         "title": "RunContextInput",
+        "type": "object"
+      },
+      "ScreenIndustryProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "display_name"
+        ],
+        "title": "ScreenIndustryProjection",
+        "type": "object"
+      },
+      "ScreenNullableRankProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "display",
+          "unavailable_reason"
+        ],
+        "title": "ScreenNullableRankProjection",
+        "type": "object"
+      },
+      "ScreenProjectedValue": {
+        "additionalProperties": false,
+        "properties": {
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "raw": {
+            "title": "Raw",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw",
+          "display"
+        ],
+        "title": "ScreenProjectedValue",
+        "type": "object"
+      },
+      "ScreenRankChangeProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "enum": [
+              "up",
+              "down",
+              "flat",
+              "unavailable"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display"
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "display",
+          "unavailable_reason",
+          "direction"
+        ],
+        "title": "ScreenRankChangeProjection",
+        "type": "object"
+      },
+      "ScreenRankProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "display"
+        ],
+        "title": "ScreenRankProjection",
+        "type": "object"
+      },
+      "ScreenRankingProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_scope": {
+            "$ref": "#/components/schemas/ApprovalScope"
+          },
+          "data_cutoff": {
+            "format": "date-time",
+            "title": "Data Cutoff",
+            "type": "string"
+          },
+          "data_mode": {
+            "$ref": "#/components/schemas/DataMode"
+          },
+          "dataset_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dataset Version Ids",
+            "type": "array"
+          },
+          "decision_time": {
+            "format": "date-time",
+            "title": "Decision Time",
+            "type": "string"
+          },
+          "factor_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Factor Version Ids",
+            "type": "array"
+          },
+          "feature_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Feature Version Ids",
+            "type": "array"
+          },
+          "industry_peers": {
+            "items": {
+              "$ref": "#/components/schemas/IndustryPeerProjection"
+            },
+            "title": "Industry Peers",
+            "type": "array"
+          },
+          "model_version_id": {
+            "title": "Model Version Id",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ScreenRankingRowProjection"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "screen_id": {
+            "title": "Screen Id",
+            "type": "string"
+          },
+          "selected_security": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SelectedScreenSecurityProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trust_state": {
+            "enum": [
+              "normalized_current",
+              "pit_verified"
+            ],
+            "title": "Trust State",
+            "type": "string"
+          },
+          "universe": {
+            "$ref": "#/components/schemas/ScreenUniverseProjection"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "screen_id",
+          "universe",
+          "decision_time",
+          "data_cutoff",
+          "data_mode",
+          "trust_state",
+          "approval_scope",
+          "model_version_id",
+          "factor_version_ids",
+          "dataset_version_ids",
+          "feature_version_ids",
+          "rows",
+          "selected_security",
+          "industry_peers",
+          "warnings"
+        ],
+        "title": "ScreenRankingProjection",
+        "type": "object"
+      },
+      "ScreenRankingRowProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "expected_return": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "industry": {
+            "$ref": "#/components/schemas/ScreenIndustryProjection"
+          },
+          "investment_view_id": {
+            "title": "Investment View Id",
+            "type": "string"
+          },
+          "previous_rank": {
+            "$ref": "#/components/schemas/ScreenNullableRankProjection"
+          },
+          "rank": {
+            "$ref": "#/components/schemas/ScreenRankProjection"
+          },
+          "rank_change": {
+            "$ref": "#/components/schemas/ScreenRankChangeProjection"
+          },
+          "score": {
+            "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "security": {
+            "$ref": "#/components/schemas/ScreenSecurityIdentityProjection"
+          },
+          "selected": {
+            "title": "Selected",
+            "type": "boolean"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "trust_state": {
+            "enum": [
+              "normalized_current",
+              "pit_verified"
+            ],
+            "title": "Trust State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "security",
+          "industry",
+          "rank",
+          "previous_rank",
+          "rank_change",
+          "score",
+          "expected_return",
+          "confidence",
+          "investment_view_id",
+          "trust_state",
+          "content_hash",
+          "selected"
+        ],
+        "title": "ScreenRankingRowProjection",
+        "type": "object"
+      },
+      "ScreenSecurityIdentityProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "exchange": {
+            "title": "Exchange",
+            "type": "string"
+          },
+          "security_id": {
+            "title": "Security Id",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "security_id",
+          "symbol",
+          "display_name",
+          "exchange"
+        ],
+        "title": "ScreenSecurityIdentityProjection",
+        "type": "object"
+      },
+      "ScreenUniverseProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "universe_size": {
+            "title": "Universe Size",
+            "type": "integer"
+          },
+          "universe_version_id": {
+            "title": "Universe Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "universe_version_id",
+          "display_name",
+          "universe_size"
+        ],
+        "title": "ScreenUniverseProjection",
+        "type": "object"
+      },
+      "SelectedScreenSecurityProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "industry": {
+            "$ref": "#/components/schemas/ScreenIndustryProjection"
+          },
+          "security_id": {
+            "title": "Security Id",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "security_id",
+          "snapshot_id",
+          "display_name",
+          "symbol",
+          "industry"
+        ],
+        "title": "SelectedScreenSecurityProjection",
         "type": "object"
       },
       "StatementType": {
@@ -1082,6 +2482,35 @@
           "evidence_hashes"
         ],
         "title": "ValidationWaiverInput",
+        "type": "object"
+      },
+      "WaterfallVisualProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "enum": [
+              "positive",
+              "negative",
+              "flat"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "start_percent": {
+            "title": "Start Percent",
+            "type": "string"
+          },
+          "width_percent": {
+            "title": "Width Percent",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_percent",
+          "width_percent",
+          "direction"
+        ],
+        "title": "WaterfallVisualProjection",
         "type": "object"
       }
     }
@@ -2302,6 +3731,85 @@
           }
         },
         "summary": "Market Summary"
+      }
+    },
+    "/api/research/workspace": {
+      "get": {
+        "operationId": "research_workspace_api_research_workspace_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "security_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 256,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Security Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchWorkspaceEnvelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Research Workspace"
       }
     },
     "/api/runs": {
