@@ -467,6 +467,12 @@ Timing、任何因子或模型科学有效。P2 的多尺寸浏览器视觉证�
   coverage 和 lineage；
 - [ ] 批量 current 数据保持 `normalized_current`；strict 只从官方版本链和独立治理运行晋升。
 
+已完成的 current-only 身份前提：财务 observation、Dataset manifest 和持久化 receipt 显式保存
+`identity_resolution_method=current_known_retrieval_date`，统一按 provider `retrieved_at` 的
+UTC 日期解析，并携带“历史报告期身份未获 PIT 验证”warning。该 resolver 只允许进入
+`normalized_current + current_research` UoW；严格 effective-dated resolver 保持独立，
+current-known 身份不能被 strict/PIT 消费。
+
 映射资格不再使用 `production_allowed` 布尔值代理。P3.5 current worker 必须显式请求
 `DataMode.CURRENT_RESEARCH`，只有包含 `current_research` scope 的映射可执行；strict/PIT
 事实摄取和 production 使用分别要求对应 scope，任何一个 scope 都不隐含另一个；mapping 的

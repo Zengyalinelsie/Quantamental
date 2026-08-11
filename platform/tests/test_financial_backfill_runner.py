@@ -19,8 +19,10 @@ from a_share_platform.domain.backfill import (
 )
 from a_share_platform.domain.disclosure import RawObject, RawObjectKind, RetentionPolicy
 from a_share_platform.domain.financial_backfill import (
+    CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
     FinancialBackfillCohort,
     FinancialBackfillPlan,
+    FinancialIdentityResolutionMethod,
     FinancialMappingResult,
     FinancialPersistResult,
     FinancialProviderBatch,
@@ -290,7 +292,10 @@ class MemoryUnitOfWork:
         self.persist_result = FinancialPersistResult(
             dataset_version_id="dataset:financial:csi300:2024:v1",
             observation_ids=("observation:total-assets:600000:2024",),
-            warnings=(),
+            identity_resolution_method=(
+                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            ),
+            warnings=(CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,),
         )
         return self.persist_result
 
@@ -405,7 +410,10 @@ class FinancialBackfillRunnerTest(unittest.TestCase):
         unit_of_work.persist_result = FinancialPersistResult(
             dataset_version_id="dataset:financial:csi300:2024:v1",
             observation_ids=("observation:total-assets:600000:2024",),
-            warnings=(),
+            identity_resolution_method=(
+                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            ),
+            warnings=(CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,),
         )
 
         outcome = runner.run_unit(

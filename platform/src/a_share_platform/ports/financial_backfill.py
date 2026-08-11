@@ -14,6 +14,7 @@ from a_share_platform.domain.backfill import (
 from a_share_platform.domain.disclosure import RawObject
 from a_share_platform.domain.financial_backfill import (
     FinancialBackfillWorkUnit,
+    FinancialIdentityResolutionMethod,
     FinancialListingIdentity,
     FinancialMappingResult,
     FinancialPersistResult,
@@ -47,6 +48,19 @@ class FinancialBackfillSource(Protocol):
 
 class FinancialIdentityResolver(Protocol):
     """Resolve provider symbols through effective-dated Security Master records."""
+
+    def resolve(
+        self,
+        canonical_symbol: str,
+        *,
+        as_of: date,
+    ) -> FinancialListingIdentity: ...
+
+
+class CurrentKnownFinancialIdentityResolver(Protocol):
+    """Resolve only normalized-current rows at their provider retrieval date."""
+
+    resolution_method: FinancialIdentityResolutionMethod
 
     def resolve(
         self,

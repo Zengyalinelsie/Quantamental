@@ -20,11 +20,14 @@ from a_share_platform.domain.backfill import (
 )
 from a_share_platform.domain.disclosure import RawObject
 from a_share_platform.domain.financial_backfill import (
+    CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
+    FinancialIdentityResolutionMethod,
     FinancialListingIdentity,
     FinancialMappingResult,
     FinancialPersistResult,
     MappedFinancialRow,
     NormalizedCurrentFinancialObservation,
+    financial_identity_retrieval_date,
 )
 from a_share_platform.domain.financial_sources import (
     AvailabilityMethod,
@@ -36,7 +39,9 @@ from a_share_platform.domain.governance import DatasetVersion, LineageEdge, Vers
 from a_share_platform.domain.metrics import MetricUnit, StatementType
 from a_share_platform.domain.pit import DataTrustState, FinancialPeriodType
 from a_share_platform.domain.run_context import DataMode
-from a_share_platform.ports.financial_backfill import FinancialIdentityResolver
+from a_share_platform.ports.financial_backfill import (
+    CurrentKnownFinancialIdentityResolver,
+)
 
 
 def _json_parameter(value: object) -> object:
@@ -129,20 +134,47 @@ class PostgresFinancialIdentityResolver:
         )
 
 
+class PostgresCurrentKnownFinancialIdentityResolver:
+    """Resolve normalized-current rows at the provider retrieval date only."""
+
+    resolution_method = (
+        FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+    )
+
+    def __init__(self, connection: Connection) -> None:
+        self._effective_dated = PostgresFinancialIdentityResolver(connection)
+
+    def resolve(
+        self,
+        canonical_symbol: str,
+        *,
+        as_of: date,
+    ) -> FinancialListingIdentity:
+        return self._effective_dated.resolve(canonical_symbol, as_of=as_of)
+
+
 class PostgresFinancialBackfillUnitOfWork:
     """Persist one financial work unit atomically after identity resolution."""
 
-    _SCHEMA_VERSION = "normalized-current-financial-observation:v1"
+    _SCHEMA_VERSION = "normalized-current-financial-observation:v2"
 
     def __init__(
         self,
         connection: Connection,
         *,
         job_id: str,
-        identity_resolver: FinancialIdentityResolver,
+        identity_resolver: CurrentKnownFinancialIdentityResolver,
     ) -> None:
         if not isinstance(job_id, str) or not job_id.strip():
             raise ValueError("job_id must not be empty")
+        if (
+            getattr(identity_resolver, "resolution_method", None)
+            is not FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+        ):
+            raise ValueError(
+                "normalized_current financial persistence requires a current-known "
+                "identity resolver"
+            )
         self._connection = connection
         self._job_id = job_id
         self._identity_resolver = identity_resolver
@@ -215,12 +247,16 @@ class PostgresFinancialBackfillUnitOfWork:
                     *batch.warnings,
                     *value.warnings,
                     *(warning for row in value.mapped_rows for warning in row.source_row.warnings),
+                    CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
                 )
             )
         )
         result = FinancialPersistResult(
             dataset_version_id=dataset.dataset_version_id,
             observation_ids=tuple(item.observation_id for item in observations),
+            identity_resolution_method=(
+                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            ),
             warnings=warnings,
         )
         self._save_receipt(
@@ -241,7 +277,8 @@ class PostgresFinancialBackfillUnitOfWork:
         self._require_job(job_id)
         row = self._connection.execute(
             """
-            SELECT dataset_version_id, observation_ids, warnings
+            SELECT dataset_version_id, observation_ids, warnings,
+                   identity_resolution_method
             FROM financial_backfill_persist_receipts
             WHERE job_id = %s AND checkpoint_key = %s
             """,
@@ -258,6 +295,7 @@ class PostgresFinancialBackfillUnitOfWork:
         return FinancialPersistResult(
             dataset_version_id=str(row[0]),
             observation_ids=tuple(str(item) for item in raw_observations),
+            identity_resolution_method=FinancialIdentityResolutionMethod(str(row[3])),
             warnings=tuple(str(item) for item in raw_warnings),
         )
 
@@ -269,7 +307,10 @@ class PostgresFinancialBackfillUnitOfWork:
         resolved: dict[tuple[str, date], FinancialListingIdentity] = {}
         for row in rows:
             canonical = self._canonical_symbol(row, symbols)
-            key = (canonical, row.source_row.report_period_end)
+            key = (
+                canonical,
+                financial_identity_retrieval_date(row.source_row.retrieved_at),
+            )
             if key not in resolved:
                 resolved[key] = self._identity_resolver.resolve(canonical, as_of=key[1])
             identity = resolved[key]
@@ -302,22 +343,31 @@ class PostgresFinancialBackfillUnitOfWork:
                 "company_id": identities[
                     (
                         self._canonical_symbol(row, batch.work_unit.symbols),
-                        row.source_row.report_period_end,
+                        financial_identity_retrieval_date(row.source_row.retrieved_at),
                     )
                 ].company_id,
                 "security_id": identities[
                     (
                         self._canonical_symbol(row, batch.work_unit.symbols),
-                        row.source_row.report_period_end,
+                        financial_identity_retrieval_date(row.source_row.retrieved_at),
                     )
                 ].security_id,
                 "listing_id": identities[
                     (
                         self._canonical_symbol(row, batch.work_unit.symbols),
-                        row.source_row.report_period_end,
+                        financial_identity_retrieval_date(row.source_row.retrieved_at),
                     )
                 ].listing_id,
-                "identity_as_of": row.source_row.report_period_end.isoformat(),
+                "identity_as_of": identities[
+                    (
+                        self._canonical_symbol(row, batch.work_unit.symbols),
+                        financial_identity_retrieval_date(row.source_row.retrieved_at),
+                    )
+                ].resolved_as_of.isoformat(),
+                "identity_resolution_method": (
+                    FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE.value
+                ),
+                "identity_warnings": [CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING],
                 "provider_id": row.provider_id,
                 "provider_table": row.source_row.provider_table,
                 "metric_code": row.metric_code,
@@ -360,7 +410,14 @@ class PostgresFinancialBackfillUnitOfWork:
                 "raw_object_hash": row.raw_object_hash,
                 "source_url": row.source_row.source_url,
                 "trust_state": row.trust_state.value,
-                "warnings": list(row.source_row.warnings),
+                "warnings": list(
+                    dict.fromkeys(
+                        (
+                            *row.source_row.warnings,
+                            CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
+                        )
+                    )
+                ),
             }
             for row in sorted(value.mapped_rows, key=lambda item: item.mapped_row_id)
         )
@@ -377,6 +434,10 @@ class PostgresFinancialBackfillUnitOfWork:
             "raw_object_hash": batch.content_hash,
             "data_mode": DataMode.CURRENT_RESEARCH.value,
             "trust_state": DataTrustState.NORMALIZED_CURRENT.value,
+            "identity_resolution_method": (
+                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE.value
+            ),
+            "warnings": [CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING],
             "rows": rows,
         }
         payload = json.dumps(
@@ -405,7 +466,9 @@ class PostgresFinancialBackfillUnitOfWork:
         for row in sorted(value.mapped_rows, key=lambda item: item.mapped_row_id):
             source = row.source_row
             canonical = self._canonical_symbol(row, batch.work_unit.symbols)
-            identity = identities[(canonical, source.report_period_end)]
+            identity = identities[
+                (canonical, financial_identity_retrieval_date(source.retrieved_at))
+            ]
             digest = hashlib.sha256(
                 f"{dataset_version_id}|{row.mapped_row_id}|{identity.listing_id}".encode()
             ).hexdigest()[:32]
@@ -420,6 +483,9 @@ class PostgresFinancialBackfillUnitOfWork:
                     listing_id=identity.listing_id,
                     canonical_symbol=canonical,
                     identity_as_of=identity.resolved_as_of,
+                    identity_resolution_method=(
+                        FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+                    ),
                     mapped_row_id=row.mapped_row_id,
                     provider_id=source.provider_id,
                     provider_table=source.provider_table,
@@ -452,7 +518,14 @@ class PostgresFinancialBackfillUnitOfWork:
                     metric_code=row.metric_code,
                     trust_state=DataTrustState.NORMALIZED_CURRENT,
                     data_mode=DataMode.CURRENT_RESEARCH,
-                    warnings=source.warnings,
+                    warnings=tuple(
+                        dict.fromkeys(
+                            (
+                                *source.warnings,
+                                CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
+                            )
+                        )
+                    ),
                 )
             )
         return tuple(observations)
@@ -563,13 +636,13 @@ class PostgresFinancialBackfillUnitOfWork:
                 report_version_type, revision_sequence, announced_at, available_at,
                 availability_method, provider_updated_at, retrieved_at, raw_object_id,
                 raw_object_hash, source_url, mapping_id, mapping_version_id, metric_code,
-                trust_state, data_mode, warnings
+                trust_state, data_mode, identity_resolution_method, warnings
             ) VALUES (
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s
+                %s, %s, %s
             )
             ON CONFLICT (observation_id) DO NOTHING
             """,
@@ -596,8 +669,9 @@ class PostgresFinancialBackfillUnitOfWork:
             """
             INSERT INTO financial_backfill_persist_receipts (
                 job_id, checkpoint_key, dataset_version_id, observation_count,
-                observation_ids, warnings, trust_state, created_at
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                observation_ids, warnings, trust_state, created_at,
+                identity_resolution_method
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (job_id, checkpoint_key) DO NOTHING
             """,
             (
@@ -609,6 +683,7 @@ class PostgresFinancialBackfillUnitOfWork:
                 _json_parameter(list(value.warnings)),
                 DataTrustState.NORMALIZED_CURRENT.value,
                 created_at,
+                value.identity_resolution_method.value,
             ),
         )
 
@@ -656,6 +731,7 @@ class PostgresFinancialBackfillUnitOfWork:
             value.metric_code,
             value.trust_state.value,
             value.data_mode.value,
+            value.identity_resolution_method.value,
             _json_parameter(list(value.warnings)),
         )
 
@@ -671,13 +747,13 @@ class PostgresFinancialBackfillUnitOfWork:
                    report_version_type, revision_sequence, announced_at, available_at,
                    availability_method, provider_updated_at, retrieved_at, raw_object_id,
                    raw_object_hash, source_url, mapping_id, mapping_version_id, metric_code,
-                   trust_state, data_mode, warnings
+                   trust_state, data_mode, identity_resolution_method, warnings
             FROM normalized_current_financial_observations
         """
 
     @staticmethod
     def _observation_from_row(row: Sequence[object]) -> NormalizedCurrentFinancialObservation:
-        warnings = _json_value(row[41])
+        warnings = _json_value(row[42])
         if not isinstance(warnings, (list, tuple)):
             raise TypeError("stored normalized financial warnings must be an array")
         return NormalizedCurrentFinancialObservation(
@@ -722,6 +798,7 @@ class PostgresFinancialBackfillUnitOfWork:
             metric_code=str(row[38]),
             trust_state=DataTrustState(str(row[39])),
             data_mode=DataMode(str(row[40])),
+            identity_resolution_method=FinancialIdentityResolutionMethod(str(row[41])),
             warnings=tuple(str(item) for item in warnings),
         )
 
@@ -731,6 +808,7 @@ class PostgresFinancialBackfillUnitOfWork:
 
 
 __all__ = [
+    "PostgresCurrentKnownFinancialIdentityResolver",
     "PostgresFinancialBackfillUnitOfWork",
     "PostgresFinancialIdentityResolver",
 ]

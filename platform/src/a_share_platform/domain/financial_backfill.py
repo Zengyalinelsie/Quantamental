@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -44,6 +44,12 @@ def _plain_date(value: date, field_name: str) -> date:
     return value
 
 
+def financial_identity_retrieval_date(value: datetime) -> date:
+    """Return the UTC date used by Python and PostgreSQL identity constraints."""
+
+    return _aware(value, "retrieved_at").astimezone(UTC).date()
+
+
 class FinancialBackfillCohort(str, Enum):
     """Ordered scale-up cohorts; CSI500 is not executable before CSI300 coverage."""
 
@@ -56,6 +62,20 @@ class FinancialBackfillCohort(str, Enum):
             self.CSI_300: "index:000300",
             self.CSI_500: "index:000905",
         }[self]
+
+
+class FinancialIdentityResolutionMethod(str, Enum):
+    """Clock used to resolve a listing identity for a normalized observation."""
+
+    EFFECTIVE_DATED_REPORT_PERIOD = "effective_dated_report_period"
+    CURRENT_KNOWN_RETRIEVAL_DATE = "current_known_retrieval_date"
+
+
+CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING = (
+    "current-known financial identity resolved at provider retrieval date for "
+    "normalized_current persistence; identity at the historical report period "
+    "is not PIT verified and cannot be used by strict_historical"
+)
 
 
 @dataclass(frozen=True)
@@ -477,6 +497,7 @@ class NormalizedCurrentFinancialObservation:
     listing_id: str
     canonical_symbol: str
     identity_as_of: date
+    identity_resolution_method: FinancialIdentityResolutionMethod
     mapped_row_id: str
     provider_id: str
     provider_table: str
@@ -538,10 +559,31 @@ class NormalizedCurrentFinancialObservation:
         identity_as_of = _plain_date(self.identity_as_of, "identity_as_of")
         start = _plain_date(self.report_period_start, "report_period_start")
         end = _plain_date(self.report_period_end, "report_period_end")
+        retrieved_at = _aware(self.retrieved_at, "retrieved_at")
         if end < start:
             raise ValueError("report_period_end cannot precede report_period_start")
-        if identity_as_of != end:
-            raise ValueError("financial identity must be resolved as of report_period_end")
+        identity_method = FinancialIdentityResolutionMethod(
+            self.identity_resolution_method
+        )
+        object.__setattr__(self, "identity_resolution_method", identity_method)
+        if (
+            identity_method
+            is FinancialIdentityResolutionMethod.EFFECTIVE_DATED_REPORT_PERIOD
+            and identity_as_of != end
+        ):
+            raise ValueError(
+                "effective-dated financial identity must use report_period_end"
+            )
+        if (
+            identity_method
+            is FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            and identity_as_of != financial_identity_retrieval_date(retrieved_at)
+        ):
+            raise ValueError(
+                "current-known financial identity must use provider retrieval date"
+            )
+        if identity_as_of < end:
+            raise ValueError("financial identity date cannot precede report_period_end")
 
         object.__setattr__(self, "statement_type", StatementType(self.statement_type))
         object.__setattr__(
@@ -586,7 +628,6 @@ class NormalizedCurrentFinancialObservation:
         ):
             if timestamp is not None:
                 _aware(timestamp, field_name)
-        _aware(self.retrieved_at, "retrieved_at")
         if not isinstance(self.raw_object_hash, str) or _SHA256.fullmatch(
             self.raw_object_hash
         ) is None:
@@ -602,6 +643,14 @@ class NormalizedCurrentFinancialObservation:
         warnings = tuple(self.warnings)
         for warning in warnings:
             _text(warning, "warning")
+        if (
+            identity_method
+            is FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            and CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING not in warnings
+        ):
+            raise ValueError(
+                "current-known financial observation requires an explicit identity warning"
+            )
         object.__setattr__(self, "warnings", warnings)
 
 
@@ -609,6 +658,7 @@ class NormalizedCurrentFinancialObservation:
 class FinancialPersistResult:
     dataset_version_id: str
     observation_ids: tuple[str, ...]
+    identity_resolution_method: FinancialIdentityResolutionMethod
     warnings: tuple[str, ...]
 
     def __post_init__(self) -> None:
@@ -619,7 +669,16 @@ class FinancialPersistResult:
         for observation_id in observations:
             _text(observation_id, "observation_id")
         object.__setattr__(self, "observation_ids", observations)
+        method = FinancialIdentityResolutionMethod(self.identity_resolution_method)
+        object.__setattr__(self, "identity_resolution_method", method)
         warnings = tuple(self.warnings)
         for warning in warnings:
             _text(warning, "warning")
+        if (
+            method is FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            and CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING not in warnings
+        ):
+            raise ValueError(
+                "current-known financial receipt requires an explicit identity warning"
+            )
         object.__setattr__(self, "warnings", warnings)

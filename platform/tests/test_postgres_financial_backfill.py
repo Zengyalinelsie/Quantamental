@@ -1,11 +1,12 @@
 import json
 import unittest
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
 from a_share_platform.adapters.memory.metrics import InMemoryMetricRegistryRepository
 from a_share_platform.adapters.postgres.financial_backfill import (
+    PostgresCurrentKnownFinancialIdentityResolver,
     PostgresFinancialBackfillUnitOfWork,
     PostgresFinancialIdentityResolver,
 )
@@ -20,6 +21,7 @@ from a_share_platform.domain.financial_backfill import (
     FinancialBackfillBatchResult,
     FinancialBackfillCohort,
     FinancialBackfillPlan,
+    FinancialIdentityResolutionMethod,
     FinancialListingIdentity,
     FinancialProviderBatch,
     FinancialStatementSelection,
@@ -104,14 +106,14 @@ def profile() -> FinancialSourceProfile:
     )
 
 
-def mapping_result():  # type: ignore[no-untyped-def]
+def mapping_result(*, retrieved_at: datetime = NOW):  # type: ignore[no-untyped-def]
     evidence = RawObject(
         raw_object_id="raw:factor-service:balance-sheet:batch-1",
         object_kind=RawObjectKind.FILE,
         content_hash=RAW_HASH,
         source_url="https://factor.example.internal/api/v2/table/query",
         provider_id="factor_service_ths",
-        retrieved_at=NOW,
+        retrieved_at=retrieved_at,
         media_type="application/vnd.a-share-platform.http-exchange-manifest+json",
         storage_uri="file:///private/research/evidence/batch-1.json",
         license_id="license:private-local-research-test",
@@ -141,10 +143,10 @@ def mapping_result():  # type: ignore[no-untyped-def]
         report_version_type=ReportVersionType.UNKNOWN,
         revision_sequence=0,
         announced_at=None,
-        available_at=NOW,
+        available_at=retrieved_at,
         availability_method=AvailabilityMethod.CONSERVATIVE_RETRIEVAL_TIME,
         provider_updated_at=None,
-        retrieved_at=NOW,
+        retrieved_at=retrieved_at,
         raw_object_id=evidence.raw_object_id,
         raw_object_hash=evidence.content_hash,
         source_url=evidence.source_url,
@@ -257,6 +259,7 @@ class PersistingFakeConnection:
                         self.receipt_row[2],
                         _json(self.receipt_row[4]),
                         _json(self.receipt_row[5]),
+                        self.receipt_row[8],
                     )
                 ]
             )
@@ -270,6 +273,10 @@ class PersistingFakeConnection:
 
 
 class StubIdentityResolver:
+    resolution_method = (
+        FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+    )
+
     def __init__(self) -> None:
         self.calls: list[tuple[str, date]] = []
 
@@ -351,8 +358,45 @@ class PostgresFinancialIdentityResolverTest(unittest.TestCase):
                 with self.assertRaisesRegex(LookupError, expected):
                     resolver.resolve("SH.600000", as_of=date(2024, 12, 31))
 
+    def test_current_known_resolver_is_separate_and_uses_the_supplied_retrieval_date(
+        self,
+    ) -> None:
+        class Connection:
+            def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
+                self.query = query
+                self.params = params
+                return FakeResult(
+                    [("company:600000", "security:600000:XSHG", "listing:600000:XSHG")]
+                )
+
+        connection = Connection()
+        resolver = PostgresCurrentKnownFinancialIdentityResolver(connection)  # type: ignore[arg-type]
+        retrieval_date = NOW.date()
+
+        identity = resolver.resolve("SH.600000", as_of=retrieval_date)
+
+        self.assertEqual(
+            resolver.resolution_method,
+            FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE,
+        )
+        self.assertEqual(identity.resolved_as_of, retrieval_date)
+        self.assertIn("identifier_history", connection.query)
+        self.assertEqual(connection.params[-1], retrieval_date)
+
 
 class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
+    def test_normalized_current_uow_rejects_the_strict_effective_dated_resolver(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, "current-known"):
+            PostgresFinancialBackfillUnitOfWork(
+                PersistingFakeConnection(),
+                job_id="job:financial:csi300:2024:v1",
+                identity_resolver=PostgresFinancialIdentityResolver(
+                    PersistingFakeConnection()
+                ),
+            )
+
     def test_checkpoint_reports_lineage_and_transaction_boundaries_are_durable(self) -> None:
         result = mapping_result()
         unit = result.provider_batch.work_unit
@@ -421,7 +465,11 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
 
         receipt = uow.persist(mapping_result())
 
-        self.assertEqual(resolver.calls, [("SH.600000", date(2024, 12, 31))])
+        self.assertEqual(resolver.calls, [("SH.600000", NOW.date())])
+        self.assertEqual(
+            receipt.identity_resolution_method,
+            FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE,
+        )
         self.assertEqual(len(receipt.observation_ids), 1)
         self.assertEqual(
             uow.get_persist_result(
@@ -443,7 +491,13 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
         self.assertIn("unknown", params)
         self.assertIn("point_in_time", params)
         self.assertIn("normalized_current", params)
+        self.assertIn("current_known_retrieval_date", params)
         self.assertNotIn("pit_verified", params)
+        warning_values = tuple(str(value) for value in _json(params[-1]))
+        self.assertTrue(
+            any("current-known" in value for value in warning_values),
+            warning_values,
+        )
 
         receipt_params = next(
             params
@@ -452,9 +506,57 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
         )
         self.assertEqual(_json(receipt_params[4]), list(receipt.observation_ids))
         self.assertEqual(receipt_params[6], "normalized_current")
+        self.assertTrue(
+            any("current-known" in warning for warning in _json(receipt_params[5]))
+        )
+        self.assertIn("current_known_retrieval_date", receipt_params)
+
+        dataset_metadata = connection.dataset_row[4]  # type: ignore[index]
+        self.assertIsInstance(dataset_metadata, dict)
+        manifest = dataset_metadata["manifest"]  # type: ignore[index]
+        self.assertEqual(
+            manifest["identity_resolution_method"],  # type: ignore[index]
+            "current_known_retrieval_date",
+        )
+        self.assertTrue(
+            any("current-known" in warning for warning in manifest["warnings"])  # type: ignore[index]
+        )
+        self.assertEqual(
+            manifest["rows"][0]["identity_as_of"],  # type: ignore[index]
+            NOW.date().isoformat(),
+        )
+
+    def test_current_identity_date_uses_utc_across_a_shanghai_midnight(self) -> None:
+        shanghai = timezone(timedelta(hours=8))
+        retrieved_at = datetime(2026, 8, 11, 0, 30, tzinfo=shanghai)
+        expected_utc_date = date(2026, 8, 10)
+        connection = PersistingFakeConnection()
+        resolver = StubIdentityResolver()
+        uow = PostgresFinancialBackfillUnitOfWork(
+            connection,
+            job_id="job:financial:csi300:2024:v1",
+            identity_resolver=resolver,
+        )
+
+        receipt = uow.persist(mapping_result(retrieved_at=retrieved_at))
+
+        self.assertEqual(resolver.calls, [("SH.600000", expected_utc_date)])
+        self.assertEqual(
+            receipt.identity_resolution_method,
+            FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE,
+        )
+        manifest = connection.dataset_row[4]["manifest"]  # type: ignore[index]
+        self.assertEqual(
+            manifest["rows"][0]["identity_as_of"],  # type: ignore[index]
+            expected_utc_date.isoformat(),
+        )
 
     def test_unresolved_identity_aborts_before_financial_or_dataset_inserts(self) -> None:
         class MissingIdentity:
+            resolution_method = (
+                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            )
+
             def resolve(self, *_args: object, **_kwargs: object) -> FinancialListingIdentity:
                 raise LookupError("unresolved financial identity")
 

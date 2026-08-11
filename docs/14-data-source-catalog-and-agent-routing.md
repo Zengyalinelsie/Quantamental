@@ -415,6 +415,11 @@ P3-W01 至 W03 的不可变证据、映射、双时间选择和冲突阻断保�
   DatasetVersion、checkpoint、quality、coverage 和 lineage；
 - raw 响应按许可进入内容寻址对象存储；不允许保存时只登记 metadata/hash，不绕过条款；
 - current 与 strict 数据集和查询门保持隔离，PIT 晋升只能由治理运行产生新记录。
+- current 财务回填只允许使用独立的 current-known identity resolver，并按 provider
+  `retrieved_at` 的 UTC 日期解析；observation、Dataset manifest 和 receipt 都必须保存
+  `current_known_retrieval_date` 及显式 warning。它解决 current Security Master 无法按历史
+  报告期有效日解析的问题，但不证明历史身份，禁止 strict/PIT 消费；严格 effective-dated
+  resolver 保持独立且不能注入 normalized-current UoW。
 
 现有 `FactObservation` 还需要评审是否补充：合并/母公司范围、累计/单季度口径、
 原始/更正/重述类型、provider record ID、provider updated time 和 Decimal 数值。若这些字段

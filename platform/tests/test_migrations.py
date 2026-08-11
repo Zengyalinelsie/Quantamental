@@ -66,6 +66,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0020_market_structure_observations.sql",
                 "0021_provider_mapping_usage_scopes.sql",
                 "0022_discrete_universe_observations.sql",
+                "0023_normalized_current_financial_identity.sql",
             ),
         )
 
