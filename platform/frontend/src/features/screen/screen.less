@@ -1,0 +1,326 @@
+@import '../../design/tokens.less';
+
+.screenRankingPanel,
+.alphaReadinessPanel {
+  display: grid;
+  gap: 14px;
+}
+
+.screenRankingPanel,
+.alphaReadinessPanel > .ant-alert,
+.alphaReadinessPanel > .ant-descriptions,
+.alphaReadinessPanel--unavailable,
+.approvedFactorCard {
+  border-radius: @radius;
+}
+
+.screenRankingPanel {
+  overflow: hidden;
+  border: 1px solid @border;
+  background: @container;
+}
+
+.screenPanelHeader,
+.alphaReadyHeader {
+  display: flex;
+  min-height: 94px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  border-top: 3px solid @primary;
+  border-bottom: 1px solid @secondary-border;
+}
+
+.screenPanelHeader p,
+.screenSelectedSecurity > p,
+.screenIndustryPeers > p,
+.alphaReadyHeader p,
+.approvedFactorCard header span {
+  margin: 0 0 5px;
+  color: @primary;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.screenPanelHeader h2,
+.alphaReadyHeader h2 {
+  margin: 0 0 7px;
+  font-size: 20px;
+}
+
+.screenPanelHeader code,
+.screenSelectedSecurity code,
+.screenLineage code,
+.screenBindingCell code,
+.alphaReadinessPanel code {
+  color: @secondary-text;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.screenContextTags,
+.alphaReadyHeader > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.screenContextTags .ant-tag,
+.alphaReadyHeader .ant-tag {
+  margin: 0;
+}
+
+.screenRankingPanel > .ant-alert {
+  margin: 0 14px;
+}
+
+.screenSelectionGrid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(360px, 2.2fr);
+  margin: 0 14px;
+  border: 1px solid @secondary-border;
+}
+
+.screenSelectedSecurity,
+.screenIndustryPeers {
+  min-width: 0;
+  padding: 14px;
+}
+
+.screenIndustryPeers {
+  border-left: 1px solid @secondary-border;
+}
+
+.screenSelectedSecurity h3 {
+  margin: 8px 0 5px;
+  font-size: 15px;
+}
+
+.screenSelectedSecurity > span {
+  display: block;
+  margin-bottom: 10px;
+  color: @secondary-text;
+  font-size: 11px;
+}
+
+.screenPeerList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.screenPeerList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 11px;
+  border-left: 3px solid @primary;
+  background: @elevated;
+}
+
+.screenPeerList li > div {
+  display: grid;
+  gap: 3px;
+}
+
+.screenPeerList li > div:last-child {
+  text-align: right;
+}
+
+.screenPeerList strong {
+  font-size: 11px;
+}
+
+.screenPeerList span {
+  color: @tertiary-text;
+  font-size: 9px;
+}
+
+.screenRankingTable {
+  overflow: hidden;
+  margin: 0 14px;
+  border: 1px solid @secondary-border;
+}
+
+.screenRankingRow--selected > td {
+  background: #f1f5fb !important;
+}
+
+.screenRankingRow--selected > td:first-child {
+  box-shadow: inset 3px 0 @primary;
+}
+
+.screenSecurityCell,
+.screenBindingCell,
+.screenVersionStack {
+  display: grid;
+  gap: 3px;
+}
+
+.screenSecurityCell strong {
+  font-size: 11px;
+}
+
+.screenSecurityCell span,
+.screenSecurityCell code {
+  color: @tertiary-text;
+  font-size: 9px;
+}
+
+.screenTabularValue,
+.screenRankChange {
+  font-variant-numeric: tabular-nums;
+}
+
+.screenRankChange--up {
+  color: @market-up;
+}
+
+.screenRankChange--down {
+  color: @market-down;
+}
+
+.screenRankChange--flat,
+.screenUnavailableValue {
+  color: @market-flat;
+}
+
+.screenLineage {
+  margin: 0 14px 14px;
+}
+
+.alphaReadinessPanel--unavailable {
+  padding: 16px;
+  border: 1px solid @border;
+  background: @container;
+}
+
+.alphaReadinessContext {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.alphaReadinessContext .ant-tag {
+  margin: 0;
+}
+
+.alphaReadinessContext span,
+.alphaReadyHeader span {
+  color: @tertiary-text;
+  font-size: 10px;
+}
+
+.alphaBlockerList,
+.approvedFactorList {
+  display: grid;
+  gap: 10px;
+}
+
+.alphaBlockerList article {
+  padding: 12px;
+  border: 1px solid @secondary-border;
+  border-left: 3px solid @severity-critical;
+  background: @elevated;
+}
+
+.alphaBlockerList header,
+.alphaBlockerList article > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.alphaBlockerList .ant-tag {
+  margin: 0;
+}
+
+.alphaBlockerList p {
+  margin: 9px 0;
+  color: @secondary-text;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.alphaReadinessPanel:not(.alphaReadinessPanel--unavailable) {
+  overflow: hidden;
+  border: 1px solid @border;
+  background: @container;
+}
+
+.alphaReadyHeader {
+  border-bottom: 1px solid @secondary-border;
+}
+
+.alphaAuthorityNotice,
+.alphaModelBinding,
+.approvedFactorList {
+  margin-right: 14px;
+  margin-left: 14px;
+}
+
+.approvedFactorList {
+  margin-bottom: 14px;
+}
+
+.approvedFactorCard {
+  overflow: hidden;
+  border: 1px solid @secondary-border;
+}
+
+.approvedFactorCard > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 13px;
+  border-bottom: 1px solid @secondary-border;
+  background: @elevated;
+}
+
+.approvedFactorCard header > div {
+  display: grid;
+}
+
+.approvedFactorCard header strong {
+  font-size: 12px;
+}
+
+.approvedFactorCard .ant-tag {
+  margin: 0;
+}
+
+.approvedFactorCard .ant-descriptions {
+  margin: 12px;
+}
+
+@media (max-width: 768px) {
+  .screenPanelHeader,
+  .alphaReadyHeader {
+    flex-direction: column;
+  }
+
+  .screenContextTags,
+  .alphaReadyHeader > div:last-child {
+    justify-content: flex-start;
+  }
+
+  .screenSelectionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .screenIndustryPeers {
+    border-top: 1px solid @secondary-border;
+    border-left: 0;
+  }
+}
