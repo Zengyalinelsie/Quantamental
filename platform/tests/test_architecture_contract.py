@@ -19,6 +19,7 @@ class ArchitectureContractTest(unittest.TestCase):
             "pydantic",
             "psycopg",
             "futu",
+            "qlib",
             "openai",
             "a_share_platform.application",
             "a_share_platform.ports",
