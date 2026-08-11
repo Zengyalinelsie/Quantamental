@@ -105,7 +105,7 @@ PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
   --start 2018-01-01 --end 2018-12-31 \
   --symbols SH.600519 SZ.000001 \
   --domains trading_calendar \
-  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
   --parquet-root ./var/private-research/parquet \
   --private-local-research-ack --execute
 
@@ -116,7 +116,7 @@ PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
   --all-a-share \
   --benchmarks 000905 \
   --domains security_master universe \
-  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
   --parquet-root ./var/private-research/parquet \
   --private-local-research-ack --execute
 
@@ -126,7 +126,7 @@ PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.workers.backfill \
   --start 2018-01-01 --end 2026-08-10 \
   --symbols SH.600519 SZ.000001 \
   --domains security_master \
-  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
   --parquet-root ./var/private-research/parquet \
   --private-local-research-ack --execute
 ```
@@ -153,7 +153,7 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.financial_cohort_aud
     job:financial-backfill:csi500:akshare-pilot-3:2018-2025:v1 \
     job:financial-backfill:csi500:akshare-remaining-497:2018-2025:v1 \
   --expected-security-count 500 \
-  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev
 ```
 
 该审计同时核对 checkpoint/receipt、normalized observations、12,000 份 coverage report、
@@ -171,7 +171,7 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.timing_baseline \
   --universe-version-id '<persisted-universe-version-id>' \
   --session 2026-08-10 \
   --target-volatility-ratio 0.12 \
-  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
   --code-version git:<commit>
 ```
 
@@ -192,12 +192,18 @@ PYTHONPATH=src .venv/bin/python -m unittest \
 
 本地 PostgreSQL 使用专用主机端口 `55432`，避免与机器上已有的 PostgreSQL `5432` 冲突：
 
+开发默认库现为 `a_share_platform_layered_dev`，按 `governance / evidence / observation /
+canonical / research / serving` 六个职责 schema 分层；`public` 只保留 migration ledger。旧库
+`a_share_platform_dev` 保持不变用于只读对账和回滚，不要在旧库执行 migration 0029。DBeaver
+继续使用用户 `a_share_platform_dev`、密码 `local-only`、主机 `127.0.0.1`、端口 `55432`，把
+Database 改为 `a_share_platform_layered_dev` 即可浏览新分层。
+
 ```bash
 cd platform
 PYTHON_BIN="${PYTHON_BIN:-python3.11}"
 docker compose up -d postgres
 PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.adapters.postgres.cli
-ASP_DATABASE_URL=postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+ASP_DATABASE_URL=postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
 PYTHONPATH=src "$PYTHON_BIN" -m uvicorn a_share_platform.api.app:app \
   --host 127.0.0.1 --port 8010 --reload
 ```
@@ -219,7 +225,7 @@ P4 三因子资格命令默认 dry-run；只有显式本地研究确认才持久
 ```bash
 cd platform
 PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.factor_qualification \
-  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
   --evaluated-at 2026-08-11T18:00:00+08:00 \
   --code-sha git:<commit>
 ```
@@ -232,7 +238,7 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.factor_qualification
 ```bash
 cd platform
 PYTHON_BIN="$PWD/.venv/bin/python" \
-ASP_DATABASE_URL=postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+ASP_DATABASE_URL=postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
 ./ci/verify.sh
 npm --prefix frontend audit --audit-level=low
 ```

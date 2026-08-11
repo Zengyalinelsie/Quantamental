@@ -1,9 +1,10 @@
 # PostgreSQL 数据分层设计与迁移记录
 
-- 状态：Accepted，影子库迁移实施中
+- 状态：Accepted，影子库迁移已完成并通过双库对账
 - 日期：2026-08-11
 - 范围：`platform/` 的 PostgreSQL 表、迁移、repository 和只读 API
 - 决策记录：`docs/adr/0005-shadow-layered-database-migration.md`
+- 实施证据：`docs/17-postgresql-layered-migration-evidence.md`
 
 ## 1. 问题判断
 
