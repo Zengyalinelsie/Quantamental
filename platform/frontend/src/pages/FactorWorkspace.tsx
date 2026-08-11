@@ -6,6 +6,7 @@ import {
   Tabs,
   Tag,
 } from 'antd'
+import { useQuery } from '@tanstack/react-query'
 import {
   Bar,
   BarChart,
@@ -19,6 +20,11 @@ import {
 } from 'recharts'
 import { useSearchParams } from 'react-router-dom'
 
+import {
+  getExperimentRuns,
+  type Envelope,
+  type ExperimentRunEntry,
+} from '../api/client'
 import { PageHeading } from '../components/PageHeading'
 import { WorkspaceState } from '../components/WorkspaceState'
 
@@ -46,8 +52,8 @@ export interface FactorExperimentView {
   factorName: string
   status: FactorRunStatus
   failureReason: string | null
-  sampleLabel: 'in_sample' | 'validation' | 'out_of_sample'
-  multipleTestingFamily: string
+  sampleLabel: 'in_sample' | 'validation' | 'out_of_sample' | 'unbound'
+  multipleTestingFamily: string | null
   statistics: FactorStatisticView
   quantiles: QuantilePoint[]
   decay: DecayPoint[]
@@ -112,6 +118,59 @@ const tabLabels = [
   ['correlation-monitor', 'Correlation Monitor'],
   ['production', 'Production'],
 ] as const
+
+function explicitParameter(run: ExperimentRunEntry, name: string) {
+  return run.spec.parameters?.find((parameter) => parameter.name === name)?.value ?? null
+}
+
+function explicitMetric(run: ExperimentRunEntry, name: string) {
+  const value = run.metrics.find((metric) => metric.name === name)?.value
+  return value === undefined ? null : String(value)
+}
+
+function mapExperiment(run: ExperimentRunEntry): FactorExperimentView {
+  const sampleLabel = explicitParameter(run, 'sample_label')
+  const confidenceLower = explicitMetric(run, 'rank_ic_ci_lower')
+  const confidenceUpper = explicitMetric(run, 'rank_ic_ci_upper')
+  return {
+    experimentId: run.run_id,
+    factorName: run.spec.feature_bindings[0]?.feature_id ?? '未绑定因子',
+    status: run.status,
+    failureReason: run.failure?.message ?? null,
+    sampleLabel: sampleLabel === 'in_sample'
+      || sampleLabel === 'validation'
+      || sampleLabel === 'out_of_sample'
+      ? sampleLabel
+      : 'unbound',
+    multipleTestingFamily: explicitParameter(run, 'multiple_testing_family'),
+    statistics: {
+      rankIc: explicitMetric(run, 'rank_ic'),
+      confidenceInterval: confidenceLower !== null && confidenceUpper !== null
+        ? [confidenceLower, confidenceUpper]
+        : null,
+      turnover: explicitMetric(run, 'turnover'),
+      coverage: explicitMetric(run, 'coverage'),
+    },
+    // ExperimentRun artifacts are immutable hashes, not chart data. Dedicated,
+    // typed validation-series endpoints must supply these points later.
+    quantiles: [],
+    decay: [],
+  }
+}
+
+function mapExperimentEnvelope(
+  envelope: Envelope<ExperimentRunEntry[]>,
+): FactorWorkspaceSnapshot {
+  return {
+    systemAsOf: envelope.context.system_as_of,
+    dataMode: envelope.context.data_mode,
+    deploymentStage: envelope.context.deployment_stage,
+    experiments: envelope.data.map(mapExperiment),
+    timingBaseline: null,
+    correlationPairs: [],
+    productionVersions: [],
+  }
+}
 
 function CatalogPanel({ snapshot }: { snapshot?: FactorWorkspaceSnapshot }) {
   return (
@@ -178,7 +237,21 @@ function ExperimentCharts({ experiment }: { experiment: FactorExperimentView }) 
   )
 }
 
-function ExperimentsPanel({ snapshot }: { snapshot?: FactorWorkspaceSnapshot }) {
+function ExperimentsPanel({
+  error,
+  isLoading,
+  snapshot,
+}: {
+  error?: Error | null
+  isLoading?: boolean
+  snapshot?: FactorWorkspaceSnapshot
+}) {
+  if (isLoading) {
+    return <WorkspaceState reason="正在读取持久化 ExperimentRun。" state="loading" />
+  }
+  if (error) {
+    return <WorkspaceState reason={String(error)} state="error" title="实验读取失败" />
+  }
   if (!snapshot || snapshot.experiments.length === 0) {
     return (
       <WorkspaceState
@@ -206,7 +279,7 @@ function ExperimentsPanel({ snapshot }: { snapshot?: FactorWorkspaceSnapshot }) 
               {
                 key: 'family',
                 label: '多重检验 family',
-                children: experiment.multipleTestingFamily,
+                children: experiment.multipleTestingFamily ?? '未绑定',
               },
               {
                 key: 'rank-ic',
@@ -236,8 +309,18 @@ function ExperimentsPanel({ snapshot }: { snapshot?: FactorWorkspaceSnapshot }) 
           {experiment.failureReason ? (
             <Alert showIcon title={experiment.failureReason} type="error" />
           ) : null}
-          <Divider />
-          <ExperimentCharts experiment={experiment} />
+          {experiment.quantiles.length > 0 || experiment.decay.length > 0 ? (
+            <>
+              <Divider />
+              <ExperimentCharts experiment={experiment} />
+            </>
+          ) : (
+            <Alert
+              showIcon
+              title="验证序列未绑定；不会从 artifact hash 或缺失值生成图表。"
+              type="info"
+            />
+          )}
         </Card>
       ))}
     </div>
@@ -314,6 +397,14 @@ function ProductionPanel({ snapshot }: { snapshot?: FactorWorkspaceSnapshot }) {
 }
 
 export function FactorWorkspace({ snapshot }: { snapshot?: FactorWorkspaceSnapshot }) {
+  const experimentRuns = useQuery({
+    queryKey: ['experiment-runs'],
+    queryFn: ({ signal }) => getExperimentRuns(signal),
+    enabled: snapshot === undefined,
+  })
+  const resolvedSnapshot = snapshot ?? (
+    experimentRuns.data ? mapExperimentEnvelope(experimentRuns.data) : undefined
+  )
   const [searchParams, setSearchParams] = useSearchParams()
   const requested = searchParams.get('tab')
   const allowed = tabLabels.map(([key]) => key)
@@ -324,15 +415,21 @@ export function FactorWorkspace({ snapshot }: { snapshot?: FactorWorkspaceSnapsh
     key,
     label,
     children: key === 'catalog'
-      ? <CatalogPanel snapshot={snapshot} />
+      ? <CatalogPanel snapshot={resolvedSnapshot} />
       : key === 'experiments'
-        ? <ExperimentsPanel snapshot={snapshot} />
-        : key === 'correlation-monitor'
-          ? <CorrelationPanel snapshot={snapshot} />
+        ? (
+          <ExperimentsPanel
+            error={snapshot === undefined ? experimentRuns.error : null}
+            isLoading={snapshot === undefined && experimentRuns.isLoading}
+            snapshot={resolvedSnapshot}
+          />
+        )
+      : key === 'correlation-monitor'
+          ? <CorrelationPanel snapshot={resolvedSnapshot} />
           : key === 'timing-lab'
-            ? <TimingPanel snapshot={snapshot} />
+            ? <TimingPanel snapshot={resolvedSnapshot} />
             : key === 'production'
-              ? <ProductionPanel snapshot={snapshot} />
+              ? <ProductionPanel snapshot={resolvedSnapshot} />
               : (
                 <WorkspaceState
                   reason="当前没有通过科学验证并获批的因子，Alpha Model 保持空状态。"

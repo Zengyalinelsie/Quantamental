@@ -46,6 +46,410 @@
         "title": "Exchange",
         "type": "string"
       },
+      "ExperimentArtifactInput": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_id": {
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "media_type": {
+            "title": "Media Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id",
+          "kind",
+          "media_type",
+          "content_hash"
+        ],
+        "title": "ExperimentArtifactInput",
+        "type": "object"
+      },
+      "ExperimentEnvironmentInput": {
+        "additionalProperties": false,
+        "properties": {
+          "dependency_lock_hash": {
+            "title": "Dependency Lock Hash",
+            "type": "string"
+          },
+          "environment_id": {
+            "title": "Environment Id",
+            "type": "string"
+          },
+          "platform": {
+            "title": "Platform",
+            "type": "string"
+          },
+          "python_version": {
+            "title": "Python Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "environment_id",
+          "python_version",
+          "platform",
+          "dependency_lock_hash"
+        ],
+        "title": "ExperimentEnvironmentInput",
+        "type": "object"
+      },
+      "ExperimentFailureInput": {
+        "additionalProperties": false,
+        "properties": {
+          "error_type": {
+            "title": "Error Type",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage",
+          "error_type",
+          "message",
+          "occurred_at",
+          "retryable"
+        ],
+        "title": "ExperimentFailureInput",
+        "type": "object"
+      },
+      "ExperimentMetricInput": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "value",
+          "unit"
+        ],
+        "title": "ExperimentMetricInput",
+        "type": "object"
+      },
+      "ExperimentParameterInput": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ],
+        "title": "ExperimentParameterInput",
+        "type": "object"
+      },
+      "ExperimentRunInput": {
+        "additionalProperties": false,
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentArtifactInput"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExperimentFailureInput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentMetricInput"
+            },
+            "title": "Metrics",
+            "type": "array"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ExperimentSpecInput"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ExperimentRunStatus"
+          }
+        },
+        "required": [
+          "run_id",
+          "spec",
+          "status",
+          "started_at",
+          "finished_at",
+          "metrics",
+          "artifacts",
+          "failure"
+        ],
+        "title": "ExperimentRunInput",
+        "type": "object"
+      },
+      "ExperimentRunStatus": {
+        "enum": [
+          "planned",
+          "running",
+          "succeeded",
+          "failed"
+        ],
+        "title": "ExperimentRunStatus",
+        "type": "string"
+      },
+      "ExperimentSpecInput": {
+        "additionalProperties": false,
+        "properties": {
+          "code_sha": {
+            "title": "Code Sha",
+            "type": "string"
+          },
+          "dataset_version_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Dataset Version Ids",
+            "type": "array"
+          },
+          "decision_time_policy_version": {
+            "title": "Decision Time Policy Version",
+            "type": "string"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/ExperimentEnvironmentInput"
+          },
+          "feature_bindings": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureVersionBindingInput"
+            },
+            "title": "Feature Bindings",
+            "type": "array"
+          },
+          "label_bindings": {
+            "items": {
+              "$ref": "#/components/schemas/LabelVersionBindingInput"
+            },
+            "title": "Label Bindings",
+            "type": "array"
+          },
+          "metric_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Metric Names",
+            "type": "array"
+          },
+          "parameters": {
+            "items": {
+              "$ref": "#/components/schemas/ExperimentParameterInput"
+            },
+            "title": "Parameters",
+            "type": "array"
+          },
+          "random_seed": {
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "readiness_evidence_hash": {
+            "title": "Readiness Evidence Hash",
+            "type": "string"
+          },
+          "research_question": {
+            "title": "Research Question",
+            "type": "string"
+          },
+          "run_context": {
+            "$ref": "#/components/schemas/RunContextInput"
+          },
+          "spec_id": {
+            "title": "Spec Id",
+            "type": "string"
+          },
+          "time_split": {
+            "$ref": "#/components/schemas/ExperimentTimeSplitInput"
+          },
+          "universe_version_id": {
+            "title": "Universe Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spec_id",
+          "research_question",
+          "run_context",
+          "decision_time_policy_version",
+          "readiness_evidence_hash",
+          "universe_version_id",
+          "dataset_version_ids",
+          "feature_bindings",
+          "label_bindings",
+          "time_split",
+          "code_sha",
+          "parameters",
+          "random_seed",
+          "environment",
+          "metric_names"
+        ],
+        "title": "ExperimentSpecInput",
+        "type": "object"
+      },
+      "ExperimentTimeSplitInput": {
+        "additionalProperties": false,
+        "properties": {
+          "test_end_exclusive": {
+            "format": "date",
+            "title": "Test End Exclusive",
+            "type": "string"
+          },
+          "test_start": {
+            "format": "date",
+            "title": "Test Start",
+            "type": "string"
+          },
+          "train_end_exclusive": {
+            "format": "date",
+            "title": "Train End Exclusive",
+            "type": "string"
+          },
+          "train_start": {
+            "format": "date",
+            "title": "Train Start",
+            "type": "string"
+          },
+          "validation_end_exclusive": {
+            "format": "date",
+            "title": "Validation End Exclusive",
+            "type": "string"
+          },
+          "validation_start": {
+            "format": "date",
+            "title": "Validation Start",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "train_start",
+          "train_end_exclusive",
+          "validation_start",
+          "validation_end_exclusive",
+          "test_start",
+          "test_end_exclusive",
+          "version"
+        ],
+        "title": "ExperimentTimeSplitInput",
+        "type": "object"
+      },
+      "FeatureVersionBindingInput": {
+        "additionalProperties": false,
+        "properties": {
+          "definition_hash": {
+            "title": "Definition Hash",
+            "type": "string"
+          },
+          "feature_id": {
+            "title": "Feature Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "feature_id",
+          "version",
+          "definition_hash"
+        ],
+        "title": "FeatureVersionBindingInput",
+        "type": "object"
+      },
       "FinancialPeriodType": {
         "enum": [
           "q1",
@@ -68,6 +472,35 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LabelVersionBindingInput": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset_version_id": {
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "label_id": {
+            "title": "Label Id",
+            "type": "string"
+          },
+          "schema_hash": {
+            "title": "Schema Hash",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label_id",
+          "version",
+          "schema_hash",
+          "dataset_version_id"
+        ],
+        "title": "LabelVersionBindingInput",
         "type": "object"
       },
       "ResponseContext": {
@@ -144,6 +577,23 @@
           "deployment_stage"
         ],
         "title": "ResponseContext",
+        "type": "object"
+      },
+      "RunContextInput": {
+        "additionalProperties": false,
+        "properties": {
+          "data_mode": {
+            "$ref": "#/components/schemas/DataMode"
+          },
+          "deployment_stage": {
+            "$ref": "#/components/schemas/DeploymentStage"
+          }
+        },
+        "required": [
+          "data_mode",
+          "deployment_stage"
+        ],
+        "title": "RunContextInput",
         "type": "object"
       },
       "StatementType": {
@@ -532,6 +982,209 @@
           }
         },
         "summary": "Datasets"
+      }
+    },
+    "/api/experiments/runs": {
+      "get": {
+        "operationId": "experiment_runs_api_experiments_runs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Experiment Runs"
+      },
+      "post": {
+        "operationId": "create_experiment_run_api_experiments_runs_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExperimentRunInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Experiment Run"
+      }
+    },
+    "/api/experiments/runs/{run_id}": {
+      "get": {
+        "operationId": "experiment_run_api_experiments_runs__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Experiment Run"
       }
     },
     "/api/health": {

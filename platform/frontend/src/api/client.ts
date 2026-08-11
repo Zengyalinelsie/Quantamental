@@ -230,6 +230,49 @@ export interface FinancialMismatchEntry {
   reason: string
 }
 
+export interface ExperimentFeatureBindingEntry {
+  feature_id: string
+  version: string
+  definition_hash: string
+}
+
+export interface ExperimentParameterEntry {
+  name: string
+  value: string
+}
+
+export interface ExperimentMetricEntry {
+  name: string
+  version: string
+  value: string | number
+  unit: string
+}
+
+export interface ExperimentFailureEntry {
+  stage: string
+  error_type: string
+  message: string
+  occurred_at: string
+  retryable: boolean
+}
+
+export interface ExperimentRunEntry {
+  run_id: string
+  status: 'planned' | 'running' | 'succeeded' | 'failed'
+  spec: {
+    spec_id: string
+    research_question: string
+    run_context: {
+      data_mode: 'current_research' | 'strict_historical'
+      deployment_stage: 'research' | 'shadow' | 'paper' | 'limited_live'
+    }
+    feature_bindings: ExperimentFeatureBindingEntry[]
+    parameters?: ExperimentParameterEntry[]
+  }
+  metrics: ExperimentMetricEntry[]
+  failure: ExperimentFailureEntry | null
+}
+
 export type SystemSection = 'catalog' | 'quality' | 'lineage' | 'jobs'
 
 export interface SystemSectionData {
@@ -293,6 +336,10 @@ export function getFactComparison(params: URLSearchParams, signal?: AbortSignal)
 
 export function getFinancialMismatches(signal?: AbortSignal) {
   return getEnvelope<FinancialMismatchEntry[]>('/api/system/mismatches', signal)
+}
+
+export function getExperimentRuns(signal?: AbortSignal) {
+  return getEnvelope<ExperimentRunEntry[]>('/api/experiments/runs', signal)
 }
 
 export function getRawEvidence(rawObjectId: string, signal?: AbortSignal) {

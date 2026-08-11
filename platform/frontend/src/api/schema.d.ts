@@ -38,6 +38,8 @@ export interface paths {
   "/api/capabilities": { get: ReadOperation };
   "/api/companies/{company_id}": { get: ReadOperation };
   "/api/datasets": { get: ReadOperation };
+  "/api/experiments/runs": { get: ReadOperation };
+  "/api/experiments/runs/{run_id}": { get: ReadOperation };
   "/api/health": { get: ReadOperation };
   "/api/identity": { get: ReadOperation };
   "/api/listings/resolve": { get: ReadOperation };
