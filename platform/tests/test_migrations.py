@@ -68,8 +68,28 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0022_discrete_universe_observations.sql",
                 "0023_normalized_current_financial_identity.sql",
                 "0024_identifier_alias_append_only_reconciliation.sql",
+                "0025_experiment_runs.sql",
             ),
         )
+
+    def test_experiment_storage_freezes_specs_runs_and_failure_evidence(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0025_experiment_runs.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE experiment_specs",
+            "CREATE TABLE experiment_runs",
+            "FOREIGN KEY (spec_id, spec_hash)",
+            "failed",
+            "failure_evidence IS NOT NULL",
+            "experiment_specs_append_only",
+            "experiment_runs_append_only",
+            "BEFORE UPDATE OR DELETE ON experiment_specs",
+            "BEFORE UPDATE OR DELETE ON experiment_runs",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_discrete_universe_migration_preserves_observed_dates_and_gaps(self) -> None:
         sql = (

@@ -13,16 +13,28 @@ from fastapi import Depends, FastAPI, Query, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from a_share_platform.adapters.memory.experiments import (
+    UnavailableExperimentRunRepository,
+)
 from a_share_platform.adapters.memory.financial_evidence import StaticFinancialEvidenceReader
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
 from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
+from a_share_platform.adapters.postgres.experiments import (
+    PostgresExperimentRunRepository,
+)
 from a_share_platform.adapters.postgres.financial_evidence import PostgresFinancialEvidenceReader
 from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
+from a_share_platform.application.experiments import ExperimentRunService
 from a_share_platform.application.financial_evidence import (
     FactComparisonQuery,
     FactIdentityQuery,
 )
-from a_share_platform.application.permissions import Principal
+from a_share_platform.application.permissions import (
+    Permission,
+    PermissionPolicy,
+    Principal,
+)
+from a_share_platform.domain.experiments import ExperimentRunConflict
 from a_share_platform.domain.market_data import (
     MarketDataCatalog,
     MarketDataConflict,
@@ -33,10 +45,14 @@ from a_share_platform.domain.pit import FinancialPeriodType
 from a_share_platform.domain.run_context import DataMode, DeploymentStage, RunContext
 from a_share_platform.domain.security_master import Exchange, SecurityMaster
 from a_share_platform.domain.universe import UniverseCatalog
+from a_share_platform.ports.experiments import (
+    ExperimentRunRepository,
+    ExperimentStoreUnavailable,
+)
 from a_share_platform.ports.financial_evidence import FinancialEvidenceReader
 from a_share_platform.ports.system_catalog import SystemCatalogReader
 
-from .schemas import Envelope, ProblemDetails, ResponseContext
+from .schemas import Envelope, ExperimentRunInput, ProblemDetails, ResponseContext
 
 
 class RunContextOverrideDenied(ValueError):
@@ -44,6 +60,14 @@ class RunContextOverrideDenied(ValueError):
 
 
 class ResourceNotFound(LookupError):
+    pass
+
+
+class PermissionDenied(PermissionError):
+    pass
+
+
+class InvalidExperimentRequest(ValueError):
     pass
 
 
@@ -70,6 +94,7 @@ def response_context(
     as_of: datetime | None = None,
     trust_state: str | None = None,
     dataset_version_ids: tuple[str, ...] = (),
+    run_id: str | None = None,
     warnings: tuple[str, ...] = (),
 ) -> ResponseContext:
     now = datetime.now(UTC)
@@ -80,6 +105,7 @@ def response_context(
         deployment_stage=context.deployment_stage,
         trust_state=trust_state,
         dataset_version_ids=list(dataset_version_ids),
+        run_id=run_id,
         warnings=list(warnings),
     )
 
@@ -91,6 +117,7 @@ def envelope(
     as_of: datetime | None = None,
     trust_state: str | None = None,
     dataset_version_ids: tuple[str, ...] = (),
+    run_id: str | None = None,
     warnings: tuple[str, ...] = (),
 ) -> Envelope:
     return Envelope(
@@ -100,6 +127,7 @@ def envelope(
             as_of=as_of,
             trust_state=trust_state,
             dataset_version_ids=dataset_version_ids,
+            run_id=run_id,
             warnings=warnings,
         ),
     )
@@ -112,6 +140,7 @@ def create_app(
     market_data_catalog: MarketDataCatalog | None = None,
     system_catalog: SystemCatalogReader | None = None,
     financial_evidence: FinancialEvidenceReader | None = None,
+    experiment_repository: ExperimentRunRepository | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="A-Share Platform Next",
@@ -133,12 +162,24 @@ def create_app(
         if database_url
         else StaticFinancialEvidenceReader()
     )
+    experiments = experiment_repository or (
+        PostgresExperimentRunRepository.from_dsn(database_url)
+        if database_url
+        else UnavailableExperimentRunRepository(
+            "ASP_DATABASE_URL is not configured for experiment persistence"
+        )
+    )
+    experiment_service = ExperimentRunService(experiments)
+    permission_policy = PermissionPolicy.default()
     app.state.governance_repository = governance
     app.state.security_master = master
     app.state.universe_catalog = universes
     app.state.market_data_catalog = market_data
     app.state.system_catalog = system
     app.state.financial_evidence = financial
+    app.state.experiment_repository = experiments
+    app.state.experiment_service = experiment_service
+    app.state.permission_policy = permission_policy
 
     @app.exception_handler(RunContextOverrideDenied)
     async def run_context_override_handler(
@@ -167,6 +208,62 @@ def create_app(
             instance=request.url.path,
         )
         return JSONResponse(problem.model_dump(), status_code=404)
+
+    @app.exception_handler(PermissionDenied)
+    async def permission_denied_handler(
+        request: Request,
+        error: PermissionDenied,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="permission_denied",
+            title="Permission denied",
+            status=403,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=403)
+
+    @app.exception_handler(InvalidExperimentRequest)
+    async def invalid_experiment_request_handler(
+        request: Request,
+        error: InvalidExperimentRequest,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="invalid_experiment_request",
+            title="Invalid experiment request",
+            status=422,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=422)
+
+    @app.exception_handler(ExperimentRunConflict)
+    async def experiment_run_conflict_handler(
+        request: Request,
+        error: ExperimentRunConflict,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="experiment_run_conflict",
+            title="Experiment run conflict",
+            status=409,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=409)
+
+    @app.exception_handler(ExperimentStoreUnavailable)
+    async def experiment_store_unavailable_handler(
+        request: Request,
+        error: ExperimentStoreUnavailable,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="experiment_store_unavailable",
+            title="Experiment store unavailable",
+            status=503,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=503)
 
     @app.exception_handler(MarketDataUnavailable)
     async def market_data_unavailable_handler(
@@ -262,6 +359,52 @@ def create_app(
         context: Annotated[RunContext, Depends(fixed_read_context)],
     ) -> Envelope:
         return envelope([asdict(item) for item in governance.list_artifacts()], context)
+
+    @app.get("/api/experiments/runs", response_model=Envelope)
+    def experiment_runs(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope(
+            [asdict(item) for item in experiment_service.list_runs()],
+            context,
+        )
+
+    @app.get("/api/experiments/runs/{run_id}", response_model=Envelope)
+    def experiment_run(
+        run_id: str,
+        _context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        value = experiment_service.get_run(run_id)
+        if value is None:
+            raise ResourceNotFound(f"experiment run not found: {run_id}")
+        return envelope(
+            asdict(value),
+            value.spec.run_context,
+            dataset_version_ids=value.spec.dataset_version_ids,
+            run_id=value.run_id,
+        )
+
+    @app.post("/api/experiments/runs", response_model=Envelope, status_code=201)
+    def create_experiment_run(
+        request: ExperimentRunInput,
+        principal: Annotated[Principal, Depends(anonymous_principal)],
+        _context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        if not permission_policy.allows(principal, Permission.CREATE_EXPERIMENT):
+            raise PermissionDenied(
+                f"subject {principal.subject_id} cannot create experiment runs"
+            )
+        try:
+            value = request.to_domain()
+        except (TypeError, ValueError) as error:
+            raise InvalidExperimentRequest(str(error)) from error
+        stored = experiment_service.create_run(value)
+        return envelope(
+            asdict(stored),
+            stored.spec.run_context,
+            dataset_version_ids=stored.spec.dataset_version_ids,
+            run_id=stored.run_id,
+        )
 
     @app.get("/api/securities", response_model=Envelope)
     def securities(
