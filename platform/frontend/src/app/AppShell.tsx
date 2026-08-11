@@ -9,6 +9,7 @@ import { useWorkspaceStore } from '../state/workspace'
 
 const { Header, Sider, Content } = Layout
 const DeskPage = lazy(() => import('../pages/DeskPage').then((module) => ({ default: module.DeskPage })))
+const FactorWorkspace = lazy(() => import('../pages/FactorWorkspace').then((module) => ({ default: module.FactorWorkspace })))
 const WorkspacePage = lazy(() => import('../pages/WorkspacePage').then((module) => ({ default: module.WorkspacePage })))
 
 function Brand({ compact = false }: { compact?: boolean }) {
@@ -152,7 +153,7 @@ export function AppShell() {
             <Routes>
               <Route path="/desk" element={<DeskPage />} />
               <Route path="/research" element={<RouteWorkspace definition={workspaceDefinitions.research} />} />
-              <Route path="/factors" element={<RouteWorkspace definition={workspaceDefinitions.factors} />} />
+              <Route path="/factors" element={<FactorWorkspace />} />
               <Route path="/portfolios" element={<RouteWorkspace definition={workspaceDefinitions.portfolios} />} />
               <Route path="/monitoring" element={<RouteWorkspace definition={workspaceDefinitions.monitoring} />} />
               <Route path="/system" element={<RouteWorkspace definition={workspaceDefinitions.system} />} />

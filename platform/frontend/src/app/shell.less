@@ -155,6 +155,90 @@
   margin: 0 auto;
 }
 
+.factorWorkspace,
+.factorCatalog,
+.experimentList,
+.correlationList,
+.productionList {
+  display: grid;
+  gap: 16px;
+}
+
+.factorGateAlert {
+  margin-bottom: 16px;
+}
+
+.factorDefinitionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.factorDefinitionGrid .ant-card,
+.experimentList .ant-card,
+.correlationList .ant-card,
+.productionList .ant-card,
+.factorChart {
+  border-color: @border;
+  box-shadow: none;
+}
+
+.factorDefinitionMeta {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.factorDefinitionGrid code,
+.experimentList code {
+  color: @secondary-text;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.factorDefinitionGrid p {
+  margin: 12px 0 0;
+  color: @secondary-text;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.experimentList .ant-descriptions {
+  margin: 16px 0;
+}
+
+.factorChartGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.factorChart {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid @border;
+  border-radius: @radius;
+}
+
+.factorChart h4 {
+  margin: 0 0 8px;
+  color: @secondary-text;
+  font-size: 12px;
+}
+
+.correlationList,
+.productionList {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.correlationList .ant-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .pageHeading {
   display: flex;
   align-items: flex-start;
@@ -499,6 +583,11 @@
 
   .pageHeading h1 {
     font-size: 21px;
+  }
+
+  .factorDefinitionGrid,
+  .factorChartGrid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .universeControls {
