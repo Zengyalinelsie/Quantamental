@@ -396,9 +396,11 @@ pilot，再按 CSI300 → CSI500 分阶段入库。入库过程可与 P4 前置�
 5. **免费源：AkShare/BaoStock**。只做 current 补充和交叉核验，不承担 strict historical
    财务主链路。
 
-当前没有已批准的结构化财务主源。Factor Service 和 Wind 都必须先形成版本化
-`FinancialSourceProfile` 资格证据；任一来源未通过许可、覆盖、可重放性或时间语义测试时，
-adapter 必须失败关闭，不能静默改变主备顺序。
+当前没有已批准的企业级或 strict/PIT 结构化财务主源。Factor Service 和 Wind 都必须先形成
+版本化 `FinancialSourceProfile` 资格证据；任一来源未通过许可、覆盖、可重放性或时间语义
+测试时，adapter 必须失败关闭，不能静默改变主备顺序。AkShare 已作为获用户批准的私人本地
+`current_research` fallback 形成 profile 和执行链，但其上限固定为 `normalized_current`，不能
+因此升级为 strict/PIT 主源、生产源或外部分发源。
 
 ### 13.2 必要代码调整
 
@@ -459,3 +461,20 @@ provider / statement_table / report_period_end / symbol_bucket
 9. strict PIT 单独执行公告版本核验和治理晋升，不因 current 全量入库成功自动开放。
 
 无论入库规模多大，数据完整性只证明工程覆盖，不证明因子、模型或策略科学有效。
+
+### 13.5 2026-08-11 current-only 执行证据
+
+AkShare fallback 已完成两级真实本地运行：
+
+- 5 家 × 2024 × 三表 pilot：15/15 checkpoint 成功，42 条观测；幂等重跑 15/15 skipped；
+- CSI300 中 30 家 × 2018–2025 × 三表：720/720 checkpoint 成功，2,120 条观测，30 家、3 张表、
+  9 个 canonical metric，覆盖 2018-12-31 至 2025-12-31；
+- 第二批持久化 720 份 quality report、720 份 coverage report，aggregate DatasetVersion 为
+  `dataset:financial-backfill:47133fabd59aacb8daba70a8:aggregate:v1`；
+- balance sheet 720、cash flow 720、income statement 680；来源缺失保持缺失，不补零。
+
+执行 worker 使用 2 秒全局串行门、有限重试、checkpoint 恢复、append-only receipt 和本机
+PostgreSQL 边界。aggregate metadata 明确保存 `data_mode=current_research`、
+`trust_state=normalized_current`、`pit_verified=false`。因此该证据不改变来源层级：当前工程
+主链是 AkShare current-only fallback；目标企业主源仍等待 Factor Service/iFinD/THS 凭证和
+资格测试，Wind 仍是待审候选，官方披露仍负责 PIT 证据与争议裁决。

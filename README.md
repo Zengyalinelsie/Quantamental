@@ -16,7 +16,11 @@ CSI800 当前 Security Master 799/800、CSI500 当日 Universe 500/500 和私人
 股本和公司行动仍未完成，因此不宣称 P2 Gate 通过。P3 已完成 4 家公司、8 份官方 PDF、
 2 条修订链、双时财务、真实数据诊断页面和首条 CSI500 被动波动率 Shadow baseline，
 Capability Gate 通过。主动 Timing 仍 `unavailable`；700–800 家财务回填是 P3 Gate 后、P4 大规模
-科学研究前的 Scale-up，尚未完成。
+科学研究前的 Scale-up，尚未完成。当前 AkShare current-only 试运行已完成 CSI300 中 30 家、
+2018–2025、三表的 720/720 工作单元，写入 2,120 条 `normalized_current` 观测；该批次不能
+用于 strict historical，也不代表 700–800 家扩容或 PIT 治理完成。P4 已有严格数据资格门、
+行业模板、partial Quality baseline 和 Fundamental Improvement V0；统计验证、生命周期与完整
+Factor Workspace 仍未完成，因此 P4 Gate 未通过。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -61,6 +65,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P2 实现与验证证据](docs/12-p2-implementation-evidence.md)
 - [P3 实现与验证证据](docs/13-p3-implementation-evidence.md)
 - [数据源总清单与 Agent 选择路由](docs/14-data-source-catalog-and-agent-routing.md)
+- [P4 实现与验证证据](docs/15-p4-implementation-evidence.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)

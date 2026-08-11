@@ -347,6 +347,11 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 
 前两项未勾选表示尚未执行真实下载/入库：当前代码能力只覆盖 XSHG/XSHE，XBSE 仍缺；历史成员仍为 `normalized_current`，且在可交易状态未验证前 `tradable_eligible=false`。
 
+状态更新（2026-08-11）：2018 首个历史 Universe 工作单元所需的 53 个仍在市证券身份已全部
+通过 BaoStock 状态与 CNInfo 法定身份链补齐；剩余 15 个均为已退市证券，必须取得官方历史
+身份后才能继续。2026 CSI300 月末离散 pilot 已保存 8 个观察月末、8 个显式未观测区间和
+2,400 条 membership，但仍是 `normalized_current`，不能代替完整历史 Universe 或 PIT。
+
 ### Gate P2
 
 状态（2026-08-10）：实现、迁移、自动化测试和真实 HTTP 接线已完成；Capability Gate 暂不宣称通过。浏览器控制当前无可用实例，交付清单要求的 320/768/1024/1440 截图与视觉回归尚待补齐。证据和剩余项见 `docs/12-p2-implementation-evidence.md`。
@@ -463,6 +468,9 @@ Timing、任何因子或模型科学有效。P2 的多尺寸浏览器视觉证�
 - [ ] Factor Service/iFinD/THS 完成新凭证、live metadata、本地批量保存和缓存副作用资格审查；
 - [ ] Wind 完成接口、许可、修订和时间语义审查，在此之前保持 candidate；
 - [ ] 3–5 家 live 结构化三表 pilot 与官方 PDF 抽样对账；
+- [x] AkShare fallback 完成 current-only source profile、映射、checkpoint worker 和本地执行门；
+- [x] AkShare 完成 5 家 × 2024 × 三表 live 工程 pilot 与幂等重跑；
+- [x] AkShare 完成 CSI300 中 30 家 × 2018–2025 × 三表批次，720/720 工作单元成功；
 - [ ] 按 CSI300 → CSI500 分阶段入库，每个工作单元持久化 DatasetVersion、checkpoint、quality、
   coverage 和 lineage；
 - [ ] 批量 current 数据保持 `normalized_current`；strict 只从官方版本链和独立治理运行晋升。
@@ -477,6 +485,12 @@ current-known 身份不能被 strict/PIT 消费。
 `DataMode.CURRENT_RESEARCH`，只有包含 `current_research` scope 的映射可执行；strict/PIT
 事实摄取和 production 使用分别要求对应 scope，任何一个 scope 都不隐含另一个；mapping 的
 production scope 仍不能绕过数据可信、Promotion Approval 或 deployment stage 门。
+
+状态更新（2026-08-11）：30 家批次持久化 2,120 条观测、30 个证券、3 张报表、9 个 metric，
+报告期覆盖 2018-12-31 至 2025-12-31；720 份 work-unit quality/coverage 与 aggregate
+DatasetVersion 均已持久化。利润表实际为 680 条，缺失保持缺失而非填零。该结果仍是
+`current_research + normalized_current + pit_verified=false`；它证明 worker、恢复和本地入库
+链路可运行，不证明官方 PDF 对账、700–800 家覆盖、strict PIT 或模型科学有效。
 
 ## 8. P4：行业模板、特征工程和正式 Factor Lab
 
@@ -504,11 +518,15 @@ W01 仍未整体完成。证据和当前阻断见 `docs/15-p4-implementation-evi
 
 先完成：
 
-- [ ] 非金融通用模板；
-- [ ] 银行模板；
-- [ ] 制造/消费模板。
+- [x] 非金融通用模板；
+- [x] 银行模板；
+- [x] 制造/消费模板。
 
 每个模板定义关键指标、不可比字段、阈值来源和例外流程。
+
+状态（2026-08-11）：三套模板已实现；应计、ROE 和利润率稳定性按非金融/银行分别定义，
+阈值只接受版本化、获批且在有效期内的来源绑定，不内置默认数值。Quality baseline 仍因稀释、
+审计/监管、退市和财务异常缺口保持 `partial / not_evaluated`。
 
 ### P4-W03：三类首发因子
 
@@ -517,6 +535,11 @@ W01 仍未整体完成。证据和当前阻断见 `docs/15-p4-implementation-evi
 - [ ] Fundamental Improvement。
 
 每个因子先做 3–5 家手算，再做截面计算；Size/行业/Beta 作为暴露和中性化变量。
+
+状态（2026-08-11）：Quality 已完成 4 家手算 baseline；Fundamental Improvement V0 已完成
+公司级纯函数和 4 个手算场景，显式区分同比/环比、TTM/单季度、季节性、基数效应和一次性
+项目。两者都尚未完成合格 PIT 截面计算，因而上述因子项继续不勾选。Valuation Expectation
+Gap、横截面变换与统计验证仍在后续工作包。
 
 ### P4-W04：统计引擎
 

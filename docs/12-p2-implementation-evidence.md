@@ -304,3 +304,28 @@ TDD 证据：先以缺失 payload/normalizer 的 import error 建立红灯，再
 
 因此本节证明的是 staging 和 fail-closed 转换能力，不是股本/公司行动/XBSE 已真实入库，
 不改变 P2 Capability Gate 的待验证结论，也不证明任何数据、因子或模型科学有效。
+
+## 14. 2018 身份缺口收敛与离散 Universe pilot
+
+2026-08-11 继续执行 2018 CSI 历史成员的身份前置回填。最初阻断首个工作单元的 68 个唯一
+代码中，53 个仍在市证券已全部通过显式 BaoStock `status=1` 与 CNInfo 法定名称、代码、市场、
+上市日链补齐并持久化。开发库 `securities` 从 812 增至 870；增量还包含 2026 pilot 的 5 个
+非 2018 缺口证券，因此不能用表总增量冒充 2018 缺口数量。
+
+完整 2018–2026 重跑后，缺口从 68 个唯一代码/659 个 code×month pair 降至 15 个唯一代码/
+164 个 pair。15 个均为 BaoStock `status=0` 的已退市证券：
+
+```text
+SH.600068 SH.600074 SH.600297 SH.600485 SH.600705 SH.600804 SH.600837 SH.601989
+SZ.000413 SZ.000540 SZ.000627 SZ.000671 SZ.000961 SZ.002411 SZ.002450
+```
+
+这些证券必须使用官方历史身份和有效区间，不能采用 current shortcut、猜 alias 或静默跳过。
+因此 2018 首 checkpoint 仍按设计失败关闭，没有继续到 2019，也没有留下部分 Universe。
+
+独立的 2026 CSI300 月末离散 pilot 已成功保存：1 个 work unit、8 个观察月末、8 个显式未观测
+区间、2,400 条 membership，quality/coverage 各 1 份。该 pilot 只证明离散月末和未观测区间
+合同可运行；信任状态仍为 `normalized_current`，不等于完整历史 Universe 或 PIT。
+
+本轮 BaoStock guard 记录 343/600 次调用，343 completed、0 blocked、无 cooldown。定向测试
+`70 passed`，compileall 与 `git diff --check` 通过。这里的数据回填没有代码修改或独立提交。
