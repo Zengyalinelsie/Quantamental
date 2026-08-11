@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -34,6 +34,7 @@ function renderScreen(section: 'catalog' | 'quality' | 'lineage' | 'jobs') {
 
 describe('SystemScreen', () => {
   afterEach(() => {
+    cleanup()
     vi.unstubAllGlobals()
   })
 
@@ -102,5 +103,121 @@ describe('SystemScreen', () => {
     renderScreen('quality')
     expect(await screen.findByText('质量报告读取失败')).toBeInTheDocument()
     expect(screen.getByText(/database unavailable/)).toBeInTheDocument()
+  })
+
+  it('shows the second pre-sliced catalog page through the real Ant Table', async () => {
+    const rows = Array.from({ length: 45 }, (_, index) => ({
+      dataset_version_id: `dataset:${String(index).padStart(2, '0')}`,
+      content_hash: String(index).repeat(64).slice(0, 64),
+      created_at: '2026-08-10T12:00:00Z',
+      schema_version: 'v1',
+      metadata: {},
+    }))
+    vi.stubGlobal('fetch', vi.fn(async () => response(rows)))
+    renderScreen('catalog')
+
+    expect(await screen.findByText('dataset:00')).toBeInTheDocument()
+    expect(screen.queryByText('dataset:20')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByTitle('2'))
+
+    expect(await screen.findByText('dataset:20')).toBeInTheDocument()
+    expect(screen.queryByText('dataset:00')).not.toBeInTheDocument()
+  })
+
+  it('renders only the active jobs page while preserving the full pagination total', async () => {
+    const rows = Array.from({ length: 45 }, (_, index) => ({
+      job_id: `job:${String(index).padStart(2, '0')}`,
+      plan_id: `plan:${String(index).padStart(2, '0')}`,
+      provider_id: 'private-local-provider',
+      status: 'succeeded',
+      output_trust_state: 'normalized_current',
+      start_date: '2018-01-01',
+      end_date: '2026-08-10',
+      created_at: '2026-08-10T11:00:00Z',
+      updated_at: '2026-08-10T12:00:00Z',
+      dataset_version_id: `dataset:${index}`,
+      failure_reasons: [],
+      checkpoints: [],
+      quality_reports: [],
+      coverage_reports: [],
+    }))
+    vi.stubGlobal('fetch', vi.fn(async () => response(rows)))
+    renderScreen('jobs')
+
+    expect(await screen.findByText('plan:00')).toBeInTheDocument()
+    expect(screen.getByText('plan:19')).toBeInTheDocument()
+    expect(screen.queryByText('plan:20')).not.toBeInTheDocument()
+    expect(screen.getByTitle('3')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByTitle('2'))
+
+    expect(await screen.findByText('plan:20')).toBeInTheDocument()
+    expect(screen.queryByText('plan:00')).not.toBeInTheDocument()
+  })
+
+  it('paginates one job checkpoints and coverage independently with explicit totals', async () => {
+    const coverageReports = Array.from({ length: 45 }, (_, index) => ({
+      coverage_report_id: `coverage:${String(index).padStart(2, '0')}`,
+      dataset_version_id: 'dataset:large-job',
+      job_id: 'job:large',
+      scope_id: 'csi500:financials',
+      data_domain: `domain:${String(index).padStart(2, '0')}`,
+      start_date: '2018-01-01',
+      end_date: '2026-08-10',
+      expected_rows: 1,
+      observed_rows: 1,
+      coverage_ratio: 1,
+      warnings: [],
+      created_at: '2026-08-10T12:00:00Z',
+    }))
+    const checkpoints = Array.from({ length: 45 }, (_, index) => ({
+      checkpoint_key: `checkpoint:${String(index).padStart(2, '0')}`,
+      scope_id: 'csi500:financials',
+      data_domain: 'financial_statements',
+      market: `M${String(index).padStart(2, '0')}`,
+      status: 'succeeded',
+      processed_rows: 1,
+      rejected_rows: 0,
+      provider_id: 'private-local-provider',
+      updated_at: '2026-08-10T12:00:00Z',
+      error: null,
+      warnings: [],
+    }))
+    vi.stubGlobal('fetch', vi.fn(async () => response([{
+      job_id: 'job:large',
+      plan_id: 'plan:large-financial-job',
+      provider_id: 'private-local-provider',
+      status: 'succeeded',
+      output_trust_state: 'normalized_current',
+      start_date: '2018-01-01',
+      end_date: '2026-08-10',
+      created_at: '2026-08-10T11:00:00Z',
+      updated_at: '2026-08-10T12:00:00Z',
+      dataset_version_id: 'dataset:large-job',
+      failure_reasons: [],
+      checkpoints,
+      quality_reports: [],
+      coverage_reports: coverageReports,
+    }])))
+    renderScreen('jobs')
+
+    const coverage = await screen.findByRole('region', {
+      name: 'job:large coverage reports',
+    })
+    const checkpoint = screen.getByRole('region', { name: 'job:large checkpoints' })
+    expect(within(coverage).getByText('45 TOTAL')).toBeInTheDocument()
+    expect(within(checkpoint).getByText('45 TOTAL')).toBeInTheDocument()
+    expect(within(coverage).getByText(/domain:19/)).toBeInTheDocument()
+    expect(within(coverage).queryByText(/domain:20/)).not.toBeInTheDocument()
+    expect(within(checkpoint).getByText(/M19/)).toBeInTheDocument()
+    expect(within(checkpoint).queryByText(/M20/)).not.toBeInTheDocument()
+
+    fireEvent.click(within(coverage).getByTitle('2'))
+    expect(await within(coverage).findByText(/domain:20/)).toBeInTheDocument()
+    expect(within(checkpoint).queryByText(/M20/)).not.toBeInTheDocument()
+
+    fireEvent.click(within(checkpoint).getByTitle('2'))
+    expect(await within(checkpoint).findByText(/M20/)).toBeInTheDocument()
   })
 })

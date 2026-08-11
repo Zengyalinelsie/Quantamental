@@ -351,11 +351,37 @@
   margin-top: 14px;
 }
 
+.systemJobEvidenceGroup {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid @secondary-border;
+}
+
+.systemJobEvidenceHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: @tertiary-text;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.systemJobEvidenceGroup > .ant-pagination {
+  justify-self: end;
+}
+
 .systemJobEvidence {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 10px;
   margin-top: 14px;
+}
+
+.systemJobEvidenceGroup .systemJobEvidence {
+  margin-top: 0;
 }
 
 .systemJobEvidence section {

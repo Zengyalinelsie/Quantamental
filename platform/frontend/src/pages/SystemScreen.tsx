@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { Alert, Card, Descriptions, Table, Tag } from 'antd'
+import { Alert, Card, Descriptions, Pagination, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   getSystemSection,
+  type CoverageReportEntry,
   type DatasetCatalogEntry,
+  type IngestionCheckpointEntry,
   type IngestionJobEntry,
   type LineageCatalogEntry,
   type QualityReportEntry,
@@ -45,7 +47,35 @@ function statusColor(status: string) {
   return 'default'
 }
 
+const TABLE_PAGE_SIZE = 20
+
+function useClientPage<T>(rows: T[]) {
+  const [requestedPage, setRequestedPage] = useState(1)
+  const lastPage = Math.max(1, Math.ceil(rows.length / TABLE_PAGE_SIZE))
+  const currentPage = Math.min(requestedPage, lastPage)
+  const pageRows = useMemo(() => {
+    const start = (currentPage - 1) * TABLE_PAGE_SIZE
+    return rows.slice(start, start + TABLE_PAGE_SIZE)
+  }, [currentPage, rows])
+
+  useEffect(() => {
+    setRequestedPage(1)
+  }, [rows])
+
+  return {
+    pageRows,
+    pagination: {
+      current: currentPage,
+      pageSize: TABLE_PAGE_SIZE,
+      showSizeChanger: false,
+      total: rows.length,
+      onChange: (page: number) => setRequestedPage(Math.max(1, Math.min(page, lastPage))),
+    },
+  }
+}
+
 function CatalogTable({ rows }: { rows: DatasetCatalogEntry[] }) {
+  const page = useClientPage(rows)
   const columns: ColumnsType<DatasetCatalogEntry> = [
     { title: 'DatasetVersion', dataIndex: 'dataset_version_id', width: 300 },
     { title: 'Schema', dataIndex: 'schema_version', width: 180 },
@@ -57,10 +87,18 @@ function CatalogTable({ rows }: { rows: DatasetCatalogEntry[] }) {
       render: (value: string) => <code>{value}</code>,
     },
   ]
-  return <Table columns={columns} dataSource={rows} pagination={{ pageSize: 20 }} rowKey="dataset_version_id" />
+  return (
+    <Table
+      columns={columns}
+      dataSource={page.pageRows}
+      pagination={page.pagination}
+      rowKey="dataset_version_id"
+    />
+  )
 }
 
 function QualityTable({ rows }: { rows: QualityReportEntry[] }) {
+  const page = useClientPage(rows)
   const columns: ColumnsType<QualityReportEntry> = [
     { title: '报告', dataIndex: 'quality_report_id', width: 280 },
     { title: 'DatasetVersion', dataIndex: 'dataset_version_id', width: 280 },
@@ -78,65 +116,134 @@ function QualityTable({ rows }: { rows: QualityReportEntry[] }) {
       render: (warnings: string[]) => warnings.length ? warnings.join('；') : '—',
     },
   ]
-  return <Table columns={columns} dataSource={rows} pagination={{ pageSize: 20 }} rowKey="quality_report_id" />
+  return (
+    <Table
+      columns={columns}
+      dataSource={page.pageRows}
+      pagination={page.pagination}
+      rowKey="quality_report_id"
+    />
+  )
 }
 
 function LineageTable({ rows }: { rows: LineageCatalogEntry[] }) {
+  const page = useClientPage(rows)
   const columns: ColumnsType<LineageCatalogEntry> = [
     { title: '上游', dataIndex: 'upstream_id' },
     { title: '关系', dataIndex: 'relation', width: 180 },
     { title: '下游', dataIndex: 'downstream_id' },
   ]
-  return <Table columns={columns} dataSource={rows} pagination={{ pageSize: 20 }} rowKey={(row) => `${row.upstream_id}:${row.relation}:${row.downstream_id}`} />
+  return (
+    <Table
+      columns={columns}
+      dataSource={page.pageRows}
+      pagination={page.pagination}
+      rowKey={(row) => `${row.upstream_id}:${row.relation}:${row.downstream_id}`}
+    />
+  )
+}
+
+function CoverageEvidence({
+  jobId,
+  rows,
+}: {
+  jobId: string
+  rows: CoverageReportEntry[]
+}) {
+  const page = useClientPage(rows)
+  return (
+    <section
+      aria-label={`${jobId} coverage reports`}
+      className="systemJobEvidenceGroup"
+    >
+      <div className="systemJobEvidenceHeading">
+        <span>COVERAGE REPORTS</span>
+        <strong>{rows.length} TOTAL</strong>
+      </div>
+      <div className="systemJobEvidence">
+        {page.pageRows.map((report) => (
+          <section key={report.coverage_report_id}>
+            <small>COVERAGE · {report.data_domain}</small>
+            <strong>
+              {report.observed_rows} / {report.expected_rows ?? '未知'}
+            </strong>
+            {report.warnings.map((warning) => <span key={warning}>{warning}</span>)}
+          </section>
+        ))}
+      </div>
+      <Pagination {...page.pagination} hideOnSinglePage size="small" />
+    </section>
+  )
+}
+
+function CheckpointEvidence({
+  jobId,
+  rows,
+}: {
+  jobId: string
+  rows: IngestionCheckpointEntry[]
+}) {
+  const page = useClientPage(rows)
+  return (
+    <section
+      aria-label={`${jobId} checkpoints`}
+      className="systemJobEvidenceGroup"
+    >
+      <div className="systemJobEvidenceHeading">
+        <span>CHECKPOINTS</span>
+        <strong>{rows.length} TOTAL</strong>
+      </div>
+      <div className="systemJobEvidence">
+        {page.pageRows.map((checkpoint) => (
+          <section key={checkpoint.checkpoint_key}>
+            <small>CHECKPOINT · {checkpoint.market ?? 'ALL'}</small>
+            <strong>
+              {checkpoint.processed_rows} processed · {checkpoint.rejected_rows} rejected
+            </strong>
+            {checkpoint.error ? <span>{checkpoint.error}</span> : null}
+          </section>
+        ))}
+      </div>
+      <Pagination {...page.pagination} hideOnSinglePage size="small" />
+    </section>
+  )
 }
 
 function JobCards({ rows }: { rows: IngestionJobEntry[] }) {
+  const page = useClientPage(rows)
   return (
-    <div className="systemJobs">
-      {rows.map((job) => (
-        <Card
-          key={job.job_id}
-          title={job.plan_id}
-          extra={<Tag color={statusColor(job.status)}>{job.status}</Tag>}
-        >
-          <Descriptions column={{ xs: 1, sm: 2, lg: 4 }} size="small">
-            <Descriptions.Item label="Provider">{job.provider_id}</Descriptions.Item>
-            <Descriptions.Item label="Trust">
-              <Tag>{job.output_trust_state}</Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="区间">{job.start_date} — {job.end_date}</Descriptions.Item>
-            <Descriptions.Item label="DatasetVersion">{job.dataset_version_id ?? '未生成'}</Descriptions.Item>
-          </Descriptions>
-          {job.failure_reasons.length ? (
-            <Alert
-              className="systemJobAlert"
-              title="阻断 / 失败原因"
-              description={job.failure_reasons.join('；')}
-              showIcon
-              type="error"
-            />
-          ) : null}
-          <div className="systemJobEvidence">
-            {job.coverage_reports.map((report) => (
-              <section key={report.coverage_report_id}>
-                <small>COVERAGE · {report.data_domain}</small>
-                <strong>
-                  {report.observed_rows} / {report.expected_rows ?? '未知'}
-                </strong>
-                {report.warnings.map((warning) => <span key={warning}>{warning}</span>)}
-              </section>
-            ))}
-            {job.checkpoints.map((checkpoint) => (
-              <section key={checkpoint.checkpoint_key}>
-                <small>CHECKPOINT · {checkpoint.market ?? 'ALL'}</small>
-                <strong>{checkpoint.processed_rows} processed · {checkpoint.rejected_rows} rejected</strong>
-                {checkpoint.error ? <span>{checkpoint.error}</span> : null}
-              </section>
-            ))}
-          </div>
-        </Card>
-      ))}
-    </div>
+    <>
+      <div className="systemJobs">
+        {page.pageRows.map((job) => (
+          <Card
+            key={job.job_id}
+            title={job.plan_id}
+            extra={<Tag color={statusColor(job.status)}>{job.status}</Tag>}
+          >
+            <Descriptions column={{ xs: 1, sm: 2, lg: 4 }} size="small">
+              <Descriptions.Item label="Provider">{job.provider_id}</Descriptions.Item>
+              <Descriptions.Item label="Trust">
+                <Tag>{job.output_trust_state}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="区间">{job.start_date} — {job.end_date}</Descriptions.Item>
+              <Descriptions.Item label="DatasetVersion">{job.dataset_version_id ?? '未生成'}</Descriptions.Item>
+            </Descriptions>
+            {job.failure_reasons.length ? (
+              <Alert
+                className="systemJobAlert"
+                title="阻断 / 失败原因"
+                description={job.failure_reasons.join('；')}
+                showIcon
+                type="error"
+              />
+            ) : null}
+            <CoverageEvidence jobId={job.job_id} rows={job.coverage_reports} />
+            <CheckpointEvidence jobId={job.job_id} rows={job.checkpoints} />
+          </Card>
+        ))}
+      </div>
+      <Pagination {...page.pagination} hideOnSinglePage />
+    </>
   )
 }
 
