@@ -31,6 +31,12 @@ THRESHOLDS = {
     "bank.core_tier1_capital_adequacy.minimum": Decimal("0.08"),
     "bank.nonperforming_loan_ratio.maximum": Decimal("0.02"),
     "bank.net_interest_margin.minimum": Decimal("0.02"),
+    "bank.accruals.maximum": Decimal("0.02"),
+    "bank.roe.minimum": Decimal("0.12"),
+    "bank.net_interest_margin_stability.minimum": Decimal("0.80"),
+    "non_financial.accruals.maximum": Decimal("0.05"),
+    "non_financial.roe.minimum": Decimal("0.12"),
+    "non_financial.net_margin_stability.minimum": Decimal("0.80"),
     "manufacturing.gross_margin_stability.minimum": Decimal("0.30"),
     "manufacturing.inventory_turnover.minimum": Decimal("4.0"),
     "manufacturing.cash_conversion_cycle.maximum": Decimal(60),
@@ -109,8 +115,11 @@ class QualityFactorV0Test(unittest.TestCase):
                     "quality.bank.core_tier1_capital_adequacy": Decimal("0.10"),
                     "quality.bank.nonperforming_loan_ratio": Decimal("0.03"),
                     "quality.bank.net_interest_margin": Decimal("0.025"),
+                    "quality.bank.accruals": Decimal("0.01"),
+                    "quality.bank.roe": Decimal("0.15"),
+                    "quality.bank.net_interest_margin_stability": Decimal("0.90"),
                 },
-                Decimal("0.8"),
+                Decimal("0.875"),
             ),
             (
                 "bank-b",
@@ -121,8 +130,11 @@ class QualityFactorV0Test(unittest.TestCase):
                     "quality.bank.core_tier1_capital_adequacy": Decimal("0.07"),
                     "quality.bank.nonperforming_loan_ratio": Decimal("0.01"),
                     "quality.bank.net_interest_margin": Decimal("0.03"),
+                    "quality.bank.accruals": Decimal("0.03"),
+                    "quality.bank.roe": Decimal("0.10"),
+                    "quality.bank.net_interest_margin_stability": Decimal("0.70"),
                 },
-                Decimal("0.4"),
+                Decimal("0.25"),
             ),
             (
                 "manufacturer-a",
@@ -133,8 +145,11 @@ class QualityFactorV0Test(unittest.TestCase):
                     "quality.manufacturing.gross_margin_stability": Decimal("0.35"),
                     "quality.manufacturing.inventory_turnover": Decimal("3.0"),
                     "quality.manufacturing.cash_conversion_cycle": Decimal(50),
+                    "quality.non_financial.accruals": Decimal("0.04"),
+                    "quality.non_financial.roe": Decimal("0.15"),
+                    "quality.non_financial.net_margin_stability": Decimal("0.75"),
                 },
-                Decimal("0.8"),
+                Decimal("0.75"),
             ),
             (
                 "manufacturer-b-boundaries",
@@ -145,6 +160,9 @@ class QualityFactorV0Test(unittest.TestCase):
                     "quality.manufacturing.gross_margin_stability": Decimal("0.30"),
                     "quality.manufacturing.inventory_turnover": Decimal("4.0"),
                     "quality.manufacturing.cash_conversion_cycle": Decimal(60),
+                    "quality.non_financial.accruals": Decimal("0.05"),
+                    "quality.non_financial.roe": Decimal("0.12"),
+                    "quality.non_financial.net_margin_stability": Decimal("0.80"),
                 },
                 Decimal(1),
             ),
@@ -190,8 +208,49 @@ class QualityFactorV0Test(unittest.TestCase):
             catalog.get(manufacturing.template_id).definition_hash,
         )
         self.assertEqual(bank.coverage_status, QualityCoverageStatus.PARTIAL)
-        self.assertIn("spec017.accruals", bank.coverage_gaps)
+        non_financial = quality_factor_definition_v0(
+            IndustryTemplateId.NON_FINANCIAL_GENERAL,
+            catalog=catalog,
+        )
+        for definition in (non_financial, bank, manufacturing):
+            with self.subTest(coverage=definition.template_id):
+                self.assertNotIn("spec017.accruals", definition.coverage_gaps)
+                self.assertNotIn("spec017.roe", definition.coverage_gaps)
+                self.assertNotIn(
+                    "spec017.net_margin_stability",
+                    definition.coverage_gaps,
+                )
+                self.assertIn("spec017.dilution", definition.coverage_gaps)
+                self.assertIn(
+                    "spec017.audit_and_regulatory",
+                    definition.coverage_gaps,
+                )
         self.assertNotEqual(bank.coverage_gaps, ())
+        for definition, expected_ids in (
+            (
+                bank,
+                {
+                    "quality.bank.accruals",
+                    "quality.bank.roe",
+                    "quality.bank.net_interest_margin_stability",
+                },
+            ),
+            (
+                manufacturing,
+                {
+                    "quality.non_financial.accruals",
+                    "quality.non_financial.roe",
+                    "quality.non_financial.net_margin_stability",
+                },
+            ),
+        ):
+            periods = {
+                component.feature_id: component.period
+                for component in definition.components
+                if component.feature_id in expected_ids
+            }
+            self.assertEqual(set(periods), expected_ids)
+            self.assertEqual(set(periods.values()), {FeaturePeriod.TTM})
 
     def test_missing_component_is_unavailable_and_never_zero_filled(self) -> None:
         definition, inputs = inputs_for(
@@ -200,8 +259,11 @@ class QualityFactorV0Test(unittest.TestCase):
                 "quality.universal.cash_flow_to_profit": Decimal("1.2"),
                 "quality.universal.balance_sheet_leverage": Decimal("0.6"),
                 "quality.bank.core_tier1_capital_adequacy": Decimal("0.10"),
-                "quality.bank.nonperforming_loan_ratio": None,
+                "quality.bank.nonperforming_loan_ratio": Decimal("0.01"),
                 "quality.bank.net_interest_margin": Decimal("0.025"),
+                "quality.bank.accruals": None,
+                "quality.bank.roe": Decimal("0.15"),
+                "quality.bank.net_interest_margin_stability": Decimal("0.90"),
             },
         )
 
@@ -211,12 +273,12 @@ class QualityFactorV0Test(unittest.TestCase):
         self.assertIsNone(result.value)
         self.assertEqual(
             result.missing_component_ids,
-            ("quality.bank.nonperforming_loan_ratio",),
+            ("quality.bank.accruals",),
         )
         missing = next(
             value
             for value in result.component_results
-            if value.feature_id == "quality.bank.nonperforming_loan_ratio"
+            if value.feature_id == "quality.bank.accruals"
         )
         self.assertIsNone(missing.value)
         self.assertIsNone(missing.passed)

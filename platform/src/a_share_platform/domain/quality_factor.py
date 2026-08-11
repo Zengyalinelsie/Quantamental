@@ -422,6 +422,12 @@ _COMPONENT_PERIODS = {
     "quality.bank.core_tier1_capital_adequacy": FeaturePeriod.INSTANT,
     "quality.bank.nonperforming_loan_ratio": FeaturePeriod.INSTANT,
     "quality.bank.net_interest_margin": FeaturePeriod.TTM,
+    "quality.bank.accruals": FeaturePeriod.TTM,
+    "quality.bank.roe": FeaturePeriod.TTM,
+    "quality.bank.net_interest_margin_stability": FeaturePeriod.TTM,
+    "quality.non_financial.accruals": FeaturePeriod.TTM,
+    "quality.non_financial.roe": FeaturePeriod.TTM,
+    "quality.non_financial.net_margin_stability": FeaturePeriod.TTM,
     "quality.manufacturing.gross_margin_stability": FeaturePeriod.TTM,
     "quality.manufacturing.inventory_turnover": FeaturePeriod.TTM,
     "quality.manufacturing.cash_conversion_cycle": FeaturePeriod.TTM,
@@ -429,19 +435,19 @@ _COMPONENT_PERIODS = {
 
 _SPEC017_COVERAGE_GAPS = {
     IndustryTemplateId.NON_FINANCIAL_GENERAL: (
-        "spec017.accruals",
-        "spec017.roe",
-        "spec017.net_margin_stability",
+        "spec017.dilution",
+        "spec017.audit_and_regulatory",
+        "spec017.delisting_and_financial_anomalies",
     ),
     IndustryTemplateId.BANK: (
-        "spec017.accruals",
-        "spec017.roe",
-        "spec017.net_margin_stability",
+        "spec017.dilution",
+        "spec017.audit_and_regulatory",
+        "spec017.delisting_and_financial_anomalies",
     ),
     IndustryTemplateId.MANUFACTURING_CONSUMER: (
-        "spec017.accruals",
-        "spec017.roe",
-        "spec017.net_margin_stability",
+        "spec017.dilution",
+        "spec017.audit_and_regulatory",
+        "spec017.delisting_and_financial_anomalies",
     ),
 }
 

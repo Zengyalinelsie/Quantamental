@@ -11,7 +11,9 @@ from a_share_platform.domain.industry_templates import (
     GovernanceApprovalStatus,
     IndustryTemplateId,
     ThresholdBinding,
+    ThresholdComparator,
     ThresholdRequirement,
+    ThresholdSourceKind,
     industry_template_catalog_v0,
 )
 
@@ -62,10 +64,7 @@ class IndustryTemplateCatalogTest(unittest.TestCase):
                 )
                 self.assertEqual(
                     {rule.threshold_key for rule in template.key_metric_rules},
-                    {
-                        requirement.threshold_key
-                        for requirement in template.threshold_requirements
-                    },
+                    {requirement.threshold_key for requirement in template.threshold_requirements},
                 )
                 self.assertEqual(
                     set(template.exception_policy.allowed_categories),
@@ -93,14 +92,110 @@ class IndustryTemplateCatalogTest(unittest.TestCase):
         )
         self.assertNotEqual(
             {field for rule in bank_rules for field in rule.input_metric_codes},
-            {
-                field
-                for rule in manufacturing_rules
-                for field in rule.input_metric_codes
-            },
+            {field for rule in manufacturing_rules for field in rule.input_metric_codes},
         )
         self.assertIn("manufacturing.inventory_turnover", bank.incomparable_metric_codes)
         self.assertIn("bank.net_interest_margin", manufacturing.incomparable_metric_codes)
+
+    def test_spec017_gap_rules_are_industry_appropriate_and_governed(self) -> None:
+        non_financial = self.catalog.get(IndustryTemplateId.NON_FINANCIAL_GENERAL)
+        bank = self.catalog.get(IndustryTemplateId.BANK)
+        manufacturing = self.catalog.get(IndustryTemplateId.MANUFACTURING_CONSUMER)
+        expected_non_financial = {
+            "quality.non_financial.accruals",
+            "quality.non_financial.roe",
+            "quality.non_financial.net_margin_stability",
+        }
+        expected_bank = {
+            "quality.bank.accruals",
+            "quality.bank.roe",
+            "quality.bank.net_interest_margin_stability",
+        }
+        non_financial_rules = {rule.feature_id: rule for rule in non_financial.key_metric_rules}
+        bank_rules = {rule.feature_id: rule for rule in bank.key_metric_rules}
+        manufacturing_rules = {rule.feature_id: rule for rule in manufacturing.key_metric_rules}
+
+        self.assertTrue(expected_non_financial.issubset(non_financial_rules))
+        self.assertTrue(expected_non_financial.issubset(manufacturing_rules))
+        self.assertTrue(expected_bank.issubset(bank_rules))
+        self.assertTrue(expected_non_financial.isdisjoint(bank_rules))
+        self.assertTrue(expected_bank.isdisjoint(manufacturing_rules))
+        self.assertIn(
+            "bank.loan_loss_provisions",
+            bank_rules["quality.bank.accruals"].input_metric_codes,
+        )
+        self.assertIn(
+            "cash_flow.net_operating_cash_flow",
+            manufacturing_rules["quality.non_financial.accruals"].input_metric_codes,
+        )
+        self.assertIn(
+            "bank.net_interest_margin.lag_3",
+            bank_rules["quality.bank.net_interest_margin_stability"].input_metric_codes,
+        )
+        self.assertIn(
+            "income.net_margin_ttm.lag_3",
+            manufacturing_rules["quality.non_financial.net_margin_stability"].input_metric_codes,
+        )
+
+        for template, expected in (
+            (non_financial, expected_non_financial),
+            (bank, expected_bank),
+            (manufacturing, expected_non_financial),
+        ):
+            with self.subTest(template=template.template_id):
+                rules = {
+                    rule.feature_id: rule
+                    for rule in template.key_metric_rules
+                    if rule.feature_id in expected
+                }
+                self.assertEqual(set(rules), expected)
+                self.assertEqual(
+                    {rule.source_layer for rule in rules.values()},
+                    {FeatureSourceLayer.INDUSTRY},
+                )
+                for rule in rules.values():
+                    requirement = template.threshold_requirement(rule.threshold_key)
+                    self.assertEqual(
+                        requirement.source_kind,
+                        ThresholdSourceKind.PEER_DISTRIBUTION,
+                    )
+                    self.assertFalse(hasattr(requirement, "value"))
+                accruals = next(
+                    rule for rule in rules.values() if rule.feature_id.endswith("accruals")
+                )
+                roe = next(rule for rule in rules.values() if rule.feature_id.endswith("roe"))
+                self.assertEqual(
+                    template.threshold_requirement(accruals.threshold_key).comparator,
+                    ThresholdComparator.MAXIMUM,
+                )
+                self.assertEqual(
+                    template.threshold_requirement(roe.threshold_key).comparator,
+                    ThresholdComparator.MINIMUM,
+                )
+
+    def test_gap_metrics_mark_bank_and_manufacturing_incomparability(self) -> None:
+        non_financial = self.catalog.get(IndustryTemplateId.NON_FINANCIAL_GENERAL)
+        bank = self.catalog.get(IndustryTemplateId.BANK)
+        manufacturing = self.catalog.get(IndustryTemplateId.MANUFACTURING_CONSUMER)
+
+        non_financial_only = {
+            "income.net_margin_ttm.current",
+            "income.net_margin_ttm.lag_1",
+            "income.net_margin_ttm.lag_2",
+            "income.net_margin_ttm.lag_3",
+        }
+        bank_only = {
+            "bank.loan_loss_provisions",
+            "bank.average_gross_loans",
+            "bank.net_interest_margin.current",
+            "bank.net_interest_margin.lag_1",
+            "bank.net_interest_margin.lag_2",
+            "bank.net_interest_margin.lag_3",
+        }
+
+        self.assertTrue(non_financial_only.issubset(bank.incomparable_metric_codes))
+        self.assertTrue(bank_only.issubset(non_financial.incomparable_metric_codes))
+        self.assertTrue(bank_only.issubset(manufacturing.incomparable_metric_codes))
 
     def test_definition_hash_covers_the_human_readable_template_name(self) -> None:
         template = self.catalog.get(IndustryTemplateId.BANK)
@@ -202,8 +297,9 @@ class IndustryTemplateCatalogTest(unittest.TestCase):
                 "not effective",
             ),
         ):
-            with self.subTest(message=message), self.assertRaisesRegex(
-                (ValueError, PermissionError), message
+            with (
+                self.subTest(message=message),
+                self.assertRaisesRegex((ValueError, PermissionError), message),
             ):
                 self.catalog.resolve_feature(
                     template_id=template.template_id,

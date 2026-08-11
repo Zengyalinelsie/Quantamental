@@ -338,9 +338,7 @@ class IndustryTemplateDefinition:
             self.incomparable_metric_codes,
             "incomparable_metric_codes",
         )
-        applicable_inputs = {
-            metric for rule in rules for metric in rule.input_metric_codes
-        }
+        applicable_inputs = {metric for rule in rules for metric in rule.input_metric_codes}
         if applicable_inputs.intersection(incomparable):
             raise ValueError("incomparable metrics cannot be template inputs")
         object.__setattr__(self, "incomparable_metric_codes", incomparable)
@@ -365,9 +363,7 @@ class IndustryTemplateDefinition:
 
     def threshold_requirement(self, threshold_key: str) -> ThresholdRequirement:
         matches = tuple(
-            value
-            for value in self.threshold_requirements
-            if value.threshold_key == threshold_key
+            value for value in self.threshold_requirements if value.threshold_key == threshold_key
         )
         if len(matches) != 1:
             raise LookupError(f"unknown template threshold requirement: {threshold_key}")
@@ -446,12 +442,8 @@ class IndustryTemplateCatalog:
                 value.formula_id for value in manufacturing_rules
             }:
                 raise ValueError("bank and manufacturing formulas must differ")
-            if {
-                metric for value in bank_rules for metric in value.input_metric_codes
-            } == {
-                metric
-                for value in manufacturing_rules
-                for metric in value.input_metric_codes
+            if {metric for value in bank_rules for metric in value.input_metric_codes} == {
+                metric for value in manufacturing_rules for metric in value.input_metric_codes
             }:
                 raise ValueError("bank and manufacturing applicable fields must differ")
 
@@ -520,9 +512,7 @@ class IndustryTemplateCatalog:
         binding_keys = tuple(value.threshold_key for value in bindings)
         if len(binding_keys) != len(set(binding_keys)):
             raise ValueError("threshold bindings must have unique keys")
-        matches = tuple(
-            value for value in bindings if value.threshold_key == rule.threshold_key
-        )
+        matches = tuple(value for value in bindings if value.threshold_key == rule.threshold_key)
         if len(matches) != 1:
             raise LookupError(f"threshold binding is missing: {rule.threshold_key}")
         binding = matches[0]
@@ -536,9 +526,7 @@ class IndustryTemplateCatalog:
         if not binding.effective_on(effective_on):
             raise PermissionError("threshold binding is not effective on as_of")
         source_layer = (
-            FeatureSourceLayer.COMPANY_EXCEPTION
-            if exception is not None
-            else rule.source_layer
+            FeatureSourceLayer.COMPANY_EXCEPTION if exception is not None else rule.source_layer
         )
         return ResolvedTemplateFeature(
             applicable=True,
@@ -643,6 +631,41 @@ def _exception_policy(template_id: IndustryTemplateId) -> CompanyExceptionPolicy
 def industry_template_catalog_v0() -> IndustryTemplateCatalog:
     universal_rules = _universal_rules()
     universal_requirements = _universal_requirements()
+    non_financial_spec017_rules = (
+        _rule(
+            "quality.non_financial.accruals",
+            "formula:quality:non-financial-accruals-to-assets:v1",
+            (
+                "income.net_profit",
+                "cash_flow.net_operating_cash_flow",
+                "balance.average_total_assets",
+            ),
+            MetricUnit.RATIO,
+            FeatureSourceLayer.INDUSTRY,
+            "non_financial.accruals.maximum",
+        ),
+        _rule(
+            "quality.non_financial.roe",
+            "formula:quality:non-financial-roe:v1",
+            ("income.net_profit", "balance.average_equity"),
+            MetricUnit.RATIO,
+            FeatureSourceLayer.INDUSTRY,
+            "non_financial.roe.minimum",
+        ),
+        _rule(
+            "quality.non_financial.net_margin_stability",
+            "formula:quality:non-financial-net-margin-stability:v1",
+            (
+                "income.net_margin_ttm.current",
+                "income.net_margin_ttm.lag_1",
+                "income.net_margin_ttm.lag_2",
+                "income.net_margin_ttm.lag_3",
+            ),
+            MetricUnit.RATIO,
+            FeatureSourceLayer.INDUSTRY,
+            "non_financial.net_margin_stability.minimum",
+        ),
+    )
     non_financial_rules = (
         _rule(
             "quality.non_financial.roic",
@@ -685,6 +708,35 @@ def industry_template_catalog_v0() -> IndustryTemplateCatalog:
             MetricUnit.RATIO,
             FeatureSourceLayer.INDUSTRY,
             "bank.net_interest_margin.minimum",
+        ),
+        _rule(
+            "quality.bank.accruals",
+            "formula:quality:bank-loan-loss-accruals:v1",
+            ("bank.loan_loss_provisions", "bank.average_gross_loans"),
+            MetricUnit.RATIO,
+            FeatureSourceLayer.INDUSTRY,
+            "bank.accruals.maximum",
+        ),
+        _rule(
+            "quality.bank.roe",
+            "formula:quality:bank-roe:v1",
+            ("income.net_profit", "balance.average_equity"),
+            MetricUnit.RATIO,
+            FeatureSourceLayer.INDUSTRY,
+            "bank.roe.minimum",
+        ),
+        _rule(
+            "quality.bank.net_interest_margin_stability",
+            "formula:quality:bank-net-interest-margin-stability:v1",
+            (
+                "bank.net_interest_margin.current",
+                "bank.net_interest_margin.lag_1",
+                "bank.net_interest_margin.lag_2",
+                "bank.net_interest_margin.lag_3",
+            ),
+            MetricUnit.RATIO,
+            FeatureSourceLayer.INDUSTRY,
+            "bank.net_interest_margin_stability.minimum",
         ),
     )
     manufacturing_rules = (
@@ -733,6 +785,29 @@ def industry_template_catalog_v0() -> IndustryTemplateCatalog:
             "Versioned solvency policy is required for interest coverage.",
         ),
     )
+    non_financial_spec017_requirements = (
+        _requirement(
+            "non_financial.accruals.maximum",
+            MetricUnit.RATIO,
+            ThresholdComparator.MAXIMUM,
+            ThresholdSourceKind.PEER_DISTRIBUTION,
+            "Versioned non-financial peer distribution is required for accruals.",
+        ),
+        _requirement(
+            "non_financial.roe.minimum",
+            MetricUnit.RATIO,
+            ThresholdComparator.MINIMUM,
+            ThresholdSourceKind.PEER_DISTRIBUTION,
+            "Versioned non-financial peer distribution is required for ROE.",
+        ),
+        _requirement(
+            "non_financial.net_margin_stability.minimum",
+            MetricUnit.RATIO,
+            ThresholdComparator.MINIMUM,
+            ThresholdSourceKind.PEER_DISTRIBUTION,
+            "Versioned non-financial peer distribution is required for net-margin stability.",
+        ),
+    )
     bank_requirements = (
         _requirement(
             "bank.core_tier1_capital_adequacy.minimum",
@@ -754,6 +829,27 @@ def industry_template_catalog_v0() -> IndustryTemplateCatalog:
             ThresholdComparator.MINIMUM,
             ThresholdSourceKind.PEER_DISTRIBUTION,
             "Versioned bank peer distribution is required for net interest margin.",
+        ),
+        _requirement(
+            "bank.accruals.maximum",
+            MetricUnit.RATIO,
+            ThresholdComparator.MAXIMUM,
+            ThresholdSourceKind.PEER_DISTRIBUTION,
+            "Versioned bank peer distribution is required for loan-loss accruals.",
+        ),
+        _requirement(
+            "bank.roe.minimum",
+            MetricUnit.RATIO,
+            ThresholdComparator.MINIMUM,
+            ThresholdSourceKind.PEER_DISTRIBUTION,
+            "Versioned bank peer distribution is required for ROE.",
+        ),
+        _requirement(
+            "bank.net_interest_margin_stability.minimum",
+            MetricUnit.RATIO,
+            ThresholdComparator.MINIMUM,
+            ThresholdSourceKind.PEER_DISTRIBUTION,
+            "Versioned bank peer distribution is required for net-interest-margin stability.",
         ),
     )
     manufacturing_requirements = (
@@ -785,19 +881,28 @@ def industry_template_catalog_v0() -> IndustryTemplateCatalog:
                 template_id=IndustryTemplateId.NON_FINANCIAL_GENERAL,
                 version="v0",
                 name="Non-financial general quality template",
-                key_metric_rules=(*universal_rules, *non_financial_rules),
+                key_metric_rules=(
+                    *universal_rules,
+                    *non_financial_rules,
+                    *non_financial_spec017_rules,
+                ),
                 incomparable_metric_codes=(
                     "bank.core_tier1_capital_adequacy",
                     "bank.nonperforming_loan_ratio",
                     "bank.net_interest_margin",
+                    "bank.loan_loss_provisions",
+                    "bank.average_gross_loans",
+                    "bank.net_interest_margin.current",
+                    "bank.net_interest_margin.lag_1",
+                    "bank.net_interest_margin.lag_2",
+                    "bank.net_interest_margin.lag_3",
                 ),
                 threshold_requirements=(
                     *universal_requirements,
                     *non_financial_requirements,
+                    *non_financial_spec017_requirements,
                 ),
-                exception_policy=_exception_policy(
-                    IndustryTemplateId.NON_FINANCIAL_GENERAL
-                ),
+                exception_policy=_exception_policy(IndustryTemplateId.NON_FINANCIAL_GENERAL),
             ),
             IndustryTemplateDefinition(
                 template_id=IndustryTemplateId.BANK,
@@ -808,6 +913,10 @@ def industry_template_catalog_v0() -> IndustryTemplateCatalog:
                     "manufacturing.inventory_turnover",
                     "manufacturing.cash_conversion_cycle",
                     "income.gross_margin",
+                    "income.net_margin_ttm.current",
+                    "income.net_margin_ttm.lag_1",
+                    "income.net_margin_ttm.lag_2",
+                    "income.net_margin_ttm.lag_3",
                     "valuation.ev_to_ebit",
                 ),
                 threshold_requirements=(*universal_requirements, *bank_requirements),
@@ -817,19 +926,28 @@ def industry_template_catalog_v0() -> IndustryTemplateCatalog:
                 template_id=IndustryTemplateId.MANUFACTURING_CONSUMER,
                 version="v0",
                 name="Manufacturing and consumer quality template",
-                key_metric_rules=(*universal_rules, *manufacturing_rules),
+                key_metric_rules=(
+                    *universal_rules,
+                    *non_financial_spec017_rules,
+                    *manufacturing_rules,
+                ),
                 incomparable_metric_codes=(
                     "bank.core_tier1_capital_adequacy",
                     "bank.nonperforming_loan_ratio",
                     "bank.net_interest_margin",
+                    "bank.loan_loss_provisions",
+                    "bank.average_gross_loans",
+                    "bank.net_interest_margin.current",
+                    "bank.net_interest_margin.lag_1",
+                    "bank.net_interest_margin.lag_2",
+                    "bank.net_interest_margin.lag_3",
                 ),
                 threshold_requirements=(
                     *universal_requirements,
+                    *non_financial_spec017_requirements,
                     *manufacturing_requirements,
                 ),
-                exception_policy=_exception_policy(
-                    IndustryTemplateId.MANUFACTURING_CONSUMER
-                ),
+                exception_policy=_exception_policy(IndustryTemplateId.MANUFACTURING_CONSUMER),
             ),
         )
     )
