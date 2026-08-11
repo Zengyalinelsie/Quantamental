@@ -564,7 +564,10 @@ class AkShareFinancialSource:
         self,
         *,
         client: AkShareFinancialClient,
-        normalizer: AkShareFinancialNormalizer,
+        normalizer: (
+            AkShareFinancialNormalizer
+            | Mapping[StatementType, AkShareFinancialNormalizer]
+        ),
         request_executor: AkShareRequestExecutor,
         evidence_capture: FinancialEvidenceCapture,
         evidence_source_urls: Mapping[StatementType, str],
@@ -572,7 +575,21 @@ class AkShareFinancialSource:
         snapshot_cache: AkShareFinancialSnapshotCache | None = None,
     ) -> None:
         self._client = client
-        self._normalizer = normalizer
+        if isinstance(normalizer, AkShareFinancialNormalizer):
+            self._normalizers = {statement_type: normalizer for statement_type in StatementType}
+        else:
+            normalizers = {
+                StatementType(statement_type): value
+                for statement_type, value in normalizer.items()
+            }
+            if set(normalizers) != set(StatementType) or any(
+                not isinstance(value, AkShareFinancialNormalizer)
+                for value in normalizers.values()
+            ):
+                raise ValueError(
+                    "statement-specific AkShare normalizers must cover all three statements"
+                )
+            self._normalizers = normalizers
         self._request_executor = request_executor
         self._evidence_capture = evidence_capture
         urls = {
@@ -636,7 +653,7 @@ class AkShareFinancialSource:
             provider_records=provider_records,
             retrieved_at=retrieved_at,
         )
-        return self._normalizer.normalize(
+        return self._normalizers[work_unit.statement_type].normalize(
             work_unit=work_unit,
             provider_records=provider_records,
             evidence=evidence,

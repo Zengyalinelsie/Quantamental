@@ -343,6 +343,58 @@ class AppearingSnapshotCache:
 
 
 class AkShareFinancialSourceTest(unittest.TestCase):
+    def test_statement_specific_normalizers_do_not_count_other_statement_fields_missing(
+        self,
+    ) -> None:
+        frame = StubFrame(
+            (
+                {
+                    "SECURITY_CODE": "600000",
+                    "REPORT_DATE": "2024-12-31",
+                    "TOTAL_ASSETS": "20",
+                },
+            )
+        )
+        source = AkShareFinancialSource(
+            client=StubAkShareClient({"SH600000": frame}),
+            normalizer={
+                StatementType.BALANCE_SHEET: AkShareFinancialNormalizer(
+                    (
+                        contract(
+                            "TOTAL_ASSETS",
+                            value_basis=FinancialValueBasis.POINT_IN_TIME,
+                        ),
+                    )
+                ),
+                StatementType.INCOME_STATEMENT: AkShareFinancialNormalizer(
+                    (
+                        contract(
+                            "TOTAL_OPERATE_INCOME",
+                            value_basis=FinancialValueBasis.CUMULATIVE_YTD,
+                        ),
+                    )
+                ),
+                StatementType.CASH_FLOW_STATEMENT: AkShareFinancialNormalizer(
+                    (
+                        contract(
+                            "NETCASH_OPERATE",
+                            value_basis=FinancialValueBasis.CUMULATIVE_YTD,
+                        ),
+                    )
+                ),
+            },
+            request_executor=RecordingRequestExecutor(),
+            evidence_capture=RecordingEvidenceCapture(StatementType.BALANCE_SHEET),
+            evidence_source_urls=SOURCE_URLS,
+            clock=lambda: NOW,
+        )
+
+        batch = source.fetch(unit(), allow_read_through_cache=False)
+
+        self.assertEqual(len(batch.rows), 1)
+        self.assertEqual(batch.rows[0].provider_field, "TOTAL_ASSETS")
+        self.assertEqual(batch.missing_value_count, 0)
+
     def test_cache_is_rechecked_inside_request_gate_before_provider_access(self) -> None:
         cached = AkShareFinancialSnapshot.from_provider_records(
             key=AkShareFinancialSnapshotKey(
