@@ -70,8 +70,26 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0024_identifier_alias_append_only_reconciliation.sql",
                 "0025_experiment_runs.sql",
                 "0026_empty_financial_periods.sql",
+                "0027_factor_promotion_reviews.sql",
             ),
         )
+
+    def test_factor_reviews_are_scoped_science_gated_and_append_only(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0027_factor_promotion_reviews.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE factor_promotion_reviews",
+            "factor_lifecycle_status = 'candidate'",
+            "decision <> 'approved' OR scientific_gate_passed",
+            "reviewer_role IN ('reviewer', 'administrator')",
+            "scope IN ('research_backtest', 'shadow', 'paper', 'limited_live')",
+            "factor_promotion_reviews_append_only",
+            "BEFORE UPDATE OR DELETE ON factor_promotion_reviews",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_empty_financial_period_migration_preserves_explicit_absence(self) -> None:
         sql = (

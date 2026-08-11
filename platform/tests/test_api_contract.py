@@ -59,7 +59,7 @@ class ApiContractTest(unittest.TestCase):
         self.assertEqual(response.json()["data"]["subject_id"], "anonymous")
         self.assertEqual(response.json()["data"]["roles"], [])
 
-    def test_openapi_exposes_only_the_permission_guarded_experiment_write_endpoint(self) -> None:
+    def test_openapi_exposes_only_permission_guarded_research_write_endpoints(self) -> None:
         schema = self.client.get("/openapi.json").json()
         methods = {
             (path, method)
@@ -67,7 +67,13 @@ class ApiContractTest(unittest.TestCase):
             for method in definition
             if method in {"post", "put", "patch", "delete"}
         }
-        self.assertEqual(methods, {("/api/experiments/runs", "post")})
+        self.assertEqual(
+            methods,
+            {
+                ("/api/experiments/runs", "post"),
+                ("/api/factors/reviews", "post"),
+            },
+        )
 
     def test_security_mapping_api_resolves_historical_code(self) -> None:
         response = self.security_client.get(

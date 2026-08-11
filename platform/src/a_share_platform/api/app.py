@@ -1,4 +1,4 @@
-"""FastAPI read-only API for governed market, financial, and system data."""
+"""FastAPI API for governed research data and append-only review decisions."""
 
 from __future__ import annotations
 
@@ -16,15 +16,26 @@ from fastapi.responses import JSONResponse
 from a_share_platform.adapters.memory.experiments import (
     UnavailableExperimentRunRepository,
 )
+from a_share_platform.adapters.memory.factor_reviews import (
+    UnavailableFactorReviewRepository,
+)
 from a_share_platform.adapters.memory.financial_evidence import StaticFinancialEvidenceReader
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
 from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
 from a_share_platform.adapters.postgres.experiments import (
     PostgresExperimentRunRepository,
 )
+from a_share_platform.adapters.postgres.factor_reviews import (
+    PostgresFactorReviewRepository,
+)
 from a_share_platform.adapters.postgres.financial_evidence import PostgresFinancialEvidenceReader
 from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
 from a_share_platform.application.experiments import ExperimentRunService
+from a_share_platform.application.factor_reviews import (
+    FactorReviewDenied,
+    FactorReviewService,
+    InvalidFactorReview,
+)
 from a_share_platform.application.financial_evidence import (
     FactComparisonQuery,
     FactIdentityQuery,
@@ -35,6 +46,7 @@ from a_share_platform.application.permissions import (
     Principal,
 )
 from a_share_platform.domain.experiments import ExperimentRunConflict
+from a_share_platform.domain.factor_reviews import FactorReviewConflict
 from a_share_platform.domain.market_data import (
     MarketDataCatalog,
     MarketDataConflict,
@@ -49,10 +61,20 @@ from a_share_platform.ports.experiments import (
     ExperimentRunRepository,
     ExperimentStoreUnavailable,
 )
+from a_share_platform.ports.factor_reviews import (
+    FactorReviewRepository,
+    FactorReviewStoreUnavailable,
+)
 from a_share_platform.ports.financial_evidence import FinancialEvidenceReader
 from a_share_platform.ports.system_catalog import SystemCatalogReader
 
-from .schemas import Envelope, ExperimentRunInput, ProblemDetails, ResponseContext
+from .schemas import (
+    Envelope,
+    ExperimentRunInput,
+    FactorReviewInput,
+    ProblemDetails,
+    ResponseContext,
+)
 
 
 class RunContextOverrideDenied(ValueError):
@@ -141,10 +163,11 @@ def create_app(
     system_catalog: SystemCatalogReader | None = None,
     financial_evidence: FinancialEvidenceReader | None = None,
     experiment_repository: ExperimentRunRepository | None = None,
+    factor_review_repository: FactorReviewRepository | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="A-Share Platform Next",
-        summary="Read-only governed research data and system-management API",
+        summary="Governed research data, experiments, and review API",
         version=version("a-share-platform"),
     )
     governance = repository or InMemoryGovernanceRepository()
@@ -170,7 +193,15 @@ def create_app(
         )
     )
     experiment_service = ExperimentRunService(experiments)
+    factor_reviews = factor_review_repository or (
+        PostgresFactorReviewRepository.from_dsn(database_url)
+        if database_url
+        else UnavailableFactorReviewRepository(
+            "ASP_DATABASE_URL is not configured for factor review persistence"
+        )
+    )
     permission_policy = PermissionPolicy.default()
+    factor_review_service = FactorReviewService(factor_reviews, permission_policy)
     app.state.governance_repository = governance
     app.state.security_master = master
     app.state.universe_catalog = universes
@@ -179,6 +210,8 @@ def create_app(
     app.state.financial_evidence = financial
     app.state.experiment_repository = experiments
     app.state.experiment_service = experiment_service
+    app.state.factor_review_repository = factor_reviews
+    app.state.factor_review_service = factor_review_service
     app.state.permission_policy = permission_policy
 
     @app.exception_handler(RunContextOverrideDenied)
@@ -259,6 +292,48 @@ def create_app(
         problem = ProblemDetails(
             type="experiment_store_unavailable",
             title="Experiment store unavailable",
+            status=503,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=503)
+
+    @app.exception_handler(InvalidFactorReview)
+    async def invalid_factor_review_handler(
+        request: Request,
+        error: InvalidFactorReview,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="invalid_factor_review",
+            title="Invalid factor review",
+            status=422,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=422)
+
+    @app.exception_handler(FactorReviewConflict)
+    async def factor_review_conflict_handler(
+        request: Request,
+        error: FactorReviewConflict,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="factor_review_conflict",
+            title="Factor review conflict",
+            status=409,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=409)
+
+    @app.exception_handler(FactorReviewStoreUnavailable)
+    async def factor_review_store_unavailable_handler(
+        request: Request,
+        error: FactorReviewStoreUnavailable,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="factor_review_store_unavailable",
+            title="Factor review store unavailable",
             status=503,
             detail=str(error),
             instance=request.url.path,
@@ -404,6 +479,58 @@ def create_app(
             stored.spec.run_context,
             dataset_version_ids=stored.spec.dataset_version_ids,
             run_id=stored.run_id,
+        )
+
+    @app.get("/api/factors/reviews", response_model=Envelope)
+    def factor_promotion_reviews(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        return envelope(
+            [asdict(item) for item in factor_review_service.list_reviews()],
+            context,
+        )
+
+    @app.get("/api/factors/reviews/{review_id}", response_model=Envelope)
+    def factor_promotion_review(
+        review_id: str,
+        _context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        value = factor_review_service.get_review(review_id)
+        if value is None:
+            raise ResourceNotFound(f"factor promotion review not found: {review_id}")
+        return envelope(asdict(value), _context)
+
+    @app.post("/api/factors/reviews", response_model=Envelope, status_code=201)
+    def create_factor_promotion_review(
+        review: FactorReviewInput,
+        principal: Annotated[Principal, Depends(anonymous_principal)],
+        _context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Envelope:
+        try:
+            factor_version = review.factor_version.to_domain()
+            validation_report = review.validation_report.to_domain()
+            stored = factor_review_service.record_review(
+                factor_version=factor_version,
+                validation_report=validation_report,
+                approval_id=review.approval_id,
+                scope=review.scope,
+                decision=review.decision,
+                principal=principal,
+                decided_at=review.decided_at,
+                reason=review.reason,
+                evidence_hashes=review.evidence_hashes,
+            )
+        except FactorReviewDenied as error:
+            raise PermissionDenied(str(error)) from error
+        except (TypeError, ValueError) as error:
+            if isinstance(error, InvalidFactorReview):
+                raise
+            raise InvalidFactorReview(str(error)) from error
+        return envelope(
+            asdict(stored),
+            validation_report.run_context,
+            dataset_version_ids=validation_report.dataset_version_ids,
+            run_id=validation_report.experiment_run_id,
         )
 
     @app.get("/api/securities", response_model=Envelope)

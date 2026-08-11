@@ -21,6 +21,20 @@ from a_share_platform.domain.experiments import (
     FeatureVersionBinding,
     LabelVersionBinding,
 )
+from a_share_platform.domain.factor_lifecycle import (
+    ApprovalDecision,
+    ApprovalScope,
+    FactorLifecycleEvent,
+    FactorLifecycleStatus,
+    FactorVersion,
+    PromotionBinding,
+    ValidationCheck,
+    ValidationCheckName,
+    ValidationOutcome,
+    ValidationReport,
+    ValidationWaiver,
+)
+from a_share_platform.domain.pit import DataTrustState
 from a_share_platform.domain.run_context import DataMode, DeploymentStage, RunContext
 
 
@@ -232,3 +246,154 @@ class ExperimentRunInput(StrictInput):
             artifacts=tuple(value.to_domain() for value in self.artifacts),
             failure=None if self.failure is None else self.failure.to_domain(),
         )
+
+
+class FactorLifecycleEventInput(StrictInput):
+    event_id: str
+    from_status: FactorLifecycleStatus
+    to_status: FactorLifecycleStatus
+    actor_id: str
+    actor_role: str
+    occurred_at: datetime
+    reason: str
+    evidence_hashes: tuple[str, ...]
+
+    def to_domain(self) -> FactorLifecycleEvent:
+        return FactorLifecycleEvent(
+            event_id=self.event_id,
+            from_status=self.from_status,
+            to_status=self.to_status,
+            actor_id=self.actor_id,
+            actor_role=self.actor_role,
+            occurred_at=self.occurred_at,
+            reason=self.reason,
+            evidence_hashes=self.evidence_hashes,
+        )
+
+
+class PromotionBindingInput(StrictInput):
+    validation_report_id: str
+    validation_report_hash: str
+    approval_id: str
+    approval_hash: str
+    scope: ApprovalScope
+    bound_at: datetime
+
+    def to_domain(self) -> PromotionBinding:
+        return PromotionBinding(
+            validation_report_id=self.validation_report_id,
+            validation_report_hash=self.validation_report_hash,
+            approval_id=self.approval_id,
+            approval_hash=self.approval_hash,
+            scope=self.scope,
+            bound_at=self.bound_at,
+        )
+
+
+class FactorVersionInput(StrictInput):
+    factor_version_id: str
+    factor_id: str
+    semantic_version: str
+    definition_hash: str
+    code_sha: str
+    dataset_version_ids: tuple[str, ...]
+    feature_version_ids: tuple[str, ...]
+    model_version_ids: tuple[str, ...]
+    created_by: str
+    created_at: datetime
+    status: FactorLifecycleStatus
+    lifecycle_events: tuple[FactorLifecycleEventInput, ...]
+    promotion_bindings: tuple[PromotionBindingInput, ...]
+
+    def to_domain(self) -> FactorVersion:
+        return FactorVersion(
+            factor_version_id=self.factor_version_id,
+            factor_id=self.factor_id,
+            semantic_version=self.semantic_version,
+            definition_hash=self.definition_hash,
+            code_sha=self.code_sha,
+            dataset_version_ids=self.dataset_version_ids,
+            feature_version_ids=self.feature_version_ids,
+            model_version_ids=self.model_version_ids,
+            created_by=self.created_by,
+            created_at=self.created_at,
+            status=self.status,
+            lifecycle_events=tuple(value.to_domain() for value in self.lifecycle_events),
+            promotion_bindings=tuple(
+                value.to_domain() for value in self.promotion_bindings
+            ),
+        )
+
+
+class ValidationWaiverInput(StrictInput):
+    actor_id: str
+    actor_role: str
+    waived_at: datetime
+    reason: str
+    evidence_hashes: tuple[str, ...]
+
+    def to_domain(self) -> ValidationWaiver:
+        return ValidationWaiver(
+            actor_id=self.actor_id,
+            actor_role=self.actor_role,
+            waived_at=self.waived_at,
+            reason=self.reason,
+            evidence_hashes=self.evidence_hashes,
+        )
+
+
+class ValidationCheckInput(StrictInput):
+    name: ValidationCheckName
+    outcome: ValidationOutcome
+    evidence_hashes: tuple[str, ...]
+    detail: str
+    waiver: ValidationWaiverInput | None = None
+
+    def to_domain(self) -> ValidationCheck:
+        return ValidationCheck(
+            name=self.name,
+            outcome=self.outcome,
+            evidence_hashes=self.evidence_hashes,
+            detail=self.detail,
+            waiver=None if self.waiver is None else self.waiver.to_domain(),
+        )
+
+
+class ValidationReportInput(StrictInput):
+    report_id: str
+    report_version: str
+    factor_version_id: str
+    experiment_run_id: str
+    dataset_version_ids: tuple[str, ...]
+    code_sha: str
+    artifact_hashes: tuple[str, ...]
+    run_context: RunContextInput
+    input_trust_state: DataTrustState
+    checks: tuple[ValidationCheckInput, ...]
+    created_at: datetime
+
+    def to_domain(self) -> ValidationReport:
+        return ValidationReport(
+            report_id=self.report_id,
+            report_version=self.report_version,
+            factor_version_id=self.factor_version_id,
+            experiment_run_id=self.experiment_run_id,
+            dataset_version_ids=self.dataset_version_ids,
+            code_sha=self.code_sha,
+            artifact_hashes=self.artifact_hashes,
+            run_context=self.run_context.to_domain(),
+            input_trust_state=self.input_trust_state,
+            checks=tuple(value.to_domain() for value in self.checks),
+            created_at=self.created_at,
+        )
+
+
+class FactorReviewInput(StrictInput):
+    approval_id: str
+    factor_version: FactorVersionInput
+    validation_report: ValidationReportInput
+    scope: ApprovalScope
+    decision: ApprovalDecision
+    decided_at: datetime
+    reason: str
+    evidence_hashes: tuple[str, ...]
