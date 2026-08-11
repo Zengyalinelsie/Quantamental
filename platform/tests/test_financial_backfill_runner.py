@@ -20,6 +20,7 @@ from a_share_platform.domain.backfill import (
 from a_share_platform.domain.disclosure import RawObject, RawObjectKind, RetentionPolicy
 from a_share_platform.domain.financial_backfill import (
     CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
+    EMPTY_FINANCIAL_WORK_UNIT_WARNING,
     FinancialBackfillCohort,
     FinancialBackfillPlan,
     FinancialIdentityResolutionMethod,
@@ -251,6 +252,33 @@ class FinancialBackfillMapperTest(unittest.TestCase):
             )
 
 
+class FinancialPersistResultTest(unittest.TestCase):
+    def test_empty_and_non_empty_receipts_require_matching_identity_semantics(self) -> None:
+        with self.assertRaisesRegex(ValueError, "must use no_observations"):
+            FinancialPersistResult(
+                dataset_version_id="dataset:empty",
+                observation_ids=(),
+                identity_resolution_method=(
+                    FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+                ),
+                warnings=(CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,),
+            )
+        with self.assertRaisesRegex(ValueError, "missing-data warning"):
+            FinancialPersistResult(
+                dataset_version_id="dataset:empty",
+                observation_ids=(),
+                identity_resolution_method=FinancialIdentityResolutionMethod.NO_OBSERVATIONS,
+                warnings=("provider returned no row",),
+            )
+        with self.assertRaisesRegex(ValueError, "non-empty"):
+            FinancialPersistResult(
+                dataset_version_id="dataset:populated",
+                observation_ids=("observation:1",),
+                identity_resolution_method=FinancialIdentityResolutionMethod.NO_OBSERVATIONS,
+                warnings=(EMPTY_FINANCIAL_WORK_UNIT_WARNING,),
+            )
+
+
 class StubSource:
     provider_id = "factor_service_ths"
 
@@ -289,13 +317,22 @@ class MemoryUnitOfWork:
 
     def persist(self, value):  # type: ignore[no-untyped-def]
         self.persisted.append(value)
+        empty = not value.mapped_rows
         self.persist_result = FinancialPersistResult(
             dataset_version_id="dataset:financial:csi300:2024:v1",
-            observation_ids=("observation:total-assets:600000:2024",),
-            identity_resolution_method=(
-                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            observation_ids=(
+                () if empty else ("observation:total-assets:600000:2024",)
             ),
-            warnings=(CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,),
+            identity_resolution_method=(
+                FinancialIdentityResolutionMethod.NO_OBSERVATIONS
+                if empty
+                else FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            ),
+            warnings=(
+                (EMPTY_FINANCIAL_WORK_UNIT_WARNING,)
+                if empty
+                else (CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,)
+            ),
         )
         return self.persist_result
 
@@ -355,6 +392,47 @@ class FinancialBackfillRunnerTest(unittest.TestCase):
         self.assertIn((plan().mapping_version_id, outcome.dataset_version_id, "mapped_by"), lineage)
         self.assertIn((plan().universe_version_id, outcome.dataset_version_id, "scoped_by"), lineage)
         self.assertEqual(source.calls, 1)
+
+    def test_empty_provider_period_is_explicitly_persisted_without_zero_fill(self) -> None:
+        empty_batch = replace(
+            provider_batch(),
+            rows=(),
+            provider_record_count=0,
+            missing_value_count=0,
+            accepted_symbols=(),
+            warnings=("requested report period is unavailable",),
+        )
+        source = StubSource(empty_batch)
+        unit_of_work = MemoryUnitOfWork()
+        value, _repository = mapper()
+        runner = FinancialBackfillRunner(
+            planner=FinancialBackfillPlanner(),
+            mapper=value,
+            unit_of_work=unit_of_work,
+            clock=lambda: NOW,
+        )
+
+        outcome = runner.run_unit(
+            plan=plan(),
+            profile=profile(),
+            job_id="job:financial:csi300:2024:v1",
+            work_unit=empty_batch.work_unit,
+            source=source,
+        )
+
+        self.assertEqual(outcome.checkpoint.status, BackfillCheckpointStatus.SUCCEEDED)
+        self.assertEqual(outcome.observation_ids, ())
+        self.assertEqual(outcome.checkpoint.processed_rows, 0)
+        assert unit_of_work.persist_result is not None
+        self.assertEqual(unit_of_work.persist_result.observation_ids, ())
+        self.assertEqual(
+            unit_of_work.persist_result.identity_resolution_method,
+            FinancialIdentityResolutionMethod.NO_OBSERVATIONS,
+        )
+        self.assertEqual(unit_of_work.coverage[0].observed_rows, 0)
+        self.assertEqual(unit_of_work.coverage[0].coverage_ratio, 0.0)
+        self.assertIn(("missing_security", 1), unit_of_work.quality[0].issue_counts)
+        self.assertIn(EMPTY_FINANCIAL_WORK_UNIT_WARNING, unit_of_work.quality[0].warnings)
 
     def test_provider_failure_rolls_back_unit_and_durably_marks_checkpoint_failed(self) -> None:
         source = FailingSource(provider_batch())

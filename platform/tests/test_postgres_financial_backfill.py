@@ -1,5 +1,6 @@
 import json
 import unittest
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -18,6 +19,7 @@ from a_share_platform.application.metric_registry import MetricRegistryService
 from a_share_platform.domain.backfill import BackfillCheckpointStatus, DatasetQualityStatus
 from a_share_platform.domain.disclosure import RawObject, RawObjectKind, RetentionPolicy
 from a_share_platform.domain.financial_backfill import (
+    EMPTY_FINANCIAL_WORK_UNIT_WARNING,
     FinancialBackfillBatchResult,
     FinancialBackfillCohort,
     FinancialBackfillPlan,
@@ -200,6 +202,25 @@ def mapping_result(*, retrieved_at: datetime = NOW):  # type: ignore[no-untyped-
     return FinancialBackfillMapper(repository).map(
         batch,
         data_mode=DataMode.CURRENT_RESEARCH,
+    )
+
+
+def empty_mapping_result():  # type: ignore[no-untyped-def]
+    populated = mapping_result()
+    batch = replace(
+        populated.provider_batch,
+        rows=(),
+        provider_record_count=0,
+        missing_value_count=0,
+        accepted_symbols=(),
+        warnings=("requested report period is unavailable",),
+    )
+    return replace(
+        populated,
+        provider_batch=batch,
+        mapped_rows=(),
+        unmapped_row_ids=(),
+        warnings=(),
     )
 
 
@@ -524,6 +545,42 @@ class PostgresFinancialBackfillUnitOfWorkTest(unittest.TestCase):
         self.assertEqual(
             manifest["rows"][0]["identity_as_of"],  # type: ignore[index]
             NOW.date().isoformat(),
+        )
+
+    def test_empty_period_persists_evidence_dataset_work_unit_and_zero_receipt(self) -> None:
+        connection = PersistingFakeConnection()
+        resolver = StubIdentityResolver()
+        uow = PostgresFinancialBackfillUnitOfWork(
+            connection,
+            job_id="job:financial:csi300:2024:v1",
+            identity_resolver=resolver,
+        )
+
+        receipt = uow.persist(empty_mapping_result())
+
+        self.assertEqual(receipt.observation_ids, ())
+        self.assertEqual(
+            receipt.identity_resolution_method,
+            FinancialIdentityResolutionMethod.NO_OBSERVATIONS,
+        )
+        self.assertIn(EMPTY_FINANCIAL_WORK_UNIT_WARNING, receipt.warnings)
+        self.assertEqual(resolver.calls, [])
+        self.assertIsNotNone(connection.raw_row)
+        self.assertIsNotNone(connection.dataset_row)
+        self.assertIsNotNone(connection.work_unit_row)
+        self.assertIsNotNone(connection.receipt_row)
+        assert connection.receipt_row is not None
+        self.assertEqual(connection.receipt_row[3], 0)
+        self.assertEqual(_json(connection.receipt_row[4]), [])
+        self.assertIsNone(connection.observation_row)
+        assert connection.dataset_row is not None
+        metadata = _json(connection.dataset_row[4])
+        self.assertIsInstance(metadata, dict)
+        manifest = metadata["manifest"]  # type: ignore[index]
+        self.assertEqual(manifest["rows"], [])  # type: ignore[index]
+        self.assertEqual(
+            manifest["identity_resolution_method"],  # type: ignore[index]
+            "no_observations",
         )
 
     def test_current_identity_date_uses_utc_across_a_shanghai_midnight(self) -> None:

@@ -151,8 +151,8 @@ class FinancialCompletedWorkUnit:
         _text(self.dataset_version_id, "dataset_version_id")
         if not isinstance(self.content_hash, str) or _SHA256.fullmatch(self.content_hash) is None:
             raise ValueError("unit content_hash must use sha256:<64 lowercase hex chars>")
-        if type(self.observation_count) is not int or self.observation_count <= 0:
-            raise ValueError("observation_count must be a positive integer")
+        if type(self.observation_count) is not int or self.observation_count < 0:
+            raise ValueError("observation_count must be a non-negative integer")
         _aware(self.completed_at, "completed_at")
 
 

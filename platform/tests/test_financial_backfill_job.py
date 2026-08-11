@@ -271,6 +271,11 @@ class FinancialBackfillJobCoordinatorTest(unittest.TestCase):
             with self.subTest(conflict=conflict), self.assertRaises(VersionConflictError):
                 self.coordinator.bootstrap(conflict)
 
+    def test_completed_work_unit_can_explicitly_record_zero_observations(self) -> None:
+        empty = replace(completed_units()[0], observation_count=0)
+
+        self.assertEqual(empty.observation_count, 0)
+
 
 class FakeResult:
     def __init__(self, rows: list[tuple[object, ...]]) -> None:

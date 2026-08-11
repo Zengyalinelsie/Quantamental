@@ -69,8 +69,23 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0023_normalized_current_financial_identity.sql",
                 "0024_identifier_alias_append_only_reconciliation.sql",
                 "0025_experiment_runs.sql",
+                "0026_empty_financial_periods.sql",
             ),
         )
+
+    def test_empty_financial_period_migration_preserves_explicit_absence(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0026_empty_financial_periods.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "observation_count >= 0",
+            "jsonb_typeof(observation_ids) = 'array'",
+            "no_observations",
+            "observation_count = jsonb_array_length(observation_ids)",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_experiment_storage_freezes_specs_runs_and_failure_evidence(self) -> None:
         sql = (

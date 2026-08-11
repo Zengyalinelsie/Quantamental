@@ -69,12 +69,18 @@ class FinancialIdentityResolutionMethod(str, Enum):
 
     EFFECTIVE_DATED_REPORT_PERIOD = "effective_dated_report_period"
     CURRENT_KNOWN_RETRIEVAL_DATE = "current_known_retrieval_date"
+    NO_OBSERVATIONS = "no_observations"
 
 
 CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING = (
     "current-known financial identity resolved at provider retrieval date for "
     "normalized_current persistence; identity at the historical report period "
     "is not PIT verified and cannot be used by strict_historical"
+)
+
+EMPTY_FINANCIAL_WORK_UNIT_WARNING = (
+    "financial work unit contains no provider observations; missing values were not "
+    "zero-filled"
 )
 
 
@@ -664,8 +670,8 @@ class FinancialPersistResult:
     def __post_init__(self) -> None:
         _text(self.dataset_version_id, "dataset_version_id")
         observations = tuple(self.observation_ids)
-        if not observations or len(observations) != len(set(observations)):
-            raise ValueError("observation_ids must be non-empty and unique")
+        if len(observations) != len(set(observations)):
+            raise ValueError("observation_ids must be unique")
         for observation_id in observations:
             _text(observation_id, "observation_id")
         object.__setattr__(self, "observation_ids", observations)
@@ -674,6 +680,19 @@ class FinancialPersistResult:
         warnings = tuple(self.warnings)
         for warning in warnings:
             _text(warning, "warning")
+        if not observations:
+            if method is not FinancialIdentityResolutionMethod.NO_OBSERVATIONS:
+                raise ValueError(
+                    "empty financial receipt must use no_observations identity method"
+                )
+            if EMPTY_FINANCIAL_WORK_UNIT_WARNING not in warnings:
+                raise ValueError(
+                    "empty financial receipt requires an explicit missing-data warning"
+                )
+        elif method is FinancialIdentityResolutionMethod.NO_OBSERVATIONS:
+            raise ValueError(
+                "non-empty financial receipt cannot use no_observations identity method"
+            )
         if (
             method is FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
             and CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING not in warnings

@@ -21,6 +21,7 @@ from a_share_platform.domain.backfill import (
 from a_share_platform.domain.disclosure import RawObject
 from a_share_platform.domain.financial_backfill import (
     CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
+    EMPTY_FINANCIAL_WORK_UNIT_WARNING,
     FinancialIdentityResolutionMethod,
     FinancialListingIdentity,
     FinancialMappingResult,
@@ -228,8 +229,6 @@ class PostgresFinancialBackfillUnitOfWork:
         work_unit = batch.work_unit
         if batch.trust_state is not DataTrustState.NORMALIZED_CURRENT:
             raise ValueError("PostgreSQL financial sink only accepts normalized_current")
-        if not value.mapped_rows:
-            raise ValueError("financial persistence requires mapped rows")
 
         resolved = self._resolve_identities(value.mapped_rows, work_unit.symbols)
         dataset, metadata = self._dataset(value, resolved)
@@ -241,22 +240,30 @@ class PostgresFinancialBackfillUnitOfWork:
         for observation in observations:
             self._save_observation(observation)
 
+        identity_method = (
+            FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            if value.mapped_rows
+            else FinancialIdentityResolutionMethod.NO_OBSERVATIONS
+        )
+        identity_warning = (
+            CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING
+            if value.mapped_rows
+            else EMPTY_FINANCIAL_WORK_UNIT_WARNING
+        )
         warnings = tuple(
             dict.fromkeys(
                 (
                     *batch.warnings,
                     *value.warnings,
                     *(warning for row in value.mapped_rows for warning in row.source_row.warnings),
-                    CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING,
+                    identity_warning,
                 )
             )
         )
         result = FinancialPersistResult(
             dataset_version_id=dataset.dataset_version_id,
             observation_ids=tuple(item.observation_id for item in observations),
-            identity_resolution_method=(
-                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
-            ),
+            identity_resolution_method=identity_method,
             warnings=warnings,
         )
         self._save_receipt(
@@ -421,6 +428,16 @@ class PostgresFinancialBackfillUnitOfWork:
             }
             for row in sorted(value.mapped_rows, key=lambda item: item.mapped_row_id)
         )
+        identity_method = (
+            FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE
+            if value.mapped_rows
+            else FinancialIdentityResolutionMethod.NO_OBSERVATIONS
+        )
+        identity_warning = (
+            CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING
+            if value.mapped_rows
+            else EMPTY_FINANCIAL_WORK_UNIT_WARNING
+        )
         manifest: dict[str, object] = {
             "schema_version": self._SCHEMA_VERSION,
             "job_id": self._job_id,
@@ -434,10 +451,8 @@ class PostgresFinancialBackfillUnitOfWork:
             "raw_object_hash": batch.content_hash,
             "data_mode": DataMode.CURRENT_RESEARCH.value,
             "trust_state": DataTrustState.NORMALIZED_CURRENT.value,
-            "identity_resolution_method": (
-                FinancialIdentityResolutionMethod.CURRENT_KNOWN_RETRIEVAL_DATE.value
-            ),
-            "warnings": [CURRENT_KNOWN_FINANCIAL_IDENTITY_WARNING],
+            "identity_resolution_method": identity_method.value,
+            "warnings": [identity_warning],
             "rows": rows,
         }
         payload = json.dumps(
