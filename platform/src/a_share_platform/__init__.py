@@ -26,6 +26,12 @@ from .domain.pit import (
     select_fact_as_of,
 )
 from .domain.run_context import DataMode, DeploymentStage, InvalidRunContextError, RunContext
+from .domain.signals import (
+    SignalSnapshot,
+    SignalSnapshotCompiler,
+    SignalSnapshotCompileRequest,
+    SignalSnapshotUnavailable,
+)
 
 __all__ = [
     "AuthorityRule",
@@ -50,5 +56,9 @@ __all__ = [
     "InvestmentViewOutcome",
     "PointInTimeConflictError",
     "RunContext",
+    "SignalSnapshot",
+    "SignalSnapshotCompileRequest",
+    "SignalSnapshotCompiler",
+    "SignalSnapshotUnavailable",
     "select_fact_as_of",
 ]
