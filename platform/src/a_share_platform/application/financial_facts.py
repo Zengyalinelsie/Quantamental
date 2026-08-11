@@ -6,9 +6,10 @@ from collections import defaultdict
 from datetime import date, datetime
 
 from a_share_platform.domain.governance import LineageEdge, VersionConflictError
-from a_share_platform.domain.metrics import MappingMethod, MetricUnit, StatementType
+from a_share_platform.domain.metrics import MappingUseScope, MetricUnit, StatementType
 from a_share_platform.domain.pit import (
     AuthorityRule,
+    DataTrustState,
     FactObservation,
     FactSelection,
     FinancialPeriodType,
@@ -36,8 +37,23 @@ class PITFinancialService:
         self._metrics = metric_repository
         self._governance = governance_repository
 
-    def ingest(self, value: FactObservation) -> FactObservation:
+    def ingest(
+        self,
+        value: FactObservation,
+        *,
+        use_scope: MappingUseScope,
+    ) -> FactObservation:
         """Validate evidence, mapping, dataset lineage, then append one fact version."""
+
+        use_scope = MappingUseScope(use_scope)
+        if (
+            use_scope
+            in {MappingUseScope.STRICT_HISTORICAL, MappingUseScope.PRODUCTION}
+            and value.trust_state is not DataTrustState.PIT_VERIFIED
+        ):
+            raise PermissionError(
+                f"{use_scope.value} financial ingestion requires pit_verified facts"
+            )
 
         existing_by_id = self._repository.get(value.fact_id)
         if existing_by_id is not None:
@@ -83,11 +99,13 @@ class PITFinancialService:
             mapping
             for mapping in mappings
             if mapping.metric_code == value.metric_code
-            and mapping.production_allowed
-            and mapping.method is not MappingMethod.FUZZY
+            and mapping.allows(use_scope)
         )
         if len(valid_mappings) != 1:
-            raise ValueError("exactly one production provider field mapping is required")
+            raise ValueError(
+                "exactly one provider field mapping allowed for "
+                f"{use_scope.value} is required"
+            )
 
         if not any(
             dataset.dataset_version_id == value.dataset_version_id

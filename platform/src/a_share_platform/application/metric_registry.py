@@ -8,6 +8,7 @@ from a_share_platform.domain.metrics import (
     CanonicalMetric,
     FinancialQualityRule,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     ProviderFieldMapping,
     StatementType,
@@ -66,11 +67,12 @@ class MetricRegistryService:
         statement_type: StatementType,
         source_field: str,
         mapping_version_id: str,
-        for_production: bool,
+        use_scope: MappingUseScope,
         unmapped_field_id: str,
         discovered_at: datetime,
         raw_object_id: str,
     ) -> ProviderFieldMapping | None:
+        use_scope = MappingUseScope(use_scope)
         version = self._repository.get_mapping_version(mapping_version_id)
         if version is None:
             raise ValueError(f"mapping version does not exist: {mapping_version_id}")
@@ -88,10 +90,13 @@ class MetricRegistryService:
             )
         if mappings:
             mapping = mappings[0]
-            if for_production and (
-                not mapping.production_allowed or mapping.method is MappingMethod.FUZZY
+            if not mapping.allows(use_scope) or (
+                use_scope is MappingUseScope.PRODUCTION
+                and mapping.method is MappingMethod.FUZZY
             ):
-                raise PermissionError("mapping is not allowed for production")
+                raise PermissionError(
+                    f"mapping is not allowed for {use_scope.value}"
+                )
             return mapping
         self._repository.enqueue_unmapped_field(
             UnmappedProviderField(

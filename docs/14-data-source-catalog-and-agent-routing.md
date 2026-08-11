@@ -313,11 +313,15 @@ Official disclosure adapter ┘        v
 接入后的固定规则：
 
 1. provider 字段只通过版本化 Mapping Registry 进入 canonical metric；
-2. 缺失、无权限、单位冲突和币种冲突不得填 0；
-3. read-through cache 副作用必须在 port 中显式声明，单元测试只用录制 fixture；
-4. current 摄取不能被历史回测读取；
-5. PIT 晋升产生新治理记录，不回写或覆盖原观察；
-6. SneAgent 不拥有权威选择、trust 晋升或交易权限。
+2. 每条 mapping 显式保存 `current_research`、`strict_historical`、`production` 用途集合；
+   调用方必须声明用途，集合不匹配即拒绝，`production` 不能冒充 current 放行；
+3. AkShare 免费财务映射只能保存 `current_research`，不得包含 `strict_historical` 或
+   `production`；fuzzy mapping 永远不得包含 `production`；
+4. 缺失、无权限、单位冲突和币种冲突不得填 0；
+5. read-through cache 副作用必须在 port 中显式声明，单元测试只用录制 fixture；
+6. current 摄取不能被历史回测读取；
+7. PIT 晋升产生新治理记录，不回写或覆盖原观察；
+8. SneAgent 不拥有权威选择、trust 晋升或交易权限。
 
 ## 10. 对 P3-W04 的调整
 

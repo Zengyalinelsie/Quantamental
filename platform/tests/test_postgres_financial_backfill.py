@@ -40,6 +40,7 @@ from a_share_platform.domain.metrics import (
     CanonicalMetric,
     CurrencyRequirement,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     MetricUnit,
     ProviderFieldMapping,
@@ -191,10 +192,13 @@ def mapping_result():  # type: ignore[no-untyped-def]
             metric_code="total_assets",
             method=MappingMethod.EXACT,
             formula=None,
-            production_allowed=True,
+            allowed_use_scopes=frozenset({MappingUseScope.CURRENT_RESEARCH}),
         )
     )
-    return FinancialBackfillMapper(repository).map(batch)
+    return FinancialBackfillMapper(repository).map(
+        batch,
+        data_mode=DataMode.CURRENT_RESEARCH,
+    )
 
 
 class FakeResult:

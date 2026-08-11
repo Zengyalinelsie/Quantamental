@@ -11,6 +11,7 @@ from a_share_platform.domain.metrics import (
     CurrencyRequirement,
     FinancialQualityRule,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     MetricUnit,
     ProviderFieldMapping,
@@ -60,7 +61,13 @@ def mapping(
     mapping_id: str = "mapping:tushare:balancesheet:total_assets:v1",
     metric_code: str = "total_assets",
     method: MappingMethod = MappingMethod.EXACT,
-    production_allowed: bool = True,
+    allowed_use_scopes: frozenset[MappingUseScope] = frozenset(
+        {
+            MappingUseScope.CURRENT_RESEARCH,
+            MappingUseScope.STRICT_HISTORICAL,
+            MappingUseScope.PRODUCTION,
+        }
+    ),
 ) -> ProviderFieldMapping:
     return ProviderFieldMapping(
         mapping_id=mapping_id,
@@ -71,7 +78,7 @@ def mapping(
         metric_code=metric_code,
         method=method,
         formula=None,
-        production_allowed=production_allowed,
+        allowed_use_scopes=allowed_use_scopes,
     )
 
 
@@ -111,7 +118,7 @@ class ProviderFieldMappingTest(unittest.TestCase):
             statement_type=StatementType.BALANCE_SHEET,
             source_field="total_assets",
             mapping_version_id="metric-mapping:tushare:v1",
-            for_production=True,
+            use_scope=MappingUseScope.PRODUCTION,
             unmapped_field_id="unmapped:not-used",
             discovered_at=NOW,
             raw_object_id="raw:tushare:balancesheet:1",
@@ -121,9 +128,15 @@ class ProviderFieldMappingTest(unittest.TestCase):
 
     def test_fuzzy_mapping_can_never_enter_production(self) -> None:
         with self.assertRaisesRegex(ValueError, "fuzzy"):
-            mapping(method=MappingMethod.FUZZY, production_allowed=True)
+            mapping(
+                method=MappingMethod.FUZZY,
+                allowed_use_scopes=frozenset({MappingUseScope.PRODUCTION}),
+            )
         fuzzy = self.service.register_mapping(
-            mapping(method=MappingMethod.FUZZY, production_allowed=False)
+            mapping(
+                method=MappingMethod.FUZZY,
+                allowed_use_scopes=frozenset({MappingUseScope.CURRENT_RESEARCH}),
+            )
         )
         with self.assertRaisesRegex(PermissionError, "production"):
             self.service.resolve_or_queue(
@@ -131,7 +144,7 @@ class ProviderFieldMappingTest(unittest.TestCase):
                 statement_type=fuzzy.statement_type,
                 source_field=fuzzy.source_field,
                 mapping_version_id=fuzzy.mapping_version_id,
-                for_production=True,
+                use_scope=MappingUseScope.PRODUCTION,
                 unmapped_field_id="unmapped:not-used",
                 discovered_at=NOW,
                 raw_object_id="raw:tushare:balancesheet:1",
@@ -143,7 +156,7 @@ class ProviderFieldMappingTest(unittest.TestCase):
             statement_type=StatementType.BALANCE_SHEET,
             source_field="mystery_asset",
             mapping_version_id="metric-mapping:tushare:v1",
-            for_production=False,
+            use_scope=MappingUseScope.CURRENT_RESEARCH,
             unmapped_field_id="unmapped:tushare:mystery_asset:1",
             discovered_at=NOW,
             raw_object_id="raw:tushare:balancesheet:1",

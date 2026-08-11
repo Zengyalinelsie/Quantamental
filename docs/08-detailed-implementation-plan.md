@@ -378,6 +378,8 @@ Gate：没有来源/许可决策，不开始批量历史回填。
 - [x] 三表字段 code、名称、单位、币种、符号；
 - [x] provider field 显式映射；
 - [x] 禁止模糊映射进入生产；
+- [x] 映射用途范围显式区分 `current_research`、`strict_historical`、`production`，调用方按
+  目标用途 fail closed；AkShare 映射仅允许 `current_research`；
 - [x] mapping version；
 - [x] 财务平衡/跨表质量规则；
 - [x] unmapped queue。
@@ -464,6 +466,11 @@ Timing、任何因子或模型科学有效。P2 的多尺寸浏览器视觉证�
 - [ ] 按 CSI300 → CSI500 分阶段入库，每个工作单元持久化 DatasetVersion、checkpoint、quality、
   coverage 和 lineage；
 - [ ] 批量 current 数据保持 `normalized_current`；strict 只从官方版本链和独立治理运行晋升。
+
+映射资格不再使用 `production_allowed` 布尔值代理。P3.5 current worker 必须显式请求
+`DataMode.CURRENT_RESEARCH`，只有包含 `current_research` scope 的映射可执行；strict/PIT
+事实摄取和 production 使用分别要求对应 scope，任何一个 scope 都不隐含另一个；mapping 的
+production scope 仍不能绕过数据可信、Promotion Approval 或 deployment stage 门。
 
 ## 8. P4：行业模板、特征工程和正式 Factor Lab
 

@@ -30,7 +30,13 @@ from a_share_platform.domain.financial_sources import (
     FinancialSourceProfile,
 )
 from a_share_platform.domain.governance import LineageEdge
-from a_share_platform.domain.metrics import MappingMethod, MetricUnit, UnmappedProviderField
+from a_share_platform.domain.metrics import (
+    MappingMethod,
+    MappingUseScope,
+    MetricUnit,
+    UnmappedProviderField,
+)
+from a_share_platform.domain.run_context import DataMode
 from a_share_platform.ports.financial_backfill import (
     FinancialBackfillSource,
     FinancialBackfillUnitOfWork,
@@ -56,7 +62,17 @@ class FinancialBackfillMapper:
     def __init__(self, repository: MetricRegistryRepository) -> None:
         self._repository = repository
 
-    def map(self, batch: FinancialProviderBatch) -> FinancialMappingResult:
+    def map(
+        self,
+        batch: FinancialProviderBatch,
+        *,
+        data_mode: DataMode,
+    ) -> FinancialMappingResult:
+        data_mode = DataMode(data_mode)
+        if data_mode is not DataMode.CURRENT_RESEARCH:
+            raise PermissionError(
+                "normalized_current financial backfill cannot use strict_historical"
+            )
         version = self._repository.get_mapping_version(batch.work_unit.mapping_version_id)
         if version is None:
             raise ValueError(
@@ -93,8 +109,10 @@ class FinancialBackfillMapper:
                 unmapped_ids.append(row.row_id)
                 continue
             mapping = mappings[0]
-            if not mapping.production_allowed or mapping.method is MappingMethod.FUZZY:
-                raise PermissionError("provider financial mapping is not production_allowed")
+            if not mapping.allows(MappingUseScope(data_mode.value)):
+                raise PermissionError(
+                    "provider financial mapping is not allowed for current_research"
+                )
             if mapping.method is MappingMethod.FORMULA:
                 raise ValueError("formula financial mappings require an explicit formula evaluator")
             metric = self._repository.get_metric(mapping.metric_code)
@@ -410,7 +428,7 @@ class FinancialBackfillRunner:
                 raise ValueError("financial source batch does not match work unit")
             if batch.trust_state is not plan.output_trust_state:
                 raise ValueError("financial source batch trust does not match immutable plan")
-            mapping_result = self._mapper.map(batch)
+            mapping_result = self._mapper.map(batch, data_mode=plan.data_mode)
             if not mapping_result.mapped_rows:
                 raise ValueError("financial work unit produced no mapped observations")
             persisted = self._unit_of_work.persist(mapping_result)

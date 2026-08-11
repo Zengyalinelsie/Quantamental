@@ -14,6 +14,7 @@ from a_share_platform.domain.metrics import (
     CurrencyRequirement,
     FinancialQualityRule,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     MetricUnit,
     ProviderFieldMapping,
@@ -131,7 +132,7 @@ class PostgresMetricRegistryRepository:
             """
             INSERT INTO provider_field_mappings (
                 mapping_id, mapping_version_id, provider_id, statement_type,
-                source_field, metric_code, method, formula, production_allowed
+                source_field, metric_code, method, formula, allowed_use_scopes
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT DO NOTHING
             """,
@@ -155,7 +156,7 @@ class PostgresMetricRegistryRepository:
         rows = self._connection.execute(
             """
             SELECT mapping_id, mapping_version_id, provider_id, statement_type,
-                   source_field, metric_code, method, formula, production_allowed
+                   source_field, metric_code, method, formula, allowed_use_scopes
             FROM provider_field_mappings
             WHERE provider_id = %s
               AND statement_type = %s
@@ -240,7 +241,7 @@ class PostgresMetricRegistryRepository:
         row = self._connection.execute(
             """
             SELECT mapping_id, mapping_version_id, provider_id, statement_type,
-                   source_field, metric_code, method, formula, production_allowed
+                   source_field, metric_code, method, formula, allowed_use_scopes
             FROM provider_field_mappings WHERE mapping_id = %s
             """,
             (mapping_id,),
@@ -324,11 +325,14 @@ class PostgresMetricRegistryRepository:
             value.metric_code,
             value.method.value,
             value.formula,
-            value.production_allowed,
+            sorted(scope.value for scope in value.allowed_use_scopes),
         )
 
     @staticmethod
     def _mapping_from_row(row: Sequence[object]) -> ProviderFieldMapping:
+        raw_scopes = row[8]
+        if not isinstance(raw_scopes, (list, tuple)):
+            raise TypeError("stored mapping allowed_use_scopes must be an array")
         return ProviderFieldMapping(
             mapping_id=str(row[0]),
             mapping_version_id=str(row[1]),
@@ -338,7 +342,9 @@ class PostgresMetricRegistryRepository:
             metric_code=str(row[5]),
             method=MappingMethod(str(row[6])),
             formula=None if row[7] is None else str(row[7]),
-            production_allowed=cast(bool, row[8]),
+            allowed_use_scopes=frozenset(
+                MappingUseScope(str(scope)) for scope in raw_scopes
+            ),
         )
 
     @staticmethod

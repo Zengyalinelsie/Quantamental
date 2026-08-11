@@ -12,6 +12,7 @@ from a_share_platform.domain.metrics import (
     CurrencyRequirement,
     FinancialQualityRule,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     MetricUnit,
     ProviderFieldMapping,
@@ -58,7 +59,13 @@ def version() -> MappingVersion:
     )
 
 
-def mapping(*, method: MappingMethod = MappingMethod.EXACT) -> ProviderFieldMapping:
+def mapping(
+    *,
+    method: MappingMethod = MappingMethod.EXACT,
+    allowed_use_scopes: frozenset[MappingUseScope] = frozenset(
+        {MappingUseScope.CURRENT_RESEARCH}
+    ),
+) -> ProviderFieldMapping:
     return ProviderFieldMapping(
         mapping_id="mapping:factor-service-ths:total-assets:v1",
         mapping_version_id=version().mapping_version_id,
@@ -68,7 +75,7 @@ def mapping(*, method: MappingMethod = MappingMethod.EXACT) -> ProviderFieldMapp
         metric_code="total_assets",
         method=method,
         formula=("assets" if method is MappingMethod.FORMULA else None),
-        production_allowed=True,
+        allowed_use_scopes=allowed_use_scopes,
     )
 
 
@@ -210,8 +217,16 @@ class PostgresMetricRegistryRepositoryTest(unittest.TestCase):
         self.assertEqual(self.connection.commits, 0)
         self.assertEqual(self.connection.rollbacks, 0)
 
-    def test_mapping_round_trip_and_lookup_preserve_method_formula_and_approval(self) -> None:
-        expected = mapping(method=MappingMethod.FORMULA)
+    def test_mapping_round_trip_preserves_formula_and_explicit_use_scopes(self) -> None:
+        expected = mapping(
+            method=MappingMethod.FORMULA,
+            allowed_use_scopes=frozenset(
+                {
+                    MappingUseScope.CURRENT_RESEARCH,
+                    MappingUseScope.STRICT_HISTORICAL,
+                }
+            ),
+        )
 
         self.assertEqual(self.repository.register_mapping(expected), expected)
         self.assertEqual(
@@ -223,6 +238,16 @@ class PostgresMetricRegistryRepositoryTest(unittest.TestCase):
             ),
             (expected,),
         )
+        insert = next(
+            params
+            for query, params in self.connection.calls
+            if "INSERT INTO provider_field_mappings" in query
+        )
+        self.assertIsInstance(insert[8], list)
+        self.assertEqual(
+            insert[8],
+            ["current_research", "strict_historical"],
+        )
         self.assertEqual(
             self.repository.find_mappings(
                 provider_id="other-provider",
@@ -233,7 +258,12 @@ class PostgresMetricRegistryRepositoryTest(unittest.TestCase):
             (),
         )
         with self.assertRaisesRegex(VersionConflictError, "immutable provider mapping"):
-            self.repository.register_mapping(replace(expected, production_allowed=False))
+            self.repository.register_mapping(
+                replace(
+                    expected,
+                    allowed_use_scopes=frozenset({MappingUseScope.CURRENT_RESEARCH}),
+                )
+            )
 
     def test_quality_rule_round_trip_preserves_decimal_terms_and_tolerance(self) -> None:
         expected = quality_rule()
@@ -286,7 +316,7 @@ class PostgresMetricRegistryRepositoryTest(unittest.TestCase):
             statement_type=expected.statement_type,
             source_field=expected.source_field,
             mapping_version_id=expected.mapping_version_id,
-            for_production=True,
+            use_scope=MappingUseScope.CURRENT_RESEARCH,
             unmapped_field_id="unmapped:not-used",
             discovered_at=NOW,
             raw_object_id="raw:not-used",

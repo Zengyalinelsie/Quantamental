@@ -227,6 +227,13 @@ MUST 保存：
 - provider、source field、raw object hash；
 - trust state、quality state、mapping version。
 
+`ProviderFieldMapping` 的用途资格 MUST 独立、显式且可持久化，至少区分
+`current_research`、`strict_historical` 和 `production`。调用方必须声明目标用途；未声明、
+未获批或未知用途一律 fail closed。`production` 资格不能替代 `current_research` 资格，反之亦然；
+模糊映射不得获得 `production` 资格。仅获批 current 研究的免费源映射（包括 AkShare）不得被
+提升为 strict historical 或 production。Mapping 的 `production` scope 只表示该字段转换合同
+具备正式流程资格，不授予数据 PIT 可信、模型晋级、部署阶段、账户或交易权限。
+
 同一事实的多个供应商观察并存；权威选值规则版本化。缺失、无权限、冲突不能显示为 0。
 
 验收：严格历史查询只返回 `available_at <= decision_time`、系统时点可见且 `pit_verified` 的最高公开修订。
@@ -245,7 +252,9 @@ MUST 保存：
 
 第一阶段来源选择仍为待决策项，必须通过 Data Source ADR；免费源可用于原型，未来实盘必须评估稳定性、PIT 完整性和使用许可。
 
-验收：Provider Registry 可回答每个字段来自哪里、能否存储、能否回测、能否对外展示。
+验收：Provider Registry 可回答每个字段来自哪里、能否存储、能否回测、能否对外展示；
+Mapping Registry 可回答每个 provider 字段映射获准用于 current、strict 或 production 中的
+哪些用途，且数据库和应用服务执行相同的 fail-closed 范围约束。
 
 ## 6. 基本面研究规格
 

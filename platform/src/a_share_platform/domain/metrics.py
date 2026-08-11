@@ -69,6 +69,14 @@ class MappingMethod(str, Enum):
     FUZZY = "fuzzy"
 
 
+class MappingUseScope(str, Enum):
+    """The approved downstream use of one immutable provider-field mapping."""
+
+    CURRENT_RESEARCH = "current_research"
+    STRICT_HISTORICAL = "strict_historical"
+    PRODUCTION = "production"
+
+
 class QualityRuleKind(str, Enum):
     ACCOUNTING_IDENTITY = "accounting_identity"
     CROSS_STATEMENT = "cross_statement"
@@ -144,7 +152,7 @@ class ProviderFieldMapping:
     metric_code: str
     method: MappingMethod
     formula: str | None
-    production_allowed: bool
+    allowed_use_scopes: frozenset[MappingUseScope]
 
     def __post_init__(self) -> None:
         for name in (
@@ -158,14 +166,23 @@ class ProviderFieldMapping:
         object.__setattr__(self, "statement_type", StatementType(self.statement_type))
         method = MappingMethod(self.method)
         object.__setattr__(self, "method", method)
-        if type(self.production_allowed) is not bool:
-            raise TypeError("production_allowed must be a boolean")
+        scopes = frozenset(MappingUseScope(scope) for scope in self.allowed_use_scopes)
+        if not scopes:
+            raise ValueError("allowed_use_scopes must not be empty")
+        object.__setattr__(self, "allowed_use_scopes", scopes)
         if method is MappingMethod.FORMULA:
             _text(self.formula or "", "formula")
         elif self.formula is not None:
             raise ValueError("formula is only valid for formula mapping")
-        if method is MappingMethod.FUZZY and self.production_allowed:
-            raise ValueError("fuzzy mapping cannot be production_allowed")
+        if method is MappingMethod.FUZZY and MappingUseScope.PRODUCTION in scopes:
+            raise ValueError("fuzzy mapping cannot be allowed for production")
+        if self.provider_id in {"akshare", "provider:akshare"} and scopes != {
+            MappingUseScope.CURRENT_RESEARCH
+        }:
+            raise ValueError("AkShare mapping is allowed only for current_research")
+
+    def allows(self, use_scope: MappingUseScope) -> bool:
+        return MappingUseScope(use_scope) in self.allowed_use_scopes
 
 
 @dataclass(frozen=True)

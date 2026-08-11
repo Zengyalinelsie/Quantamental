@@ -18,6 +18,7 @@ from a_share_platform.domain.metrics import (
     CanonicalMetric,
     CurrencyRequirement,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     MetricUnit,
     ProviderFieldMapping,
@@ -126,11 +127,25 @@ class PITFinancialServiceTest(unittest.TestCase):
             governance_repository=self.governance,
         )
 
+    def _ingest(
+        self,
+        value: FactObservation,
+        *,
+        use_scope: MappingUseScope = MappingUseScope.STRICT_HISTORICAL,
+    ) -> FactObservation:
+        return self.service.ingest(value, use_scope=use_scope)
+
     def _register_provider_mapping(
         self,
         provider_id: str,
         mapping_version_id: str,
         content_hash: str,
+        allowed_use_scopes: frozenset[MappingUseScope] = frozenset(
+            {
+                MappingUseScope.CURRENT_RESEARCH,
+                MappingUseScope.STRICT_HISTORICAL,
+            }
+        ),
     ) -> None:
         registry = MetricRegistryService(self.metrics)
         if self.metrics.get_metric("revenue") is None:
@@ -164,12 +179,12 @@ class PITFinancialServiceTest(unittest.TestCase):
                 metric_code="revenue",
                 method=MappingMethod.EXACT,
                 formula=None,
-                production_allowed=True,
+                allowed_use_scopes=allowed_use_scopes,
             )
         )
 
     def test_ingest_requires_matching_raw_evidence_mapping_and_registers_lineage(self) -> None:
-        stored = self.service.ingest(fact())
+        stored = self._ingest(fact())
         self.assertIs(stored, self.facts.get(stored.fact_id))
         self.assertEqual(
             {
@@ -183,17 +198,18 @@ class PITFinancialServiceTest(unittest.TestCase):
             },
         )
         with self.assertRaisesRegex(ValueError, "raw object hash"):
-            self.service.ingest(
+            self._ingest(
                 fact(fact_id="fact:bad-hash", raw_object_hash=HASH_B)
             )
         with self.assertRaisesRegex(ValueError, "provider field mapping"):
-            self.service.ingest(
+            self._ingest(
                 replace(fact(fact_id="fact:unmapped"), source_field="mystery")
             )
 
     def test_current_and_strict_queries_enforce_trust_and_both_clocks(self) -> None:
-        current_only = self.service.ingest(
-            fact(trust_state=DataTrustState.NORMALIZED_CURRENT)
+        current_only = self._ingest(
+            fact(trust_state=DataTrustState.NORMALIZED_CURRENT),
+            use_scope=MappingUseScope.CURRENT_RESEARCH,
         )
         strict = self.service.query(
             company_id=current_only.company_id,
@@ -222,7 +238,7 @@ class PITFinancialServiceTest(unittest.TestCase):
         self.assertIsNone(strict.selected)
         self.assertIs(current.selected, current_only)
 
-        backfilled = self.service.ingest(
+        backfilled = self._ingest(
             fact(
                 fact_id="fact:late-backfill",
                 known_from=datetime(2026, 1, 1, tzinfo=UTC),
@@ -237,9 +253,83 @@ class PITFinancialServiceTest(unittest.TestCase):
         )
         self.assertIsNone(before_warehouse.selected)
 
+    def test_ingest_requires_mapping_scope_matching_fact_trust(self) -> None:
+        provider_id = "provider:current-only"
+        mapping_version_id = "metric-mapping:current-only:v1"
+        self.disclosures.register_raw_object(
+            raw_object("raw:current-only:report:v1", provider_id, HASH_B)
+        )
+        self._register_provider_mapping(
+            provider_id,
+            mapping_version_id,
+            HASH_B,
+            frozenset({MappingUseScope.CURRENT_RESEARCH}),
+        )
+        common = {
+            "provider_id": provider_id,
+            "source_object_id": "raw:current-only:report:v1",
+            "raw_object_hash": HASH_B,
+            "mapping_version_id": mapping_version_id,
+        }
+
+        stored = self._ingest(
+            fact(
+                fact_id="fact:current-only:normalized",
+                trust_state=DataTrustState.NORMALIZED_CURRENT,
+                **common,
+            ),
+            use_scope=MappingUseScope.CURRENT_RESEARCH,
+        )
+        self.assertIs(stored.trust_state, DataTrustState.NORMALIZED_CURRENT)
+        with self.assertRaisesRegex(ValueError, "strict_historical"):
+            self._ingest(
+                fact(
+                    fact_id="fact:current-only:pit",
+                    trust_state=DataTrustState.PIT_VERIFIED,
+                    **common,
+                ),
+                use_scope=MappingUseScope.STRICT_HISTORICAL,
+            )
+
+        production_provider = "provider:production-only"
+        production_mapping_version = "metric-mapping:production-only:v1"
+        self.disclosures.register_raw_object(
+            raw_object(
+                "raw:production-only:report:v1",
+                production_provider,
+                HASH_B,
+            )
+        )
+        self._register_provider_mapping(
+            production_provider,
+            production_mapping_version,
+            HASH_B,
+            frozenset({MappingUseScope.PRODUCTION}),
+        )
+        production_fact = fact(
+            fact_id="fact:production-only:pit",
+            provider_id=production_provider,
+            source_object_id="raw:production-only:report:v1",
+            raw_object_hash=HASH_B,
+            mapping_version_id=production_mapping_version,
+        )
+        stored_production = self._ingest(
+            production_fact,
+            use_scope=MappingUseScope.PRODUCTION,
+        )
+        self.assertIs(stored_production.trust_state, DataTrustState.PIT_VERIFIED)
+        with self.assertRaisesRegex(ValueError, "current_research"):
+            self._ingest(
+                replace(
+                    production_fact,
+                    fact_id="fact:production-only:current-request",
+                ),
+                use_scope=MappingUseScope.CURRENT_RESEARCH,
+            )
+
     def test_public_revision_changes_only_after_its_available_at(self) -> None:
-        original = self.service.ingest(fact())
-        revised = self.service.ingest(
+        original = self._ingest(fact())
+        revised = self._ingest(
             fact(
                 fact_id="fact:cninfo:revenue:2023:r1:system1",
                 value=90.0,
@@ -267,12 +357,12 @@ class PITFinancialServiceTest(unittest.TestCase):
         self.assertIs(after.selected, revised)
 
     def test_multi_source_conflict_selects_versioned_authority_but_blocks_downstream(self) -> None:
-        cninfo = self.service.ingest(fact())
+        cninfo = self._ingest(fact())
         self.disclosures.register_raw_object(
             raw_object("raw:vendor:report:v1", "provider:vendor", HASH_B)
         )
         self._register_provider_mapping("provider:vendor", "metric-mapping:vendor:v1", HASH_B)
-        vendor = self.service.ingest(
+        vendor = self._ingest(
             fact(
                 fact_id="fact:vendor:revenue:2023:r0:system1",
                 provider_id="provider:vendor",
@@ -298,8 +388,8 @@ class PITFinancialServiceTest(unittest.TestCase):
         self.assertEqual(selection.authority_rule_version, "authority:official-first:v1")
 
     def test_system_correction_closes_old_interval_without_rewriting_history(self) -> None:
-        original = self.service.ingest(fact())
-        corrected = self.service.ingest(
+        original = self._ingest(fact())
+        corrected = self._ingest(
             fact(
                 fact_id="fact:cninfo:revenue:2023:r0:system2",
                 value=99.0,
@@ -327,7 +417,7 @@ class PITFinancialServiceTest(unittest.TestCase):
         self.assertIs(after.selected, corrected)
 
     def test_blocked_quality_is_not_silently_selected(self) -> None:
-        blocked = self.service.ingest(
+        blocked = self._ingest(
             fact(
                 quality_state=DataQualityState.BLOCKED,
                 quality_issue_ids=("quality:balance-mismatch",),

@@ -817,7 +817,7 @@ class PostgresPITFixtureImporter:
                         "metric_code",
                         "method",
                         "formula",
-                        "production_allowed",
+                        "allowed_use_scopes",
                     ),
                     (
                         mapping_id,
@@ -828,7 +828,11 @@ class PostgresPITFixtureImporter:
                         metric_code,
                         "manual_verified" if provider_id == "provider:cninfo" else "exact",
                         None,
-                        True,
+                        (
+                            ["current_research", "strict_historical"]
+                            if provider_id == "provider:cninfo"
+                            else ["current_research"]
+                        ),
                     ),
                 )
 

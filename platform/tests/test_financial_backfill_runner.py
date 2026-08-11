@@ -42,6 +42,7 @@ from a_share_platform.domain.metrics import (
     CanonicalMetric,
     CurrencyRequirement,
     MappingMethod,
+    MappingUseScope,
     MappingVersion,
     MetricUnit,
     ProviderFieldMapping,
@@ -157,7 +158,12 @@ def provider_batch():
     )
 
 
-def mapper() -> tuple[FinancialBackfillMapper, InMemoryMetricRegistryRepository]:
+def mapper(
+    *,
+    allowed_use_scopes: frozenset[MappingUseScope] = frozenset(
+        {MappingUseScope.CURRENT_RESEARCH}
+    ),
+) -> tuple[FinancialBackfillMapper, InMemoryMetricRegistryRepository]:
     repository = InMemoryMetricRegistryRepository()
     service = MetricRegistryService(repository)
     service.register_metric(
@@ -190,7 +196,7 @@ def mapper() -> tuple[FinancialBackfillMapper, InMemoryMetricRegistryRepository]
             metric_code="total_assets",
             method=MappingMethod.EXACT,
             formula=None,
-            production_allowed=True,
+            allowed_use_scopes=allowed_use_scopes,
         )
     )
     return FinancialBackfillMapper(repository), repository
@@ -199,7 +205,10 @@ def mapper() -> tuple[FinancialBackfillMapper, InMemoryMetricRegistryRepository]
 class FinancialBackfillMapperTest(unittest.TestCase):
     def test_explicit_mapping_preserves_decimal_evidence_and_current_trust(self) -> None:
         value, _repository = mapper()
-        result = value.map(provider_batch())
+        result = value.map(
+            provider_batch(),
+            data_mode=DataMode.CURRENT_RESEARCH,
+        )
         mapped = result.mapped_rows[0]
         self.assertEqual(mapped.value, Decimal("1234500.00"))
         self.assertEqual(mapped.metric_code, "total_assets")
@@ -210,10 +219,23 @@ class FinancialBackfillMapperTest(unittest.TestCase):
         value, repository = mapper()
         batch = provider_batch()
         unknown = replace(batch.rows[0], provider_field="unknown_field")
-        result = value.map(replace(batch, rows=(unknown,)))
+        result = value.map(
+            replace(batch, rows=(unknown,)),
+            data_mode=DataMode.CURRENT_RESEARCH,
+        )
         self.assertEqual(result.mapped_rows, ())
         self.assertEqual(result.unmapped_row_ids, (unknown.row_id,))
         self.assertEqual(len(repository.list_unmapped_fields()), 1)
+
+    def test_production_only_mapping_does_not_authorize_current_backfill(self) -> None:
+        value, _repository = mapper(
+            allowed_use_scopes=frozenset({MappingUseScope.PRODUCTION})
+        )
+        with self.assertRaisesRegex(PermissionError, "current_research"):
+            value.map(
+                provider_batch(),
+                data_mode=DataMode.CURRENT_RESEARCH,
+            )
 
     def test_mapping_result_cannot_silently_drop_a_provider_row(self) -> None:
         batch = provider_batch()
