@@ -71,8 +71,27 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0025_experiment_runs.sql",
                 "0026_empty_financial_periods.sql",
                 "0027_factor_promotion_reviews.sql",
+                "0028_factor_qualification_audits.sql",
             ),
         )
+
+    def test_factor_qualification_audits_are_failed_append_only_evidence(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0028_factor_qualification_audits.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE factor_validation_reports",
+            "CREATE TABLE factor_qualification_audits",
+            "readiness_permitted = FALSE",
+            "factor_lifecycle_status IN ('draft', 'research')",
+            "factor_qualification_audits_append_only",
+            "factor_validation_reports_append_only",
+            "BEFORE UPDATE OR DELETE ON factor_qualification_audits",
+            "BEFORE UPDATE OR DELETE ON factor_validation_reports",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_factor_reviews_are_scoped_science_gated_and_append_only(self) -> None:
         sql = (
