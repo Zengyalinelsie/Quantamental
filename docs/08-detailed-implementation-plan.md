@@ -626,6 +626,12 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [ ] 分析师修正 adapter（若数据源通过资格）；
 - [ ] scenario/sensitivity。
 
+状态（2026-08-11）：已有行业模板相关的估值/改善领域基线；本轮新增 provider-neutral 的
+base/bull/bear scenario/sensitivity，以及按 security、decision time、data mode、trust 和 bundle
+version 精确冻结的 application 编排。缺少从真实 PostgreSQL financial/price/comparable inputs
+构造 bundle 的 adapter、历史/行业/同业相对估值服务、分析师修正资格链路和真实运行产物，
+因此 W01 尚未完成；所有结果继续标记 `not_evaluated`。
+
 ### P5-W02：Expected Return Compiler V0
 
 - [ ] 统一 20/60/120 日期限；
@@ -637,6 +643,12 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [ ] catalyst/invalidator；
 - [ ] 不可量化约束路径。
 
+状态（2026-08-11）：20/60/120 日、四分项、P8 前 event unavailable、Decimal residual 闭合、
+分布/downside、catalyst/invalidator、约束路径和确定性 hash 的领域合同已实现；View、Outcome、
+Calibration 的 append-only application/memory ledger 与 PostgreSQL 空表迁移已实现。缺少
+PostgreSQL repository、真实合格输入编译、API projection 和 outcome 到期写入 worker，故本工作包
+尚未完成，测试产物不得视为真实收益预测。
+
 ### P5-W03：SignalSnapshot
 
 - [ ] 只接受对当前用途获批的 model/factor；
@@ -645,6 +657,12 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [ ] trust 和 version binding；
 - [ ] immutable hash；
 - [ ] production 与 research API 隔离。
+
+状态（2026-08-11）：SignalSnapshot 已绑定 exact FactorVersion、FactorPromotionReview、approval
+scope、Universe/cutoff/trust/version、rank/score/expected return/confidence 和 immutable hash；
+append-only ledger、research/forward query service 隔离、PostgreSQL 空表及两个 serving view 已完成。
+当前 P4 没有通过 PIT/科学验证门，也没有获批因子，所以真实 Snapshot 必须保持 0 条。缺少
+PostgreSQL repository 和 FastAPI 的物理路由隔离，W03 尚未完成。
 
 ### P5-W04：前端 Security 与 Screen
 
@@ -657,6 +675,11 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [ ] ranking changes；
 - [ ] frozen Artifact export。
 
+状态（2026-08-11）：InvestmentView distribution/waterfall/residual/evidence/invalidator/trust/version
+组件，以及 server-owned Screen ranking、industry peers、Alpha Model readiness/approval blocker 组件
+已完成合同测试；前端不重算闭合、rank change 或排序。组件尚未连接真实 P5 API 和 `/research`
+路由，Security 详情、frozen Artifact export 与浏览器端到端验收仍未完成，运行时不得注入 demo 值。
+
 ### Gate P5
 
 - 一个真实决策日产生首个可追溯 InvestmentView/SignalSnapshot；
@@ -664,6 +687,10 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - outcome 不可事后修改；
 - 组合层无需读取新闻文本或页面计算；
 - SPEC-018–019、024–025 通过；SPEC-030 的输入合同完成，输出和组合验收留到 P6。
+
+状态（2026-08-11）：**未通过**。工程骨架正在推进，但缺少合格 PIT/获批 factor/model、真实决策日
+InvestmentView/SignalSnapshot、持久化 API 与浏览器黄金路径。不能以单元测试、空表迁移或展示
+组件替代 Capability Gate，更不能据此声称模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测
 

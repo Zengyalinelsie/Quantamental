@@ -84,3 +84,23 @@ Jobs 及每个 Job 的 coverage/checkpoint 也独立分页，分页总数仍使�
   达数秒到十余秒，后续应增加保持审计总数的服务端 cursor pagination；
 - P4 Capability Gate 仍未通过，因为缺合格 `pit_verified` 截面和 forward-return labels；
 - 以上证据只证明物理分层、数据一致性和工程链路，不证明因子或模型科学有效。
+
+## 7. P5 后续增量迁移
+
+2026-08-11 在分层开发库执行 migration `0030_p5_investment_signal_ledgers`，对应代码提交
+`e7e007a`。本次是 0029 切换完成后的增量建表，不改变第 2–4 节记录的“迁移时 49 表、314,561
+行、0 差异”历史证据。
+
+新增对象：
+
+- `research.investment_views`、`research.investment_view_outcomes`、
+  `research.expected_return_calibrations`、`research.signal_snapshots`；
+- `serving.research_signal_snapshots` 和 `serving.production_signal_snapshots` 两个按 approval scope
+  隔离的只读 view；
+- 四张表均有 UPDATE/DELETE 阻断 trigger，并在数据库约束层保留 horizon、RunContext、trust、
+  cutoff、自然键和 research/forward scope 约束。
+
+执行后 migration ledger 存在该版本，四张新表行数均为 0。空表不是缺陷：P4 Gate 尚未通过，
+当前没有满足用途审批的 factor/model，也没有可合法写入的真实 SignalSnapshot；本次未生成 demo
+InvestmentView、伪 PIT 或生产信号。增量后的平台业务表为 53 张，`research` 为 11 张表，
+`serving` 为 3 个 view。结构与自动测试通过只证明工程合同，不证明模型科学有效。
