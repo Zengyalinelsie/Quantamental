@@ -503,16 +503,17 @@ DatasetVersion 均已持久化。利润表实际为 680 条，缺失保持缺失
 - [x] FeatureDefinition 纯函数合同；
 - [x] unit/currency/period 兼容；
 - [x] missing policy；
-- [ ] winsorization/standardization 执行；
-- [ ] industry/size neutralization 执行；
+- [x] winsorization/standardization 执行；
+- [x] industry/size neutralization 执行；
 - [x] FeatureSnapshot hash；
 - [x] label schema、类型与 namespace 隔离合同；
-- [ ] label 与生产 API 的物理持久化隔离。
+- [x] label 与生产 API 的物理持久化隔离。
 
-状态（2026-08-10）：P4-W00 严格 PIT 数据资格门和 P4-W01 首批领域合同已分别提交为
-`6cde9ef`、`6948073`。W01 尚未实现横截面 winsorize、standardize、neutralization 的统计
-执行器，也没有 FeatureSnapshot/Label 的物理 repository、migration 或生产 API，因此
-W01 仍未整体完成。证据和当前阻断见 `docs/15-p4-implementation-evidence.md`。
+状态（2026-08-11）：P4-W00 严格 PIT 数据资格门和 P4-W01 领域合同分别从 `6cde9ef`、
+`6948073` 开始；`98d1990` 已实现确定性 Decimal 横截面 winsorize、standardize 和
+industry/size neutralization，`40b73bc` 已用独立表、port、repository 和 append-only trigger
+物理隔离 FeatureSnapshot 与 research label。W01 工程能力完成；这不表示已有合格 PIT 截面
+数据或科学验证结果。证据和当前阻断见 `docs/15-p4-implementation-evidence.md`。
 
 ### P4-W02：行业模板 V0
 
@@ -537,47 +538,62 @@ W01 仍未整体完成。证据和当前阻断见 `docs/15-p4-implementation-evi
 每个因子先做 3–5 家手算，再做截面计算；Size/行业/Beta 作为暴露和中性化变量。
 
 状态（2026-08-11）：Quality 已完成 4 家手算 baseline；Fundamental Improvement V0 已完成
-公司级纯函数和 4 个手算场景，显式区分同比/环比、TTM/单季度、季节性、基数效应和一次性
-项目。两者都尚未完成合格 PIT 截面计算，因而上述因子项继续不勾选。Valuation Expectation
-Gap、横截面变换与统计验证仍在后续工作包。
+公司级纯函数和 4 个手算场景；Valuation Expectation Gap V0 也已完成 4 家区间手算，并按银行
+行业把 FCF yield、EV/EBIT 标为 `not_applicable`。三个 baseline 都保存 unit/period/currency、
+假设、失效条件、exposure 和 provenance，current 输入不能冒充 strict。由于数据库尚无满足
+冻结窗口的 `pit_verified` 截面，三个因子项继续不勾选；公司级公式完成不等于真实因子完成。
 
 ### P4-W04：统计引擎
 
-- [ ] IC/Rank IC；
-- [ ] HAC Newey-West；
-- [ ] block bootstrap CI；
-- [ ] quantile/monotonicity；
-- [ ] decay/turnover/coverage；
-- [ ] Fama–MacBeth；
-- [ ] regime/subperiod；
-- [ ] BH/FDR；
-- [ ] walk-forward；
-- [ ] purged/embargo utility；
-- [ ] independent-library cross-check。
+- [x] IC/Rank IC；
+- [x] HAC Newey-West；
+- [x] block bootstrap CI；
+- [x] quantile/monotonicity；
+- [x] decay/turnover/coverage；
+- [x] Fama–MacBeth；
+- [x] regime/subperiod；
+- [x] BH/FDR；
+- [x] walk-forward；
+- [x] purged/embargo utility；
+- [x] independent-library cross-check。
+
+状态（2026-08-11）：统计工程能力已完成。独立适配器使用 SciPy 交叉验证 Pearson/Spearman
+IC（含 ties），使用 statsmodels 交叉验证 HAC Newey-West 和 Fama–MacBeth 逐期 OLS/聚合；
+版本、输入 hash、容差和逐组件误差均进入报告。依赖缺失为 `unavailable`，数值分歧为
+`mismatch`，不会静默通过。交叉验证只证明数值实现一致，不证明因子科学有效。
 
 ### P4-W05：Experiment 与 Factor Lifecycle
 
-- [ ] ExperimentSpec/Run；
-- [ ] code/environment/data binding；
-- [ ] failure registry；
-- [ ] ValidationReport；
-- [ ] waiver/PromotionReview；
-- [ ] Approval 的用途范围：research_backtest/shadow/paper/limited_live；
-- [ ] 最小 Reviewer 服务端审批路径；
-- [ ] FactorVersion lifecycle；
-- [ ] Qlib export/Recorder import adapter。
+- [x] ExperimentSpec/Run；
+- [x] code/environment/data binding；
+- [x] failure registry；
+- [x] ValidationReport；
+- [x] waiver/PromotionReview；
+- [x] Approval 的用途范围：research_backtest/shadow/paper/limited_live；
+- [x] 最小 Reviewer 服务端审批路径；
+- [x] FactorVersion lifecycle；
+- [x] Qlib export/Recorder import adapter。
+
+状态（2026-08-11）：Experiment、ValidationReport、FactorVersion 和审批合同已落库；Reviewer/
+Administrator 的服务端身份策略、append-only review API、失败科学门不可被审批覆盖等路径已
+验证。Qlib export 冻结数据/代码/环境/标签/验证血缘，Recorder import 只接受显式 schema；
+Qlib SDK 缺失时显式 `unavailable`。三类真实资格审计均失败且 metrics 为空，未发生晋级。
 
 ### P4-W06：前端 Factor Workspace
 
-- [ ] Catalog；
-- [ ] Experiments；
-- [ ] Alpha Model honest empty state；
-- [ ] Timing Lab baseline tab；
-- [ ] Correlation Monitor；
-- [ ] Production；
-- [ ] IC/CI/quantile/decay/turnover chart；
-- [ ] multiple-testing family 和样本外标识；
-- [ ] failed experiment 可见。
+- [x] Catalog；
+- [x] Experiments；
+- [x] Alpha Model honest empty state；
+- [x] Timing Lab baseline tab；
+- [x] Correlation Monitor；
+- [x] Production；
+- [x] IC/CI/quantile/decay/turnover chart；
+- [x] multiple-testing family 和样本外标识；
+- [x] failed experiment 可见。
+
+状态（2026-08-11）：Workspace 从真实 Experiment API 读取 append-only runs；缺少 validation
+series 时不从 artifact hash 或空值生成图表。浏览器验收确认六个页签、6 条失败记录、折叠的
+完整失败证据、Production 审批阻断和最新刷新后无控制台错误。页面工程完成不改变 Gate 结论。
 
 ### Gate P4
 
@@ -587,6 +603,12 @@ Gap、横截面变换与统计验证仍在后续工作包。
 - Factor Lab 不把 current score 当历史结果；
 - 晋级必须经过最小 RBAC/Approval；科学失败的因子被保留但不晋级；
 - SPEC-016–017、020–023 通过；SPEC-018–019 只完成可复用特征层，不在 P4 完整验收。
+
+状态（2026-08-11）：W01–W06 的工程能力已经完成，但 P4 Capability Gate **未通过**。真实
+资格运行确认八类冻结窗口输入均未同时满足 `pit_verified`、覆盖、available-at 和 lineage 门；
+三条最新 ExperimentRun 均 `failed`、三份 ValidationReport 均不可晋级、FactorVersion 保持
+`draft`，没有计算因子分数、IC 或 RankIC。恢复 P2/PIT 数据后必须重跑真实截面和独立交叉
+验证，不能用当前工程测试替代 Gate。
 
 ## 9. P5：InvestmentView、Expected Return Compiler 与生产信号
 

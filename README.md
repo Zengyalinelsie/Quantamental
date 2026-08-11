@@ -19,9 +19,10 @@ Capability Gate 通过。主动 Timing 仍 `unavailable`；P3.5 已完成 CSI500
 2018–2025 年末三表的 12,000/12,000 工作单元，写入 35,505 条 `normalized_current` 观测，
 其中 78 个合法空期显式保存且未填零。另有 CSI300 中 30 家的 720/720 工作单元和 2,120 条
 观测；这些 current-only 批次不能用于 strict historical，也不代表 CSI300+CSI500 去重后的
-700–800 家扩容或 PIT 治理完成。P4 已有严格数据资格门、
-行业模板、partial Quality baseline 和 Fundamental Improvement V0；统计验证、生命周期与完整
-Factor Workspace 仍未完成，因此 P4 Gate 未通过。
+700–800 家扩容或 PIT 治理完成。P4 W00–W06 的工程能力已完成：三类 company-level baseline、
+统计引擎及独立库交叉验证、Experiment/Reviewer 生命周期、Qlib exchange 和完整 Factor
+Workspace 均已接线。真实开发库的三因子资格审计已失败关闭；冻结窗口缺合格 `pit_verified`
+输入，因此没有计算因子 score/IC/RankIC、没有晋级，P4 Gate 仍未通过。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -67,6 +68,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P3 实现与验证证据](docs/13-p3-implementation-evidence.md)
 - [数据源总清单与 Agent 选择路由](docs/14-data-source-catalog-and-agent-routing.md)
 - [P4 实现与验证证据](docs/15-p4-implementation-evidence.md)
+- [PostgreSQL 数据分层方案（待批准）](docs/16-postgresql-data-layering-proposal.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)
@@ -205,12 +207,25 @@ PYTHONPATH=src "$PYTHON_BIN" -m uvicorn a_share_platform.api.app:app \
 ```bash
 cd platform/frontend
 npm ci
-PYTHON_BIN=python3.11 npm run generate:api  # 可替换为任一 Python 3.11+
+PYTHON_BIN=../.venv/bin/python npm run generate:api
 npm run dev
 ```
 
 本项目固定使用前端 `5173`、后端 `8010`；不占用本机其他项目的 `8000`。Vite 默认把
 `/api` 代理到 `http://127.0.0.1:8010`，需要覆盖时显式设置 `VITE_API_PROXY`。
+
+P4 三因子资格命令默认 dry-run；只有显式本地研究确认才持久化 append-only 失败/成功审计：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.factor_qualification \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_dev \
+  --evaluated-at 2026-08-11T18:00:00+08:00 \
+  --code-sha git:<commit>
+```
+
+当前数据库会正确返回资格失败；不要添加 `--execute` 期待生成因子数值。恢复真实 PIT 输入后，
+仍须先 dry-run 审查 role DatasetVersion、覆盖和 lineage。
 
 运行当前全量验证；若要包含真实 PostgreSQL migration smoke，显式传入本地验证库 URL：
 
