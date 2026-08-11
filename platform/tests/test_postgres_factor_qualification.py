@@ -98,7 +98,11 @@ class SourceConnection(AbstractContextManager["SourceConnection"]):
         if "FROM universe_versions AS versions" in sql:
             return Result([(29600, 800, START, END, ["dataset:universe:v1"], ["csi"])])
         if "JOIN industry_memberships AS observed" in sql:
-            return Result([observed])
+            return Result([unavailable])
+        if "FROM industry_memberships" in sql:
+            return Result(
+                [(1258, date(2026, 8, 10), date(2026, 8, 11))]
+            )
         if "JOIN daily_market_states AS observed" in sql:
             return Result([(7177, 30, START, date(2018, 12, 31), *observed[4:])])
         if "JOIN share_capital_observations AS observed" in sql:
@@ -220,10 +224,26 @@ class PostgresFactorQualificationTest(unittest.TestCase):
         self.assertEqual(financial.observed_entity_count, 2)
         self.assertEqual(
             [item.role for item in value.role_evidence if item.row_count == 0],
-            [FactorDataRole.BENCHMARK_BAR, FactorDataRole.FORWARD_RETURN_LABEL],
+            [
+                FactorDataRole.BENCHMARK_BAR,
+                FactorDataRole.FORWARD_RETURN_LABEL,
+                FactorDataRole.INDUSTRY_CLASSIFICATION,
+            ],
         )
         self.assertFalse(
             any("UPDATE" in query or "INSERT" in query for query, _ in connection.calls)
+        )
+        industry = next(
+            item
+            for item in value.role_evidence
+            if item.role is FactorDataRole.INDUSTRY_CLASSIFICATION
+        )
+        self.assertTrue(
+            any(
+                "current-only rows=1258" in warning
+                and "2026-08-10..2026-08-11" in warning
+                for warning in industry.warnings
+            )
         )
 
     def test_corporate_action_coverage_includes_successful_explicit_zero_evidence(self) -> None:

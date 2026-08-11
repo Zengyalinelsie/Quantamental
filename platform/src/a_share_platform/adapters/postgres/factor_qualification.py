@@ -248,6 +248,24 @@ class PostgresFactorQualificationSource:
                 "qualification does not persist source observation payloads"
             )
         ]
+        if role is FactorDataRole.INDUSTRY_CLASSIFICATION and unavailable:
+            current_industry = connection.execute(
+                """
+                SELECT COUNT(*), MIN(valid_from),
+                       MAX(COALESCE(valid_to, valid_from))
+                FROM industry_memberships
+                """
+            ).fetchone()
+            if current_industry is not None and int(cast(int, current_industry[0])) > 0:
+                current_rows = int(cast(int, current_industry[0]))
+                current_start = cast(date, current_industry[1])
+                current_end = cast(date, current_industry[2])
+                warnings.append(
+                    "PIT-qualified frozen-window binding rows=0; separate "
+                    f"current-only rows={current_rows} cover "
+                    f"{current_start.isoformat()}..{current_end.isoformat()} outside "
+                    "the frozen study window"
+                )
         if role is FactorDataRole.FINANCIAL_FACT:
             warnings.append(
                 "individual PIT facts exist, but no complete per-decision-time factor panel exists"
