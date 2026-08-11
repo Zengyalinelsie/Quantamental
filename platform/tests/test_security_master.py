@@ -9,6 +9,8 @@ from a_share_platform.domain.security_master import (
     IdentifierKind,
     Listing,
     ListingState,
+    OfficialIdentifierAlias,
+    ProviderIdentifierCorrection,
     SecurityMasterConflict,
     SpecialTreatment,
 )
@@ -90,6 +92,41 @@ class SecurityMasterTest(unittest.TestCase):
                 Board.STAR,
                 date(2020, 1, 1),
             )
+
+    def test_official_identifier_alias_requires_public_evidence(self) -> None:
+        value = OfficialIdentifierAlias(
+            listing_id="listing:avic-cac:xshe",
+            kind=IdentifierKind.CODE,
+            value="300114",
+            valid_from=date(2010, 8, 27),
+            valid_to=date(2025, 2, 17),
+            source_id="cninfo:announcement:1222544408",
+            evidence_url=(
+                "https://static.cninfo.com.cn/finalpage/2025-02-15/"
+                "1222544408.PDF"
+            ),
+            published_on=date(2025, 2, 14),
+        )
+
+        self.assertEqual(value.kind, IdentifierKind.CODE)
+        with self.assertRaisesRegex(ValueError, "evidence_url"):
+            replace(value, evidence_url="")
+
+    def test_provider_identifier_correction_is_explicitly_provider_scoped(self) -> None:
+        value = ProviderIdentifierCorrection(
+            provider_id="baostock_sdk",
+            listing_id="listing:avic-cac:xshe",
+            kind=IdentifierKind.CODE,
+            observed_value="300114",
+            valid_from=date(2010, 8, 27),
+            valid_to=date(2025, 2, 17),
+            source_id="operator-review:baostock:300114",
+            reason="provider historical code correction",
+        )
+
+        self.assertEqual(value.provider_id, "baostock_sdk")
+        with self.assertRaisesRegex(ValueError, "provider_id"):
+            replace(value, provider_id="")
 
 
 if __name__ == "__main__":

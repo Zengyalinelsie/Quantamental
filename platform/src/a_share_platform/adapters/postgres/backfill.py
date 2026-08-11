@@ -20,6 +20,7 @@ from a_share_platform.domain.backfill import (
     DatasetCoverageReport,
     DatasetQualityReport,
     ProviderRetrievalMetadata,
+    UniverseObservationMode,
 )
 from a_share_platform.domain.market_data import PriceAdjustment
 from a_share_platform.domain.pit import DataTrustState
@@ -317,6 +318,7 @@ class PostgresBackfillRepository:
             "symbols": list(value.symbols),
             "markets": list(value.markets),
             "all_a_share": value.all_a_share,
+            "universe_observation_mode": value.universe_observation_mode.value,
         }
 
     @staticmethod
@@ -374,6 +376,14 @@ class PostgresBackfillRepository:
                 )
             ),
             all_a_share=bool(value.get("all_a_share", False)),
+            universe_observation_mode=UniverseObservationMode(
+                str(
+                    value.get(
+                        "universe_observation_mode",
+                        UniverseObservationMode.CONTINUOUS_DAILY.value,
+                    )
+                )
+            ),
         )
 
     @staticmethod

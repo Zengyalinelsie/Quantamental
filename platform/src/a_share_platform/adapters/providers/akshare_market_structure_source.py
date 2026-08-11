@@ -89,7 +89,10 @@ class AkshareMarketStructureSource:
             tuple[datetime, tuple[StagedCorporateActionObservation, ...]],
         ] = {}
         self._bse_rows: tuple[datetime, tuple[Mapping[str, object], ...]] | None = None
-        self._profile_cache: dict[str, tuple[datetime, str]] = {}
+        self._profile_cache: dict[
+            str,
+            tuple[datetime, Mapping[str, object]],
+        ] = {}
 
     def fetch(self, unit: BackfillWorkUnit, plan: BackfillPlan) -> BackfillBatch:
         self._validate(unit, plan)
@@ -120,11 +123,18 @@ class AkshareMarketStructureSource:
             if not payload.rows:
                 warnings.append("no corporate action was returned for this interval")
         else:
-            payload, expected_rows, retrieved_at = self._xbse_security_master(
-                akshare,
-                unit,
-                plan,
-            )
+            if unit.market == "XBSE":
+                payload, expected_rows, retrieved_at = self._xbse_security_master(
+                    akshare,
+                    unit,
+                    plan,
+                )
+            else:
+                payload, expected_rows, retrieved_at = self._cninfo_security_master(
+                    akshare,
+                    unit,
+                    plan,
+                )
             units = (("identity", "record"),)
 
         metadata_warnings = (
@@ -174,9 +184,13 @@ class AkshareMarketStructureSource:
             )
         if unit.market not in _MARKET_PREFIX:
             raise ProviderBackfillUnavailable("market-structure work unit requires a market")
-        if unit.domain is BackfillDataDomain.SECURITY_MASTER and unit.market != "XBSE":
+        if (
+            unit.domain is BackfillDataDomain.SECURITY_MASTER
+            and unit.market != "XBSE"
+            and plan.all_a_share
+        ):
             raise ProviderBackfillUnavailable(
-                "AkShare market-structure security master implements only XBSE"
+                "AkShare XSHG/XSHE security master requires explicit symbols"
             )
         if not plan.symbols and not plan.all_a_share:
             raise ValueError("AkShare market-structure source requires explicit scope")
@@ -335,10 +349,19 @@ class AkshareMarketStructureSource:
         return SecurityMasterPayload(tuple(accepted)), len(selected_codes), max(retrieved_times)
 
     def _legal_name(self, akshare: Any, digits: str) -> tuple[str, datetime]:
+        profile, retrieved_at = self._profile(akshare, digits)
+        legal_name = self._required_text(profile.get("公司名称"), "公司名称")
+        return legal_name, retrieved_at
+
+    def _profile(
+        self,
+        akshare: Any,
+        digits: str,
+    ) -> tuple[Mapping[str, object], datetime]:
         cached = self._profile_cache.get(digits)
         if cached is not None:
-            retrieved_at, legal_name = cached
-            return legal_name, retrieved_at
+            retrieved_at, profile = cached
+            return profile, retrieved_at
         response = self._call(
             "stock_profile_cninfo",
             lambda: akshare.stock_profile_cninfo(symbol=digits),
@@ -355,9 +378,79 @@ class AkshareMarketStructureSource:
             raise ProviderBackfillUnavailable(
                 f"XBSE profile code mismatch: expected={digits}, actual={profile_code}"
             )
-        legal_name = self._required_text(profile.get("公司名称"), "公司名称")
-        self._profile_cache[digits] = (retrieved_at, legal_name)
-        return legal_name, retrieved_at
+        self._profile_cache[digits] = (retrieved_at, profile)
+        return profile, retrieved_at
+
+    def _cninfo_security_master(
+        self,
+        akshare: Any,
+        unit: BackfillWorkUnit,
+        plan: BackfillPlan,
+    ) -> tuple[SecurityMasterPayload, int, datetime]:
+        codes = self._unit_symbols(unit, plan)
+        if not codes:
+            raise ProviderBackfillUnavailable(
+                "AkShare XSHG/XSHE security master requires explicit symbols"
+            )
+        accepted: list[StagedSecurityIdentity] = []
+        retrieved_times: list[datetime] = []
+        for code in codes:
+            digits = code.split(".", 1)[1]
+            profile, retrieved_at = self._profile(akshare, digits)
+            retrieved_times.append(retrieved_at)
+            market_name = self._required_text(profile.get("所属市场"), "所属市场")
+            expected_market_text = "深交所" if unit.market == "XSHE" else "上交所"
+            if expected_market_text not in market_name:
+                raise ProviderBackfillUnavailable(
+                    f"CNInfo profile market mismatch: code={code}, market={market_name}"
+                )
+            listed_on = self._required_date(profile.get("上市日期"), "上市日期")
+            if listed_on > retrieved_at.date():
+                raise ProviderBackfillUnavailable(
+                    "CNInfo profile listing date cannot be in the future"
+                )
+            industry = self._optional_text(profile.get("所属行业"))
+            accepted.append(
+                StagedSecurityIdentity(
+                    code=code,
+                    company_legal_name=self._required_text(
+                        profile.get("公司名称"),
+                        "公司名称",
+                    ),
+                    security_name=self._required_text(
+                        profile.get("A股简称"),
+                        "A股简称",
+                    ),
+                    exchange=(
+                        Exchange.XSHE if unit.market == "XSHE" else Exchange.XSHG
+                    ),
+                    board=self._board(code),
+                    listed_on=listed_on,
+                    delisted_on=None,
+                    listing_state=ListingState.ACTIVE,
+                    observed_on=retrieved_at.date(),
+                    industry_taxonomy=("CNInfo current industry" if industry else None),
+                    industry_code=None,
+                    industry_name=industry,
+                    identity_source_id="akshare.stock_profile_cninfo",
+                    legal_name_source_id="akshare.stock_profile_cninfo",
+                    industry_source_id=(
+                        "akshare.stock_profile_cninfo" if industry else None
+                    ),
+                )
+            )
+        return SecurityMasterPayload(tuple(accepted)), len(codes), max(retrieved_times)
+
+    @staticmethod
+    def _board(code: str) -> Board:
+        if code.startswith("BJ."):
+            return Board.BSE
+        digits = code.split(".", 1)[1]
+        if code.startswith("SH.") and digits.startswith("688"):
+            return Board.STAR
+        if code.startswith("SZ.") and digits.startswith("3"):
+            return Board.CHINEXT
+        return Board.MAIN
 
     def _unit_symbols(
         self,

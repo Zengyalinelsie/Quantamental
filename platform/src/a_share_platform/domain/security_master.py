@@ -148,6 +148,56 @@ class IdentifierHistory:
 
 
 @dataclass(frozen=True)
+class OfficialIdentifierAlias:
+    """An exchange/company-announced identity interval with public evidence."""
+
+    listing_id: str
+    kind: IdentifierKind
+    value: str
+    valid_from: date
+    valid_to: date | None
+    source_id: str
+    evidence_url: str
+    published_on: date
+
+    def __post_init__(self) -> None:
+        _require_id(self.listing_id, "listing_id")
+        object.__setattr__(self, "kind", IdentifierKind(self.kind))
+        _require_id(self.value, "value")
+        _validate_interval(self.valid_from, self.valid_to)
+        _require_id(self.source_id, "source_id")
+        if not isinstance(self.evidence_url, str) or not self.evidence_url.startswith(
+            "https://"
+        ):
+            raise ValueError("evidence_url must be a non-empty HTTPS URL")
+        if not isinstance(self.published_on, date):
+            raise TypeError("published_on must be a date")
+
+
+@dataclass(frozen=True)
+class ProviderIdentifierCorrection:
+    """A provider-local identity correction that must never become a global alias."""
+
+    provider_id: str
+    listing_id: str
+    kind: IdentifierKind
+    observed_value: str
+    valid_from: date
+    valid_to: date | None
+    source_id: str
+    reason: str
+
+    def __post_init__(self) -> None:
+        _require_id(self.provider_id, "provider_id")
+        _require_id(self.listing_id, "listing_id")
+        object.__setattr__(self, "kind", IdentifierKind(self.kind))
+        _require_id(self.observed_value, "observed_value")
+        _validate_interval(self.valid_from, self.valid_to)
+        _require_id(self.source_id, "source_id")
+        _require_id(self.reason, "reason")
+
+
+@dataclass(frozen=True)
 class ListingStatePeriod:
     listing_id: str
     valid_from: date

@@ -26,6 +26,7 @@ from a_share_platform.domain.backfill import (
     DatasetCoverageReport,
     DatasetQualityReport,
     DatasetQualityStatus,
+    UniverseObservationMode,
 )
 from a_share_platform.domain.governance import DatasetVersion
 from a_share_platform.domain.market_data import PriceAdjustment
@@ -109,6 +110,9 @@ def build_private_local_backfill_plan(
     all_a_share: bool = False,
     universe_benchmark_codes: tuple[str, ...] | None = None,
     markets: tuple[str, ...] | None = None,
+    universe_observation_mode: UniverseObservationMode = (
+        UniverseObservationMode.CONTINUOUS_DAILY
+    ),
 ) -> BackfillPlan:
     """Build an explicitly bounded, non-PIT private local research plan."""
 
@@ -203,6 +207,7 @@ def build_private_local_backfill_plan(
         symbols=selected_symbols,
         markets=selected_markets,
         all_a_share=all_a_share,
+        universe_observation_mode=universe_observation_mode,
     )
 
 

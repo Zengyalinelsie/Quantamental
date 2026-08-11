@@ -233,6 +233,60 @@ class AkshareMarketStructureSourceTest(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "profile code mismatch"):
             self.source(Mismatch()).fetch(unit, plan)
 
+    def test_explicit_xshe_identity_uses_cninfo_profile_without_bse_list_probe(self) -> None:
+        class XsheProfile(FakeAkshare):
+            def stock_profile_cninfo(self, *, symbol: str) -> FakeFrame:
+                self.profile_calls.append(symbol)
+                return FakeFrame(
+                    [
+                        {
+                            "公司名称": "中航成飞股份有限公司",
+                            "A股代码": "302132",
+                            "A股简称": "中航成飞",
+                            "上市日期": date(2010, 8, 27),
+                            "所属市场": "深交所创业板",
+                            "所属行业": "计算机、通信和其他电子设备制造业",
+                        }
+                    ]
+                )
+
+        module = XsheProfile()
+        source = self.source(module)
+        plan = plan_for(BackfillDataDomain.SECURITY_MASTER, "SZ.302132")
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        batch = source.fetch(unit, plan)
+
+        self.assertEqual(module.bse_calls, 0)
+        self.assertEqual(module.profile_calls, ["302132"])
+        payload = batch.payload
+        assert isinstance(payload, SecurityMasterPayload)
+        row = payload.rows[0]
+        self.assertEqual(row.company_legal_name, "中航成飞股份有限公司")
+        self.assertEqual(row.security_name, "中航成飞")
+        self.assertEqual(row.exchange, Exchange.XSHE)
+        self.assertEqual(row.board, Board.CHINEXT)
+        self.assertEqual(row.listed_on, date(2010, 8, 27))
+        self.assertEqual(batch.expected_rows, 1)
+        BackfillService._validate_batch(plan, unit, batch)
+
+    def test_non_xbse_all_market_identity_remains_blocked(self) -> None:
+        plan = build_private_local_backfill_plan(
+            plan_id="private:akshare:xshe-all:v1",
+            provider_id="akshare",
+            symbols=(),
+            all_a_share=True,
+            markets=("XSHE",),
+            domains=(BackfillDataDomain.SECURITY_MASTER,),
+            start_date=date(2018, 1, 1),
+            end_date=date(2026, 8, 10),
+            created_at=NOW,
+        )
+        unit = BackfillPlanner().work_units(plan)[0]
+
+        with self.assertRaisesRegex(RuntimeError, "explicit symbols"):
+            self.source(FakeAkshare()).fetch(unit, plan)
+
     def test_source_rejects_unsupported_domain_before_provider_access(self) -> None:
         module = FakeAkshare()
         plan = plan_for(BackfillDataDomain.RAW_DAILY_BAR, "SZ.000858")

@@ -15,6 +15,7 @@ from a_share_platform.domain.backfill import (
     BackfillJob,
     BackfillQualification,
     ProviderRetrievalMetadata,
+    UniverseObservationMode,
 )
 
 PLATFORM_ROOT = Path(__file__).resolve().parents[1]
@@ -171,6 +172,7 @@ class PostgresBackfillTest(unittest.TestCase):
             start_date=date(2018, 1, 1),
             end_date=date(2026, 8, 8),
             created_at=NOW,
+            universe_observation_mode=UniverseObservationMode.DISCRETE_MONTH_END,
         )
 
         restored = PostgresBackfillRepository._plan_from_json(
@@ -179,6 +181,10 @@ class PostgresBackfillTest(unittest.TestCase):
 
         self.assertEqual(restored, value)
         self.assertTrue(restored.all_a_share)
+        self.assertEqual(
+            restored.universe_observation_mode,
+            UniverseObservationMode.DISCRETE_MONTH_END,
+        )
 
 
 if __name__ == "__main__":

@@ -80,6 +80,11 @@ class DatasetQualityStatus(str, Enum):
     FAILED = "failed"
 
 
+class UniverseObservationMode(str, Enum):
+    CONTINUOUS_DAILY = "continuous_daily"
+    DISCRETE_MONTH_END = "discrete_month_end"
+
+
 @dataclass(frozen=True)
 class BackfillScope:
     scope_id: str
@@ -145,6 +150,9 @@ class BackfillPlan:
     symbols: tuple[str, ...] = ()
     markets: tuple[str, ...] = ("XSHG", "XSHE", "XBSE")
     all_a_share: bool = False
+    universe_observation_mode: UniverseObservationMode = (
+        UniverseObservationMode.CONTINUOUS_DAILY
+    )
 
     def __post_init__(self) -> None:
         _required(self.plan_id, "plan_id")
@@ -165,6 +173,11 @@ class BackfillPlan:
         if len(self.domains) != len(set(self.domains)):
             raise ValueError("backfill data domains must be unique")
         object.__setattr__(self, "provider_use", ProviderUse(self.provider_use))
+        object.__setattr__(
+            self,
+            "universe_observation_mode",
+            UniverseObservationMode(self.universe_observation_mode),
+        )
         object.__setattr__(self, "symbols", tuple(self.symbols))
         object.__setattr__(self, "markets", tuple(self.markets))
         if type(self.all_a_share) is not bool:
@@ -208,6 +221,12 @@ class BackfillPlan:
             and self.output_trust_state is not DataTrustState.NORMALIZED_CURRENT
         ):
             raise ValueError("private local research backfills must remain normalized_current")
+        if (
+            self.universe_observation_mode
+            is not UniverseObservationMode.CONTINUOUS_DAILY
+            and BackfillDataDomain.UNIVERSE not in self.domains
+        ):
+            raise ValueError("non-default universe observation mode requires the universe domain")
 
 
 @dataclass(frozen=True)

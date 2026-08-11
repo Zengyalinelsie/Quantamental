@@ -31,6 +31,7 @@ from a_share_platform.domain.backfill import (
     BackfillDataDomain,
     DatasetQualityStatus,
     ProviderRetrievalMetadata,
+    UniverseObservationMode,
 )
 from a_share_platform.domain.governance import DatasetVersion, VersionConflictError
 from a_share_platform.domain.pit import DataTrustState
@@ -79,6 +80,18 @@ class CurrentIdentityFallbackConnection(FakeConnection):
             return FakeResult()
         if "FROM listings" in query and "listed_on <=" in query:
             return FakeResult(("listing:XSHG:600519",))
+        return FakeResult()
+
+
+class ProviderCorrectionConnection(FakeConnection):
+    def execute(self, query: str, params: tuple[object, ...] = ()) -> FakeResult:
+        self.calls.append((query, params))
+        if "RETURNING" in query:
+            return FakeResult((True,))
+        if "FROM provider_identifier_corrections" in query:
+            if "corrections.valid_from <=" in query:
+                return FakeResult(("listing:XSHE:302132",))
+            return FakeResult()
         return FakeResult()
 
 
@@ -269,6 +282,49 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             fallback_params,
             ("listing:XSHG:600519", "XSHG", date(2018, 1, 2), date(2018, 1, 2)),
         )
+
+    def test_sink_applies_correction_only_with_batch_provider_scope(self) -> None:
+        connection = ProviderCorrectionConnection()
+        parquet = FakeParquetStore()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=parquet,  # type: ignore[arg-type]
+            clock=lambda: NOW,
+        )
+        payload = DailyObservationPayload(
+            rows=(
+                StagedDailyObservation(
+                    code="SZ.300114",
+                    exchange=Exchange.XSHE,
+                    session_date=date(2024, 12, 31),
+                    currency="CNY",
+                    open=Decimal(10),
+                    high=Decimal(11),
+                    low=Decimal(9),
+                    close=Decimal(10),
+                    previous_close=Decimal(10),
+                    volume_shares=100,
+                    amount=Decimal(1000),
+                    is_trading=True,
+                    special_treatment=SpecialTreatment.NONE,
+                    source_id="baostock_sdk",
+                ),
+            )
+        )
+
+        sink.persist(
+            batch_for(BackfillDataDomain.RAW_DAILY_BAR, payload),
+            dataset_version_id="dataset:bars:v1",
+        )
+
+        self.assertEqual(parquet.bars[0].listing_id, "listing:XSHE:302132")
+        correction_params = next(
+            params
+            for query, params in connection.calls
+            if "FROM provider_identifier_corrections" in query
+            and "corrections.valid_from <=" in query
+        )
+        self.assertEqual(correction_params[0], "baostock_sdk")
 
     def test_current_known_listing_fallback_requires_exactly_one_compatible_row(self) -> None:
         class MultipleRowsResult(FakeResult):
@@ -475,6 +531,85 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         self.assertIn("tradability_not_evaluated", str(membership[7]))
         self.assertEqual(membership[9], "baostock_sdk.query_hs300_stocks")
 
+    def test_discrete_universe_version_persists_observed_dates_and_gaps(self) -> None:
+        connection = FakeConnection()
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            listing_resolver=lambda code, _as_of: f"listing:{code}",
+            clock=lambda: NOW,
+        )
+        payload = UniverseMembershipPayload(
+            benchmark_code="000300",
+            rows=(
+                StagedUniverseMembership(
+                    code="SH.600519",
+                    valid_from=date(2018, 1, 31),
+                    valid_to=date(2018, 2, 1),
+                    source_id="baostock_sdk.query_hs300_stocks:month_end_discrete",
+                ),
+            ),
+            observation_mode=UniverseObservationMode.DISCRETE_MONTH_END,
+            observed_dates=(date(2018, 1, 31),),
+            unobserved_intervals=((date(2018, 1, 1), date(2018, 1, 31)),),
+        )
+
+        sink.persist(
+            batch_for(BackfillDataDomain.UNIVERSE, payload),
+            dataset_version_id="dataset:universe:discrete:v1",
+        )
+
+        version = next(
+            params
+            for query, params in connection.calls
+            if "INSERT INTO universe_versions" in query
+        )
+        self.assertEqual(version[10], "discrete_month_end")
+        self.assertIn("2018-01-31", str(version[11]))
+        self.assertIn("2018-01-01", str(version[12]))
+
+    def test_universe_identity_preflight_finishes_before_any_version_write(self) -> None:
+        connection = FakeConnection()
+
+        def resolver(code: str, _as_of: date) -> str:
+            if code == "SZ.302132":
+                raise CanonicalSinkError("official alias is missing")
+            return f"listing:{code}"
+
+        sink = CanonicalBackfillSink(
+            connection=connection,
+            parquet_store=FakeParquetStore(),  # type: ignore[arg-type]
+            listing_resolver=resolver,
+            clock=lambda: NOW,
+        )
+        payload = UniverseMembershipPayload(
+            benchmark_code="000300",
+            rows=(
+                StagedUniverseMembership(
+                    code="SH.600519",
+                    valid_from=date(2026, 8, 10),
+                    valid_to=date(2026, 8, 11),
+                    source_id="baostock_sdk.query_hs300_stocks",
+                ),
+                StagedUniverseMembership(
+                    code="SZ.302132",
+                    valid_from=date(2026, 8, 10),
+                    valid_to=date(2026, 8, 11),
+                    source_id="baostock_sdk.query_hs300_stocks",
+                ),
+            ),
+        )
+
+        with self.assertRaisesRegex(CanonicalSinkError, "identity preflight"):
+            sink.persist(
+                batch_for(BackfillDataDomain.UNIVERSE, payload),
+                dataset_version_id="dataset:universe:v1",
+            )
+
+        sql = "\n".join(query for query, _params in connection.calls)
+        self.assertNotIn("INSERT INTO universe_definitions", sql)
+        self.assertNotIn("INSERT INTO universe_versions", sql)
+
     def test_normalized_current_universe_is_rejected_by_strict_pit_reader(self) -> None:
         row = (
             "universe:000300:dataset:universe:v1",
@@ -487,6 +622,9 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             NOW,
             NOW,
             None,
+            UniverseObservationMode.CONTINUOUS_DAILY.value,
+            [],
+            [],
         )
 
         class UniverseReadConnection(FakeConnection):
@@ -522,6 +660,12 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         self.assertEqual(
             restored.source_ids, ("baostock_sdk.query_hs300_stocks",)
         )
+        self.assertEqual(
+            restored.observation_mode,
+            UniverseObservationMode.CONTINUOUS_DAILY,
+        )
+        self.assertEqual(restored.observed_dates, ())
+        self.assertEqual(restored.unobserved_intervals, ())
 
     def test_same_benchmark_annual_checkpoints_have_distinct_stable_versions(self) -> None:
         connection = FakeConnection()
@@ -578,7 +722,9 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
         self.assertNotEqual(versions[0][0], versions[1][0])
         self.assertEqual(versions[0][:6], versions[2][:6])
         self.assertEqual(str(versions[0][6]), str(versions[2][6]))
-        self.assertEqual(versions[0][7:], versions[2][7:])
+        self.assertEqual(versions[0][7:11], versions[2][7:11])
+        self.assertEqual(str(versions[0][11]), str(versions[2][11]))
+        self.assertEqual(str(versions[0][12]), str(versions[2][12]))
         self.assertEqual(versions[0][7], first.metadata.retrieved_at)
         self.assertEqual(versions[0][8], first.metadata.retrieved_at)
 

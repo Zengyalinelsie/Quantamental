@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from itertools import pairwise
 
+from a_share_platform.domain.backfill import UniverseObservationMode
 from a_share_platform.domain.security_master import (
     Board,
     Exchange,
@@ -147,17 +148,61 @@ class StagedUniverseMembership:
 class UniverseMembershipPayload:
     benchmark_code: str
     rows: tuple[StagedUniverseMembership, ...]
+    observation_mode: UniverseObservationMode = UniverseObservationMode.CONTINUOUS_DAILY
+    observed_dates: tuple[date, ...] = ()
+    unobserved_intervals: tuple[tuple[date, date], ...] = ()
 
     def __post_init__(self) -> None:
         if self.benchmark_code not in {"000300", "000905"}:
             raise ValueError("benchmark_code must be 000300 or 000905")
         object.__setattr__(self, "rows", tuple(self.rows))
+        object.__setattr__(
+            self,
+            "observation_mode",
+            UniverseObservationMode(self.observation_mode),
+        )
+        object.__setattr__(self, "observed_dates", tuple(self.observed_dates))
+        object.__setattr__(
+            self,
+            "unobserved_intervals",
+            tuple(tuple(item) for item in self.unobserved_intervals),
+        )
         if any(not isinstance(row, StagedUniverseMembership) for row in self.rows):
             raise TypeError("universe payload rows must be staged memberships")
         ordered = sorted(self.rows, key=lambda row: (row.code, row.valid_from))
-        for left, right in pairwise(ordered):
-            if left.code == right.code and right.valid_from < left.valid_to:
+        for membership_left, membership_right in pairwise(ordered):
+            if (
+                membership_left.code == membership_right.code
+                and membership_right.valid_from < membership_left.valid_to
+            ):
                 raise ValueError("universe membership intervals must not overlap")
+        if len(self.observed_dates) != len(set(self.observed_dates)):
+            raise ValueError("observed_dates must be unique")
+        if tuple(sorted(self.observed_dates)) != self.observed_dates:
+            raise ValueError("observed_dates must be sorted")
+        for lower, upper in self.unobserved_intervals:
+            if not isinstance(lower, date) or not isinstance(upper, date):
+                raise TypeError("unobserved interval boundaries must be dates")
+            if upper <= lower:
+                raise ValueError("unobserved interval end must be later than start")
+            if any(lower <= observed < upper for observed in self.observed_dates):
+                raise ValueError("unobserved intervals cannot overlap an observed date")
+        for interval_left, interval_right in pairwise(self.unobserved_intervals):
+            if interval_right[0] < interval_left[1]:
+                raise ValueError("unobserved intervals must not overlap")
+        if self.observation_mode is UniverseObservationMode.DISCRETE_MONTH_END:
+            if not self.observed_dates:
+                raise ValueError("discrete snapshot requires observed_dates")
+            observed = set(self.observed_dates)
+            if any(
+                row.valid_from not in observed
+                or row.valid_to != row.valid_from + timedelta(days=1)
+                for row in self.rows
+            ):
+                raise ValueError("discrete snapshot rows must be one-day observations")
+            row_dates = {row.valid_from for row in self.rows}
+            if row_dates != observed:
+                raise ValueError("every observed date must contain membership rows")
 
 
 @dataclass(frozen=True)

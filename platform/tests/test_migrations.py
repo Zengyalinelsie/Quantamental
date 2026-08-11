@@ -62,9 +62,58 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0016_financial_backfill_dimensions.sql",
                 "0017_feature_snapshots_and_research_labels.sql",
                 "0018_normalized_current_financial_backfill.sql",
+                "0019_identifier_alias_scopes.sql",
                 "0020_market_structure_observations.sql",
+                "0021_provider_mapping_usage_scopes.sql",
+                "0022_discrete_universe_observations.sql",
             ),
         )
+
+    def test_discrete_universe_migration_preserves_observed_dates_and_gaps(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0022_discrete_universe_observations.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "ADD COLUMN observation_mode TEXT NOT NULL",
+            "ADD COLUMN observed_dates JSONB NOT NULL",
+            "ADD COLUMN unobserved_intervals JSONB NOT NULL",
+            "discrete_month_end",
+            "jsonb_array_length(observed_dates) > 0",
+            "CREATE VIEW strict_pit_universe_versions",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
+        for column in (
+            "observation_mode",
+            "observed_dates",
+            "unobserved_intervals",
+        ):
+            with self.subTest(dropped_default=column):
+                self.assertIn(
+                    f"ALTER COLUMN {column} DROP DEFAULT",
+                    normalized_sql,
+                )
+
+    def test_identifier_alias_migration_separates_official_and_provider_scope(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0019_identifier_alias_scopes.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE official_identifier_aliases",
+            "evidence_url",
+            "published_on",
+            "CREATE TABLE provider_identifier_corrections",
+            "provider_id TEXT NOT NULL",
+            "recorded_at TIMESTAMPTZ NOT NULL",
+            "official_identifier_aliases_append_only",
+            "provider_identifier_corrections_append_only",
+            "BEFORE UPDATE OR DELETE ON official_identifier_aliases",
+            "BEFORE UPDATE OR DELETE ON provider_identifier_corrections",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_feature_and_research_label_storage_is_physically_separate_and_append_only(self) -> None:
         sql = (

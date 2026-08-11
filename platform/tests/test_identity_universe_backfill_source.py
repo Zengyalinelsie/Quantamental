@@ -20,7 +20,10 @@ from a_share_platform.application.backfill import (
     BackfillService,
     build_private_local_backfill_plan,
 )
-from a_share_platform.domain.backfill import BackfillDataDomain
+from a_share_platform.domain.backfill import (
+    BackfillDataDomain,
+    UniverseObservationMode,
+)
 from a_share_platform.domain.security_master import Board, Exchange
 
 NOW = datetime(2026, 8, 10, 9, 0, tzinfo=UTC)
@@ -367,6 +370,102 @@ class IdentityUniverseBackfillSourceTest(unittest.TestCase):
         self.assertEqual(by_code["SH.600519"].valid_to, date(2018, 1, 4))
         self.assertEqual(batch.metadata.adjustment_mode, "not_applicable")
         BackfillService._validate_batch(plan, unit, batch)
+
+    def test_official_302_code_prefix_is_a_chinext_a_share(self) -> None:
+        class NewCodeMembership(FakeBaostock):
+            def query_hs300_stocks(self, *, date: str) -> FakeResult:
+                return FakeResult(
+                    ["updateDate", "code", "code_name"],
+                    [[date, "sz.302132", "中航成飞"]],
+                )
+
+        plan = plan_for(BackfillDataDomain.UNIVERSE)
+        unit = next(
+            item
+            for item in BackfillPlanner().work_units(plan)
+            if item.scope_id == "index:000300"
+        )
+
+        batch = self.source(baostock=NewCodeMembership()).fetch(unit, plan)
+
+        payload = batch.payload
+        assert isinstance(payload, UniverseMembershipPayload)
+        self.assertEqual({row.code for row in payload.rows}, {"SZ.302132"})
+        self.assertEqual(IdentityUniverseBackfillSource._board("SZ.302132"), Board.CHINEXT)
+
+    def test_month_end_mode_queries_only_discrete_dates_and_keeps_gaps(self) -> None:
+        class MonthlyCalendar(FakeBaostock):
+            def query_trade_dates(self, *, start_date: str, end_date: str) -> FakeResult:
+                return FakeResult(
+                    ["calendar_date", "is_trading_day"],
+                    [
+                        ["2018-01-02", "1"],
+                        ["2018-01-31", "1"],
+                        ["2018-02-01", "1"],
+                        ["2018-02-28", "1"],
+                    ],
+                )
+
+            def query_hs300_stocks(self, *, date: str) -> FakeResult:
+                self.universe_calls.append(("000300", date))
+                return FakeResult(
+                    ["updateDate", "code", "code_name"],
+                    [[date, "sh.600519", "贵州茅台"]],
+                )
+
+        plan = build_private_local_backfill_plan(
+            plan_id="private:universe:monthly:v1",
+            provider_id="a_share_identity_universe",
+            symbols=(),
+            all_a_share=True,
+            domains=(BackfillDataDomain.UNIVERSE,),
+            universe_benchmark_codes=("000300",),
+            start_date=date(2018, 1, 1),
+            end_date=date(2018, 2, 28),
+            created_at=NOW,
+            universe_observation_mode=(
+                UniverseObservationMode.DISCRETE_MONTH_END
+            ),
+        )
+        unit = BackfillPlanner().work_units(plan)[0]
+        baostock = MonthlyCalendar()
+
+        batch = self.source(baostock=baostock).fetch(unit, plan)
+
+        payload = batch.payload
+        assert isinstance(payload, UniverseMembershipPayload)
+        self.assertEqual(
+            baostock.universe_calls,
+            [("000300", "2018-01-31"), ("000300", "2018-02-28")],
+        )
+        self.assertEqual(
+            payload.observation_mode,
+            UniverseObservationMode.DISCRETE_MONTH_END,
+        )
+        self.assertEqual(
+            payload.observed_dates,
+            (date(2018, 1, 31), date(2018, 2, 28)),
+        )
+        self.assertEqual(
+            payload.unobserved_intervals,
+            (
+                (date(2018, 1, 1), date(2018, 1, 31)),
+                (date(2018, 2, 1), date(2018, 2, 28)),
+            ),
+        )
+        self.assertEqual(
+            {(row.valid_from, row.valid_to) for row in payload.rows},
+            {
+                (date(2018, 1, 31), date(2018, 2, 1)),
+                (date(2018, 2, 28), date(2018, 3, 1)),
+            },
+        )
+        self.assertTrue(
+            all("month_end_discrete" in row.source_id for row in payload.rows)
+        )
+        self.assertTrue(
+            any("does not imply continuity" in item for item in batch.metadata.warnings)
+        )
 
     def test_empty_daily_index_snapshot_fails_closed(self) -> None:
         class EmptyMembership(FakeBaostock):

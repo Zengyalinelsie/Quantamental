@@ -40,7 +40,11 @@ from a_share_platform.application.backfill import (
     build_private_local_backfill_plan,
 )
 from a_share_platform.application.provider_registry import build_p2_provider_registry
-from a_share_platform.domain.backfill import BackfillDataDomain, BackfillPlan
+from a_share_platform.domain.backfill import (
+    BackfillDataDomain,
+    BackfillPlan,
+    UniverseObservationMode,
+)
 from a_share_platform.ports.backfill import BackfillSink, BackfillSource
 
 PRIVATE_LOCAL_STORAGE_ROOT = (
@@ -72,6 +76,15 @@ def _parser() -> argparse.ArgumentParser:
         nargs="+",
         choices=("000300", "000905"),
         help="explicit CSI benchmark subset for an all-A-share universe backfill",
+    )
+    parser.add_argument(
+        "--universe-observation-mode",
+        choices=[item.value for item in UniverseObservationMode],
+        default=UniverseObservationMode.CONTINUOUS_DAILY.value,
+        help=(
+            "continuous_daily queries every trading date; discrete_month_end "
+            "persists only observed month-end snapshots and explicit gaps"
+        ),
     )
     parser.add_argument(
         "--markets",
@@ -125,6 +138,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "symbols": list(plan.symbols),
         "all_a_share": plan.all_a_share,
         "markets": list(plan.markets),
+        "universe_observation_mode": plan.universe_observation_mode.value,
         "work_unit_count": len(preview.work_units),
         "provider_use": plan.provider_use.value,
         "output_trust_state": plan.output_trust_state.value,
@@ -175,6 +189,7 @@ def _default_plan_id(args: argparse.Namespace, private_request: bool) -> str:
             ",".join(args.domains),
             ",".join(args.benchmarks or ("000300", "000905")),
             ",".join(args.markets or ()),
+            args.universe_observation_mode,
             "all_a_share" if args.all_a_share else "explicit_symbols",
         )
     ).encode("utf-8")
@@ -201,6 +216,9 @@ def _build_plan(
                 None if args.benchmarks is None else tuple(args.benchmarks)
             ),
             markets=(None if args.markets is None else tuple(args.markets)),
+            universe_observation_mode=UniverseObservationMode(
+                args.universe_observation_mode
+            ),
         )
     return build_csi_backfill_plan(
         plan_id=plan_id,
@@ -262,6 +280,17 @@ def _execution_gate_blockers(args: argparse.Namespace) -> list[str]:
             blockers.append(
                 "provider=a_share_identity_universe with explicit symbols supports "
                 "only security_master; Universe requires --all-a-share"
+            )
+        if (
+            BackfillDataDomain.UNIVERSE.value in requested_domains
+            and (args.end - args.start).days > 31
+            and args.universe_observation_mode
+            != UniverseObservationMode.DISCRETE_MONTH_END.value
+        ):
+            blockers.append(
+                "historical Universe execution longer than 31 days requires "
+                "--universe-observation-mode discrete_month_end to cap provider "
+                "requests and preserve unobserved gaps"
             )
     if args.all_a_share:
         if args.provider == "a_share_identity_universe":

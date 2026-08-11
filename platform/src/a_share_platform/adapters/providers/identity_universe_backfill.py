@@ -20,6 +20,7 @@ from a_share_platform.domain.backfill import (
     BackfillWorkUnit,
     DatasetQualityStatus,
     ProviderRetrievalMetadata,
+    UniverseObservationMode,
 )
 from a_share_platform.domain.pit import DataTrustState
 from a_share_platform.domain.provider import ProviderUse
@@ -111,7 +112,10 @@ class IdentityUniverseBackfillSource:
         self._membership_update_max_age_days = membership_update_max_age_days
         self._request_interval_seconds = request_interval_seconds
         self._call_timeout_seconds = call_timeout_seconds
-        self._baostock_guard = baostock_guard or BaostockGuard()
+        self._baostock_guard = baostock_guard or BaostockGuard(
+            daily_limit=600,
+            minimum_interval_seconds=0.5,
+        )
 
     def fetch(self, unit: BackfillWorkUnit, plan: BackfillPlan) -> BackfillBatch:
         self._validate_request(unit, plan)
@@ -153,6 +157,15 @@ class IdentityUniverseBackfillSource:
             "current identity and retrieved historical membership remain normalized_current",
             "retrieval time does not establish historical PIT availability",
         ]
+        if (
+            unit.domain is BackfillDataDomain.UNIVERSE
+            and plan.universe_observation_mode
+            is UniverseObservationMode.DISCRETE_MONTH_END
+        ):
+            warnings.append(
+                "month-end discrete observation does not imply continuity across "
+                "explicit unobserved intervals"
+            )
         if issues:
             warnings.append("provider rows with unavailable required identity fields were rejected")
         if not payload.rows:
@@ -345,7 +358,15 @@ class IdentityUniverseBackfillSource:
             raise ProviderBackfillUnavailable(
                 f"unsupported benchmark scope={unit.scope_id}"
             ) from error
-        query_end = min(plan.end_date, unit.end_date + timedelta(days=14))
+        discrete = (
+            plan.universe_observation_mode
+            is UniverseObservationMode.DISCRETE_MONTH_END
+        )
+        query_end = (
+            unit.end_date
+            if discrete
+            else min(plan.end_date, unit.end_date + timedelta(days=14))
+        )
         calendar = self._baostock_call(
             session,
             "query_trade_dates",
@@ -373,16 +394,23 @@ class IdentityUniverseBackfillSource:
                 "universe trading calendar contains no checkpoint trading day"
             )
         boundary_date = next((item for item in trading_dates if item > unit.end_date), None)
-        if unit.end_date < plan.end_date and boundary_date is None:
+        if not discrete and unit.end_date < plan.end_date and boundary_date is None:
             raise ProviderBackfillUnavailable(
                 "next annual checkpoint boundary trading day is unavailable"
             )
+        observation_dates = (
+            self._month_end_dates(checkpoint_dates)
+            if discrete
+            else checkpoint_dates
+        )
         active: dict[str, date] = {}
         intervals: list[StagedUniverseMembership] = []
         source_id = f"baostock_sdk.{method_name}"
+        if discrete:
+            source_id += ":month_end_discrete"
         query_members = getattr(baostock, method_name)
         previous_members: set[str] | None = None
-        for trading_date in checkpoint_dates:
+        for trading_date in observation_dates:
             result = self._baostock_call(
                 session,
                 method_name,
@@ -432,6 +460,18 @@ class IdentityUniverseBackfillSource:
                     raise ProviderBackfillUnavailable(
                         f"{benchmark_code} membership change ratio exceeded the quality gate"
                     )
+            if discrete:
+                intervals.extend(
+                    StagedUniverseMembership(
+                        code,
+                        trading_date,
+                        trading_date + timedelta(days=1),
+                        source_id,
+                    )
+                    for code in sorted(members)
+                )
+                previous_members = members
+                continue
             for code in sorted(active.keys() - members):
                 intervals.append(
                     StagedUniverseMembership(code, active.pop(code), trading_date, source_id)
@@ -439,12 +479,50 @@ class IdentityUniverseBackfillSource:
             for code in sorted(members - active.keys()):
                 active[code] = trading_date
             previous_members = members
-        close_on = boundary_date or (unit.end_date + timedelta(days=1))
-        for code, valid_from in sorted(active.items()):
-            intervals.append(
-                StagedUniverseMembership(code, valid_from, close_on, source_id)
-            )
-        return UniverseMembershipPayload(benchmark_code, tuple(intervals))
+        if not discrete:
+            close_on = boundary_date or (unit.end_date + timedelta(days=1))
+            for code, valid_from in sorted(active.items()):
+                intervals.append(
+                    StagedUniverseMembership(code, valid_from, close_on, source_id)
+                )
+        return UniverseMembershipPayload(
+            benchmark_code,
+            tuple(intervals),
+            observation_mode=plan.universe_observation_mode,
+            observed_dates=observation_dates,
+            unobserved_intervals=(
+                self._unobserved_intervals(
+                    unit.start_date,
+                    unit.end_date + timedelta(days=1),
+                    observation_dates,
+                )
+                if discrete
+                else ()
+            ),
+        )
+
+    @staticmethod
+    def _month_end_dates(trading_dates: tuple[date, ...]) -> tuple[date, ...]:
+        by_month: dict[tuple[int, int], date] = {}
+        for trading_date in trading_dates:
+            by_month[(trading_date.year, trading_date.month)] = trading_date
+        return tuple(by_month[key] for key in sorted(by_month))
+
+    @staticmethod
+    def _unobserved_intervals(
+        lower: date,
+        upper: date,
+        observed_dates: tuple[date, ...],
+    ) -> tuple[tuple[date, date], ...]:
+        intervals: list[tuple[date, date]] = []
+        cursor = lower
+        for observed in observed_dates:
+            if cursor < observed:
+                intervals.append((cursor, observed))
+            cursor = observed + timedelta(days=1)
+        if cursor < upper:
+            intervals.append((cursor, upper))
+        return tuple(intervals)
 
     def _legal_name(self, akshare: Any, code: str, listed_on: date) -> str | None:
         symbol = code.split(".", 1)[1]
@@ -564,7 +642,15 @@ class IdentityUniverseBackfillSource:
         if code.startswith("sh."):
             return code[3:6] in {"600", "601", "603", "605", "688", "689"}
         if code.startswith("sz."):
-            return code[3:6] in {"000", "001", "002", "003", "300", "301"}
+            return code[3:6] in {
+                "000",
+                "001",
+                "002",
+                "003",
+                "300",
+                "301",
+                "302",
+            }
         return False
 
     @staticmethod
@@ -580,7 +666,7 @@ class IdentityUniverseBackfillSource:
         digits = code.split(".", 1)[1]
         if code.startswith("SH.") and digits.startswith(("688", "689")):
             return Board.STAR
-        if code.startswith("SZ.") and digits.startswith(("300", "301")):
+        if code.startswith("SZ.") and digits.startswith(("300", "301", "302")):
             return Board.CHINEXT
         return Board.MAIN
 

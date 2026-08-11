@@ -14,10 +14,15 @@ from a_share_platform.adapters.parquet.market_data import ParquetMarketDataStore
 from a_share_platform.adapters.providers.backfill_payloads import (
     DailyObservationPayload,
     SecurityMasterPayload,
+    StagedUniverseMembership,
     TradingCalendarPayload,
     UniverseMembershipPayload,
 )
-from a_share_platform.domain.backfill import BackfillBatch, BackfillDataDomain
+from a_share_platform.domain.backfill import (
+    BackfillBatch,
+    BackfillDataDomain,
+    UniverseObservationMode,
+)
 from a_share_platform.domain.market_data import (
     DailyBar,
     DailyMarketState,
@@ -70,6 +75,9 @@ class CanonicalUniverseVersion:
     retrieved_at: datetime
     system_as_of: datetime
     available_at: datetime | None
+    observation_mode: UniverseObservationMode
+    observed_dates: tuple[date, ...]
+    unobserved_intervals: tuple[tuple[date, date], ...]
 
 
 @dataclass(frozen=True)
@@ -84,6 +92,42 @@ class PostgresListingResolver:
 
     def __call__(self, code: str, as_of: date) -> str:
         exchange = {"SH": "XSHG", "SZ": "XSHE", "BJ": "XBSE"}[code[:2]]
+        value = code.split(".", 1)[1]
+        official_rows = self._connection.execute(
+            """
+            SELECT aliases.listing_id
+            FROM official_identifier_aliases AS aliases
+            JOIN listings ON listings.listing_id = aliases.listing_id
+            WHERE aliases.kind = 'code'
+              AND aliases.value = %s
+              AND aliases.valid_from <= %s
+              AND (aliases.valid_to IS NULL OR %s < aliases.valid_to)
+              AND listings.exchange = %s
+            ORDER BY aliases.listing_id
+            """,
+            (value, as_of, as_of, exchange),
+        ).fetchall()
+        if official_rows:
+            return self._one_listing(
+                official_rows,
+                context=f"official alias for code={code}, as_of={as_of}",
+            )
+        known_official_rows = self._connection.execute(
+            """
+            SELECT aliases.listing_id
+            FROM official_identifier_aliases AS aliases
+            JOIN listings ON listings.listing_id = aliases.listing_id
+            WHERE aliases.kind = 'code'
+              AND aliases.value = %s
+              AND listings.exchange = %s
+            ORDER BY aliases.listing_id
+            """,
+            (value, exchange),
+        ).fetchall()
+        if known_official_rows:
+            raise CanonicalSinkError(
+                f"official alias exists but is not effective: code={code}, as_of={as_of}"
+            )
         rows = self._connection.execute(
             """
             SELECT identifiers.listing_id
@@ -96,12 +140,75 @@ class PostgresListingResolver:
               AND listings.exchange = %s
             ORDER BY identifiers.listing_id
             """,
-            (code.split(".", 1)[1], as_of, as_of, exchange),
+            (value, as_of, as_of, exchange),
         ).fetchall()
-        if len(rows) != 1:
-            raise CanonicalSinkError(
-                f"expected one effective listing for code={code}, as_of={as_of}; got {len(rows)}"
+        return self._one_listing(
+            rows,
+            context=f"effective listing for code={code}, as_of={as_of}",
+        )
+
+    def resolve_for_provider(
+        self,
+        *,
+        provider_id: str,
+        code: str,
+        as_of: date,
+    ) -> str:
+        if not isinstance(provider_id, str) or not provider_id.strip():
+            raise ValueError("provider_id must not be empty")
+        exchange = {"SH": "XSHG", "SZ": "XSHE", "BJ": "XBSE"}[code[:2]]
+        value = code.split(".", 1)[1]
+        correction_rows = self._connection.execute(
+            """
+            SELECT corrections.listing_id
+            FROM provider_identifier_corrections AS corrections
+            JOIN listings ON listings.listing_id = corrections.listing_id
+            WHERE corrections.provider_id = %s
+              AND corrections.kind = 'code'
+              AND corrections.observed_value = %s
+              AND corrections.valid_from <= %s
+              AND (corrections.valid_to IS NULL OR %s < corrections.valid_to)
+              AND listings.exchange = %s
+            ORDER BY corrections.listing_id
+            """,
+            (provider_id, value, as_of, as_of, exchange),
+        ).fetchall()
+        if correction_rows:
+            return self._one_listing(
+                correction_rows,
+                context=(
+                    f"provider correction for provider_id={provider_id}, "
+                    f"code={code}, as_of={as_of}"
+                ),
             )
+        known_correction_rows = self._connection.execute(
+            """
+            SELECT corrections.listing_id
+            FROM provider_identifier_corrections AS corrections
+            JOIN listings ON listings.listing_id = corrections.listing_id
+            WHERE corrections.provider_id = %s
+              AND corrections.kind = 'code'
+              AND corrections.observed_value = %s
+              AND listings.exchange = %s
+            ORDER BY corrections.listing_id
+            """,
+            (provider_id, value, exchange),
+        ).fetchall()
+        if known_correction_rows:
+            raise CanonicalSinkError(
+                "provider correction exists but is not effective: "
+                f"provider_id={provider_id}, code={code}, as_of={as_of}"
+            )
+        return self(code, as_of)
+
+    @staticmethod
+    def _one_listing(
+        rows: list[tuple[object, ...]],
+        *,
+        context: str,
+    ) -> str:
+        if len(rows) != 1:
+            raise CanonicalSinkError(f"expected one {context}; got {len(rows)}")
         return str(rows[0][0])
 
 
@@ -117,7 +224,10 @@ class CanonicalBackfillSink:
         self._connection = connection
         self._parquet = parquet_store
         self._clock = clock
-        self._listing_resolver = listing_resolver or PostgresListingResolver(connection)
+        self._postgres_listing_resolver = (
+            PostgresListingResolver(connection) if listing_resolver is None else None
+        )
+        self._listing_resolver = listing_resolver or self._postgres_listing_resolver
 
     def persist(
         self,
@@ -170,6 +280,7 @@ class CanonicalBackfillSink:
             SELECT universe_version_id, definition_id, dataset_version_id,
                    created_at, trust_state, provider_id, source_ids,
                    retrieved_at, system_as_of, available_at
+                   , observation_mode, observed_dates, unobserved_intervals
             FROM universe_versions
             WHERE universe_version_id = %s
             """,
@@ -203,6 +314,7 @@ class CanonicalBackfillSink:
                 row.code,
                 row.session_date,
                 trust_state=batch.trust_state,
+                provider_id=batch.metadata.provider_id,
             )
             listing_id = resolution.listing_id
             warnings.update(resolution.warnings)
@@ -577,6 +689,26 @@ class CanonicalBackfillSink:
         source_ids = tuple(sorted({row.source_id for row in payload.rows}))
         if not source_ids:
             raise CanonicalSinkError("universe version requires at least one source_id")
+        resolved_rows: list[tuple[StagedUniverseMembership, ListingResolution]] = []
+        preflight_failures: list[str] = []
+        for row in payload.rows:
+            try:
+                resolution = self._resolve_listing(
+                    row.code,
+                    row.valid_from,
+                    trust_state=batch.trust_state,
+                    provider_id=batch.metadata.provider_id,
+                )
+            except CanonicalSinkError as error:
+                preflight_failures.append(
+                    f"{row.code}@{row.valid_from.isoformat()}: {error}"
+                )
+                continue
+            resolved_rows.append((row, resolution))
+        if preflight_failures:
+            raise CanonicalSinkError(
+                "universe identity preflight failed: " + "; ".join(preflight_failures)
+            )
         # This is the first stable system-observation time carried by the batch.
         # It does not qualify as a historical available_at, which remains NULL.
         system_as_of = batch.metadata.retrieved_at
@@ -603,8 +735,8 @@ class CanonicalBackfillSink:
             INSERT INTO universe_versions (
                 universe_version_id, definition_id, dataset_version_id, created_at,
                 trust_state, provider_id, source_ids, retrieved_at, system_as_of,
-                available_at
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                available_at, observation_mode, observed_dates, unobserved_intervals
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (universe_version_id) DO UPDATE SET
                 universe_version_id = universe_versions.universe_version_id
             WHERE universe_versions.definition_id = EXCLUDED.definition_id
@@ -616,6 +748,9 @@ class CanonicalBackfillSink:
               AND universe_versions.retrieved_at = EXCLUDED.retrieved_at
               AND universe_versions.system_as_of = EXCLUDED.system_as_of
               AND universe_versions.available_at IS NOT DISTINCT FROM EXCLUDED.available_at
+              AND universe_versions.observation_mode = EXCLUDED.observation_mode
+              AND universe_versions.observed_dates = EXCLUDED.observed_dates
+              AND universe_versions.unobserved_intervals = EXCLUDED.unobserved_intervals
             RETURNING universe_version_id
             """,
             (
@@ -629,6 +764,16 @@ class CanonicalBackfillSink:
                 batch.metadata.retrieved_at,
                 system_as_of,
                 None,
+                payload.observation_mode.value,
+                _json_parameter(
+                    [item.isoformat() for item in payload.observed_dates]
+                ),
+                _json_parameter(
+                    [
+                        {"start": lower.isoformat(), "end": upper.isoformat()}
+                        for lower, upper in payload.unobserved_intervals
+                    ]
+                ),
             ),
         )
         self._require_immutable_write(
@@ -636,12 +781,7 @@ class CanonicalBackfillSink:
             "universe version identifier conflicts with different lineage",
         )
         warnings: set[str] = set()
-        for row in payload.rows:
-            resolution = self._resolve_listing(
-                row.code,
-                row.valid_from,
-                trust_state=batch.trust_state,
-            )
+        for row, resolution in resolved_rows:
             listing_id = resolution.listing_id
             warnings.update(resolution.warnings)
             membership_result = self._connection.execute(
@@ -687,9 +827,19 @@ class CanonicalBackfillSink:
         as_of: date,
         *,
         trust_state: DataTrustState,
+        provider_id: str,
     ) -> ListingResolution:
         try:
-            return ListingResolution(self._listing_resolver(code, as_of))
+            if self._postgres_listing_resolver is not None:
+                listing_id = self._postgres_listing_resolver.resolve_for_provider(
+                    provider_id=provider_id,
+                    code=code,
+                    as_of=as_of,
+                )
+            else:
+                assert self._listing_resolver is not None
+                listing_id = self._listing_resolver(code, as_of)
+            return ListingResolution(listing_id)
         except CanonicalSinkError as strict_error:
             if trust_state is not DataTrustState.NORMALIZED_CURRENT:
                 raise
@@ -745,6 +895,45 @@ class CanonicalBackfillSink:
             raise CanonicalSinkError("universe source_ids must not be empty")
         trust_state = DataTrustState(str(row[4]))
         available_at = cast(datetime | None, row[9])
+        observation_mode = UniverseObservationMode(str(row[10]))
+        raw_observed_dates = row[11]
+        if isinstance(raw_observed_dates, str):
+            raw_observed_dates = json.loads(raw_observed_dates)
+        if not isinstance(raw_observed_dates, (list, tuple)):
+            raise CanonicalSinkError("universe observed_dates must be a JSON array")
+        observed_dates = tuple(date.fromisoformat(str(item)) for item in raw_observed_dates)
+        raw_unobserved = row[12]
+        if isinstance(raw_unobserved, str):
+            raw_unobserved = json.loads(raw_unobserved)
+        if not isinstance(raw_unobserved, (list, tuple)):
+            raise CanonicalSinkError(
+                "universe unobserved_intervals must be a JSON array"
+            )
+        unobserved_intervals: list[tuple[date, date]] = []
+        for raw_interval in raw_unobserved:
+            if not isinstance(raw_interval, dict):
+                raise CanonicalSinkError(
+                    "universe unobserved interval must be a JSON object"
+                )
+            try:
+                lower = date.fromisoformat(str(raw_interval["start"]))
+                upper = date.fromisoformat(str(raw_interval["end"]))
+            except (KeyError, ValueError) as error:
+                raise CanonicalSinkError(
+                    "universe unobserved interval has invalid boundaries"
+                ) from error
+            if upper <= lower:
+                raise CanonicalSinkError(
+                    "universe unobserved interval end must follow start"
+                )
+            unobserved_intervals.append((lower, upper))
+        if (
+            observation_mode is UniverseObservationMode.DISCRETE_MONTH_END
+            and not observed_dates
+        ):
+            raise CanonicalSinkError(
+                "discrete universe version requires observed_dates"
+            )
         if trust_state is DataTrustState.PIT_VERIFIED and available_at is None:
             raise CanonicalSinkError("pit_verified universe requires available_at")
         if trust_state is not DataTrustState.PIT_VERIFIED and available_at is not None:
@@ -762,4 +951,7 @@ class CanonicalBackfillSink:
             retrieved_at=cast(datetime, row[7]),
             system_as_of=cast(datetime, row[8]),
             available_at=available_at,
+            observation_mode=observation_mode,
+            observed_dates=observed_dates,
+            unobserved_intervals=tuple(unobserved_intervals),
         )

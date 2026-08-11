@@ -33,6 +33,59 @@ class PrivateBackfillCliTest(unittest.TestCase):
         self.assertEqual(payload["scopes"], ["index:000905"])
         self.assertEqual(payload["work_unit_count"], 1)
 
+    def test_long_universe_execution_requires_low_request_discrete_mode(self) -> None:
+        base = [
+            "--provider",
+            "a_share_identity_universe",
+            "--start",
+            "2018-01-01",
+            "--end",
+            "2018-12-31",
+            "--all-a-share",
+            "--domains",
+            "universe",
+            "--benchmarks",
+            "000300",
+            "--database-url",
+            "postgresql://localhost/research",
+            "--parquet-root",
+            str(PRIVATE_LOCAL_STORAGE_ROOT / "test-discrete-universe"),
+            "--private-local-research-ack",
+            "--execute",
+        ]
+        output = io.StringIO()
+        with (
+            patch("a_share_platform.workers.backfill._execute_backfill") as execute,
+            redirect_stdout(output),
+        ):
+            exit_code = main(base)
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 2)
+        self.assertTrue(any("discrete_month_end" in item for item in payload["blockers"]))
+        execute.assert_not_called()
+
+        output = io.StringIO()
+        with patch(
+            "a_share_platform.workers.backfill._execute_backfill",
+            return_value={
+                "execution_status": "succeeded",
+                "dataset_version_id": "dataset:discrete:v1",
+            },
+        ) as execute, redirect_stdout(output):
+            exit_code = main(
+                [
+                    *base,
+                    "--universe-observation-mode",
+                    "discrete_month_end",
+                ]
+            )
+
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(payload["universe_observation_mode"], "discrete_month_end")
+        execute.assert_called_once()
+
     def test_execute_requires_explicit_private_ack_database_symbols_and_domains(self) -> None:
         output = io.StringIO()
         with redirect_stdout(output):
@@ -103,6 +156,8 @@ class PrivateBackfillCliTest(unittest.TestCase):
             "--domains",
             "security_master",
             "universe",
+            "--universe-observation-mode",
+            "discrete_month_end",
             "--database-url",
             "postgresql://localhost/research",
             "--parquet-root",

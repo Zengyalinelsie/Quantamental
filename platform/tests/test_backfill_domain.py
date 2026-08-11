@@ -12,6 +12,7 @@ from a_share_platform.domain.backfill import (
     BackfillJobStatus,
     BackfillPlan,
     BackfillQualification,
+    UniverseObservationMode,
 )
 from a_share_platform.domain.market_data import PriceAdjustment
 from a_share_platform.domain.pit import DataTrustState
@@ -66,6 +67,23 @@ class BackfillDomainTest(unittest.TestCase):
                 created_at=NOW.replace(tzinfo=None),
                 output_trust_state=DataTrustState.NORMALIZED_CURRENT,
                 price_adjustment=PriceAdjustment.UNADJUSTED,
+            )
+
+    def test_discrete_universe_mode_requires_universe_domain(self) -> None:
+        with self.assertRaisesRegex(ValueError, "requires the universe domain"):
+            BackfillPlan(
+                plan_id="bad-discrete-mode",
+                provider_id="provider",
+                scopes=(A_SHARE_SECURITY_MASTER_SCOPE,),
+                domains=(BackfillDataDomain.SECURITY_MASTER,),
+                start_date=date(2018, 1, 1),
+                end_date=date(2018, 1, 2),
+                created_at=NOW,
+                output_trust_state=DataTrustState.NORMALIZED_CURRENT,
+                price_adjustment=PriceAdjustment.UNADJUSTED,
+                universe_observation_mode=(
+                    UniverseObservationMode.DISCRETE_MONTH_END
+                ),
             )
 
     def test_job_and_checkpoint_transitions_fail_closed(self) -> None:
