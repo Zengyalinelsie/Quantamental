@@ -67,6 +67,7 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0021_provider_mapping_usage_scopes.sql",
                 "0022_discrete_universe_observations.sql",
                 "0023_normalized_current_financial_identity.sql",
+                "0024_identifier_alias_append_only_reconciliation.sql",
             ),
         )
 
@@ -115,6 +116,56 @@ class MigrationRunnerTest(unittest.TestCase):
         ):
             with self.subTest(contract=contract):
                 self.assertIn(contract, normalized_sql)
+
+    def test_identifier_alias_append_only_reconciliation_is_forward_only(self) -> None:
+        sql = (
+            PLATFORM_ROOT
+            / "migrations"
+            / "0024_identifier_alias_append_only_reconciliation.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            (
+                "DROP TRIGGER IF EXISTS official_identifier_aliases_append_only "
+                "ON official_identifier_aliases"
+            ),
+            (
+                "DROP TRIGGER IF EXISTS provider_identifier_corrections_append_only "
+                "ON provider_identifier_corrections"
+            ),
+            "CREATE OR REPLACE FUNCTION prevent_identifier_alias_mutation()",
+            (
+                "CREATE TRIGGER official_identifier_aliases_append_only "
+                "BEFORE UPDATE OR DELETE ON official_identifier_aliases"
+            ),
+            (
+                "CREATE TRIGGER provider_identifier_corrections_append_only "
+                "BEFORE UPDATE OR DELETE ON provider_identifier_corrections"
+            ),
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
+
+        self.assertLess(
+            normalized_sql.index(
+                "DROP TRIGGER IF EXISTS official_identifier_aliases_append_only"
+            ),
+            normalized_sql.index("CREATE TRIGGER official_identifier_aliases_append_only"),
+        )
+        self.assertLess(
+            normalized_sql.index(
+                "DROP TRIGGER IF EXISTS provider_identifier_corrections_append_only"
+            ),
+            normalized_sql.index("CREATE TRIGGER provider_identifier_corrections_append_only"),
+        )
+        for forbidden_data_mutation in (
+            "UPDATE official_identifier_aliases SET",
+            "DELETE FROM official_identifier_aliases",
+            "UPDATE provider_identifier_corrections SET",
+            "DELETE FROM provider_identifier_corrections",
+        ):
+            with self.subTest(forbidden_data_mutation=forbidden_data_mutation):
+                self.assertNotIn(forbidden_data_mutation, normalized_sql)
 
     def test_feature_and_research_label_storage_is_physically_separate_and_append_only(self) -> None:
         sql = (
