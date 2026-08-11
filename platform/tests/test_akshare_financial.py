@@ -1,7 +1,14 @@
+import json
+import tempfile
 import unittest
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from pathlib import Path
 
+from a_share_platform.adapters.object_store.financial_evidence import (
+    LocalFinancialEvidenceCapture,
+)
+from a_share_platform.adapters.object_store.local import LocalRawObjectStore
 from a_share_platform.adapters.providers.akshare_financial import (
     AkShareEndpoint,
     AkShareFieldContract,
@@ -44,7 +51,9 @@ def unit(
 ) -> FinancialBackfillWorkUnit:
     return FinancialBackfillWorkUnit(
         plan_id="financial-backfill:csi300:akshare:v1",
-        checkpoint_key=f"financial:{provider_table}:2024-12-31:bucket-0001",
+        checkpoint_key=(
+            f"financial:{provider_table}:{report_period_end.isoformat()}:bucket-0001"
+        ),
         provider_id="akshare",
         provider_profile_version="financial-source:akshare-fallback:v1",
         benchmark_id="index:000300",
@@ -502,14 +511,101 @@ class AkShareFinancialSourceTest(unittest.TestCase):
         self.assertEqual(earlier.rows[0].raw_value, Decimal(10))
         self.assertEqual(latest.rows[0].retrieved_at, earlier.rows[0].retrieved_at)
         self.assertEqual(len(evidence_capture.calls), 2)
+        latest_evidence_records = evidence_capture.calls[0]["provider_records"]
+        earlier_evidence_records = evidence_capture.calls[1]["provider_records"]
+        self.assertEqual(len(latest_evidence_records), 1)  # type: ignore[arg-type]
+        self.assertEqual(len(earlier_evidence_records), 1)  # type: ignore[arg-type]
         self.assertEqual(
-            evidence_capture.calls[0]["provider_records"],
-            evidence_capture.calls[1]["provider_records"],
+            latest_evidence_records[0]["REPORT_DATE"],  # type: ignore[index]
+            "2024-12-31",
+        )
+        self.assertEqual(
+            earlier_evidence_records[0]["REPORT_DATE"],  # type: ignore[index]
+            "2023-12-31",
         )
         self.assertIsNot(
-            evidence_capture.calls[0]["provider_records"],
-            evidence_capture.calls[1]["provider_records"],
+            latest_evidence_records,
+            earlier_evidence_records,
         )
+
+    def test_two_periods_persist_only_target_period_evidence_from_one_snapshot(self) -> None:
+        frame = StubFrame(
+            (
+                {
+                    "SECURITY_CODE": "600000",
+                    "REPORT_DATE": "2024-12-31",
+                    "TOTAL_ASSETS": "20",
+                },
+                {
+                    "SECURITY_CODE": "600000",
+                    "REPORT_DATE": "2023-12-31",
+                    "TOTAL_ASSETS": "10",
+                },
+            )
+        )
+        client = StubAkShareClient({"SH600000": frame})
+
+        with tempfile.TemporaryDirectory() as directory:
+            evidence_root = Path(directory) / "evidence"
+            source = AkShareFinancialSource(
+                client=client,
+                normalizer=AkShareFinancialNormalizer(
+                    (
+                        contract(
+                            "TOTAL_ASSETS",
+                            value_basis=FinancialValueBasis.POINT_IN_TIME,
+                        ),
+                    )
+                ),
+                request_executor=RecordingRequestExecutor(),
+                evidence_capture=LocalFinancialEvidenceCapture(
+                    object_store=LocalRawObjectStore(evidence_root),
+                    license_id="akshare-private-local-research:v1",
+                    retention_policy=RetentionPolicy.INDEFINITE,
+                    redistribution_allowed=False,
+                ),
+                evidence_source_urls=SOURCE_URLS,
+                clock=lambda: NOW,
+            )
+
+            latest = source.fetch(unit(), allow_read_through_cache=True)
+            earlier = source.fetch(
+                unit(report_period_end=date(2023, 12, 31)),
+                allow_read_through_cache=True,
+            )
+
+            payloads = tuple(
+                json.loads(path.read_text(encoding="utf-8"))
+                for path in sorted((evidence_root / "sha256").iterdir())
+            )
+
+        self.assertEqual(
+            client.calls,
+            [("stock_balance_sheet_by_report_em", "SH600000")],
+        )
+        self.assertNotEqual(latest.evidence.raw_object_id, earlier.evidence.raw_object_id)
+        self.assertEqual(len(payloads), 2)
+        self.assertEqual(
+            {payload["report_period_end"] for payload in payloads},
+            {"2023-12-31", "2024-12-31"},
+        )
+        for payload in payloads:
+            self.assertFalse(payload["byte_exact_http"])
+            self.assertEqual(payload["evidence_kind"], "decoded_provider_extraction")
+            self.assertEqual(len(payload["provider_records"]), 1)
+            self.assertEqual(
+                payload["provider_records"][0]["REPORT_DATE"],
+                payload["report_period_end"],
+            )
+            self.assertIn(payload["report_period_end"], payload["checkpoint_key"])
+        for batch in (latest, earlier):
+            self.assertEqual(batch.trust_state, DataTrustState.NORMALIZED_CURRENT)
+            self.assertTrue(
+                any("current-only" in warning for warning in batch.warnings)
+            )
+            self.assertTrue(
+                any("not strict-historical" in warning for warning in batch.warnings)
+            )
 
     def test_cache_bypass_refetches_provider_response(self) -> None:
         frame = StubFrame(

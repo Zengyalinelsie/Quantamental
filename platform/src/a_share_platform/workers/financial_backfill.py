@@ -3,16 +3,57 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import importlib
 import json
 import os
 from collections.abc import Mapping, Sequence
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any, cast
 
-from a_share_platform.application.financial_backfill import (
-    FinancialBackfillPlanner,
+from a_share_platform.adapters.object_store.financial_evidence import (
+    LocalFinancialEvidenceCapture,
 )
+from a_share_platform.adapters.object_store.local import LocalRawObjectStore
+from a_share_platform.adapters.postgres.financial_backfill import (
+    PostgresCurrentKnownFinancialIdentityResolver,
+    PostgresFinancialBackfillUnitOfWork,
+)
+from a_share_platform.adapters.postgres.financial_backfill_job import (
+    PostgresFinancialBackfillJobRepository,
+)
+from a_share_platform.adapters.postgres.metrics import PostgresMetricRegistryRepository
+from a_share_platform.adapters.providers.akshare_financial import (
+    AkShareFinancialClient,
+    AkShareFinancialSource,
+)
+from a_share_platform.adapters.providers.akshare_financial_profile import (
+    akshare_financial_normalizers_v1,
+)
+from a_share_platform.adapters.providers.akshare_financial_runtime import (
+    DEFAULT_AKSHARE_FINANCIAL_CACHE_DIRECTORY,
+    ContentAddressedAkShareFinancialSnapshotCache,
+    CrossProcessAkShareRequestExecutor,
+)
+from a_share_platform.application.akshare_financial_mapping_seed import (
+    AKSHARE_CURRENT_MAPPING_VERSION_ID,
+    install_akshare_current_mapping_v1,
+)
+from a_share_platform.application.financial_backfill import (
+    FinancialBackfillBlockedError,
+    FinancialBackfillMapper,
+    FinancialBackfillPlanner,
+    FinancialBackfillRunner,
+)
+from a_share_platform.application.financial_backfill_execution import (
+    FinancialBackfillExecutionService,
+)
+from a_share_platform.application.financial_backfill_job import (
+    FinancialBackfillJobCoordinator,
+)
+from a_share_platform.application.metric_registry import MetricRegistryService
+from a_share_platform.domain.disclosure import RetentionPolicy
 from a_share_platform.domain.financial_backfill import (
     FinancialBackfillCohort,
     FinancialBackfillPlan,
@@ -28,6 +69,16 @@ from a_share_platform.domain.metrics import StatementType
 from a_share_platform.domain.pit import DataTrustState
 from a_share_platform.domain.run_context import DataMode
 from a_share_platform.workers.backfill import _postgres_endpoint_is_private_local
+
+_AKSHARE_FINANCIAL_RUNTIME_ROOT = DEFAULT_AKSHARE_FINANCIAL_CACHE_DIRECTORY.parent
+_AKSHARE_MINIMUM_INTERVAL_SECONDS = 2.0
+_AKSHARE_MAX_ATTEMPTS = 3
+_AKSHARE_RETRY_BACKOFF_SECONDS = 3.0
+_AKSHARE_EVIDENCE_SOURCE_URLS = {
+    StatementType.BALANCE_SHEET: "https://akshare.akfamily.xyz/data/stock/stock.html",
+    StatementType.INCOME_STATEMENT: "https://akshare.akfamily.xyz/data/stock/stock.html",
+    StatementType.CASH_FLOW_STATEMENT: "https://akshare.akfamily.xyz/data/stock/stock.html",
+}
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -110,7 +161,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             _print(output)
             return 1
         output.update(execution)
-        output["writes_performed"] = execution.get("execution_status") == "succeeded"
+        reported_writes = execution.get("writes_performed")
+        output["writes_performed"] = (
+            reported_writes
+            if type(reported_writes) is bool
+            else execution.get("execution_status") == "succeeded"
+        )
     _print(output)
     return 0
 
@@ -134,14 +190,29 @@ def _execution_gate_blockers(
         blockers.append("an explicit local database URL is required for execution")
     elif not _postgres_endpoint_is_private_local(args.database_url):
         blockers.append("private-local PostgreSQL must use a loopback or Unix socket endpoint")
-    if not os.environ.get("FACTOR_SERVICE_BASE_URL", "").strip():
-        blockers.append("FACTOR_SERVICE_BASE_URL is required for execution")
-    if not os.environ.get("FACTOR_SERVICE_BEARER_TOKEN", "").strip():
-        blockers.append("FACTOR_SERVICE_BEARER_TOKEN is required for execution")
-    if plan.provider_id != "factor_service_ths":
+    if plan.provider_id == "factor_service_ths":
+        if not os.environ.get("FACTOR_SERVICE_BASE_URL", "").strip():
+            blockers.append("FACTOR_SERVICE_BASE_URL is required for execution")
+        if not os.environ.get("FACTOR_SERVICE_BEARER_TOKEN", "").strip():
+            blockers.append("FACTOR_SERVICE_BEARER_TOKEN is required for execution")
+        blockers.append(
+            "Factor Service live execution remains unavailable until a new credential, "
+            "live metadata, retention, and response-evidence qualification is installed"
+        )
+    elif plan.provider_id == "akshare":
+        if plan.mapping_version_id != AKSHARE_CURRENT_MAPPING_VERSION_ID:
+            blockers.append(
+                "execution requires the exact reviewed AkShare mapping package "
+                f"{AKSHARE_CURRENT_MAPPING_VERSION_ID}"
+            )
+        if not plan.allow_read_through_cache:
+            blockers.append(
+                "AkShare execution requires the immutable read-through cache"
+            )
+    else:
         blockers.append(
             f"provider={plan.provider_id} has no executable financial source; "
-            "AkShare/Eastmoney requires source-aware retrieval grouping and immutable cache"
+            "only the qualified AkShare current-research adapter is supported"
         )
     return blockers
 
@@ -273,19 +344,124 @@ def _execute_financial_backfill(
     plan: FinancialBackfillPlan,
     profile: FinancialSourceProfile,
 ) -> dict[str, object]:
-    """Fail closed until the byte-exact live source composition is installed.
+    """Run one immutable AkShare plan using only private-local current evidence."""
 
-    The PostgreSQL unit of work is executable independently and this CLI owns all
-    external side-effect gates. The source composition remains blocked because the
-    current provider adapter exposes decoded records, not byte-exact HTTP response
-    bodies. Treating those decoded records as raw evidence would be dishonest.
-    """
+    if plan.provider_id != "akshare":
+        raise PermissionError("only provider=akshare has an executable financial worker")
+    if plan.mapping_version_id != AKSHARE_CURRENT_MAPPING_VERSION_ID:
+        raise PermissionError("financial execution requires the reviewed AkShare mapping")
+    if not plan.allow_read_through_cache:
+        raise PermissionError("financial execution requires the immutable read-through cache")
+    if plan.data_mode is not DataMode.CURRENT_RESEARCH:
+        raise PermissionError("AkShare financial execution is current_research only")
+    if plan.output_trust_state is not DataTrustState.NORMALIZED_CURRENT:
+        raise PermissionError("AkShare financial execution is normalized_current only")
+    if not isinstance(args.database_url, str) or not args.database_url.strip():
+        raise ValueError("an explicit private-local PostgreSQL URL is required")
+    if not _postgres_endpoint_is_private_local(args.database_url):
+        raise PermissionError(
+            "financial execution requires a private-local PostgreSQL endpoint"
+        )
 
-    del args, plan, profile
-    raise RuntimeError(
-        "byte-exact Factor Service evidence recorder is not configured; "
-        "financial execution remains blocked"
-    )
+    planner = FinancialBackfillPlanner()
+    preview = planner.preview(plan, profile)
+    if not preview.qualification.permitted:
+        raise FinancialBackfillBlockedError("; ".join(preview.qualification.blockers))
+
+    import psycopg
+
+    clock = lambda: datetime.now(UTC)
+    with psycopg.connect(args.database_url) as connection:
+        metric_repository = PostgresMetricRegistryRepository(connection)
+        metric_service = MetricRegistryService(metric_repository)
+        try:
+            mapping_package = install_akshare_current_mapping_v1(metric_service)
+            if mapping_package.version.mapping_version_id != plan.mapping_version_id:
+                raise PermissionError("installed AkShare mapping does not match the plan")
+            connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
+
+        plan_directory = _akshare_financial_plan_directory(plan)
+        snapshot_cache = ContentAddressedAkShareFinancialSnapshotCache(
+            root=plan_directory / "cache"
+        )
+        request_executor = CrossProcessAkShareRequestExecutor(
+            state_directory=_AKSHARE_FINANCIAL_RUNTIME_ROOT / "gate",
+            minimum_interval_seconds=_AKSHARE_MINIMUM_INTERVAL_SECONDS,
+            max_attempts=_AKSHARE_MAX_ATTEMPTS,
+            retry_backoff_seconds=_AKSHARE_RETRY_BACKOFF_SECONDS,
+            retryable_errors=_akshare_retryable_errors(),
+            clock=clock,
+        )
+        evidence_capture = LocalFinancialEvidenceCapture(
+            object_store=LocalRawObjectStore(plan_directory / "evidence"),
+            license_id="akshare-eastmoney-private-local-research:v1",
+            retention_policy=RetentionPolicy.INDEFINITE,
+            redistribution_allowed=False,
+        )
+        source = AkShareFinancialSource(
+            client=_load_akshare_client(),
+            normalizer=akshare_financial_normalizers_v1(),
+            request_executor=request_executor,
+            evidence_capture=evidence_capture,
+            evidence_source_urls=_AKSHARE_EVIDENCE_SOURCE_URLS,
+            clock=clock,
+            snapshot_cache=snapshot_cache,
+        )
+        job_id = f"job:{plan.plan_id}"
+        identity_resolver = PostgresCurrentKnownFinancialIdentityResolver(connection)
+        unit_of_work = PostgresFinancialBackfillUnitOfWork(
+            connection,
+            job_id=job_id,
+            identity_resolver=identity_resolver,
+        )
+        runner = FinancialBackfillRunner(
+            planner=planner,
+            mapper=FinancialBackfillMapper(metric_repository),
+            unit_of_work=unit_of_work,
+            clock=clock,
+        )
+        coordinator = FinancialBackfillJobCoordinator(
+            repository=PostgresFinancialBackfillJobRepository(connection),
+            clock=clock,
+        )
+        result = FinancialBackfillExecutionService(
+            planner=planner,
+            job_coordinator=coordinator,
+            runner=runner,
+        ).run(plan=plan, profile=profile, source=source)
+        return {
+            "execution_status": result.status.value,
+            "job_id": result.job_id,
+            "writes_performed": result.writes_performed,
+            "completed_work_units": result.completed_work_units,
+            "skipped_work_units": result.skipped_work_units,
+            "unit_dataset_version_ids": list(result.unit_dataset_version_ids),
+            "aggregate_dataset_version_id": result.aggregate_dataset_version_id,
+            "data_mode": DataMode.CURRENT_RESEARCH.value,
+            "output_trust_state": DataTrustState.NORMALIZED_CURRENT.value,
+            "pit_verified": False,
+            "redistribution_allowed": False,
+        }
+
+
+def _akshare_financial_plan_directory(plan: FinancialBackfillPlan) -> Path:
+    if not isinstance(plan, FinancialBackfillPlan):
+        raise TypeError("plan must be a FinancialBackfillPlan")
+    digest = hashlib.sha256(plan.plan_id.encode("utf-8")).hexdigest()
+    return _AKSHARE_FINANCIAL_RUNTIME_ROOT / "plans" / digest
+
+
+def _load_akshare_client() -> AkShareFinancialClient:
+    return cast(AkShareFinancialClient, importlib.import_module("akshare"))
+
+
+def _akshare_retryable_errors() -> tuple[type[Exception], ...]:
+    from requests.exceptions import RequestException
+
+    return (TimeoutError, ConnectionError, RequestException)
 
 
 if __name__ == "__main__":

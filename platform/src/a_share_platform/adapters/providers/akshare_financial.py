@@ -358,6 +358,10 @@ class AkShareFinancialNormalizer:
 
         batch_warnings = [
             "AkShare/Eastmoney rows are normalized_current and not strict-historical evidence",
+            (
+                "AkShare/Eastmoney decoded extraction is current-only and cannot "
+                "establish PIT verification"
+            ),
             "date-only announcement/update fields do not establish exact availability",
         ]
         if missing_values:
@@ -646,11 +650,15 @@ class AkShareFinancialSource:
             record for snapshot in snapshots for record in snapshot.materialize()
         )
         retrieved_at = max(snapshot.retrieved_at for snapshot in snapshots)
+        evidence_records = self._target_period_evidence_records(
+            work_unit=work_unit,
+            provider_records=provider_records,
+        )
         evidence = self._evidence_capture.capture_provider_response(
             work_unit=work_unit,
             provider_id=self.provider_id,
             source_url=self._evidence_source_urls[work_unit.statement_type],
-            provider_records=provider_records,
+            provider_records=evidence_records,
             retrieved_at=retrieved_at,
         )
         return self._normalizers[work_unit.statement_type].normalize(
@@ -658,6 +666,30 @@ class AkShareFinancialSource:
             provider_records=provider_records,
             evidence=evidence,
             retrieved_at=retrieved_at,
+        )
+
+    @staticmethod
+    def _target_period_evidence_records(
+        *,
+        work_unit: FinancialBackfillWorkUnit,
+        provider_records: tuple[Mapping[str, object], ...],
+    ) -> tuple[Mapping[str, object], ...]:
+        """Retain only rows capable of supporting this checkpoint's target period.
+
+        One AkShare endpoint response contains all available report periods.  The
+        immutable snapshot cache keeps that response for request reuse, while the
+        retained RawObject stays checkpoint-scoped and avoids copying unrelated
+        periods into every work unit's evidence object.
+        """
+
+        return tuple(
+            record
+            for record in provider_records
+            if AkShareFinancialNormalizer._provider_date(
+                record.get(_REPORT_DATE_FIELD),
+                _REPORT_DATE_FIELD,
+            )
+            == work_unit.report_period_end
         )
 
     def _load_snapshot(

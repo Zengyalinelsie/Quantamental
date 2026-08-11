@@ -154,7 +154,7 @@ class FinancialBackfillCliTest(unittest.TestCase):
         self.assertIn("only a candidate", " ".join(payload["blockers"]))
         execute.assert_not_called()
 
-    def test_explicit_gates_reach_injected_runtime_without_printing_credentials(self) -> None:
+    def test_factor_service_remains_blocked_even_with_credentials_and_acks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             plan_path, profile_path = self._manifests(Path(directory))
             output = io.StringIO()
@@ -169,11 +169,6 @@ class FinancialBackfillCliTest(unittest.TestCase):
                 ),
                 patch(
                     "a_share_platform.workers.financial_backfill._execute_financial_backfill",
-                    return_value={
-                        "execution_status": "succeeded",
-                        "completed_work_units": 1,
-                        "dataset_version_ids": ["dataset:financial:test"],
-                    },
                 ) as execute,
                 redirect_stdout(output),
             ):
@@ -193,11 +188,12 @@ class FinancialBackfillCliTest(unittest.TestCase):
                 )
 
         payload = json.loads(output.getvalue())
-        self.assertEqual(exit_code, 0)
-        self.assertTrue(payload["writes_performed"])
+        self.assertEqual(exit_code, 2)
+        self.assertFalse(payload["writes_performed"])
         self.assertTrue(payload["credentials_configured"])
+        self.assertIn("Factor Service live execution remains unavailable", output.getvalue())
         self.assertNotIn("secret-token", output.getvalue())
-        execute.assert_called_once()
+        execute.assert_not_called()
 
     def test_remote_postgres_is_never_an_executable_target(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -236,31 +232,34 @@ class FinancialBackfillCliTest(unittest.TestCase):
         self.assertIn("loopback or Unix socket", output.getvalue())
         execute.assert_not_called()
 
-    def test_akshare_execute_is_blocked_until_source_aware_grouping_exists(self) -> None:
+    def test_akshare_idempotent_resume_reports_no_new_write_or_factor_credentials(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             plan_value = plan_document()
-            plan_value["provider_id"] = "akshare_eastmoney"
+            plan_value["provider_id"] = "akshare"
             plan_value["provider_profile_version"] = "financial-source:akshare:v1"
+            plan_value["mapping_version_id"] = "metric-mapping:akshare-eastmoney:v1"
             profile_value = profile_document()
-            profile_value["provider_id"] = "akshare_eastmoney"
+            profile_value["provider_id"] = "akshare"
             profile_value["profile_version"] = "financial-source:akshare:v1"
+            profile_value["role"] = "fallback"
             plan_path = root / "plan.json"
             profile_path = root / "profile.json"
             plan_path.write_text(json.dumps(plan_value), encoding="utf-8")
             profile_path.write_text(json.dumps(profile_value), encoding="utf-8")
             output = io.StringIO()
             with (
-                patch.dict(
-                    os.environ,
-                    {
-                        "FACTOR_SERVICE_BASE_URL": "https://factor.example.internal",
-                        "FACTOR_SERVICE_BEARER_TOKEN": "secret-token",
-                    },
-                    clear=True,
-                ),
+                patch.dict(os.environ, {}, clear=True),
                 patch(
-                    "a_share_platform.workers.financial_backfill._execute_financial_backfill"
+                    "a_share_platform.workers.financial_backfill._execute_financial_backfill",
+                    return_value={
+                        "execution_status": "succeeded",
+                        "writes_performed": False,
+                        "completed_work_units": 1,
+                        "dataset_version_ids": ["dataset:financial:akshare:test"],
+                    },
                 ) as execute,
                 redirect_stdout(output),
             ):
@@ -279,9 +278,11 @@ class FinancialBackfillCliTest(unittest.TestCase):
                     ]
                 )
 
-        self.assertEqual(exit_code, 2)
-        self.assertIn("source-aware retrieval grouping", output.getvalue())
-        execute.assert_not_called()
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertFalse(payload["writes_performed"])
+        self.assertFalse(payload["credentials_configured"])
+        execute.assert_called_once()
 
 
 if __name__ == "__main__":
