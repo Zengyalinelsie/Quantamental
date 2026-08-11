@@ -109,8 +109,7 @@ class AkShareFinancialSnapshot:
             if len(names) != len(set(names)):
                 raise ValueError("cached AkShare record field names must be unique")
             if any(
-                value is not None
-                and not isinstance(value, (str, int, float, bool, Decimal))
+                value is not None and not isinstance(value, (str, int, float, bool, Decimal))
                 for _name, value in record
             ):
                 raise TypeError("cached AkShare values must be immutable scalars")
@@ -252,9 +251,7 @@ class AkShareFinancialNormalizer:
         selected_record_count = 0
         rows_outside_period = 0
         for provider_record in provider_records:
-            requested_symbol = self._canonical_symbol(
-                provider_record.get(_REQUESTED_SYMBOL_FIELD)
-            )
+            requested_symbol = self._canonical_symbol(provider_record.get(_REQUESTED_SYMBOL_FIELD))
             if requested_symbol not in work_unit.symbols:
                 raise ValueError("AkShare requested symbol is outside the work unit")
             source_code = self._source_code(provider_record.get(_SECURITY_CODE_FIELD))
@@ -327,9 +324,7 @@ class AkShareFinancialNormalizer:
                         provider_table=work_unit.provider_table,
                         provider_record_id=provider_record_id,
                         provider_field=field.provider_field,
-                        market=(
-                            "XSHG" if requested_symbol.startswith("SH.") else "XSHE"
-                        ),
+                        market=("XSHG" if requested_symbol.startswith("SH.") else "XSHE"),
                         source_symbol=source_code,
                         statement_type=work_unit.statement_type,
                         statement_scope=field.statement_scope,
@@ -368,9 +363,7 @@ class AkShareFinancialNormalizer:
         if missing_values:
             batch_warnings.append(f"missing_provider_value_count={missing_values}")
         if rows_outside_period:
-            batch_warnings.append(
-                f"provider_rows_outside_requested_period={rows_outside_period}"
-            )
+            batch_warnings.append(f"provider_rows_outside_requested_period={rows_outside_period}")
         return FinancialProviderBatch(
             work_unit=work_unit,
             evidence=evidence,
@@ -591,9 +584,7 @@ class AkShareFinancialSource:
         self._evidence_source_urls = urls
         self._clock = clock
         self._snapshot_cache = (
-            AkShareInMemoryFinancialSnapshotCache()
-            if snapshot_cache is None
-            else snapshot_cache
+            AkShareInMemoryFinancialSnapshotCache() if snapshot_cache is None else snapshot_cache
         )
 
     def fetch(
@@ -618,36 +609,24 @@ class AkShareFinancialSource:
                 endpoint=endpoint,
                 canonical_symbol=canonical_symbol,
             )
-            snapshot = (
-                self._snapshot_cache.get(key) if allow_read_through_cache else None
-            )
-            if snapshot is not None and (
-                not isinstance(snapshot, AkShareFinancialSnapshot)
-                or snapshot.key != key
-            ):
-                raise ValueError("AkShare cache returned a snapshot for another source key")
+            snapshot = self._cached_snapshot(key) if allow_read_through_cache else None
             if snapshot is None:
                 operation = f"{endpoint.value}:{provider_symbol}"
-                frame = self._request_executor.execute(
+                loaded = self._request_executor.execute(
                     operation,
-                    partial(self._fetch_frame, endpoint, provider_symbol),
+                    partial(
+                        self._load_snapshot,
+                        key=key,
+                        endpoint=endpoint,
+                        provider_symbol=provider_symbol,
+                        canonical_symbol=canonical_symbol,
+                        allow_read_through_cache=allow_read_through_cache,
+                    ),
                 )
-                records = self._frame_records(
-                    frame,
-                    requested_symbol=canonical_symbol,
-                )
-                snapshot = AkShareFinancialSnapshot.from_provider_records(
-                    key=key,
-                    provider_records=records,
-                    retrieved_at=self._clock(),
-                )
-                if allow_read_through_cache:
-                    self._snapshot_cache.put(snapshot)
+                snapshot = self._require_snapshot(loaded, key)
             snapshots.append(snapshot)
         provider_records = tuple(
-            record
-            for snapshot in snapshots
-            for record in snapshot.materialize()
+            record for snapshot in snapshots for record in snapshot.materialize()
         )
         retrieved_at = max(snapshot.retrieved_at for snapshot in snapshots)
         evidence = self._evidence_capture.capture_provider_response(
@@ -663,6 +642,51 @@ class AkShareFinancialSource:
             evidence=evidence,
             retrieved_at=retrieved_at,
         )
+
+    def _load_snapshot(
+        self,
+        *,
+        key: AkShareFinancialSnapshotKey,
+        endpoint: AkShareEndpoint,
+        provider_symbol: str,
+        canonical_symbol: str,
+        allow_read_through_cache: bool,
+    ) -> AkShareFinancialSnapshot:
+        if allow_read_through_cache:
+            cached = self._cached_snapshot(key)
+            if cached is not None:
+                return cached
+        frame = self._fetch_frame(endpoint, provider_symbol)
+        records = self._frame_records(
+            frame,
+            requested_symbol=canonical_symbol,
+        )
+        snapshot = AkShareFinancialSnapshot.from_provider_records(
+            key=key,
+            provider_records=records,
+            retrieved_at=self._clock(),
+        )
+        if allow_read_through_cache:
+            self._snapshot_cache.put(snapshot)
+        return snapshot
+
+    def _cached_snapshot(
+        self,
+        key: AkShareFinancialSnapshotKey,
+    ) -> AkShareFinancialSnapshot | None:
+        value = self._snapshot_cache.get(key)
+        if value is None:
+            return None
+        return self._require_snapshot(value, key)
+
+    @staticmethod
+    def _require_snapshot(
+        value: object,
+        key: AkShareFinancialSnapshotKey,
+    ) -> AkShareFinancialSnapshot:
+        if not isinstance(value, AkShareFinancialSnapshot) or value.key != key:
+            raise ValueError("AkShare cache returned a snapshot for another source key")
+        return value
 
     def _fetch_frame(self, endpoint: AkShareEndpoint, symbol: str) -> object:
         if endpoint is AkShareEndpoint.BALANCE_SHEET:
@@ -690,9 +714,7 @@ class AkShareFinancialSource:
                 raise TypeError("AkShare DataFrame record must be a mapping")
             if _REQUESTED_SYMBOL_FIELD in raw_record:
                 raise ValueError("AkShare response used a reserved internal field")
-            sanitized = {
-                str(key): cls._evidence_scalar(value) for key, value in raw_record.items()
-            }
+            sanitized = {str(key): cls._evidence_scalar(value) for key, value in raw_record.items()}
             sanitized[_REQUESTED_SYMBOL_FIELD] = requested_symbol
             records.append(sanitized)
         return tuple(records)
@@ -710,9 +732,7 @@ class AkShareFinancialSource:
             return plain.isoformat()
         if isinstance(plain, date):
             return plain.isoformat()
-        raise TypeError(
-            f"unsupported AkShare DataFrame scalar type: {type(plain).__name__}"
-        )
+        raise TypeError(f"unsupported AkShare DataFrame scalar type: {type(plain).__name__}")
 
 
 __all__ = [

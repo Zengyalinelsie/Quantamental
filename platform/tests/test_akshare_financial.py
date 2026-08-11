@@ -3,8 +3,11 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from a_share_platform.adapters.providers.akshare_financial import (
+    AkShareEndpoint,
     AkShareFieldContract,
     AkShareFinancialNormalizer,
+    AkShareFinancialSnapshot,
+    AkShareFinancialSnapshotKey,
     AkShareFinancialSource,
     AkShareRateLimitedRequestExecutor,
 )
@@ -137,9 +140,7 @@ class AkShareFinancialNormalizerTest(unittest.TestCase):
         for statement_type, table, field, basis, expected_start in cases:
             with self.subTest(statement_type=statement_type):
                 work_unit = unit(statement_type, table)
-                batch = AkShareFinancialNormalizer(
-                    (contract(field, value_basis=basis),)
-                ).normalize(
+                batch = AkShareFinancialNormalizer((contract(field, value_basis=basis),)).normalize(
                     work_unit=work_unit,
                     provider_records=(record(field, "123.45"),),
                     evidence=raw_object(statement_type),
@@ -154,7 +155,9 @@ class AkShareFinancialNormalizerTest(unittest.TestCase):
                 self.assertEqual(value.report_period_start, expected_start)
                 self.assertEqual(value.statement_scope, FinancialStatementScope.UNKNOWN)
                 self.assertEqual(value.report_version_type, ReportVersionType.UNKNOWN)
-                self.assertEqual(value.availability_method, AvailabilityMethod.CONSERVATIVE_RETRIEVAL_TIME)
+                self.assertEqual(
+                    value.availability_method, AvailabilityMethod.CONSERVATIVE_RETRIEVAL_TIME
+                )
                 self.assertEqual(value.available_at, NOW)
                 self.assertIsNone(value.announced_at)
                 self.assertIsNone(value.provider_updated_at)
@@ -197,9 +200,7 @@ class AkShareFinancialNormalizerTest(unittest.TestCase):
         )
 
         self.assertEqual(batch.rows[0].raw_value, Decimal("123.45"))
-        self.assertTrue(
-            any("binary float" in warning for warning in batch.rows[0].warnings)
-        )
+        self.assertTrue(any("binary float" in warning for warning in batch.rows[0].warnings))
 
     def test_revenue_provider_field_is_not_aliased_to_a_different_source_definition(self) -> None:
         batch = AkShareFinancialNormalizer(
@@ -327,7 +328,77 @@ class RecordingEvidenceCapture:
         return raw_object(self.statement_type)
 
 
+class AppearingSnapshotCache:
+    def __init__(self, value: AkShareFinancialSnapshot | None) -> None:
+        self.value = value
+        self.get_calls = 0
+        self.put_calls: list[AkShareFinancialSnapshot] = []
+
+    def get(self, _key: AkShareFinancialSnapshotKey):
+        self.get_calls += 1
+        return None if self.get_calls == 1 else self.value
+
+    def put(self, value: AkShareFinancialSnapshot) -> None:
+        self.put_calls.append(value)
+
+
 class AkShareFinancialSourceTest(unittest.TestCase):
+    def test_cache_is_rechecked_inside_request_gate_before_provider_access(self) -> None:
+        cached = AkShareFinancialSnapshot.from_provider_records(
+            key=AkShareFinancialSnapshotKey(
+                provider_id="akshare",
+                endpoint=AkShareEndpoint.BALANCE_SHEET,
+                canonical_symbol="SH.600000",
+            ),
+            provider_records=(record("TOTAL_ASSETS", "10"),),
+            retrieved_at=NOW,
+        )
+        cache = AppearingSnapshotCache(cached)
+        client = StubAkShareClient({})
+        executor = RecordingRequestExecutor()
+        source = AkShareFinancialSource(
+            client=client,
+            normalizer=AkShareFinancialNormalizer(
+                (contract("TOTAL_ASSETS", value_basis=FinancialValueBasis.POINT_IN_TIME),)
+            ),
+            request_executor=executor,
+            evidence_capture=RecordingEvidenceCapture(StatementType.BALANCE_SHEET),
+            evidence_source_urls=SOURCE_URLS,
+            clock=lambda: NOW,
+            snapshot_cache=cache,
+        )
+
+        batch = source.fetch(unit(), allow_read_through_cache=True)
+
+        self.assertEqual(cache.get_calls, 2)
+        self.assertEqual(cache.put_calls, [])
+        self.assertEqual(client.calls, [])
+        self.assertEqual(batch.rows[0].raw_value, Decimal(10))
+
+    def test_provider_exception_is_never_written_to_snapshot_cache(self) -> None:
+        class FailingClient(StubAkShareClient):
+            def stock_balance_sheet_by_report_em(self, *, symbol: str) -> StubFrame:
+                self.calls.append(("stock_balance_sheet_by_report_em", symbol))
+                raise TimeoutError("provider unavailable")
+
+        cache = AppearingSnapshotCache(None)
+        source = AkShareFinancialSource(
+            client=FailingClient({}),
+            normalizer=AkShareFinancialNormalizer(
+                (contract("TOTAL_ASSETS", value_basis=FinancialValueBasis.POINT_IN_TIME),)
+            ),
+            request_executor=RecordingRequestExecutor(),
+            evidence_capture=RecordingEvidenceCapture(StatementType.BALANCE_SHEET),
+            evidence_source_urls=SOURCE_URLS,
+            clock=lambda: NOW,
+            snapshot_cache=cache,
+        )
+
+        with self.assertRaisesRegex(TimeoutError, "provider unavailable"):
+            source.fetch(unit(), allow_read_through_cache=True)
+
+        self.assertEqual(cache.put_calls, [])
+
     def test_read_through_cache_reuses_one_all_period_response_per_symbol_table(self) -> None:
         frame = StubFrame(
             (
@@ -521,9 +592,7 @@ class AkShareFinancialSourceTest(unittest.TestCase):
                 capture = RecordingEvidenceCapture(statement_type)
                 source = AkShareFinancialSource(
                     client=client,
-                    normalizer=AkShareFinancialNormalizer(
-                        (contract(field, value_basis=basis),)
-                    ),
+                    normalizer=AkShareFinancialNormalizer((contract(field, value_basis=basis),)),
                     request_executor=RecordingRequestExecutor(),
                     evidence_capture=capture,
                     evidence_source_urls=SOURCE_URLS,
