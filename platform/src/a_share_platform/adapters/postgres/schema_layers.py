@@ -71,7 +71,11 @@ PERSISTENT_TABLE_SCHEMAS: Final[Mapping[str, SchemaLayer]] = MappingProxyType(
         "factor_qualification_audits": SchemaLayer.RESEARCH,
         "factor_validation_reports": SchemaLayer.RESEARCH,
         "feature_snapshots": SchemaLayer.RESEARCH,
+        "expected_return_calibrations": SchemaLayer.RESEARCH,
+        "investment_view_outcomes": SchemaLayer.RESEARCH,
+        "investment_views": SchemaLayer.RESEARCH,
         "research_labels": SchemaLayer.RESEARCH,
+        "signal_snapshots": SchemaLayer.RESEARCH,
         "timing_forecasts": SchemaLayer.RESEARCH,
     }
 )

@@ -85,8 +85,33 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0027_factor_promotion_reviews.sql",
                 "0028_factor_qualification_audits.sql",
                 "0029_layered_schemas.sql",
+                "0030_p5_investment_signal_ledgers.sql",
             ),
         )
+
+    def test_p5_ledgers_are_layered_append_only_and_api_isolated(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0030_p5_investment_signal_ledgers.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE research.investment_views",
+            "CREATE TABLE research.investment_view_outcomes",
+            "CREATE TABLE research.expected_return_calibrations",
+            "CREATE TABLE research.signal_snapshots",
+            "UNIQUE (view_id)",
+            "UNIQUE (outcome_id)",
+            "BEFORE UPDATE OR DELETE ON research.investment_views",
+            "BEFORE UPDATE OR DELETE ON research.investment_view_outcomes",
+            "BEFORE UPDATE OR DELETE ON research.expected_return_calibrations",
+            "BEFORE UPDATE OR DELETE ON research.signal_snapshots",
+            "CREATE VIEW serving.research_signal_snapshots",
+            "approval_scope = 'research_backtest'",
+            "CREATE VIEW serving.production_signal_snapshots",
+            "approval_scope IN ('shadow', 'paper', 'limited_live')",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_factor_qualification_audits_are_failed_append_only_evidence(self) -> None:
         sql = (

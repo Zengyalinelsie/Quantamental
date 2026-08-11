@@ -13,7 +13,7 @@ SOURCE_ROOT = PLATFORM_ROOT / "src" / "a_share_platform"
 
 
 class PostgresSchemaLayerContractTest(unittest.TestCase):
-    def test_six_layers_and_all_49_persistent_tables_have_one_owner(self) -> None:
+    def test_six_layers_and_all_53_persistent_tables_have_one_owner(self) -> None:
         self.assertEqual(
             {layer.value for layer in SchemaLayer},
             {
@@ -25,7 +25,7 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
                 "serving",
             },
         )
-        self.assertEqual(len(PERSISTENT_TABLE_SCHEMAS), 49)
+        self.assertEqual(len(PERSISTENT_TABLE_SCHEMAS), 53)
         self.assertEqual(
             qualified_table("financial_fact_observations"),
             "canonical.financial_fact_observations",
@@ -38,6 +38,10 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
             qualified_table("factor_promotion_reviews"),
             "governance.factor_promotion_reviews",
         )
+        self.assertEqual(
+            qualified_table("signal_snapshots"),
+            "research.signal_snapshots",
+        )
         with self.assertRaisesRegex(KeyError, "unknown persistent table"):
             qualified_table("made_up_table")
 
@@ -48,7 +52,15 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
         normalized = " ".join(sql.split())
         for layer in SchemaLayer:
             self.assertIn(f"CREATE SCHEMA {layer.value}", normalized)
+        p5_tables = {
+            "investment_views",
+            "investment_view_outcomes",
+            "expected_return_calibrations",
+            "signal_snapshots",
+        }
         for table, layer in PERSISTENT_TABLE_SCHEMAS.items():
+            if table in p5_tables:
+                continue
             with self.subTest(table=table):
                 self.assertEqual(
                     normalized.count(
@@ -56,6 +68,15 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
                     ),
                     1,
                 )
+        p5_sql = (
+            PLATFORM_ROOT / "migrations" / "0030_p5_investment_signal_ledgers.sql"
+        ).read_text(encoding="utf-8")
+        p5_normalized = " ".join(p5_sql.split())
+        for table in p5_tables:
+            self.assertIn(
+                f"CREATE TABLE research.{table}",
+                p5_normalized,
+            )
         self.assertIn(
             "ALTER VIEW public.strict_pit_universe_versions SET SCHEMA serving",
             normalized,
