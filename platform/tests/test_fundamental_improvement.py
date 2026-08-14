@@ -7,7 +7,9 @@ from a_share_platform.domain.fundamental_improvement import (
     BaseEffectTreatment,
     FundamentalImprovementExposures,
     FundamentalImprovementInput,
+    FundamentalImprovementInputCompilerV0,
     FundamentalImprovementMetric,
+    FundamentalImprovementObservationInput,
     ImprovementComparison,
     ImprovementInputProvenance,
     ImprovementResultStatus,
@@ -60,9 +62,7 @@ def component_input(
         current_comparison = date(2024, 9, 30)
         prior_comparison = date(2024, 6, 30)
     level_unit = (
-        MetricUnit.RATIO
-        if metric is FundamentalImprovementMetric.MARGIN
-        else MetricUnit.CURRENCY
+        MetricUnit.RATIO if metric is FundamentalImprovementMetric.MARGIN else MetricUnit.CURRENCY
     )
     return FundamentalImprovementInput(
         metric=metric,
@@ -181,6 +181,158 @@ class FundamentalImprovementV0HandCalculationTest(unittest.TestCase):
             result.component(FundamentalImprovementMetric.PROFIT).acceleration,
             Decimal(0),
         )
+
+
+class FundamentalImprovementInputCompilerV0Test(unittest.TestCase):
+    def observation(
+        self,
+        metric: FundamentalImprovementMetric,
+        *,
+        current: str,
+        current_comparison: str,
+        prior: str,
+        prior_comparison: str,
+        current_one_off: str = "0",
+        current_comparison_one_off: str = "0",
+        prior_one_off: str = "0",
+        prior_comparison_one_off: str = "0",
+        comparison: ImprovementComparison = ImprovementComparison.YOY,
+        window: ImprovementWindow = ImprovementWindow.TTM,
+        seasonality: SeasonalityTreatment = SeasonalityTreatment.NOT_APPLICABLE,
+        base_effect: BaseEffectTreatment = BaseEffectTreatment.ABSENT,
+        one_off: OneOffTreatment = OneOffTreatment.EXCLUDED,
+    ) -> FundamentalImprovementObservationInput:
+        if comparison is ImprovementComparison.YOY:
+            current_comparison_period = date(2023, 12, 31)
+            prior_comparison_period = date(2023, 9, 30)
+        else:
+            current_comparison_period = date(2024, 9, 30)
+            prior_comparison_period = date(2024, 6, 30)
+        return FundamentalImprovementObservationInput(
+            metric=metric,
+            current_reported=Decimal(current),
+            current_comparison_reported=Decimal(current_comparison),
+            prior_reported=Decimal(prior),
+            prior_comparison_reported=Decimal(prior_comparison),
+            current_one_off=Decimal(current_one_off),
+            current_comparison_one_off=Decimal(current_comparison_one_off),
+            prior_one_off=Decimal(prior_one_off),
+            prior_comparison_one_off=Decimal(prior_comparison_one_off),
+            level_unit=(
+                MetricUnit.RATIO
+                if metric is FundamentalImprovementMetric.MARGIN
+                else MetricUnit.CURRENCY
+            ),
+            currency=(None if metric is FundamentalImprovementMetric.MARGIN else "CNY"),
+            comparison=comparison,
+            window=window,
+            current_period_end=date(2024, 12, 31),
+            current_comparison_period_end=current_comparison_period,
+            prior_period_end=date(2024, 9, 30),
+            prior_comparison_period_end=prior_comparison_period,
+            seasonality_treatment=seasonality,
+            base_effect_treatment=base_effect,
+            one_off_treatment=one_off,
+            provenance=provenance(metric),
+            data_mode=DataMode.CURRENT_RESEARCH,
+            trust_state=DataTrustState.NORMALIZED_CURRENT,
+            decision_time=datetime(2025, 1, 2, 15, 0, tzinfo=UTC),
+            latest_source_available_at=datetime(2025, 1, 2, 14, 59, tzinfo=UTC),
+        )
+
+    def test_compiles_one_off_adjusted_level_trend_and_acceleration(self) -> None:
+        compiled = FundamentalImprovementInputCompilerV0().compile(
+            self.observation(
+                FundamentalImprovementMetric.REVENUE,
+                current="130",
+                current_comparison="100",
+                prior="110",
+                prior_comparison="100",
+                current_one_off="10",
+                prior_one_off="10",
+            )
+        )
+        result = fundamental_improvement_definition_v0().calculate(
+            {FundamentalImprovementMetric.REVENUE: compiled},
+            exposures=exposures(),
+            data_mode=DataMode.CURRENT_RESEARCH,
+        )
+        component = result.component(FundamentalImprovementMetric.REVENUE)
+
+        self.assertEqual(compiled.level, Decimal(120))
+        self.assertEqual(compiled.current_change, Decimal("0.20"))
+        self.assertEqual(compiled.prior_change, Decimal(0))
+        self.assertEqual(component.acceleration, Decimal("0.20"))
+
+    def test_margin_uses_percentage_point_change_not_relative_growth(self) -> None:
+        compiled = FundamentalImprovementInputCompilerV0().compile(
+            self.observation(
+                FundamentalImprovementMetric.MARGIN,
+                current="0.25",
+                current_comparison="0.23",
+                prior="0.22",
+                prior_comparison="0.21",
+            )
+        )
+
+        self.assertEqual(compiled.current_change, Decimal("0.02"))
+        self.assertEqual(compiled.prior_change, Decimal("0.01"))
+
+    def test_zero_base_or_uncontrolled_treatment_is_unavailable_without_zero_fill(self) -> None:
+        cases = (
+            self.observation(
+                FundamentalImprovementMetric.REVENUE,
+                current="100",
+                current_comparison="0",
+                prior="90",
+                prior_comparison="80",
+            ),
+            self.observation(
+                FundamentalImprovementMetric.PROFIT,
+                current="20",
+                current_comparison="10",
+                prior="15",
+                prior_comparison="9",
+                comparison=ImprovementComparison.QOQ,
+                window=ImprovementWindow.SINGLE_QUARTER,
+                seasonality=SeasonalityTreatment.UNCONTROLLED,
+            ),
+            self.observation(
+                FundamentalImprovementMetric.CASH_FLOW,
+                current="20",
+                current_comparison="10",
+                prior="15",
+                prior_comparison="9",
+                one_off=OneOffTreatment.INCLUDED_UNADJUSTED,
+            ),
+        )
+        for value in cases:
+            with self.subTest(metric=value.metric.value):
+                compiled = FundamentalImprovementInputCompilerV0().compile(value)
+                self.assertIsNone(compiled.level)
+                self.assertIsNone(compiled.current_change)
+                self.assertIsNone(compiled.prior_change)
+                self.assertTrue(compiled.unavailable_reasons)
+
+    def test_negative_comparison_base_is_unavailable_without_zero_fill(self) -> None:
+        compiled = FundamentalImprovementInputCompilerV0().compile(
+            self.observation(
+                FundamentalImprovementMetric.PROFIT,
+                current="10",
+                current_comparison="-2",
+                prior="8",
+                prior_comparison="-1",
+            )
+        )
+
+        self.assertIsNone(compiled.level)
+        self.assertIsNone(compiled.current_change)
+        self.assertIn("non-positive comparison base", compiled.unavailable_reasons[0])
+
+
+class FundamentalImprovementV0DistortionTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.definition = fundamental_improvement_definition_v0()
 
     def test_uncontrolled_distortions_are_partial_and_never_zero_filled(self) -> None:
         values = {
@@ -321,8 +473,9 @@ class FundamentalImprovementV0ContractTest(unittest.TestCase):
             ),
         )
         for invalid_builder in invalid_builders:
-            with self.subTest(invalid_builder=invalid_builder), self.assertRaises(
-                (TypeError, ValueError)
+            with (
+                self.subTest(invalid_builder=invalid_builder),
+                self.assertRaises((TypeError, ValueError)),
             ):
                 invalid_builder()
 

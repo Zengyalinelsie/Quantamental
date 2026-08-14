@@ -1,7 +1,7 @@
 # P5 实现与验证证据
 
 > 状态快照：2026-08-14  
-> 范围：P5 当前工程进度；Frozen Artifact durable/API + provider-neutral Outcome worker
+> 范围：P5 当前工程进度；Frozen Artifact、Outcome worker、估值/改善工程模型
 > Gate：P5 Capability Gate 仍未通过
 
 ## 1. Frozen InvestmentView Artifact application export
@@ -106,6 +106,29 @@ a_share_platform.application.investment_view_outcomes
 
 实现后 Outcome、Expected Return ledger、PostgreSQL adapter 和 migration 共 58 项定向测试通过。
 
+Task 4 首次执行按预期失败：
+
+```text
+ImportError: cannot import name 'ValuationModelSuiteInput'
+ImportError: cannot import name 'FundamentalImprovementInputCompilerV0'
+```
+
+实现过程中新增的 mode/trust 混合参考集红测再次先失败，随后补齐同一 reference set 的
+mode/trust/decision-time 门。只读复审发现草案 suite 没有真正读取 frozen bundle，可能形成第二输入
+真源，因此在提交前删除该 application 入口；运行时继续只使用既有 exact bundle orchestration。
+复审还推动补齐：分析师 provider/use/license/approval/time attestation、预测目标与 snapshot 可比轴、
+current/prior provider/provenance 与 attested provider 的一致性、资格生效/过期/trust ceiling 测试、
+价格/每股基本面/假设分离 provenance 和单位、缺 anchor unavailable、三类参考必须逐项表达，以及
+P/B<1 时银行隐含 ROE 的全端点包络。合并模型结果保留输入 method/version lineage，不只合并
+DatasetVersion/observation/hash。ADR-0011 同步冻结这些边界；全部仍为 `not_evaluated`。真实
+compiler 没有一次性项目或基数效应证据时输出无数值 unavailable，不填零、不用 reported 数字冒充
+adjusted 数字。
+
+第二轮只读复审确认，新模型尚未进入现有 frozen bundle/persistence/orchestration。Task 4 因此拆为
+4A 纯领域模型 `verified` 与 4B 安全 frozen runtime 接线 `pending`；本 Evidence 不再把 Task 4 整体
+描述为完成。领域测试中构造的 attestation 只是合同 fixture，不是治理 registry 的真实资格记录。
+Task 4A 最终定向命令共 `43/43` 通过。
+
 ## 5. 真实 PostgreSQL 证据
 
 迁移前只读预检：
@@ -133,9 +156,9 @@ View/Outcome 均为 0。真实库 dry-run maturity scan 返回 `items=[]`、`wri
 ## 6. 全量验证
 
 ```text
-Backend unittest: 785/785 passed
+Backend unittest: 807/807 passed
 Ruff: passed
-mypy: 174 source files passed
+mypy: 175 source files passed
 compileall: passed
 git diff --check: passed
 Frontend Vitest: 59/59 passed
@@ -166,6 +189,12 @@ API 合同。
 - `platform/src/a_share_platform/workers/investment_view_outcomes.py`；
 - `platform/migrations/0035_outcome_source_policy.sql`；
 - `platform/tests/test_investment_view_outcome_worker.py`；
+- `platform/src/a_share_platform/domain/valuation_models.py`；
+- `platform/src/a_share_platform/domain/fundamental_improvement.py`；
+- `platform/src/a_share_platform/application/valuation_improvement.py`；
+- `platform/src/a_share_platform/adapters/postgres/valuation_input_qualification.py`；
+- `platform/tests/test_valuation_models.py`、`test_fundamental_improvement.py`；
+- `docs/adr/0011-valuation-model-engineering-defaults.md`；
 - `platform/ci/verify.sh`、`platform/tests/test_architecture_contract.py`。
 
 ## 8. 未完成和 Gate 边界
@@ -174,7 +203,9 @@ Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成�
 
 - Research/InvestmentView 页面查看或下载入口；
 - 获批的真实 Outcome price/calendar/corporate-action adapter 与真实到期产物；
-- P5 估值/改善剩余服务和 320/768/1024 最终浏览器验收；
+- 真实 historical/industry/peer、FCF、合格分析师输入 adapter/产物；
+- 新估值模型的 exact frozen bundle、持久化和 orchestration 安全接线；
+- 320/768/1024 最终浏览器验收；
 - 真实 qualified PIT bundle、InvestmentView、Review 和 SignalSnapshot。
 
 因此 P5 Capability Gate 仍未通过。自动测试证明工程合同按预期工作，不证明 Expected Return、

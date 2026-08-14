@@ -134,8 +134,7 @@ class ImprovementInputProvenance:
         if not facts or any(not isinstance(value, str) or not value.strip() for value in facts):
             raise ValueError("source_fact_ids must contain non-empty identifiers")
         if not hashes or any(
-            not isinstance(value, str) or _SHA256.fullmatch(value) is None
-            for value in hashes
+            not isinstance(value, str) or _SHA256.fullmatch(value) is None for value in hashes
         ):
             raise ValueError("content_hashes must contain sha256 hashes")
         if len(facts) != len(set(facts)) or len(hashes) != len(set(hashes)):
@@ -185,6 +184,127 @@ class FundamentalImprovementExposures:
                 if value is None
             ),
         )
+
+
+@dataclass(frozen=True)
+class FundamentalImprovementObservationInput:
+    """Four reported observations used to compile level/trend/acceleration."""
+
+    metric: FundamentalImprovementMetric
+    current_reported: Decimal
+    current_comparison_reported: Decimal
+    prior_reported: Decimal
+    prior_comparison_reported: Decimal
+    current_one_off: Decimal
+    current_comparison_one_off: Decimal
+    prior_one_off: Decimal
+    prior_comparison_one_off: Decimal
+    level_unit: MetricUnit
+    currency: str | None
+    comparison: ImprovementComparison
+    window: ImprovementWindow
+    current_period_end: date
+    current_comparison_period_end: date
+    prior_period_end: date
+    prior_comparison_period_end: date
+    seasonality_treatment: SeasonalityTreatment
+    base_effect_treatment: BaseEffectTreatment
+    one_off_treatment: OneOffTreatment
+    provenance: ImprovementInputProvenance
+    data_mode: DataMode
+    trust_state: DataTrustState
+    decision_time: datetime
+    latest_source_available_at: datetime
+
+    def __post_init__(self) -> None:
+        metric = FundamentalImprovementMetric(self.metric)
+        for name in (
+            "current_reported",
+            "current_comparison_reported",
+            "prior_reported",
+            "prior_comparison_reported",
+            "current_one_off",
+            "current_comparison_one_off",
+            "prior_one_off",
+            "prior_comparison_one_off",
+        ):
+            _decimal(getattr(self, name), name)
+        level_unit = MetricUnit(self.level_unit)
+        expected_unit = (
+            MetricUnit.RATIO
+            if metric is FundamentalImprovementMetric.MARGIN
+            else MetricUnit.CURRENCY
+        )
+        if level_unit is not expected_unit:
+            raise ValueError(f"{metric.value} level unit is incompatible")
+        if expected_unit is MetricUnit.CURRENCY:
+            if self.currency is None or re.fullmatch(r"[A-Z]{3}", self.currency) is None:
+                raise ValueError("currency observation requires a three-letter currency")
+        elif self.currency is not None:
+            raise ValueError("ratio observation must not carry currency")
+        comparison = ImprovementComparison(self.comparison)
+        window = ImprovementWindow(self.window)
+        seasonality = SeasonalityTreatment(self.seasonality_treatment)
+        base_effect = BaseEffectTreatment(self.base_effect_treatment)
+        one_off = OneOffTreatment(self.one_off_treatment)
+        current = _plain_date(self.current_period_end, "current_period_end")
+        current_comparison = _plain_date(
+            self.current_comparison_period_end,
+            "current_comparison_period_end",
+        )
+        prior = _plain_date(self.prior_period_end, "prior_period_end")
+        prior_comparison = _plain_date(
+            self.prior_comparison_period_end,
+            "prior_comparison_period_end",
+        )
+        if _quarter_ordinal(current) - _quarter_ordinal(prior) != 1:
+            raise ValueError("current and prior trend periods must be adjacent quarters")
+        if comparison is ImprovementComparison.YOY:
+            if (
+                _quarter_ordinal(current) - _quarter_ordinal(current_comparison) != 4
+                or _quarter_ordinal(prior) - _quarter_ordinal(prior_comparison) != 4
+            ):
+                raise ValueError("yoy inputs require year-earlier comparison periods")
+        elif (
+            current_comparison != prior
+            or _quarter_ordinal(prior) - _quarter_ordinal(prior_comparison) != 1
+        ):
+            raise ValueError("qoq inputs require adjacent-quarter comparison periods")
+        if window is ImprovementWindow.SINGLE_QUARTER:
+            if (
+                comparison is ImprovementComparison.QOQ
+                and seasonality is SeasonalityTreatment.YOY_COMPARABLE
+            ):
+                raise ValueError("qoq single-quarter input cannot claim yoy comparability")
+            if (
+                comparison is ImprovementComparison.YOY
+                and seasonality is SeasonalityTreatment.NOT_APPLICABLE
+            ):
+                raise ValueError("single-quarter yoy input must state seasonality treatment")
+        if not isinstance(self.provenance, ImprovementInputProvenance):
+            raise TypeError("provenance must be ImprovementInputProvenance")
+        mode = DataMode(self.data_mode)
+        trust = DataTrustState(self.trust_state)
+        if trust is DataTrustState.RAW:
+            raise ValueError("raw inputs cannot enter Fundamental Improvement V0")
+        if mode is DataMode.STRICT_HISTORICAL and trust is not DataTrustState.PIT_VERIFIED:
+            raise PermissionError("strict_historical improvement requires pit_verified inputs")
+        decision = _aware(self.decision_time, "decision_time")
+        available = _aware(
+            self.latest_source_available_at,
+            "latest_source_available_at",
+        )
+        if available > decision:
+            raise ValueError("available_at cannot exceed decision_time")
+        object.__setattr__(self, "metric", metric)
+        object.__setattr__(self, "level_unit", level_unit)
+        object.__setattr__(self, "comparison", comparison)
+        object.__setattr__(self, "window", window)
+        object.__setattr__(self, "seasonality_treatment", seasonality)
+        object.__setattr__(self, "base_effect_treatment", base_effect)
+        object.__setattr__(self, "one_off_treatment", one_off)
+        object.__setattr__(self, "data_mode", mode)
+        object.__setattr__(self, "trust_state", trust)
 
 
 @dataclass(frozen=True)
@@ -252,9 +372,15 @@ class FundamentalImprovementInput:
         object.__setattr__(self, "one_off_treatment", OneOffTreatment(self.one_off_treatment))
         self._validate_periods()
         if window is ImprovementWindow.SINGLE_QUARTER:
-            if comparison is ImprovementComparison.QOQ and seasonality is SeasonalityTreatment.YOY_COMPARABLE:
+            if (
+                comparison is ImprovementComparison.QOQ
+                and seasonality is SeasonalityTreatment.YOY_COMPARABLE
+            ):
                 raise ValueError("qoq single-quarter input cannot claim yoy comparability")
-            if comparison is ImprovementComparison.YOY and seasonality is SeasonalityTreatment.NOT_APPLICABLE:
+            if (
+                comparison is ImprovementComparison.YOY
+                and seasonality is SeasonalityTreatment.NOT_APPLICABLE
+            ):
                 raise ValueError("single-quarter yoy input must state seasonality treatment")
 
         if not isinstance(self.provenance, ImprovementInputProvenance):
@@ -325,6 +451,84 @@ class FundamentalImprovementInput:
             or _quarter_ordinal(prior) - _quarter_ordinal(prior_comparison) != 1
         ):
             raise ValueError("qoq inputs require adjacent-quarter comparison periods")
+
+
+@dataclass(frozen=True)
+class FundamentalImprovementInputCompilerV0:
+    compiler_version: str = "fundamental-improvement-input-compiler:v0"
+
+    def compile(
+        self,
+        value: FundamentalImprovementObservationInput,
+    ) -> FundamentalImprovementInput:
+        if not isinstance(value, FundamentalImprovementObservationInput):
+            raise TypeError("value must be FundamentalImprovementObservationInput")
+        reasons: list[str] = []
+        if value.seasonality_treatment in {
+            SeasonalityTreatment.UNCONTROLLED,
+            SeasonalityTreatment.UNKNOWN,
+        }:
+            reasons.append(
+                f"seasonality is {value.seasonality_treatment.value} for "
+                f"{value.comparison.value}/{value.window.value}"
+            )
+        if value.base_effect_treatment in {
+            BaseEffectTreatment.PRESENT_UNADJUSTED,
+            BaseEffectTreatment.UNKNOWN,
+        }:
+            reasons.append(f"base effect is {value.base_effect_treatment.value}")
+        if value.one_off_treatment in {
+            OneOffTreatment.INCLUDED_UNADJUSTED,
+            OneOffTreatment.UNKNOWN,
+        }:
+            reasons.append(f"one-off treatment is {value.one_off_treatment.value}")
+
+        adjusted = (
+            value.current_reported - value.current_one_off,
+            value.current_comparison_reported - value.current_comparison_one_off,
+            value.prior_reported - value.prior_one_off,
+            value.prior_comparison_reported - value.prior_comparison_one_off,
+        )
+        current, current_comparison, prior, prior_comparison = adjusted
+        if value.metric is not FundamentalImprovementMetric.MARGIN and (
+            current_comparison <= 0 or prior_comparison <= 0
+        ):
+            reasons.append("non-positive comparison base prevents a comparable change")
+
+        if reasons:
+            level = current_change = prior_change = None
+        elif value.metric is FundamentalImprovementMetric.MARGIN:
+            level = current
+            current_change = current - current_comparison
+            prior_change = prior - prior_comparison
+        else:
+            level = current
+            current_change = current / current_comparison - Decimal(1)
+            prior_change = prior / prior_comparison - Decimal(1)
+        return FundamentalImprovementInput(
+            metric=value.metric,
+            level=level,
+            current_change=current_change,
+            prior_change=prior_change,
+            level_unit=value.level_unit,
+            change_unit=MetricUnit.RATIO,
+            currency=value.currency,
+            comparison=value.comparison,
+            window=value.window,
+            current_period_end=value.current_period_end,
+            current_comparison_period_end=value.current_comparison_period_end,
+            prior_period_end=value.prior_period_end,
+            prior_comparison_period_end=value.prior_comparison_period_end,
+            seasonality_treatment=value.seasonality_treatment,
+            base_effect_treatment=value.base_effect_treatment,
+            one_off_treatment=value.one_off_treatment,
+            provenance=value.provenance,
+            data_mode=value.data_mode,
+            trust_state=value.trust_state,
+            unavailable_reasons=tuple(dict.fromkeys(reasons)),
+            decision_time=value.decision_time,
+            latest_source_available_at=value.latest_source_available_at,
+        )
 
 
 @dataclass(frozen=True)
@@ -470,7 +674,10 @@ class FundamentalImprovementDefinition:
                 raise TypeError(f"improvement input {metric.value} has invalid type")
             if value.metric is not metric:
                 raise ValueError(f"improvement input metric mismatch: {metric.value}")
-            if mode is DataMode.STRICT_HISTORICAL and value.trust_state is not DataTrustState.PIT_VERIFIED:
+            if (
+                mode is DataMode.STRICT_HISTORICAL
+                and value.trust_state is not DataTrustState.PIT_VERIFIED
+            ):
                 raise PermissionError("strict_historical improvement requires pit_verified inputs")
             if value.data_mode is not mode:
                 raise PermissionError(
@@ -482,9 +689,7 @@ class FundamentalImprovementDefinition:
             self._component(metric, normalized.get(metric)) for metric in self.required_metrics
         )
         quantified = tuple(
-            value
-            for value in components
-            if value.status is FeatureCalculationStatus.QUANTIFIED
+            value for value in components if value.status is FeatureCalculationStatus.QUANTIFIED
         )
         unavailable = tuple(
             sorted(
@@ -507,7 +712,9 @@ class FundamentalImprovementDefinition:
                 else ImprovementResultStatus.PARTIAL
             )
             breadth = Decimal(
-                sum(value.acceleration > 0 for value in quantified if value.acceleration is not None)
+                sum(
+                    value.acceleration > 0 for value in quantified if value.acceleration is not None
+                )
             ) / Decimal(len(quantified))
             confidence = Decimal(len(quantified)) / Decimal(len(self.required_metrics))
         if mode is DataMode.STRICT_HISTORICAL:
@@ -520,9 +727,7 @@ class FundamentalImprovementDefinition:
                 value.latest_source_available_at for value in normalized.values()
             )
             assert all(value is not None for value in available_times)
-            latest_input_available_at = max(
-                value for value in available_times if value is not None
-            )
+            latest_input_available_at = max(value for value in available_times if value is not None)
         else:
             decision_time = None
             latest_input_available_at = None
@@ -637,7 +842,7 @@ class FundamentalImprovementDefinition:
             base_effect_treatment=value.base_effect_treatment,
             one_off_treatment=value.one_off_treatment,
             provenance=value.provenance,
-            unavailable_reasons=tuple(reasons),
+            unavailable_reasons=tuple(dict.fromkeys(reasons)),
         )
 
 
@@ -661,7 +866,9 @@ __all__ = [
     "FundamentalImprovementDefinition",
     "FundamentalImprovementExposures",
     "FundamentalImprovementInput",
+    "FundamentalImprovementInputCompilerV0",
     "FundamentalImprovementMetric",
+    "FundamentalImprovementObservationInput",
     "FundamentalImprovementResult",
     "ImprovementComparison",
     "ImprovementInputProvenance",

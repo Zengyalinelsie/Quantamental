@@ -28,7 +28,10 @@ P5 已完成 InvestmentView/SignalSnapshot 领域合同、PostgreSQL append-only
 资格检查和 frozen valuation bundle 持久化链路。真实库 dry-run 因财务窗口、近期价格和版本化
 comparable 缺口失败关闭，bundle 表仍为 0；Frozen Artifact 的 application export、durable Governance
 adapter、数据库不可变约束和私有 metadata/download API 已完成，页面下载入口尚未完成；
-仍缺合格 PIT InvestmentView、Outcome 到期 worker 及
+provider-neutral Outcome 到期 worker 已完成，但真实价格/日历/公司行动 source 尚未获资格；
+ADR-0011 已冻结并实现相对估值、FCF/银行锚定、价格隐含预期、分析师资格门和四期改善纯领域工程
+模型；新估值模型尚未安全接入现有 frozen bundle/orchestration，真实 historical/industry/peer、FCF
+和分析师输入仍不可用。仍缺合格 PIT InvestmentView 及
 320/768/1024 运行时验收，因此 P5 Gate 也未通过，尚未进入 P6。
 
 Expected Return Compiler 前已有独立的 strict PIT application gate：只有 exact frozen bundle、

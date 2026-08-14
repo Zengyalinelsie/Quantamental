@@ -618,12 +618,13 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 
 ### P5-W01：估值与改善服务
 
-- [ ] 行业适用估值口径；
-- [ ] 相对估值；
-- [ ] 基本面锚定估值；
-- [ ] 隐含增长/利润率；
-- [ ] 趋势/加速度/一次性调整；
+- [x] 行业适用估值口径；
+- [x] 相对估值纯函数；
+- [x] 基本面锚定估值纯函数；
+- [x] 隐含增长/ROE 纯函数；
+- [x] 趋势/加速度/一次性调整编译器；
 - [ ] 分析师修正 adapter（若数据源通过资格）；
+- [ ] 新估值模型的 exact frozen bundle / persistence / orchestration 安全接线；
 - [x] scenario/sensitivity。
 
 状态（2026-08-14）：已有行业模板相关的估值/改善领域基线和 provider-neutral 的
@@ -632,8 +633,17 @@ versioned comparable 三域的只读资格检查、repeatable-read 确定性编�
 bundle、append-only Repository/migration 和 dry-run-by-default worker。current 路径只消费
 `normalized_current`；strict 路径只消费 `pit_verified` 并检查 `available_at <= decision_time` 与
 财务双时间。真实开发库 dry-run 因财务改善窗口、近期价格和 comparable lineage 缺口失败关闭，
-没有生成 bundle。仍缺历史/行业/同业相对估值、基本面锚定估值、隐含预期模型、分析师修正资格
-链路和真实合格运行产物，因此 W01 尚未完成；不可用分项继续显式 `unavailable`，不得填零。
+没有生成 bundle。ADR-0011 已冻结 V0 估值工程默认；历史/行业/同业相对估值、非金融 FCF
+永续增长、银行 justified P/B、价格反解隐含增长/ROE、分析师区间修正和四期改善编译器已实现为
+provider-neutral 纯函数，并保持 `scientific_status=not_evaluated`。新模型没有新增 application
+输入真源；但现有 frozen bundle 和 orchestration 尚未携带或调用这些新模型，安全 runtime 接线仍待
+完成。价格、每股基本面和假设分别绑定单位/provenance；分析师 current/prior 快照分别绑定 provider
+与 provenance，并与 attestation provider 一致；领域 dataclass 不能替代治理 registry 的真实 lookup。
+缺 anchor、三类相对参考或可核验分析师 attestation 时显式 unavailable。PostgreSQL compiler 遇到
+未知基数效应/一次性项目时现在生成无数值的 unavailable 输入。仍缺真实
+historical/industry/peer 估值分布、FCF、合格分析师 adapter/运行产物和新模型的 frozen runtime 接线，
+因此 W01 和 P5 Gate 尚未
+完成；不可用分项继续显式 `unavailable`，不得填零。
 
 ### P5-W02：Expected Return Compiler V0
 

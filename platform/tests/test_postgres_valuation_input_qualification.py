@@ -78,11 +78,7 @@ def financial_rows(trust: DataTrustState) -> list[tuple[object, ...]]:
             values[metric][period_index],
             "currency",
             "CNY",
-            (
-                "point_in_time"
-                if metric == "balance.total_equity"
-                else "ttm"
-            ),
+            ("point_in_time" if metric == "balance.total_equity" else "ttm"),
             "mapping:financial:v1",
             f"raw:{metric}:{period.isoformat()}",
         )
@@ -300,16 +296,17 @@ class PostgresValuationInputQualificationSourceTest(unittest.TestCase):
         self.assertIsNone(metrics[ValuationMetric.FREE_CASH_FLOW_YIELD].numerator)
         self.assertIsNone(frozen.market_implied.lower)
         self.assertTrue(frozen.market_implied.unavailable_reasons)
-        self.assertTrue(
-            all(item.driver_lower is None for item in frozen.scenario_inputs)
-        )
+        self.assertTrue(all(item.level is None for item in frozen.improvement_inputs))
+        self.assertTrue(all(item.unavailable_reasons for item in frozen.improvement_inputs))
+        self.assertTrue(all(item.driver_lower is None for item in frozen.scenario_inputs))
         self.assertEqual(
             {
                 item.status
                 for item in ValuationImprovementOrchestrationService(
                     MemoryValuationImprovementInputSource((frozen,)),
                     scenario_definition(),
-                ).evaluate(
+                )
+                .evaluate(
                     ValuationImprovementInputRequest(
                         security_id=frozen.security_id,
                         decision_time=frozen.decision_time,
@@ -317,7 +314,8 @@ class PostgresValuationInputQualificationSourceTest(unittest.TestCase):
                         trust_state=frozen.trust_state,
                         bundle_version_id=frozen.bundle_version_id,
                     )
-                ).scenario_result.scenario_results
+                )
+                .scenario_result.scenario_results
             },
             {ValuationScenarioStatus.UNAVAILABLE},
         )
@@ -332,7 +330,9 @@ class PostgresValuationInputQualificationSourceTest(unittest.TestCase):
         missing = missing_source.inspect(request())
         self.assertFalse(missing.is_qualified)
         comparable = next(
-            item for item in missing.domain_evidence if item.domain is ValuationInputDomain.COMPARABLE
+            item
+            for item in missing.domain_evidence
+            if item.domain is ValuationInputDomain.COMPARABLE
         )
         self.assertEqual(comparable.observation_count, 0)
         self.assertTrue(comparable.blockers)

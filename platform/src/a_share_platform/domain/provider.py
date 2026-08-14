@@ -22,6 +22,7 @@ class DataField(str, Enum):
     CORPORATE_ACTION = "corporate_action"
     SHARE_CAPITAL = "share_capital"
     ANNOUNCEMENT = "announcement"
+    ANALYST_CONSENSUS = "analyst_consensus"
 
 
 class ProviderTier(str, Enum):
@@ -124,7 +125,9 @@ class ProviderRegistry:
         try:
             return self._policies[(provider_id, DataField(field))]
         except KeyError as error:
-            raise KeyError(f"provider {provider_id!r} has no policy for {DataField(field).value}") from error
+            raise KeyError(
+                f"provider {provider_id!r} has no policy for {DataField(field).value}"
+            ) from error
 
     def policies_for(self, field: DataField) -> tuple[ProviderFieldPolicy, ...]:
         order = {

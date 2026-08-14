@@ -102,6 +102,7 @@
 | ID | 决策 | 推荐默认 | 最迟时点 |
 |---|---|---|---|
 | P5-D1-01 | Outcome entry/exit session、价格、复权和公司行动政策 | ADR-0006 | 已冻结；实际 source 仍需资格 |
+| P5-D1-02 | P5 相对估值、FCF/银行锚定、隐含预期和负值政策 | ADR-0011：区间模型、保留负隐含增长、分析师来源先过资格门 | 已冻结；科学状态仍为 `not_evaluated` |
 | P6-D1-01 | 第一再平衡频率 | ADR-0006：月度，周度仅敏感度 | 已冻结 |
 | P6-D1-02 | 第一成本/成交参考 | ADR-0006：versioned next-session VWAP/cost | 已冻结 |
 | P7-D1-01 | Timing 预测 benchmark/可交易对象 | ADR-0006：与 P6 对齐，必要时绑定 proxy | 已冻结 |

@@ -21,8 +21,9 @@ from a_share_platform.domain.features import FeaturePeriod
 from a_share_platform.domain.fundamental_improvement import (
     BaseEffectTreatment,
     FundamentalImprovementExposures,
-    FundamentalImprovementInput,
+    FundamentalImprovementInputCompilerV0,
     FundamentalImprovementMetric,
+    FundamentalImprovementObservationInput,
     ImprovementComparison,
     ImprovementInputProvenance,
     ImprovementWindow,
@@ -163,9 +164,7 @@ class PostgresValuationInputCompilation:
     def __post_init__(self) -> None:
         if not isinstance(self.qualification, ValuationInputQualification):
             raise TypeError("qualification must be a ValuationInputQualification")
-        if self.bundle is not None and not isinstance(
-            self.bundle, ValuationImprovementInputBundle
-        ):
+        if self.bundle is not None and not isinstance(self.bundle, ValuationImprovementInputBundle):
             raise TypeError("bundle must be a ValuationImprovementInputBundle")
         if self.qualification.is_qualified != (self.bundle is not None):
             raise ValueError("qualified compilation must contain exactly one frozen bundle")
@@ -210,9 +209,7 @@ class DuckDbFrozenPriceReader:
         if row is None:
             return None
         return FrozenPriceObservation(
-            observation_id=(
-                f"price:{row[0]}:{row[1].isoformat()}:{row[4]}:{row[5]}"
-            ),
+            observation_id=(f"price:{row[0]}:{row[1].isoformat()}:{row[4]}:{row[5]}"),
             listing_id=str(row[0]),
             session_date=cast(date, row[1]),
             close=cast(Decimal, row[2]),
@@ -281,9 +278,7 @@ class PostgresValuationInputQualificationSource:
             raise TypeError("request must be a ValuationInputQualificationRequest")
         try:
             with self._connection_factory() as connection, connection.transaction():
-                connection.execute(
-                    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY"
-                )
+                connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
                 financial = self._financial(connection, request)
                 price = self._price(connection, request)
                 comparable = self._comparable(connection, request)
@@ -325,11 +320,7 @@ class PostgresValuationInputQualificationSource:
                         request.decision_time,
                     ),
                 ).fetchall()
-                if (
-                    selected_price is None
-                    or selected_price_row is None
-                    or len(industry_rows) != 1
-                ):
+                if selected_price is None or selected_price_row is None or len(industry_rows) != 1:
                     raise RuntimeError(
                         "qualified valuation input rows changed inside repeatable-read compilation"
                     )
@@ -368,7 +359,9 @@ class PostgresValuationInputQualificationSource:
             try:
                 return indexed[(metric, period)]
             except KeyError as error:
-                raise RuntimeError(f"qualified financial point disappeared: {metric}/{period}") from error
+                raise RuntimeError(
+                    f"qualified financial point disappeared: {metric}/{period}"
+                ) from error
 
         def number(row: Sequence[object]) -> Decimal:
             value = Decimal(str(row[8]))
@@ -391,13 +384,7 @@ class PostgresValuationInputQualificationSource:
             hashes: tuple[str, ...] = (),
         ) -> ValuationInputProvenance:
             datasets = tuple(
-                sorted(
-                    {
-                        dataset_id
-                        for item in evidence
-                        for dataset_id in item.dataset_version_ids
-                    }
-                )
+                sorted({dataset_id for item in evidence for dataset_id in item.dataset_version_ids})
             )
             source_observations = tuple(
                 sorted(
@@ -411,9 +398,7 @@ class PostgresValuationInputQualificationSource:
             content_hashes = tuple(
                 sorted(
                     set(hashes).union(
-                        content_hash
-                        for item in evidence
-                        for content_hash in item.content_hashes
+                        content_hash for item in evidence for content_hash in item.content_hashes
                     )
                 )
             )
@@ -480,9 +465,7 @@ class PostgresValuationInputQualificationSource:
                 provenance=financial_price_provenance,
                 data_mode=request.data_mode,
                 trust_state=request.requested_trust_state,
-                unavailable_reasons=(
-                    () if unavailable_reason is None else (unavailable_reason,)
-                ),
+                unavailable_reasons=(() if unavailable_reason is None else (unavailable_reason,)),
                 decision_time=request.decision_time,
                 latest_source_available_at=financial_price_available,
             )
@@ -559,12 +542,6 @@ class PostgresValuationInputQualificationSource:
             latest_source_available_at=financial_available,
         )
 
-        def change(metric: str, value_date: date, comparison_date: date) -> Decimal:
-            comparison = number(point(metric, comparison_date))
-            if comparison == 0:
-                raise ValueError(f"{metric} comparison value is zero")
-            return number(point(metric, value_date)) / comparison - Decimal(1)
-
         def improvement_provenance(
             metric: FundamentalImprovementMetric,
             rows: tuple[Sequence[object], ...],
@@ -575,13 +552,13 @@ class PostgresValuationInputQualificationSource:
             mapping_id = (
                 mappings[0]
                 if len(mappings) == 1
-                else "mapping-set:"
-                + hashlib.sha256("|".join(mappings).encode()).hexdigest()
+                else "mapping-set:" + hashlib.sha256("|".join(mappings).encode()).hexdigest()
             )
             return ImprovementInputProvenance(
                 dataset_version_id=datasets[0],
                 additional_dataset_version_ids=datasets[1:],
-                source_version_id="source-set:" + hashlib.sha256("|".join(sources).encode()).hexdigest(),
+                source_version_id="source-set:"
+                + hashlib.sha256("|".join(sources).encode()).hexdigest(),
                 mapping_version_id=mapping_id,
                 metric_definition_id=f"metric:{metric.value}",
                 metric_definition_version="v1",
@@ -589,7 +566,8 @@ class PostgresValuationInputQualificationSource:
                 content_hashes=tuple(sorted({str(row[6]) for row in rows})),
             )
 
-        improvement_inputs: list[FundamentalImprovementInput] = []
+        improvement_compiler = FundamentalImprovementInputCompilerV0()
+        improvement_inputs = []
         metric_bindings = {
             FundamentalImprovementMetric.REVENUE: "income.total_operating_revenue",
             FundamentalImprovementMetric.PROFIT: "income.net_profit",
@@ -601,28 +579,34 @@ class PostgresValuationInputQualificationSource:
                 for period in (current, current_comparison, prior, prior_comparison)
             )
             improvement_inputs.append(
-                FundamentalImprovementInput(
-                    metric=metric,
-                    level=number(rows[0]),
-                    current_change=change(financial_metric, current, current_comparison),
-                    prior_change=change(financial_metric, prior, prior_comparison),
-                    level_unit=MetricUnit.CURRENCY,
-                    change_unit=MetricUnit.RATIO,
-                    currency=currency,
-                    comparison=ImprovementComparison.YOY,
-                    window=ImprovementWindow.TTM,
-                    current_period_end=current,
-                    current_comparison_period_end=current_comparison,
-                    prior_period_end=prior,
-                    prior_comparison_period_end=prior_comparison,
-                    seasonality_treatment=SeasonalityTreatment.YOY_COMPARABLE,
-                    base_effect_treatment=BaseEffectTreatment.UNKNOWN,
-                    one_off_treatment=OneOffTreatment.UNKNOWN,
-                    provenance=improvement_provenance(metric, rows),
-                    data_mode=request.data_mode,
-                    trust_state=request.requested_trust_state,
-                    decision_time=request.decision_time,
-                    latest_source_available_at=financial_available,
+                improvement_compiler.compile(
+                    FundamentalImprovementObservationInput(
+                        metric=metric,
+                        current_reported=number(rows[0]),
+                        current_comparison_reported=number(rows[1]),
+                        prior_reported=number(rows[2]),
+                        prior_comparison_reported=number(rows[3]),
+                        current_one_off=Decimal(0),
+                        current_comparison_one_off=Decimal(0),
+                        prior_one_off=Decimal(0),
+                        prior_comparison_one_off=Decimal(0),
+                        level_unit=MetricUnit.CURRENCY,
+                        currency=currency,
+                        comparison=ImprovementComparison.YOY,
+                        window=ImprovementWindow.TTM,
+                        current_period_end=current,
+                        current_comparison_period_end=current_comparison,
+                        prior_period_end=prior,
+                        prior_comparison_period_end=prior_comparison,
+                        seasonality_treatment=SeasonalityTreatment.YOY_COMPARABLE,
+                        base_effect_treatment=BaseEffectTreatment.UNKNOWN,
+                        one_off_treatment=OneOffTreatment.UNKNOWN,
+                        provenance=improvement_provenance(metric, rows),
+                        data_mode=request.data_mode,
+                        trust_state=request.requested_trust_state,
+                        decision_time=request.decision_time,
+                        latest_source_available_at=financial_available,
+                    )
                 )
             )
 
@@ -642,31 +626,37 @@ class PostgresValuationInputQualificationSource:
             return number(point("income.net_profit", period)) / revenue
 
         improvement_inputs.append(
-            FundamentalImprovementInput(
-                metric=FundamentalImprovementMetric.MARGIN,
-                level=margin(current),
-                current_change=margin(current) - margin(current_comparison),
-                prior_change=margin(prior) - margin(prior_comparison),
-                level_unit=MetricUnit.RATIO,
-                change_unit=MetricUnit.RATIO,
-                currency=None,
-                comparison=ImprovementComparison.YOY,
-                window=ImprovementWindow.TTM,
-                current_period_end=current,
-                current_comparison_period_end=current_comparison,
-                prior_period_end=prior,
-                prior_comparison_period_end=prior_comparison,
-                seasonality_treatment=SeasonalityTreatment.YOY_COMPARABLE,
-                base_effect_treatment=BaseEffectTreatment.UNKNOWN,
-                one_off_treatment=OneOffTreatment.UNKNOWN,
-                provenance=improvement_provenance(
-                    FundamentalImprovementMetric.MARGIN,
-                    margin_rows,
-                ),
-                data_mode=request.data_mode,
-                trust_state=request.requested_trust_state,
-                decision_time=request.decision_time,
-                latest_source_available_at=financial_available,
+            improvement_compiler.compile(
+                FundamentalImprovementObservationInput(
+                    metric=FundamentalImprovementMetric.MARGIN,
+                    current_reported=margin(current),
+                    current_comparison_reported=margin(current_comparison),
+                    prior_reported=margin(prior),
+                    prior_comparison_reported=margin(prior_comparison),
+                    current_one_off=Decimal(0),
+                    current_comparison_one_off=Decimal(0),
+                    prior_one_off=Decimal(0),
+                    prior_comparison_one_off=Decimal(0),
+                    level_unit=MetricUnit.RATIO,
+                    currency=None,
+                    comparison=ImprovementComparison.YOY,
+                    window=ImprovementWindow.TTM,
+                    current_period_end=current,
+                    current_comparison_period_end=current_comparison,
+                    prior_period_end=prior,
+                    prior_comparison_period_end=prior_comparison,
+                    seasonality_treatment=SeasonalityTreatment.YOY_COMPARABLE,
+                    base_effect_treatment=BaseEffectTreatment.UNKNOWN,
+                    one_off_treatment=OneOffTreatment.UNKNOWN,
+                    provenance=improvement_provenance(
+                        FundamentalImprovementMetric.MARGIN,
+                        margin_rows,
+                    ),
+                    data_mode=request.data_mode,
+                    trust_state=request.requested_trust_state,
+                    decision_time=request.decision_time,
+                    latest_source_available_at=financial_available,
+                )
             )
         )
 
@@ -687,9 +677,7 @@ class PostgresValuationInputQualificationSource:
                 provenance=scenario_provenance,
                 data_mode=request.data_mode,
                 trust_state=request.requested_trust_state,
-                unavailable_reasons=(
-                    f"{scenario.value} scenario interval is unavailable",
-                ),
+                unavailable_reasons=(f"{scenario.value} scenario interval is unavailable",),
                 decision_time=request.decision_time,
                 latest_source_available_at=comparable_available,
             )
@@ -777,9 +765,7 @@ class PostgresValuationInputQualificationSource:
     def _improvement_window(
         rows: Sequence[Sequence[object]],
     ) -> tuple[date, date, date, date] | None:
-        by_metric: dict[str, dict[int, date]] = {
-            metric: {} for metric in _IMPROVEMENT_METRICS
-        }
+        by_metric: dict[str, dict[int, date]] = {metric: {} for metric in _IMPROVEMENT_METRICS}
         for row in rows:
             metric = str(row[1])
             period = cast(date, row[2])
@@ -817,7 +803,9 @@ class PostgresValuationInputQualificationSource:
         observed_metrics = {str(row[1]) for row in rows}
         missing_metrics = sorted(_REQUIRED_FINANCIAL_METRICS - observed_metrics)
         if missing_metrics:
-            blockers.append("required financial metrics are unavailable: " + ", ".join(missing_metrics))
+            blockers.append(
+                "required financial metrics are unavailable: " + ", ".join(missing_metrics)
+            )
         if rows and not self._has_improvement_window(rows):
             blockers.append(
                 "financial periods do not contain an adjacent-quarter YoY improvement window"
@@ -931,19 +919,11 @@ class PostgresValuationInputQualificationSource:
             blockers.append("share-capital trust does not match the requested trust")
         return ValuationInputDomainEvidence(
             domain=ValuationInputDomain.PRICE,
-            trust_state=(
-                selected.trust_state if selected.trust_state is capital_trust else None
-            ),
-            dataset_version_ids=tuple(
-                sorted({selected.dataset_version_id, str(selected_row[11])})
-            ),
+            trust_state=(selected.trust_state if selected.trust_state is capital_trust else None),
+            dataset_version_ids=tuple(sorted({selected.dataset_version_id, str(selected_row[11])})),
             source_ids=tuple(sorted({selected.source_id, str(selected_row[12])})),
-            observation_ids=tuple(
-                sorted({selected.observation_id, str(selected_row[9])})
-            ),
-            content_hashes=tuple(
-                sorted({selected.content_hash, str(selected_row[15])})
-            ),
+            observation_ids=tuple(sorted({selected.observation_id, str(selected_row[9])})),
+            content_hashes=tuple(sorted({selected.content_hash, str(selected_row[15])})),
             observation_count=2,
             latest_source_available_at=max(
                 selected.available_at,
@@ -1098,9 +1078,7 @@ class PostgresValuationInputQualificationSource:
         blockers: list[str] = []
         member_count = len({str(row[1]) for row in rows})
         if member_count < 3:
-            blockers.append(
-                "versioned comparable set requires the subject and at least two peers"
-            )
+            blockers.append("versioned comparable set requires the subject and at least two peers")
         if not rows:
             blockers.append("qualified comparable observations are unavailable")
         return self._evidence_from_rows(
@@ -1142,9 +1120,7 @@ class PostgresValuationInputQualificationSource:
             content_hashes=tuple(sorted({str(row[hash_index]) for row in rows})),
             observation_count=len(rows),
             latest_source_available_at=(
-                None
-                if not rows
-                else max(cast(datetime, row[available_index]) for row in rows)
+                None if not rows else max(cast(datetime, row[available_index]) for row in rows)
             ),
             blockers=tuple(normalized_blockers),
         )

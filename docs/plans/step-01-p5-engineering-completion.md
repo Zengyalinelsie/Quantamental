@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`；Task 1–3 已验证
+> 状态：`in_progress`；Task 1–3、Task 4A 已验证，Task 4B/5 待完成
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -38,6 +38,7 @@
 ### 待决策
 
 - `P5-D1-01` Outcome 价格政策：不阻塞 provider-neutral worker；阻塞真实 price source adapter；
+- `P5-D1-02` 估值工程公式：已由 ADR-0011 冻结；改变公式、端点组合或负值政策必须升版；
 - 分析师修正无合格来源时保持 unavailable，不阻塞其他 P5 服务。
 
 ### 验收
@@ -101,7 +102,24 @@ Outcome 时拒绝猜测回填。默认运行时 source 因 `P5-D1-01` 未批准�
 
 先实现 provider-neutral source、成熟度扫描、dry-run 默认、execute ack、幂等和 mismatch 拒绝。真实价格 adapter 等 `P5-D1-01`。
 
-### Task 4：估值/改善剩余服务
+### Task 4A：估值/改善纯领域模型
+
+状态：`verified`（仅纯领域工程模型）。ADR-0011 已冻结 provider-neutral V0 公式；相对估值、FCF/银行
+锚定、隐含增长/ROE、分析师修正资格门和四期改善输入编译器均有手算与异常值测试。新模型只在
+domain 提供纯函数，没有新增 application 输入源；运行时仍只允许现有 frozen bundle source 和
+orchestration。价格、每股基本面、假设 provenance 与单位分别闭合；合并结果另保留各输入的
+method/version lineage。分析师 current/prior 快照分别绑定 provider/provenance，且必须与 attestation
+provider 一致；领域对象不替代治理 registry lookup。缺 anchor、缺三类相对参考或缺分析师
+attestation 时显式 unavailable。PostgreSQL compiler 对未知基数效应/一次性项目显式生成 unavailable，
+不再携带看似可量化的数字。
+
+### Task 4B：估值模型 frozen runtime 接线
+
+状态：`pending`。当前 `ValuationImprovementInputBundle`、持久化文档和 orchestration 尚未携带或调用
+Task 4A 的 relative reference、anchor 和 analyst revision 模型。真实 historical/industry/peer 分布、
+FCF 和分析师来源也尚未通过资格。完成时必须扩展现有 exact frozen bundle、qualification/compiler、
+append-only persistence 和 orchestration；不得另建可绕过 bundle ID/decision time/mode/trust 的输入入口。
+在此之前 Task 4 整体和 P5 Gate 都不能标记完成。
 
 预计文件：
 
@@ -130,6 +148,7 @@ Outcome 时拒绝猜测回填。默认运行时 source 因 `P5-D1-01` 未批准�
 cd platform
 PYTHONPATH=src .venv/bin/python -m unittest tests.test_investment_view_artifacts -v
 PYTHONPATH=src .venv/bin/python -m unittest tests.test_investment_view_compilation tests.test_expected_return_ledger tests.test_research_workspace_api -v
+PYTHONPATH=src .venv/bin/python -m unittest tests.test_valuation_models tests.test_fundamental_improvement tests.test_postgres_valuation_input_qualification tests.test_valuation_improvement_service -v
 npm --prefix frontend test -- --run ResearchP5Screen InvestmentViewSummary WorkspacePage.research
 ```
 
