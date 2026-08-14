@@ -26,8 +26,9 @@ Workspace 均已接线。真实开发库的三因子资格审计已失败关闭�
 P5 已完成 InvestmentView/SignalSnapshot 领域合同、PostgreSQL append-only ledger、只读研究 API、
 `/research` 产品接线、1440 px 原型黄金路径，以及真实 PostgreSQL financial/price/comparable
 资格检查和 frozen valuation bundle 持久化链路。真实库 dry-run 因财务窗口、近期价格和版本化
-comparable 缺口失败关闭，bundle 表仍为 0；仍缺合格 PIT InvestmentView、Outcome 到期 worker、
-Frozen Artifact export 及 320/768/1024 运行时验收，因此 P5 Gate 也未通过，尚未进入 P6。
+comparable 缺口失败关闭，bundle 表仍为 0；Frozen Artifact 的 application export 已完成，但 durable
+Governance adapter、下载 API/UI 尚未完成；仍缺合格 PIT InvestmentView、Outcome 到期 worker及
+320/768/1024 运行时验收，因此 P5 Gate 也未通过，尚未进入 P6。
 
 Expected Return Compiler 前已有独立的 strict PIT application gate：只有 exact frozen bundle、
 量化的 quality/valuation/revision、量化 scenario、完整 DatasetVersion/definition/bundle evidence 和
@@ -83,6 +84,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [从当前状态到最终产品的全局交付路线图](docs/19-end-to-end-product-roadmap.md)
 - [P5–P11 开发前 Spec / Plan 完整性审计](docs/20-pre-development-spec-plan-audit.md)
 - [逐步骤实现级 Spec / Plan 包](docs/plans/README.md)
+- [P5 实现与验证证据](docs/21-p5-implementation-evidence.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)

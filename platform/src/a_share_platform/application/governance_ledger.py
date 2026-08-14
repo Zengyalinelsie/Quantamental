@@ -26,6 +26,9 @@ class GovernanceLedger:
     def register_run(self, value: RunRecord) -> RunRecord:
         return self._repository.register_run(value)
 
+    def get_run(self, run_id: str) -> RunRecord | None:
+        return self._repository.get_run(run_id)
+
     def finish_run(
         self,
         run_id: str,
@@ -55,5 +58,11 @@ class GovernanceLedger:
             raise ValueError(f"artifact run does not exist: {value.run_id}")
         return self._repository.register_artifact(value)
 
+    def list_artifacts(self) -> tuple[Artifact, ...]:
+        return self._repository.list_artifacts()
+
     def register_lineage(self, value: LineageEdge) -> LineageEdge:
         return self._repository.register_lineage(value)
+
+    def list_lineage(self) -> tuple[LineageEdge, ...]:
+        return self._repository.list_lineage()

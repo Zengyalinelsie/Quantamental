@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`  
+> 状态：`in_progress`；Task 1 application export 已验证
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -51,6 +51,8 @@
 ## Plan
 
 ### Task 1：Frozen Artifact 红绿闭环
+
+状态：`verified`。TDD、全量验证和限制见 `docs/21-p5-implementation-evidence.md`。
 
 预计文件：
 

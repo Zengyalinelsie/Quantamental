@@ -654,8 +654,9 @@ projection 已实现。本轮新增 strict PIT compilation application gate：Ex
 与 exact frozen valuation bundle、量化的 quality/valuation/revision/scenario、DatasetVersion、
 definition hash、bundle version 和 availability 完整闭合，preview 零写入，ensure 幂等落账；current、
 partial 或 lineage 不闭合全部失败关闭。当前没有合格 PIT bundle 和获批模型输出 adapter，真实库
-InvestmentView 仍为 0。仍缺 outcome 到期写入 worker 和 Frozen Artifact export，故本工作包尚未
-完成，测试产物不得视为真实收益预测。
+InvestmentView 仍为 0。Frozen Artifact 的 deterministic application export、成功 Run preflight、
+content-addressed object、Artifact/lineage 和幂等已完成；仍缺 durable Governance adapter、下载
+API/UI 和 outcome 到期写入 worker，故本工作包尚未完成，测试产物不得视为真实收益预测。
 
 ### P5-W03：SignalSnapshot
 
@@ -688,7 +689,7 @@ serving view 和 FastAPI 只读查询面已完成。当前 P4 没有通过 PIT/�
 组件，以及 server-owned Screen ranking、industry peers、Alpha Model readiness/approval blocker 组件
 已完成合同测试并接入 `/api/research/workspace` 和 `/research` 产品路由；前端不重算闭合、
 rank change 或排序。当前页面只能展示数据库中真实存在且满足查询合同的对象，空库会诚实显示
-blocker。仍缺真实数据详情、Frozen Artifact export、320/768/1024 响应式实现和最终浏览器验收，
+blocker。仍缺真实数据详情、Frozen Artifact durable/API/UI 接线、320/768/1024 响应式实现和最终浏览器验收，
 运行时不得注入 demo 值。产品蓝图、黄金路径与当前原型证据见
 `docs/18-product-blueprint-and-prototype.md`。
 
