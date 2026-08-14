@@ -77,6 +77,7 @@ PERSISTENT_TABLE_SCHEMAS: Final[Mapping[str, SchemaLayer]] = MappingProxyType(
         "research_labels": SchemaLayer.RESEARCH,
         "signal_snapshots": SchemaLayer.RESEARCH,
         "timing_forecasts": SchemaLayer.RESEARCH,
+        "valuation_input_bundles": SchemaLayer.RESEARCH,
     }
 )
 

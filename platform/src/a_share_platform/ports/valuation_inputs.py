@@ -196,7 +196,15 @@ class ValuationImprovementInputBundle:
             raise ValueError("dataset_version_ids must contain non-empty versions")
         if len(declared_datasets) != len(set(declared_datasets)):
             raise ValueError("dataset_version_ids must be unique")
-        actual_datasets = tuple(sorted({value.provenance.dataset_version_id for value in evidence}))
+        actual_datasets = tuple(
+            sorted(
+                {
+                    dataset_id
+                    for value in evidence
+                    for dataset_id in value.provenance.dataset_version_ids
+                }
+            )
+        )
         if declared_datasets != actual_datasets:
             raise ValueError("dataset_version_ids do not match frozen input lineage")
         object.__setattr__(self, "dataset_version_ids", declared_datasets)
@@ -224,8 +232,26 @@ class ValuationImprovementInputSource(Protocol):
     ) -> ValuationImprovementInputBundle | None: ...
 
 
+class ValuationImprovementInputConflict(RuntimeError):
+    """An immutable frozen bundle identifier or natural key was reused."""
+
+
+class ValuationImprovementInputUnavailable(RuntimeError):
+    """The configured durable frozen-input store cannot be reached."""
+
+
+class ValuationImprovementInputRepository(ValuationImprovementInputSource, Protocol):
+    def append(
+        self,
+        value: ValuationImprovementInputBundle,
+    ) -> ValuationImprovementInputBundle: ...
+
+
 __all__ = [
     "ValuationImprovementInputBundle",
+    "ValuationImprovementInputConflict",
+    "ValuationImprovementInputRepository",
     "ValuationImprovementInputRequest",
     "ValuationImprovementInputSource",
+    "ValuationImprovementInputUnavailable",
 ]

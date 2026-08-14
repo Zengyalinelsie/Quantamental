@@ -473,6 +473,9 @@ class CanonicalBackfillSinkTest(unittest.TestCase):
             params for query, params in connection.calls if "INSERT INTO canonical.industry_memberships" in query
         )
         self.assertIsNone(industry_call[3])
+        self.assertEqual(industry_call[6], "dataset:identity:v1")
+        self.assertEqual(industry_call[7], DataTrustState.NORMALIZED_CURRENT.value)
+        self.assertEqual(industry_call[8], NOW)
         listing_state_call = next(
             params
             for query, params in connection.calls

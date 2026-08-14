@@ -626,11 +626,14 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [ ] 分析师修正 adapter（若数据源通过资格）；
 - [x] scenario/sensitivity。
 
-状态（2026-08-14）：已有行业模板相关的估值/改善领域基线；本轮新增 provider-neutral 的
-base/bull/bear scenario/sensitivity，以及按 security、decision time、data mode、trust 和 bundle
-version 精确冻结的 application 编排。缺少从真实 PostgreSQL financial/price/comparable inputs
-构造 bundle 的 adapter、历史/行业/同业相对估值服务、分析师修正资格链路和真实运行产物，
-因此 W01 尚未完成；所有结果继续标记 `not_evaluated`。
+状态（2026-08-14）：已有行业模板相关的估值/改善领域基线和 provider-neutral 的
+base/bull/bear scenario/sensitivity。本轮完成真实 PostgreSQL financial、price/share-capital、
+versioned comparable 三域的只读资格检查、repeatable-read 确定性编译、完整 lineage 的 frozen
+bundle、append-only Repository/migration 和 dry-run-by-default worker。current 路径只消费
+`normalized_current`；strict 路径只消费 `pit_verified` 并检查 `available_at <= decision_time` 与
+财务双时间。真实开发库 dry-run 因财务改善窗口、近期价格和 comparable lineage 缺口失败关闭，
+没有生成 bundle。仍缺历史/行业/同业相对估值、基本面锚定估值、隐含预期模型、分析师修正资格
+链路和真实合格运行产物，因此 W01 尚未完成；不可用分项继续显式 `unavailable`，不得填零。
 
 ### P5-W02：Expected Return Compiler V0
 
@@ -694,10 +697,10 @@ blocker。仍缺真实数据详情、Frozen Artifact export、320/768/1024 响�
 - SPEC-018–019、024–025 通过；SPEC-030 的输入合同完成，输出和组合验收留到 P6。
 
 状态（2026-08-14）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
-原型黄金路径已经具备，但仍缺合格 PIT/获批 factor/model、真实决策日 InvestmentView/
-SignalSnapshot、outcome 到期 worker、Frozen Artifact export、320/768/1024 运行时响应式证据和最终
-浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，更不能据此声称
-模型科学有效。
+原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
+仍缺合格 PIT/获批 factor/model、真实决策日 InvestmentView/SignalSnapshot、outcome 到期 worker、
+Frozen Artifact export、320/768/1024 运行时响应式证据和最终浏览器验收。不能以单元测试、空表
+迁移、原型或展示组件替代 Capability Gate，更不能据此声称模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测
 

@@ -104,3 +104,26 @@ Jobs 及每个 Job 的 coverage/checkpoint 也独立分页，分页总数仍使�
 当前没有满足用途审批的 factor/model，也没有可合法写入的真实 SignalSnapshot；本次未生成 demo
 InvestmentView、伪 PIT 或生产信号。增量后的平台业务表为 53 张，`research` 为 11 张表，
 `serving` 为 3 个 view。结构与自动测试通过只证明工程合同，不证明模型科学有效。
+
+## 8. P5 frozen valuation input 增量迁移
+
+2026-08-14 只在分层开发库执行 migration `0031_p5_frozen_valuation_inputs`；首次执行返回该版本，
+第二次执行无输出且正常退出。旧库未修改。该 migration：
+
+- 新增 `research.valuation_input_bundles`，按 security、decision time、data mode、trust 和 bundle
+  version 精确保存完整 JSONB 文档、content hash 与 DatasetVersion lineage；
+- 用数据库约束阻止 `strict_historical + normalized_current`、未来可用时间、空 DatasetVersion
+  集合和文档/列身份不一致；UPDATE/DELETE 由 append-only trigger 阻断；
+- 为 `canonical.industry_memberships` 增加 DatasetVersion、trust、observed/available 时间列。
+  既有分类行全部保留 NULL lineage，migration 没有猜测或回填来源；后续新 Security Master
+  观察才可写入完整 `normalized_current` lineage。
+
+真实 dry-run 使用 `security:cn:XSHE:000009:a-share` 和
+`2026-08-14T15:00:00+08:00`。数据库返回 72 条 current 财务观察，但相邻季度 YoY 改善窗口不完整；
+近期价格/share-capital 联合输入和版本化 comparable 不可用。因此结果为 `qualified=false`、
+`bundle_version_id=null`、`writes_performed=false`，`research.valuation_input_bundles` 仍为 0 行。
+这证明失败关闭路径工作，不代表已有真实合格估值结果。
+
+增量后的平台业务表为 54 张，`research` 为 12 张表，`serving` 仍为 3 个 view。migration、
+Repository、qualification、compiler 和 CLI 的自动测试通过只证明工程合同，不证明估值模型、
+InvestmentView 或任何投资策略科学有效。

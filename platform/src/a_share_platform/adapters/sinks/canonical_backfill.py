@@ -534,6 +534,8 @@ class CanonicalBackfillSink:
                     industry_name=row.industry_name,
                     observed_on=row.observed_on,
                     source_id=row.industry_source_id,
+                    dataset_version_id=dataset_version_id,
+                    observed_at=self._clock(),
                 )
 
     def _persist_identifier(
@@ -627,6 +629,8 @@ class CanonicalBackfillSink:
         industry_name: str,
         observed_on: date,
         source_id: str,
+        dataset_version_id: str,
+        observed_at: datetime,
     ) -> None:
         self._connection.execute(
             """
@@ -646,9 +650,10 @@ class CanonicalBackfillSink:
             """
             INSERT INTO canonical.industry_memberships (
                 security_id, taxonomy, industry_name, industry_code,
-                valid_from, valid_to, source_id
+                valid_from, valid_to, source_id, dataset_version_id,
+                trust_state, observed_at, available_at
             )
-            VALUES (%s, %s, %s, %s, %s, NULL, %s)
+            VALUES (%s, %s, %s, %s, %s, NULL, %s, %s, %s, %s, NULL)
             ON CONFLICT (security_id, taxonomy, valid_from) DO UPDATE SET
                 industry_name = industry_memberships.industry_name
             WHERE industry_memberships.industry_code IS NOT DISTINCT FROM
@@ -665,6 +670,9 @@ class CanonicalBackfillSink:
                 industry_code,
                 observed_on,
                 source_id,
+                dataset_version_id,
+                DataTrustState.NORMALIZED_CURRENT.value,
+                observed_at,
             ),
         )
         self._require_immutable_write(

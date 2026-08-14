@@ -116,6 +116,7 @@ class ValuationScenarioProvenance:
     dataset_version_id: str
     source_observation_ids: tuple[str, ...]
     content_hashes: tuple[str, ...]
+    additional_dataset_version_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         _text(self.dataset_version_id, "dataset_version_id")
@@ -129,6 +130,18 @@ class ValuationScenarioProvenance:
             raise ValueError("content_hashes must be unique")
         object.__setattr__(self, "source_observation_ids", tuple(sorted(observations)))
         object.__setattr__(self, "content_hashes", tuple(sorted(hashes)))
+        additional = tuple(sorted(self.additional_dataset_version_ids))
+        if len(additional) != len(set(additional)) or any(
+            not isinstance(value, str) or not value.strip() for value in additional
+        ):
+            raise ValueError("additional_dataset_version_ids must be unique non-empty text")
+        if self.dataset_version_id in additional:
+            raise ValueError("primary dataset_version_id cannot be repeated")
+        object.__setattr__(self, "additional_dataset_version_ids", additional)
+
+    @property
+    def dataset_version_ids(self) -> tuple[str, ...]:
+        return (self.dataset_version_id, *self.additional_dataset_version_ids)
 
 
 @dataclass(frozen=True)
@@ -425,7 +438,13 @@ class ValuationScenarioSensitivityDefinition:
             method_version=self.method_version,
             definition_hash=self.definition_hash,
             input_dataset_version_ids=tuple(
-                sorted({value.dataset_version_id for value in provenances})
+                sorted(
+                    {
+                        dataset_id
+                        for value in provenances
+                        for dataset_id in value.dataset_version_ids
+                    }
+                )
             ),
             input_source_observation_ids=tuple(
                 sorted(

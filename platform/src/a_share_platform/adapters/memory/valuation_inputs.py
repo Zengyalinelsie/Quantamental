@@ -48,7 +48,31 @@ class UnavailableValuationImprovementInputSource:
         return None
 
 
+class MemoryValuationImprovementInputRepository(MemoryValuationImprovementInputSource):
+    """Append-only in-memory repository for application contract tests."""
+
+    def append(
+        self,
+        value: ValuationImprovementInputBundle,
+    ) -> ValuationImprovementInputBundle:
+        if not isinstance(value, ValuationImprovementInputBundle):
+            raise TypeError("value must be a ValuationImprovementInputBundle")
+        existing = self._values.get(value.frozen_key)
+        if existing is not None:
+            if existing != value:
+                raise ValueError("immutable valuation/improvement bundle conflict")
+            return existing
+        if any(
+            item.bundle_version_id == value.bundle_version_id and item != value
+            for item in self._values.values()
+        ):
+            raise ValueError("immutable valuation/improvement bundle identifier conflict")
+        self._values[value.frozen_key] = value
+        return value
+
+
 __all__ = [
+    "MemoryValuationImprovementInputRepository",
     "MemoryValuationImprovementInputSource",
     "UnavailableValuationImprovementInputSource",
 ]

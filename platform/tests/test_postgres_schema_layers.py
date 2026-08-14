@@ -13,7 +13,7 @@ SOURCE_ROOT = PLATFORM_ROOT / "src" / "a_share_platform"
 
 
 class PostgresSchemaLayerContractTest(unittest.TestCase):
-    def test_six_layers_and_all_53_persistent_tables_have_one_owner(self) -> None:
+    def test_six_layers_and_all_54_persistent_tables_have_one_owner(self) -> None:
         self.assertEqual(
             {layer.value for layer in SchemaLayer},
             {
@@ -25,7 +25,7 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
                 "serving",
             },
         )
-        self.assertEqual(len(PERSISTENT_TABLE_SCHEMAS), 53)
+        self.assertEqual(len(PERSISTENT_TABLE_SCHEMAS), 54)
         self.assertEqual(
             qualified_table("financial_fact_observations"),
             "canonical.financial_fact_observations",
@@ -57,6 +57,7 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
             "investment_view_outcomes",
             "expected_return_calibrations",
             "signal_snapshots",
+            "valuation_input_bundles",
         }
         for table, layer in PERSISTENT_TABLE_SCHEMAS.items():
             if table in p5_tables:
@@ -70,6 +71,8 @@ class PostgresSchemaLayerContractTest(unittest.TestCase):
                 )
         p5_sql = (
             PLATFORM_ROOT / "migrations" / "0030_p5_investment_signal_ledgers.sql"
+        ).read_text(encoding="utf-8") + (
+            PLATFORM_ROOT / "migrations" / "0031_p5_frozen_valuation_inputs.sql"
         ).read_text(encoding="utf-8")
         p5_normalized = " ".join(p5_sql.split())
         for table in p5_tables:

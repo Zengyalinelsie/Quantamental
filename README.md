@@ -24,9 +24,10 @@ Capability Gate 通过。主动 Timing 仍 `unavailable`；P3.5 已完成 CSI500
 Workspace 均已接线。真实开发库的三因子资格审计已失败关闭；冻结窗口缺合格 `pit_verified`
 输入，因此没有计算因子 score/IC/RankIC、没有晋级，P4 Gate 仍未通过。
 P5 已完成 InvestmentView/SignalSnapshot 领域合同、PostgreSQL append-only ledger、只读研究 API、
-`/research` 产品接线和 1440 px 原型黄金路径；仍缺真实 PostgreSQL 估值输入 bundle、合格 PIT
-InvestmentView、Outcome 到期 worker、Frozen Artifact export 及 320/768/1024 运行时验收，
-因此 P5 Gate 也未通过，尚未进入 P6。
+`/research` 产品接线、1440 px 原型黄金路径，以及真实 PostgreSQL financial/price/comparable
+资格检查和 frozen valuation bundle 持久化链路。真实库 dry-run 因财务窗口、近期价格和版本化
+comparable 缺口失败关闭，bundle 表仍为 0；仍缺合格 PIT InvestmentView、Outcome 到期 worker、
+Frozen Artifact export 及 320/768/1024 运行时验收，因此 P5 Gate 也未通过，尚未进入 P6。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -237,6 +238,34 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.factor_qualification
 
 当前数据库会正确返回资格失败；不要添加 `--execute` 期待生成因子数值。恢复真实 PIT 输入后，
 仍须先 dry-run 审查 role DatasetVersion、覆盖和 lineage。
+
+P5 估值输入资格命令同样默认 dry-run。它只读检查 financial、price/share-capital 和 versioned
+comparable 三域，任一域不合格就不构造、不持久化 bundle：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.valuation_inputs \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
+  --security-id security:cn:XSHE:000009:a-share \
+  --decision-time 2026-08-14T15:00:00+08:00 \
+  --data-mode current_research \
+  --trust-state normalized_current
+```
+
+只有三域全部合格后，增加 `--private-local-research-ack --execute` 才会走 append-only freeze。
+`strict_historical` 必须同时请求 `pit_verified`，且每项事实仍需满足自己的
+`available_at <= decision_time`/双时间条件；该命令不会提升数据 trust。定向验证：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_valuation_input_qualification \
+  tests.test_postgres_valuation_input_qualification \
+  tests.test_postgres_valuation_inputs \
+  tests.test_valuation_input_cli \
+  tests.test_migrations \
+  tests.test_postgres_schema_layers -v
+```
 
 运行当前全量验证；若要包含真实 PostgreSQL migration smoke，显式传入本地验证库 URL：
 

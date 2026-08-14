@@ -86,8 +86,27 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0028_factor_qualification_audits.sql",
                 "0029_layered_schemas.sql",
                 "0030_p5_investment_signal_ledgers.sql",
+                "0031_p5_frozen_valuation_inputs.sql",
             ),
         )
+
+    def test_p5_frozen_valuation_inputs_are_exact_append_only_and_fail_closed(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0031_p5_frozen_valuation_inputs.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "CREATE TABLE research.valuation_input_bundles",
+            "ALTER TABLE canonical.industry_memberships",
+            "industry_membership_qualification_complete",
+            "latest_source_available_at <= decision_time",
+            "data_mode <> 'strict_historical' OR trust_state = 'pit_verified'",
+            "jsonb_array_length(dataset_version_ids) > 0",
+            "bundle_document ->> 'bundle_version_id' = bundle_version_id",
+            "BEFORE UPDATE OR DELETE ON research.valuation_input_bundles",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_p5_ledgers_are_layered_append_only_and_api_isolated(self) -> None:
         sql = (
