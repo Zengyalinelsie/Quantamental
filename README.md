@@ -29,6 +29,11 @@ P5 已完成 InvestmentView/SignalSnapshot 领域合同、PostgreSQL append-only
 comparable 缺口失败关闭，bundle 表仍为 0；仍缺合格 PIT InvestmentView、Outcome 到期 worker、
 Frozen Artifact export 及 320/768/1024 运行时验收，因此 P5 Gate 也未通过，尚未进入 P6。
 
+Expected Return Compiler 前已有独立的 strict PIT application gate：只有 exact frozen bundle、
+量化的 quality/valuation/revision、量化 scenario、完整 DatasetVersion/definition/bundle evidence 和
+可用时间全部闭合时，才允许幂等写入 InvestmentView ledger。当前没有获批模型输出 adapter，也没有
+合格 PIT bundle，因此运行库 InvestmentView 仍为 0；平台不会用 CLI 参数或运行时 demo 值补造。
+
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
 ```text
@@ -263,6 +268,7 @@ PYTHONPATH=src .venv/bin/python -m unittest \
   tests.test_postgres_valuation_input_qualification \
   tests.test_postgres_valuation_inputs \
   tests.test_valuation_input_cli \
+  tests.test_investment_view_compilation \
   tests.test_migrations \
   tests.test_postgres_schema_layers -v
 ```

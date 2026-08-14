@@ -650,8 +650,12 @@ bundle、append-only Repository/migration 和 dry-run-by-default worker。curren
 状态（2026-08-14）：20/60/120 日、四分项、P8 前 event unavailable、Decimal residual 闭合、
 分布/downside、catalyst/invalidator、约束路径和确定性 hash 的领域合同已实现；View、Outcome、
 Calibration 的 append-only application/memory ledger、PostgreSQL migration/repository 和只读 API
-projection 已实现。仍缺真实合格输入编译、outcome 到期写入 worker 和 Frozen Artifact export，
-故本工作包尚未完成，测试产物不得视为真实收益预测。
+projection 已实现。本轮新增 strict PIT compilation application gate：Expected Return 模型输出必须
+与 exact frozen valuation bundle、量化的 quality/valuation/revision/scenario、DatasetVersion、
+definition hash、bundle version 和 availability 完整闭合，preview 零写入，ensure 幂等落账；current、
+partial 或 lineage 不闭合全部失败关闭。当前没有合格 PIT bundle 和获批模型输出 adapter，真实库
+InvestmentView 仍为 0。仍缺 outcome 到期写入 worker 和 Frozen Artifact export，故本工作包尚未
+完成，测试产物不得视为真实收益预测。
 
 ### P5-W03：SignalSnapshot
 
@@ -698,9 +702,10 @@ blocker。仍缺真实数据详情、Frozen Artifact export、320/768/1024 响�
 
 状态（2026-08-14）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
 原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
-仍缺合格 PIT/获批 factor/model、真实决策日 InvestmentView/SignalSnapshot、outcome 到期 worker、
-Frozen Artifact export、320/768/1024 运行时响应式证据和最终浏览器验收。不能以单元测试、空表
-迁移、原型或展示组件替代 Capability Gate，更不能据此声称模型科学有效。
+strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
+InvestmentView/SignalSnapshot、outcome 到期 worker、Frozen Artifact export、320/768/1024 运行时
+响应式证据和最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
+更不能据此声称模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测
 
