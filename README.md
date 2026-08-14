@@ -80,9 +80,17 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P4 实现与验证证据](docs/15-p4-implementation-evidence.md)
 - [PostgreSQL 数据分层方案（待批准）](docs/16-postgresql-data-layering-proposal.md)
 - [产品蓝图与 Figma 原型真源](docs/18-product-blueprint-and-prototype.md)
+- [从当前状态到最终产品的全局交付路线图](docs/19-end-to-end-product-roadmap.md)
+- [P5–P11 开发前 Spec / Plan 完整性审计](docs/20-pre-development-spec-plan-audit.md)
+- [逐步骤实现级 Spec / Plan 包](docs/plans/README.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)
+- [研究基线与 Outcome 评价口径 ADR](docs/adr/0006-research-baseline-and-evaluation-policy.md)
+- [严格 PIT 来源资格策略 ADR](docs/adr/0007-strict-pit-source-qualification-policy.md)
+- [事件文档保存边界 ADR](docs/adr/0008-event-document-retention-policy.md)
+- [监控责任边界 ADR](docs/adr/0009-monitoring-ownership-policy.md)
+- [内部 Paper Broker ADR](docs/adr/0010-deterministic-internal-paper-broker.md)
 
 ## 开发入口
 
