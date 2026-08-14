@@ -26,8 +26,9 @@ Workspace 均已接线。真实开发库的三因子资格审计已失败关闭�
 P5 已完成 InvestmentView/SignalSnapshot 领域合同、PostgreSQL append-only ledger、只读研究 API、
 `/research` 产品接线、1440 px 原型黄金路径，以及真实 PostgreSQL financial/price/comparable
 资格检查和 frozen valuation bundle 持久化链路。真实库 dry-run 因财务窗口、近期价格和版本化
-comparable 缺口失败关闭，bundle 表仍为 0；Frozen Artifact 的 application export 已完成，但 durable
-Governance adapter、下载 API/UI 尚未完成；仍缺合格 PIT InvestmentView、Outcome 到期 worker及
+comparable 缺口失败关闭，bundle 表仍为 0；Frozen Artifact 的 application export、durable Governance
+adapter、数据库不可变约束和私有 metadata/download API 已完成，页面下载入口尚未完成；
+仍缺合格 PIT InvestmentView、Outcome 到期 worker 及
 320/768/1024 运行时验收，因此 P5 Gate 也未通过，尚未进入 P6。
 
 Expected Return Compiler 前已有独立的 strict PIT application gate：只有 exact frozen bundle、
@@ -104,6 +105,26 @@ PYTHONPATH=src "$PYTHON_BIN" -m unittest discover -s tests -v
 PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q src
 "$PYTHON_BIN" -m ruff check src tests
 "$PYTHON_BIN" -m mypy src
+```
+
+P5 私有 Frozen Artifact API 使用 PostgreSQL 中已登记的 metadata，绝不接受客户端传入文件路径。
+本地下载还必须把 `ASP_ARTIFACT_ROOT` 指向导出时 `LocalRawObjectStore` 使用的同一绝对根目录；未配置
+时稳定返回 503。默认运行时没有可信身份提供者，所以匿名请求会在查找 Artifact 前返回 403；测试中
+伪造的 dependency override 不能用于生产。Viewer 只能读已发布研究，而当前 Artifact 没有发布状态，
+所以也不授予；当前只授权指定研究角色读取 research-stage Artifact，P11/limited-live 仍拒绝。
+
+```bash
+cd platform
+ASP_DATABASE_URL=postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
+ASP_ARTIFACT_ROOT="$PWD/var/private-research/artifacts" \
+PYTHONPATH=src .venv/bin/python -m uvicorn a_share_platform.api.app:create_app --factory
+
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_postgres_governance \
+  tests.test_investment_view_artifact_api \
+  tests.test_investment_view_artifacts \
+  tests.test_raw_object_store \
+  tests.test_migrations -v
 ```
 
 ### 私人本地真实数据回填

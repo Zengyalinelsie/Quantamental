@@ -87,8 +87,55 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0029_layered_schemas.sql",
                 "0030_p5_investment_signal_ledgers.sql",
                 "0031_p5_frozen_valuation_inputs.sql",
+                "0032_governance_integrity.sql",
+                "0033_failed_run_reason_guard.sql",
+                "0034_governance_nonblank_fields.sql",
             ),
         )
+
+    def test_governance_identifiers_cannot_bypass_domain_with_blank_text(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0034_governance_nonblank_fields.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for field in (
+            "btrim(run_id) <> ''",
+            "btrim(run_kind) <> ''",
+            "btrim(code_version) <> ''",
+            "btrim(environment_fingerprint) <> ''",
+            "btrim(upstream_id) <> ''",
+            "btrim(downstream_id) <> ''",
+            "btrim(relation) <> ''",
+        ):
+            self.assertIn(field, normalized_sql)
+
+    def test_failed_governance_run_cannot_bypass_reason_with_sql_null(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0033_failed_run_reason_guard.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        self.assertIn("DROP CONSTRAINT run_records_terminal_shape", normalized_sql)
+        self.assertIn("coalesce(btrim(failure_reason), '') <> ''", normalized_sql)
+
+    def test_governance_ledger_is_database_enforced_and_runs_only_transition_once(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0032_governance_integrity.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "content_hash ~ '^sha256:[0-9a-f]{64}$'",
+            "data_mode = 'strict_historical' AND deployment_stage <> 'research'",
+            "BEFORE UPDATE OR DELETE ON governance.dataset_versions",
+            "BEFORE UPDATE OR DELETE ON governance.artifacts",
+            "BEFORE UPDATE OR DELETE ON governance.lineage_edges",
+            "BEFORE UPDATE OR DELETE ON governance.run_records",
+            "OLD.status <> 'running'",
+            "NEW.status NOT IN ('succeeded', 'failed', 'cancelled')",
+            "NEW.data_mode IS DISTINCT FROM OLD.data_mode",
+            "NEW.code_version IS DISTINCT FROM OLD.code_version",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_p5_frozen_valuation_inputs_are_exact_append_only_and_fail_closed(self) -> None:
         sql = (

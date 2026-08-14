@@ -11,7 +11,12 @@ from a_share_platform.application.expected_return_ledger import (
     ExpectedReturnLedgerService,
 )
 from a_share_platform.application.governance_ledger import GovernanceLedger
-from a_share_platform.domain.governance import Artifact, LineageEdge, RunStatus
+from a_share_platform.domain.governance import (
+    Artifact,
+    LineageEdge,
+    RunStatus,
+    VersionConflictError,
+)
 from a_share_platform.domain.investment_view import InvestmentView
 from a_share_platform.ports.disclosure import RawObjectStore
 
@@ -95,15 +100,7 @@ class InvestmentViewArtifactExporter:
         artifact_id = f"artifact:investment-view:{digest}"
         content_hash = f"sha256:{digest}"
         expected_lineage = _lineage(view, artifact_id)
-        registered_artifacts = self._governance.list_artifacts()
-        existing = next(
-            (
-                value
-                for value in registered_artifacts
-                if value.artifact_id == artifact_id
-            ),
-            None,
-        )
+        existing = self._governance.get_artifact(artifact_id)
         if existing is not None:
             if (
                 existing.run_id != view.run_id
@@ -113,22 +110,14 @@ class InvestmentViewArtifactExporter:
                 raise RuntimeError(
                     f"frozen InvestmentView Artifact conflict: {artifact_id}"
                 )
-            prior_lineage = set(self._governance.list_lineage())
-            for edge in expected_lineage:
-                self._governance.register_lineage(edge)
+            prior_lineage = set(self._governance.list_lineage_for(artifact_id))
+            self._governance.register_artifact_with_lineage(existing, expected_lineage)
             return InvestmentViewArtifactExportResult(
                 artifact=existing,
                 writes_performed=any(edge not in prior_lineage for edge in expected_lineage),
             )
 
-        hash_owner = next(
-            (
-                value
-                for value in registered_artifacts
-                if value.content_hash == content_hash
-            ),
-            None,
-        )
+        hash_owner = self._governance.get_artifact_by_hash(content_hash)
         if hash_owner is not None:
             raise RuntimeError(
                 "frozen InvestmentView Artifact content hash conflict: "
@@ -136,18 +125,41 @@ class InvestmentViewArtifactExporter:
             )
 
         storage_uri = self._object_store.put(payload)
-        artifact = self._governance.register_artifact(
-            Artifact(
-                artifact_id=artifact_id,
-                run_id=view.run_id,
-                content_hash=content_hash,
-                media_type=_MEDIA_TYPE,
-                storage_uri=storage_uri,
-                created_at=created_at,
-            )
+        candidate = Artifact(
+            artifact_id=artifact_id,
+            run_id=view.run_id,
+            content_hash=content_hash,
+            media_type=_MEDIA_TYPE,
+            storage_uri=storage_uri,
+            created_at=created_at,
         )
-        for edge in expected_lineage:
-            self._governance.register_lineage(edge)
+        try:
+            artifact = self._governance.register_artifact_with_lineage(
+                candidate,
+                expected_lineage,
+            )
+        except VersionConflictError as error:
+            winner = self._governance.get_artifact(artifact_id)
+            if winner is None or (
+                winner.run_id != candidate.run_id
+                or winner.content_hash != candidate.content_hash
+                or winner.media_type != candidate.media_type
+                or winner.storage_uri != candidate.storage_uri
+            ):
+                raise RuntimeError(
+                    f"concurrent frozen InvestmentView Artifact conflict: {artifact_id}"
+                ) from error
+            prior_lineage = set(self._governance.list_lineage_for(artifact_id))
+            artifact = self._governance.register_artifact_with_lineage(
+                winner,
+                expected_lineage,
+            )
+            return InvestmentViewArtifactExportResult(
+                artifact=artifact,
+                writes_performed=any(
+                    edge not in prior_lineage for edge in expected_lineage
+                ),
+            )
         return InvestmentViewArtifactExportResult(
             artifact=artifact,
             writes_performed=True,

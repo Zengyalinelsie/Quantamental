@@ -65,14 +65,24 @@
 
 ### Task 2：Artifact PostgreSQL/API
 
+状态：`verified`。PostgreSQL repository、0032–0034 数据库约束、精确 lookup、Artifact+lineage 单事务、
+私有 metadata/download API、严格 OpenAPI、受控本地 reader 和真实 PostgreSQL rollback smoke 已完成。
+浏览器入口仍属于 Task 5，不以本 Task 的 API 完成冒充 UI 完成。
+
 预计文件：
 
 - `platform/tests/test_research_workspace_api.py` 或新增 `test_investment_view_artifact_api.py`；
 - `platform/src/a_share_platform/api/app.py`、`api/schemas.py`；
 - `platform/src/a_share_platform/adapters/postgres/governance.py`（若现有能力不足）；
-- `platform/frontend/src/api/client.ts` 和生成 schema。
+- 前端 client/schema 和页面入口移至 Task 5，避免在没有可信身份提供者时做伪可用按钮。
 
 先写缺失、无权限、成功读取和 immutable cache/header 合同，再接只读元数据/下载入口。
+
+实现补充：匿名在对象查找前拒绝；metadata 不暴露 `storage_uri`，并返回 producer RunContext；
+missing producer Run、路径越界、symlink/非普通文件、超限和 hash mismatch 均失败关闭；
+Viewer 因缺少发布/审批绑定而拒绝，Run 列表也鉴权并限定 research；limited-live Artifact 因 P11
+未授权而拒绝。等价并发 CAS/object/DB winner 可幂等恢复。对象存储与 PostgreSQL 无跨系统原子事务，CAS 对象先写而
+DB 事务失败时可能留下不可下载的孤儿对象，后续由对象清理任务处理，不能据此登记 Artifact。
 
 ### Task 3：Outcome source 与 worker
 

@@ -6,12 +6,13 @@ import os
 from dataclasses import asdict
 from datetime import UTC, date, datetime, time
 from importlib.metadata import version
+from pathlib import Path
 from typing import Annotated, Any
 from zoneinfo import ZoneInfo
 
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from a_share_platform.adapters.memory.expected_return import (
     UnavailableExpectedReturnLedgerRepository,
@@ -26,6 +27,10 @@ from a_share_platform.adapters.memory.financial_evidence import StaticFinancialE
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
 from a_share_platform.adapters.memory.signals import UnavailableSignalSnapshotRepository
 from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
+from a_share_platform.adapters.object_store.local import (
+    LocalArtifactReader,
+    UnavailableArtifactReader,
+)
 from a_share_platform.adapters.postgres.expected_return import (
     PostgresExpectedReturnLedgerRepository,
 )
@@ -36,6 +41,7 @@ from a_share_platform.adapters.postgres.factor_reviews import (
     PostgresFactorReviewRepository,
 )
 from a_share_platform.adapters.postgres.financial_evidence import PostgresFinancialEvidenceReader
+from a_share_platform.adapters.postgres.governance import PostgresGovernanceRepository
 from a_share_platform.adapters.postgres.signals import PostgresSignalSnapshotRepository
 from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
 from a_share_platform.application.experiments import ExperimentRunService
@@ -78,10 +84,19 @@ from a_share_platform.ports.factor_reviews import (
     FactorReviewStoreUnavailable,
 )
 from a_share_platform.ports.financial_evidence import FinancialEvidenceReader
+from a_share_platform.ports.governance import (
+    ArtifactIntegrityError,
+    ArtifactObjectReader,
+    ArtifactObjectUnavailable,
+    GovernanceRepository,
+    GovernanceStoreUnavailable,
+)
 from a_share_platform.ports.signals import SignalSnapshotRepository
 from a_share_platform.ports.system_catalog import SystemCatalogReader
 
 from .schemas import (
+    ArtifactMetadataEnvelope,
+    ArtifactMetadataListEnvelope,
     Envelope,
     ExperimentRunInput,
     FactorReviewInput,
@@ -111,6 +126,16 @@ def anonymous_principal() -> Principal:
     """P1 has no trusted identity provider; headers never create a principal."""
 
     return Principal.anonymous()
+
+
+def artifact_read_principal(
+    principal: Annotated[Principal, Depends(anonymous_principal)],
+) -> Principal:
+    if not PermissionPolicy.default().allows(principal, Permission.READ_ARTIFACT):
+        raise PermissionDenied(
+            f"subject {principal.subject_id} cannot read private Artifacts"
+        )
+    return principal
 
 
 def fixed_read_context(
@@ -170,7 +195,7 @@ def envelope(
 
 
 def create_app(
-    repository: InMemoryGovernanceRepository | None = None,
+    repository: GovernanceRepository | None = None,
     security_master: SecurityMaster | None = None,
     universe_catalog: UniverseCatalog | None = None,
     market_data_catalog: MarketDataCatalog | None = None,
@@ -180,17 +205,30 @@ def create_app(
     factor_review_repository: FactorReviewRepository | None = None,
     expected_return_repository: ExpectedReturnLedgerRepository | None = None,
     signal_snapshot_repository: SignalSnapshotRepository | None = None,
+    artifact_reader: ArtifactObjectReader | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="A-Share Platform Next",
         summary="Governed research data, experiments, and review API",
         version=version("a-share-platform"),
     )
-    governance = repository or InMemoryGovernanceRepository()
+    database_url = os.environ.get("ASP_DATABASE_URL", "").strip()
+    governance = repository or (
+        PostgresGovernanceRepository.from_dsn(database_url)
+        if database_url
+        else InMemoryGovernanceRepository()
+    )
+    artifact_root = os.environ.get("ASP_ARTIFACT_ROOT", "").strip()
+    artifact_objects = artifact_reader or (
+        LocalArtifactReader(Path(artifact_root))
+        if artifact_root
+        else UnavailableArtifactReader(
+            "ASP_ARTIFACT_ROOT is not configured for Artifact downloads"
+        )
+    )
     master = security_master or SecurityMaster.empty()
     universes = universe_catalog or UniverseCatalog.empty()
     market_data = market_data_catalog or MarketDataCatalog.empty()
-    database_url = os.environ.get("ASP_DATABASE_URL", "").strip()
     system = system_catalog or (
         PostgresSystemCatalogReader.from_dsn(database_url)
         if database_url
@@ -239,6 +277,7 @@ def create_app(
         security_master=master,
     )
     app.state.governance_repository = governance
+    app.state.artifact_reader = artifact_objects
     app.state.security_master = master
     app.state.universe_catalog = universes
     app.state.market_data_catalog = market_data
@@ -280,6 +319,48 @@ def create_app(
             instance=request.url.path,
         )
         return JSONResponse(problem.model_dump(), status_code=404)
+
+    @app.exception_handler(GovernanceStoreUnavailable)
+    async def governance_store_unavailable_handler(
+        request: Request,
+        error: GovernanceStoreUnavailable,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="governance_store_unavailable",
+            title="Governance store unavailable",
+            status=503,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=503)
+
+    @app.exception_handler(ArtifactObjectUnavailable)
+    async def artifact_object_unavailable_handler(
+        request: Request,
+        error: ArtifactObjectUnavailable,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="artifact_object_unavailable",
+            title="Artifact object unavailable",
+            status=503,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=503)
+
+    @app.exception_handler(ArtifactIntegrityError)
+    async def artifact_integrity_error_handler(
+        request: Request,
+        error: ArtifactIntegrityError,
+    ) -> JSONResponse:
+        problem = ProblemDetails(
+            type="artifact_integrity_error",
+            title="Artifact integrity error",
+            status=409,
+            detail=str(error),
+            instance=request.url.path,
+        )
+        return JSONResponse(problem.model_dump(), status_code=409)
 
     @app.exception_handler(PermissionDenied)
     async def permission_denied_handler(
@@ -464,15 +545,164 @@ def create_app(
 
     @app.get("/api/runs", response_model=Envelope)
     def runs(
+        _principal: Annotated[Principal, Depends(artifact_read_principal)],
         context: Annotated[RunContext, Depends(fixed_read_context)],
     ) -> Envelope:
-        return envelope([asdict(item) for item in governance.list_runs()], context)
+        return envelope(
+            [
+                asdict(item)
+                for item in governance.list_runs()
+                if item.context.deployment_stage is DeploymentStage.RESEARCH
+            ],
+            context,
+        )
 
-    @app.get("/api/artifacts", response_model=Envelope)
+    @app.get(
+        "/api/artifacts",
+        response_model=ArtifactMetadataListEnvelope,
+        responses={
+            403: {"model": ProblemDetails, "description": "Permission denied"},
+            409: {"model": ProblemDetails, "description": "Artifact integrity error"},
+            503: {"model": ProblemDetails, "description": "Governance unavailable"},
+        },
+    )
     def artifacts(
+        _principal: Annotated[Principal, Depends(artifact_read_principal)],
         context: Annotated[RunContext, Depends(fixed_read_context)],
-    ) -> Envelope:
-        return envelope([asdict(item) for item in governance.list_artifacts()], context)
+    ) -> ArtifactMetadataListEnvelope:
+        rows = []
+        for value in governance.list_artifacts():
+            run = artifact_producer_run(value)
+            if run.context.deployment_stage is DeploymentStage.RESEARCH:
+                rows.append(artifact_metadata_document(value, run))
+        response = envelope(rows, context)
+        return ArtifactMetadataListEnvelope.model_validate(response.model_dump())
+
+    def artifact_producer_run(value):  # type: ignore[no-untyped-def]
+        run = governance.get_run(value.run_id)
+        if run is None:
+            raise ArtifactIntegrityError(
+                f"Artifact producer run does not exist: {value.artifact_id}"
+            )
+        return run
+
+    def require_research_artifact(value):  # type: ignore[no-untyped-def]
+        run = artifact_producer_run(value)
+        if run.context.deployment_stage is not DeploymentStage.RESEARCH:
+            raise PermissionDenied(
+                "P11/live-scoped Artifact access is not authorized: "
+                f"{value.artifact_id}"
+            )
+        return run
+
+    def artifact_metadata_document(value, run):  # type: ignore[no-untyped-def]
+        return {
+            "artifact_id": value.artifact_id,
+            "run_id": value.run_id,
+            "content_hash": value.content_hash,
+            "media_type": value.media_type,
+            "created_at": value.created_at,
+            "producer_context": {
+                "data_mode": run.context.data_mode,
+                "deployment_stage": run.context.deployment_stage,
+            },
+        }
+
+    def artifact_or_404(artifact_id: str):  # type: ignore[no-untyped-def]
+        value = governance.get_artifact(artifact_id)
+        if value is None:
+            raise ResourceNotFound(f"Artifact not found: {artifact_id}")
+        return value
+
+    @app.get(
+        "/api/artifacts/{artifact_id}",
+        response_model=ArtifactMetadataEnvelope,
+        responses={
+            403: {"model": ProblemDetails, "description": "Permission denied"},
+            404: {"model": ProblemDetails, "description": "Artifact not found"},
+            409: {"model": ProblemDetails, "description": "Artifact integrity error"},
+            503: {"model": ProblemDetails, "description": "Governance unavailable"},
+        },
+    )
+    def artifact_metadata(
+        artifact_id: str,
+        _principal: Annotated[Principal, Depends(artifact_read_principal)],
+        _context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> ArtifactMetadataEnvelope:
+        value = artifact_or_404(artifact_id)
+        run = require_research_artifact(value)
+        response = envelope(
+            artifact_metadata_document(value, run),
+            run.context,
+            as_of=value.created_at,
+            run_id=value.run_id,
+        )
+        return ArtifactMetadataEnvelope.model_validate(response.model_dump())
+
+    @app.get(
+        "/api/artifacts/{artifact_id}/download",
+        response_class=Response,
+        responses={
+            200: {
+                "description": "Verified immutable Artifact bytes",
+                "content": {
+                    "application/json": {
+                        "schema": {"type": "string", "format": "binary"}
+                    },
+                    "application/octet-stream": {
+                        "schema": {"type": "string", "format": "binary"}
+                    },
+                },
+                "headers": {
+                    "ETag": {"schema": {"type": "string"}},
+                    "Cache-Control": {"schema": {"type": "string"}},
+                    "Content-Disposition": {"schema": {"type": "string"}},
+                    "X-Content-Type-Options": {"schema": {"type": "string"}},
+                },
+            },
+            304: {
+                "description": "Verified immutable object not modified",
+                "headers": {
+                    "ETag": {"schema": {"type": "string"}},
+                    "Cache-Control": {"schema": {"type": "string"}},
+                },
+            },
+            400: {"model": ProblemDetails, "description": "Context override denied"},
+            403: {"model": ProblemDetails, "description": "Permission denied"},
+            404: {"model": ProblemDetails, "description": "Artifact not found"},
+            409: {"model": ProblemDetails, "description": "Artifact integrity error"},
+            503: {"model": ProblemDetails, "description": "Artifact unavailable"},
+        },
+    )
+    def artifact_download(
+        artifact_id: str,
+        request: Request,
+        _principal: Annotated[Principal, Depends(artifact_read_principal)],
+        _context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> Response:
+        value = artifact_or_404(artifact_id)
+        require_research_artifact(value)
+        payload = artifact_objects.read(value)
+        digest = value.content_hash.removeprefix("sha256:")
+        safe_media_type = (
+            "application/json"
+            if value.media_type == "application/json"
+            else "application/octet-stream"
+        )
+        suffix = "json" if safe_media_type == "application/json" else "bin"
+        headers = {
+            "Cache-Control": "private, max-age=31536000, immutable",
+            "Content-Disposition": f'attachment; filename="artifact-{digest}.{suffix}"',
+            "ETag": f'"{value.content_hash}"',
+            "X-Content-Type-Options": "nosniff",
+        }
+        if request.headers.get("if-none-match") == headers["ETag"]:
+            return Response(status_code=304, headers=headers)
+        return Response(
+            content=payload,
+            media_type=safe_media_type,
+            headers=headers,
+        )
 
     @app.get("/api/experiments/runs", response_model=Envelope)
     def experiment_runs(

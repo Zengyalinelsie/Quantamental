@@ -36,12 +36,19 @@ class ApiContractTest(unittest.TestCase):
         self.assertIn("as_of", payload["context"])
         self.assertIn("system_as_of", payload["context"])
 
-    def test_governance_resources_are_honestly_empty(self) -> None:
-        for resource in ("datasets", "runs", "artifacts"):
+    def test_public_dataset_resource_is_honestly_empty(self) -> None:
+        for resource in ("datasets",):
             with self.subTest(resource=resource):
                 response = self.client.get(f"/api/{resource}")
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json()["data"], [])
+
+    def test_anonymous_cannot_enumerate_private_artifacts(self) -> None:
+        for resource in ("artifacts", "runs"):
+            with self.subTest(resource=resource):
+                response = self.client.get(f"/api/{resource}")
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.json()["type"], "permission_denied")
 
     def test_client_cannot_promote_run_context_with_query_parameters(self) -> None:
         response = self.client.get(

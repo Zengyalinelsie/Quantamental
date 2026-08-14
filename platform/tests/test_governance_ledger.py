@@ -1,5 +1,5 @@
 import unittest
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from datetime import UTC, datetime, timedelta
 
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
@@ -39,6 +39,10 @@ def running_run() -> RunRecord:
         code_version="git:abc123",
         environment_fingerprint="python:3.12:test",
     )
+
+
+def pending_run() -> RunRecord:
+    return replace(running_run(), status=RunStatus.PENDING)
 
 
 class GovernanceLedgerTest(unittest.TestCase):
@@ -89,6 +93,26 @@ class GovernanceLedgerTest(unittest.TestCase):
                 status=RunStatus.FAILED,
                 finished_at=NOW + timedelta(minutes=2),
                 failure_reason="late failure",
+            )
+
+    def test_memory_repository_enforces_same_run_transitions_as_postgres(self) -> None:
+        pending = self.repository.register_run(pending_run())
+        running = replace(pending, status=RunStatus.RUNNING)
+        self.assertEqual(self.repository.append_run_state(running), running)
+        with self.assertRaises(InvalidRunTransitionError):
+            self.repository.append_run_state(replace(running, status=RunStatus.PENDING))
+
+    def test_memory_repository_rejects_orphan_artifact_without_ledger_wrapper(self) -> None:
+        with self.assertRaisesRegex(ValueError, "run does not exist"):
+            self.repository.register_artifact(
+                Artifact(
+                    artifact_id="artifact:orphan",
+                    run_id="run:missing",
+                    content_hash=HASH_A,
+                    media_type="application/json",
+                    storage_uri="file:///private/orphan",
+                    created_at=NOW,
+                )
             )
 
     def test_artifact_write_is_idempotent_and_hash_bound(self) -> None:

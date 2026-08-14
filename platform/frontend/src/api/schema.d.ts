@@ -28,12 +28,64 @@ export interface ProblemDetails {
   instance: string;
 }
 
+export interface ArtifactProducerContext {
+  data_mode: DataMode;
+  deployment_stage: DeploymentStage;
+}
+
+export interface ArtifactMetadata {
+  artifact_id: string;
+  run_id: string;
+  content_hash: string;
+  media_type: string;
+  created_at: string;
+  producer_context: ArtifactProducerContext;
+}
+
+export interface ArtifactMetadataListOperation {
+  responses: {
+    200: { content: { 'application/json': Envelope<ArtifactMetadata[]> } };
+    403: { content: { 'application/json': ProblemDetails } };
+    409: { content: { 'application/json': ProblemDetails } };
+    503: { content: { 'application/json': ProblemDetails } };
+  };
+}
+
+export interface ArtifactMetadataOperation {
+  responses: {
+    200: { content: { 'application/json': Envelope<ArtifactMetadata> } };
+    403: { content: { 'application/json': ProblemDetails } };
+    404: { content: { 'application/json': ProblemDetails } };
+    409: { content: { 'application/json': ProblemDetails } };
+    503: { content: { 'application/json': ProblemDetails } };
+  };
+}
+
+export interface ArtifactDownloadOperation {
+  responses: {
+    200: {
+      content: {
+        'application/json': ArrayBuffer;
+        'application/octet-stream': ArrayBuffer;
+      };
+    };
+    304: { content?: never };
+    400: { content: { 'application/json': ProblemDetails } };
+    403: { content: { 'application/json': ProblemDetails } };
+    404: { content: { 'application/json': ProblemDetails } };
+    409: { content: { 'application/json': ProblemDetails } };
+    503: { content: { 'application/json': ProblemDetails } };
+  };
+}
+
 export interface ReadOperation {
   responses: { 200: { content: { 'application/json': Envelope } } };
 }
 
 export interface paths {
-  "/api/artifacts": { get: ReadOperation };
+  "/api/artifacts": { get: ArtifactMetadataListOperation };
+  "/api/artifacts/{artifact_id}": { get: ArtifactMetadataOperation };
+  "/api/artifacts/{artifact_id}/download": { get: ArtifactDownloadOperation };
   "/api/calendars/{exchange}/next-session": { get: ReadOperation };
   "/api/capabilities": { get: ReadOperation };
   "/api/companies/{company_id}": { get: ReadOperation };

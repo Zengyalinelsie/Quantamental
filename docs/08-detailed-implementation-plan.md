@@ -655,8 +655,12 @@ projection 已实现。本轮新增 strict PIT compilation application gate：Ex
 definition hash、bundle version 和 availability 完整闭合，preview 零写入，ensure 幂等落账；current、
 partial 或 lineage 不闭合全部失败关闭。当前没有合格 PIT bundle 和获批模型输出 adapter，真实库
 InvestmentView 仍为 0。Frozen Artifact 的 deterministic application export、成功 Run preflight、
-content-addressed object、Artifact/lineage 和幂等已完成；仍缺 durable Governance adapter、下载
-API/UI 和 outcome 到期写入 worker，故本工作包尚未完成，测试产物不得视为真实收益预测。
+content-addressed object、Artifact/lineage 和幂等已完成；本轮进一步完成 durable PostgreSQL
+Governance adapter、0032–0034 数据库不可变/Run transition/失败原因/非空字段约束、精确 lookup、
+Artifact+lineage 单事务、
+私有 metadata/download API、生成的前端 OpenAPI snapshot/types 和受控本地对象 reader。Viewer 在
+没有发布绑定时拒绝，Run/Artifact 只列 research stage，P11 不授权。仍缺页面下载入口和 outcome 到期
+写入 worker，故本工作包尚未完成，测试产物不得视为真实收益预测。
 
 ### P5-W03：SignalSnapshot
 
@@ -689,7 +693,8 @@ serving view 和 FastAPI 只读查询面已完成。当前 P4 没有通过 PIT/�
 组件，以及 server-owned Screen ranking、industry peers、Alpha Model readiness/approval blocker 组件
 已完成合同测试并接入 `/api/research/workspace` 和 `/research` 产品路由；前端不重算闭合、
 rank change 或排序。当前页面只能展示数据库中真实存在且满足查询合同的对象，空库会诚实显示
-blocker。仍缺真实数据详情、Frozen Artifact durable/API/UI 接线、320/768/1024 响应式实现和最终浏览器验收，
+blocker。Frozen Artifact durable/API 已完成，仍缺真实数据详情、页面下载入口、320/768/1024
+响应式实现和最终浏览器验收；
 运行时不得注入 demo 值。产品蓝图、黄金路径与当前原型证据见
 `docs/18-product-blueprint-and-prototype.md`。
 
@@ -704,7 +709,7 @@ blocker。仍缺真实数据详情、Frozen Artifact durable/API/UI 接线、320
 状态（2026-08-14）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
 原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
 strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
-InvestmentView/SignalSnapshot、outcome 到期 worker、Frozen Artifact export、320/768/1024 运行时
+InvestmentView/SignalSnapshot、outcome 到期 worker、Frozen Artifact 页面入口、320/768/1024 运行时
 响应式证据和最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
 更不能据此声称模型科学有效。
 

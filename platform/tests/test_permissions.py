@@ -25,6 +25,7 @@ class PermissionPolicyTest(unittest.TestCase):
     def test_anonymous_principal_is_read_only(self) -> None:
         anonymous = Principal.anonymous()
         self.assertTrue(self.policy.allows(anonymous, Permission.READ_PUBLIC))
+        self.assertFalse(self.policy.allows(anonymous, Permission.READ_ARTIFACT))
         self.assertFalse(self.policy.allows(anonymous, Permission.CREATE_EXPERIMENT))
         self.assertFalse(self.policy.allows(anonymous, Permission.SEND_ORDER))
 
@@ -35,6 +36,25 @@ class PermissionPolicyTest(unittest.TestCase):
             with self.subTest(role=role):
                 principal = Principal(subject_id=f"subject:{role.value}", roles=frozenset({role}))
                 self.assertFalse(self.policy.allows(principal, Permission.SEND_ORDER))
+
+    def test_private_artifact_read_is_human_role_scoped_and_denied_to_agent(self) -> None:
+        permitted = {
+            Role.RESEARCHER,
+            Role.DATA_OPERATOR,
+            Role.REVIEWER,
+            Role.PORTFOLIO_MANAGER,
+            Role.ADMINISTRATOR,
+        }
+        for role in Role:
+            with self.subTest(role=role):
+                principal = Principal(f"subject:{role.value}", frozenset({role}))
+                self.assertEqual(
+                    self.policy.allows(principal, Permission.READ_ARTIFACT),
+                    role in permitted,
+                )
+
+        viewer = Principal("subject:viewer", frozenset({Role.VIEWER}))
+        self.assertFalse(self.policy.allows(viewer, Permission.READ_ARTIFACT))
 
     def test_each_human_role_has_only_its_declared_p1_capability(self) -> None:
         expected = {

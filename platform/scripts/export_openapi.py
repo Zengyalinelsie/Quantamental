@@ -21,8 +21,13 @@ def main() -> None:
         for path, operations in schema["paths"].items()
         if "get" in operations
     )
+    operation_types = {
+        "/api/artifacts": "ArtifactMetadataListOperation",
+        "/api/artifacts/{artifact_id}": "ArtifactMetadataOperation",
+        "/api/artifacts/{artifact_id}/download": "ArtifactDownloadOperation",
+    }
     path_contracts = "\n".join(
-        f'  "{path}": {{ get: ReadOperation }};'
+        f'  "{path}": {{ get: {operation_types.get(path, "ReadOperation")} }};'
         for path in get_paths
     )
     (directory / "schema.d.ts").write_text(
@@ -54,6 +59,56 @@ export interface ProblemDetails {
   status: number;
   detail: string;
   instance: string;
+}
+
+export interface ArtifactProducerContext {
+  data_mode: DataMode;
+  deployment_stage: DeploymentStage;
+}
+
+export interface ArtifactMetadata {
+  artifact_id: string;
+  run_id: string;
+  content_hash: string;
+  media_type: string;
+  created_at: string;
+  producer_context: ArtifactProducerContext;
+}
+
+export interface ArtifactMetadataListOperation {
+  responses: {
+    200: { content: { 'application/json': Envelope<ArtifactMetadata[]> } };
+    403: { content: { 'application/json': ProblemDetails } };
+    409: { content: { 'application/json': ProblemDetails } };
+    503: { content: { 'application/json': ProblemDetails } };
+  };
+}
+
+export interface ArtifactMetadataOperation {
+  responses: {
+    200: { content: { 'application/json': Envelope<ArtifactMetadata> } };
+    403: { content: { 'application/json': ProblemDetails } };
+    404: { content: { 'application/json': ProblemDetails } };
+    409: { content: { 'application/json': ProblemDetails } };
+    503: { content: { 'application/json': ProblemDetails } };
+  };
+}
+
+export interface ArtifactDownloadOperation {
+  responses: {
+    200: {
+      content: {
+        'application/json': ArrayBuffer;
+        'application/octet-stream': ArrayBuffer;
+      };
+    };
+    304: { content?: never };
+    400: { content: { 'application/json': ProblemDetails } };
+    403: { content: { 'application/json': ProblemDetails } };
+    404: { content: { 'application/json': ProblemDetails } };
+    409: { content: { 'application/json': ProblemDetails } };
+    503: { content: { 'application/json': ProblemDetails } };
+  };
 }
 
 export interface ReadOperation {

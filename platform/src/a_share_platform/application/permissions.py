@@ -19,6 +19,7 @@ class Role(str, Enum):
 
 class Permission(str, Enum):
     READ_PUBLIC = "read_public"
+    READ_ARTIFACT = "read_artifact"
     CREATE_EXPERIMENT = "create_experiment"
     MANAGE_DATA = "manage_data"
     APPROVE_RESEARCH = "approve_research"
@@ -49,13 +50,16 @@ class PermissionPolicy:
     @classmethod
     def default(cls) -> PermissionPolicy:
         read = frozenset({Permission.READ_PUBLIC})
+        artifact_read = frozenset({Permission.READ_ARTIFACT})
         return cls(
             {
                 Role.VIEWER: read,
-                Role.RESEARCHER: read | {Permission.CREATE_EXPERIMENT},
-                Role.DATA_OPERATOR: read | {Permission.MANAGE_DATA},
-                Role.REVIEWER: read | {Permission.APPROVE_RESEARCH},
-                Role.PORTFOLIO_MANAGER: read | {Permission.APPROVE_PORTFOLIO},
+                Role.RESEARCHER: read | artifact_read | {Permission.CREATE_EXPERIMENT},
+                Role.DATA_OPERATOR: read | artifact_read | {Permission.MANAGE_DATA},
+                Role.REVIEWER: read | artifact_read | {Permission.APPROVE_RESEARCH},
+                Role.PORTFOLIO_MANAGER: read
+                | artifact_read
+                | {Permission.APPROVE_PORTFOLIO},
                 Role.TRADER: read | {Permission.SEND_ORDER},
                 Role.ADMINISTRATOR: frozenset(Permission),
                 Role.AGENT: read,

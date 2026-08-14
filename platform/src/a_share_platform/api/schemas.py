@@ -64,6 +64,30 @@ class StrictResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", use_enum_values=True)
 
 
+class ArtifactProducerContext(StrictResponse):
+    data_mode: DataMode
+    deployment_stage: DeploymentStage
+
+
+class ArtifactMetadata(StrictResponse):
+    artifact_id: str
+    run_id: str
+    content_hash: str
+    media_type: str
+    created_at: datetime
+    producer_context: ArtifactProducerContext
+
+
+class ArtifactMetadataEnvelope(StrictResponse):
+    data: ArtifactMetadata
+    context: ResponseContext
+
+
+class ArtifactMetadataListEnvelope(StrictResponse):
+    data: list[ArtifactMetadata]
+    context: ResponseContext
+
+
 class ResearchWorkspaceBlocker(StrictResponse):
     code: str
     reason: str

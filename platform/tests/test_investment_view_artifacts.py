@@ -1,6 +1,7 @@
 import hashlib
 import json
 import unittest
+from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -18,7 +19,12 @@ from a_share_platform.application.investment_view_artifacts import (
     InvestmentViewArtifactExporter,
 )
 from a_share_platform.domain.expected_return import ExpectedReturnCompilerV0
-from a_share_platform.domain.governance import Artifact, RunRecord, RunStatus
+from a_share_platform.domain.governance import (
+    Artifact,
+    RunRecord,
+    RunStatus,
+    VersionConflictError,
+)
 from tests.test_expected_return_compiler import DECISION_TIME, request
 
 
@@ -37,6 +43,71 @@ def succeeded_run():  # type: ignore[no-untyped-def]
 
 
 class InvestmentViewArtifactExporterTest(unittest.TestCase):
+    def test_concurrent_equivalent_registration_recovers_idempotently(self) -> None:
+        class RacingRepository(InMemoryGovernanceRepository):
+            raced = False
+
+            def register_artifact_with_lineage(self, value, lineage):  # type: ignore[no-untyped-def]
+                if not self.raced:
+                    self.raced = True
+                    winner = replace(
+                        value,
+                        created_at=value.created_at - timedelta(seconds=1),
+                    )
+                    super().register_artifact_with_lineage(winner, lineage)
+                    raise VersionConflictError("simulated concurrent winner")
+                return super().register_artifact_with_lineage(value, lineage)
+
+        expected = InMemoryExpectedReturnLedgerRepository()
+        governance = RacingRepository()
+        view = ExpectedReturnCompilerV0().compile(request())
+        ExpectedReturnLedgerService(expected).record_view(view)
+        GovernanceLedger(governance).register_run(succeeded_run())
+        with TemporaryDirectory() as directory:
+            result = InvestmentViewArtifactExporter(
+                ExpectedReturnLedgerService(expected),
+                GovernanceLedger(governance),
+                LocalRawObjectStore(Path(directory)),
+            ).export(
+                view.view_id,
+                created_at=DECISION_TIME + timedelta(minutes=2),
+            )
+        self.assertFalse(result.writes_performed)
+        self.assertEqual(
+            result.artifact.created_at,
+            DECISION_TIME + timedelta(minutes=2) - timedelta(seconds=1),
+        )
+
+    def test_export_uses_exact_governance_lookups_not_full_ledger_scans(self) -> None:
+        class ExactLookupRepository(InMemoryGovernanceRepository):
+            def list_artifacts(self):  # type: ignore[no-untyped-def]
+                raise AssertionError("export must not scan all Artifacts")
+
+            def list_lineage(self):  # type: ignore[no-untyped-def]
+                raise AssertionError("export must not scan all lineage")
+
+        expected = InMemoryExpectedReturnLedgerRepository()
+        governance = ExactLookupRepository()
+        view = ExpectedReturnCompilerV0().compile(request())
+        ExpectedReturnLedgerService(expected).record_view(view)
+        GovernanceLedger(governance).register_run(succeeded_run())
+        with TemporaryDirectory() as directory:
+            exporter = InvestmentViewArtifactExporter(
+                ExpectedReturnLedgerService(expected),
+                GovernanceLedger(governance),
+                LocalRawObjectStore(Path(directory)),
+            )
+            first = exporter.export(
+                view.view_id,
+                created_at=DECISION_TIME + timedelta(minutes=2),
+            )
+            second = exporter.export(
+                view.view_id,
+                created_at=DECISION_TIME + timedelta(minutes=3),
+            )
+        self.assertTrue(first.writes_performed)
+        self.assertFalse(second.writes_performed)
+
     def test_exports_canonical_content_addressed_json_and_complete_lineage(self) -> None:
         expected = InMemoryExpectedReturnLedgerRepository()
         governance = InMemoryGovernanceRepository()

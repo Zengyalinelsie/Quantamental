@@ -58,11 +58,29 @@ class GovernanceLedger:
             raise ValueError(f"artifact run does not exist: {value.run_id}")
         return self._repository.register_artifact(value)
 
+    def get_artifact(self, artifact_id: str) -> Artifact | None:
+        return self._repository.get_artifact(artifact_id)
+
+    def get_artifact_by_hash(self, content_hash: str) -> Artifact | None:
+        return self._repository.get_artifact_by_hash(content_hash)
+
     def list_artifacts(self) -> tuple[Artifact, ...]:
         return self._repository.list_artifacts()
+
+    def register_artifact_with_lineage(
+        self,
+        value: Artifact,
+        lineage: tuple[LineageEdge, ...],
+    ) -> Artifact:
+        if self._repository.get_run(value.run_id) is None:
+            raise ValueError(f"artifact run does not exist: {value.run_id}")
+        return self._repository.register_artifact_with_lineage(value, lineage)
 
     def register_lineage(self, value: LineageEdge) -> LineageEdge:
         return self._repository.register_lineage(value)
 
     def list_lineage(self) -> tuple[LineageEdge, ...]:
         return self._repository.list_lineage()
+
+    def list_lineage_for(self, downstream_id: str) -> tuple[LineageEdge, ...]:
+        return self._repository.list_lineage_for(downstream_id)

@@ -1,7 +1,7 @@
 # P5 实现与验证证据
 
 > 状态快照：2026-08-14  
-> 范围：P5 当前工程进度；本次新增 Frozen InvestmentView Artifact application export  
+> 范围：P5 当前工程进度；Frozen InvestmentView Artifact export + durable PostgreSQL/API
 > Gate：P5 Capability Gate 仍未通过
 
 ## 1. Frozen InvestmentView Artifact application export
@@ -23,7 +23,36 @@ Artifact 或对象存储合同。
 - 已存在相同 content hash 的不同 Artifact owner 会在对象写入前失败，不留下孤儿文件；
 - 已存在 Artifact 但 lineage 不完整时可幂等补齐缺失边。
 
-## 2. TDD 证据
+## 2. Durable PostgreSQL Governance 与私有 API
+
+本工作包新增 `PostgresGovernanceRepository` 并在 `ASP_DATABASE_URL` 存在时由 API 自动 composition：
+
+- Dataset/Run/Artifact/Lineage 全部使用 schema-qualified `governance.*`；
+- RunContext、终态和失败原因完整 round-trip，OperationalError 映射为显式 503；
+- Artifact 要求 producer Run 存在，ID/hash 双重不可变；Dataset 同 hash 冲突映射为领域冲突；
+- exporter 改为 Artifact ID/hash 和 downstream lineage 精确查询，不再全表扫描；
+- Artifact 与完整 lineage 在一个数据库事务中登记；
+- `0032_governance_integrity.sql` 在数据库层约束 hash、合法 RunContext/状态/时间，并阻止
+  Dataset/Artifact/Lineage 更新删除；Run 只允许 pending→running 或 running→terminal；0033 以
+  `coalesce` 关闭 failed Run 的 NULL reason 三值逻辑旁路；0034 阻止 Run/Lineage 空白字段；
+- `GET /api/artifacts`、metadata 和 download 全部要求私有 Artifact 权限，匿名在对象查找前 403；
+- Viewer 因 Artifact 尚无“已发布/已审批”绑定而不获私有读取权；`/api/runs` 同样鉴权并只列 research；
+- metadata 使用 strict schema，不暴露 `storage_uri`，并携带 producer RunContext 和 Artifact 时间；
+- 下载只读取已登记 Artifact，限定 research stage；P11/limited-live 显式拒绝；
+- 本地 reader 只接受受控根下 `sha256/<digest>` 普通文件，使用 root/sha256 dirfd 和逐段
+  `O_NOFOLLOW`，拒绝 scheme/percent/path/symlink 越界，16 MiB 上限，同一 file descriptor 读取并
+  重新计算 SHA-256；
+- 下载提供 ETag、conditional 304、private immutable cache、nosniff 和安全文件名；
+- producer Run 缺失、路径或 hash 不一致使用 409；对象/DB 不可用使用 503。
+- exporter/本地 CAS 对等价并发 winner 幂等恢复；不兼容 winner 继续冲突关闭；
+- 前端 `openapi.json` 和 `schema.d.ts` 已刷新，metadata、download bytes、304 和错误响应有显式类型。
+
+对象存储和 PostgreSQL 不能形成跨系统事务：CAS 写入成功、DB 事务失败时可能留下无法由 API 发现或
+下载的孤儿对象。数据库侧 Artifact+lineage 已原子；孤儿对象清理仍是后续运维工作，不允许用孤儿对象
+冒充已登记 Artifact。PostgreSQL 保存 Run 当前状态投影并强制单向 transition；独立 append-only Run
+state event history 尚未成为 port 合同。
+
+## 3. TDD 证据
 
 首次定向执行结果：
 
@@ -42,12 +71,41 @@ OK
 覆盖：canonical/content-addressed export、完整 lineage、幂等、缺 View、非成功 Run、无效时间和
 治理 hash 冲突零对象写入。
 
-## 3. 全量验证
+Task 2 首次定向执行按预期失败：
 
 ```text
-Backend unittest: 743/743 passed
+ModuleNotFoundError: a_share_platform.adapters.postgres.governance
+ImportError: cannot import name 'LocalArtifactReader'
+```
+
+随后分别增加权限、OpenAPI、P11 scope、producer provenance、reader resource guard、精确 lookup、
+单事务、adapter 一致性和并发 winner 红测；最终核心 Artifact 相关 57 项定向测试通过。
+
+## 4. 真实 PostgreSQL 证据
+
+迁移前只读预检：
+
+```text
+DatasetVersion: 13,314
+RunRecord: 1
+Artifact: 0
+LineageEdge: 77,639
+invalid_dataset_hash=0, blank_dataset_fields=0, invalid_runs=0
+blank_run_fields=0, blank_lineage_fields=0
+```
+
+`0032_governance_integrity`、`0033_failed_run_reason_guard` 和
+`0034_governance_nonblank_fields` 已应用到本地开发库。随后在外层事务中完成真实 Dataset/Run/
+Artifact+lineage round-trip、exact lookup、同 hash 冲突、Artifact UPDATE 拒绝和终态 Run 再变更拒绝；
+smoke 事务整体回滚，测试行未留库，迁移记录保留。另以真实 CHECK violation 验证
+`failed + NULL failure_reason`、空白 lineage 被拒绝，并验证 pending→running→terminal；均未留记录。
+
+## 5. 全量验证
+
+```text
+Backend unittest: 775/775 passed
 Ruff: passed
-mypy: 171 source files passed
+mypy: 172 source files passed
 compileall: passed
 git diff --check: passed
 Frontend Vitest: 59/59 passed
@@ -58,18 +116,25 @@ Frontend build: passed
 Vite 仍报告既有 AntD 大 chunk warning；本工作包没有修改前端 bundle，也没有把 warning 隐藏或
 改成通过项。
 
-## 4. 文件
+## 6. 主要文件
 
 - `platform/src/a_share_platform/application/investment_view_artifacts.py`；
 - `platform/src/a_share_platform/application/governance_ledger.py`；
-- `platform/tests/test_investment_view_artifacts.py`。
+- `platform/src/a_share_platform/adapters/postgres/governance.py`；
+- `platform/src/a_share_platform/adapters/object_store/local.py`；
+- `platform/src/a_share_platform/api/app.py`、`api/schemas.py`；
+- `platform/migrations/0032_governance_integrity.sql`；
+- `platform/migrations/0033_failed_run_reason_guard.sql`；
+- `platform/migrations/0034_governance_nonblank_fields.sql`；
+- `platform/scripts/export_openapi.py`、`platform/frontend/src/api/openapi.json`、`schema.d.ts`；
+- `platform/tests/test_investment_view_artifacts.py`；
+- `platform/tests/test_postgres_governance.py`；
+- `platform/tests/test_investment_view_artifact_api.py`。
 
-## 5. 未完成和 Gate 边界
+## 7. 未完成和 Gate 边界
 
-本工作包只完成 application/port-compatible export。以下仍未完成：
+Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成。以下仍未完成：
 
-- durable PostgreSQL Governance Repository 的 Run/Artifact/Lineage 实现；
-- Artifact metadata/download API、权限和 OpenAPI；
 - Research/InvestmentView 页面查看或下载入口；
 - Outcome 到期 worker；
 - P5 估值/改善剩余服务和 320/768/1024 最终浏览器验收；
