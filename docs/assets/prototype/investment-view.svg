@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1200" viewBox="0 0 1440 1200">
+  <rect width="1440" height="1200" fill="#F3F5F7"/>
+  <rect width="224" height="1200" fill="#18202A"/>
+  <rect x="224" width="1216" height="64" fill="#FFFFFF"/>
+  <line x1="224" y1="64" x2="1440" y2="64" stroke="#C8CDD4"/>
+  <rect x="16" y="18" width="32" height="32" rx="2" fill="#2F5EA8"/>
+  <text x="23" y="40" font-family="Arial" font-size="14" font-weight="700" fill="#FFFFFF">FQ</text>
+  <text x="60" y="30" font-family="Arial" font-size="13" font-weight="600" fill="#FFFFFF">Fundamental Quant</text>
+  <text x="60" y="47" font-family="PingFang SC,Arial" font-size="10" fill="#9DA8B6">基本面量化研究平台</text>
+
+  <g font-family="PingFang SC,Arial" font-size="14" fill="#CBD2DB">
+    <text x="42" y="130">01  今日工作台</text>
+    <rect x="12" y="152" width="200" height="40" rx="2" fill="#273B58"/>
+    <rect x="12" y="152" width="4" height="40" fill="#6F9BD8"/>
+    <text x="42" y="178" fill="#FFFFFF">02  研究</text>
+    <text x="42" y="226">03  因子</text>
+    <text x="42" y="274">04  组合</text>
+    <text x="42" y="322">05  监控</text>
+    <text x="42" y="370">06  数据与管理</text>
+  </g>
+  <text x="24" y="430" font-family="Arial" font-size="10" fill="#718095">RESEARCH LOOP</text>
+  <text x="24" y="456" font-family="PingFang SC,Arial" font-size="11" fill="#AEB8C5">发现 → 研究 → View</text>
+  <text x="24" y="478" font-family="PingFang SC,Arial" font-size="11" fill="#AEB8C5">组合 → 回测 → Shadow</text>
+  <rect x="24" y="1016" width="176" height="120" fill="none" stroke="#3A4654"/>
+  <text x="36" y="1042" font-family="Arial" font-size="10" fill="#6F9BD8">PROTOTYPE ONLY</text>
+  <text x="36" y="1064" font-family="PingFang SC,Arial" font-size="10" fill="#AEB8C5">DESIGN FIXTURE</text>
+  <text x="36" y="1084" font-family="PingFang SC,Arial" font-size="10" fill="#AEB8C5">非生产数据</text>
+  <text x="36" y="1104" font-family="PingFang SC,Arial" font-size="10" fill="#AEB8C5">不代表 PIT / 科学有效</text>
+
+  <rect x="246" y="16" width="380" height="32" fill="#F7F8FA" stroke="#C8CDD4"/>
+  <text x="262" y="37" font-family="PingFang SC,Arial" font-size="11" fill="#727D8B">搜索证券、公司、Case、Artifact…</text>
+  <text x="656" y="26" font-family="Arial" font-size="9" fill="#727D8B">RESEARCH TIME</text>
+  <text x="656" y="43" font-family="Arial" font-size="11" fill="#18202A">2026-08-13 15:30 CST</text>
+  <text x="814" y="26" font-family="Arial" font-size="9" fill="#727D8B">DATA MODE</text>
+  <text x="814" y="43" font-family="Arial" font-size="11" fill="#2F5EA8">current_research</text>
+  <text x="970" y="26" font-family="Arial" font-size="9" fill="#727D8B">DEPLOYMENT</text>
+  <text x="970" y="43" font-family="Arial" font-size="11" fill="#8A651A">research</text>
+  <text x="1098" y="26" font-family="Arial" font-size="9" fill="#727D8B">UNIVERSE</text>
+  <text x="1098" y="43" font-family="Arial" font-size="11" fill="#18202A">CSI 800</text>
+  <rect x="1302" y="16" width="112" height="26" fill="#FFF9E9" stroke="#9A6A16"/>
+  <text x="1312" y="34" font-family="PingFang SC,Arial" font-size="9" fill="#77510F">DESIGN FIXTURE</text>
+
+  <rect x="224" y="64" width="1216" height="64" fill="#FFFFFF"/>
+  <line x1="224" y1="128" x2="1440" y2="128" stroke="#C8CDD4"/>
+  <g font-family="PingFang SC,Arial" font-size="13">
+    <text x="252" y="106" fill="#4E5968">概览</text>
+    <text x="342" y="106" fill="#4E5968">公司质量</text>
+    <text x="442" y="106" fill="#4E5968">估值</text>
+    <text x="522" y="106" fill="#4E5968">改善</text>
+    <text x="602" y="106" fill="#4E5968">事件</text>
+    <text x="682" y="106" fill="#4E5968">财务</text>
+    <text x="762" y="106" fill="#4E5968">证据</text>
+    <text x="842" y="106" fill="#244C8A" font-weight="600">InvestmentView</text>
+  </g>
+  <rect x="834" y="117" width="130" height="3" fill="#2F5EA8"/>
+
+  <text x="246" y="158" font-family="Arial" font-size="10" fill="#2F5EA8">RESEARCH / P5 · FROZEN DECISION OBJECT</text>
+  <text x="246" y="190" font-family="PingFang SC,Arial" font-size="25" font-weight="600" fill="#18202A">600519.SH 贵州茅台 · InvestmentView</text>
+  <text x="1398" y="180" text-anchor="end" font-family="PingFang SC,Arial" font-size="11" fill="#4E5968">决策时点 2026-08-13 15:30 CST · current_research / partial</text>
+
+  <rect x="246" y="212" width="1168" height="50" fill="#FFFFFF" stroke="#C8CDD4"/>
+  <g font-family="PingFang SC,Arial" font-size="12">
+    <text x="270" y="243" fill="#4E5968">期限</text>
+    <rect x="322" y="222" width="82" height="30" fill="#FFFFFF" stroke="#C8CDD4"/><text x="347" y="242" fill="#4E5968">20D</text>
+    <rect x="412" y="222" width="92" height="30" fill="#2F5EA8"/><text x="440" y="242" fill="#FFFFFF">60D</text>
+    <rect x="512" y="222" width="92" height="30" fill="#FFFFFF" stroke="#C8CDD4"/><text x="540" y="242" fill="#4E5968">120D</text>
+  </g>
+  <text x="1020" y="242" font-family="Arial" font-size="10" fill="#727D8B">VIEW STATUS</text>
+  <text x="1112" y="242" font-family="Arial" font-size="11" fill="#8A651A">PARTIAL · NOT APPROVED</text>
+  <rect x="1280" y="222" width="112" height="30" fill="#FFFFFF" stroke="#AEB6C0"/>
+  <text x="1300" y="242" font-family="PingFang SC,Arial" font-size="10" fill="#27313E">打开证据</text>
+
+  <rect x="246" y="278" width="570" height="184" fill="#FFFFFF" stroke="#C8CDD4"/>
+  <text x="264" y="308" font-family="PingFang SC,Arial" font-size="14" font-weight="600" fill="#18202A">Expected Return Distribution · 60D</text>
+  <line x1="292" y1="390" x2="770" y2="390" stroke="#C8CDD4"/>
+  <line x1="420" y1="344" x2="420" y2="412" stroke="#2E7660" stroke-width="3"/>
+  <line x1="540" y1="326" x2="540" y2="412" stroke="#2F5EA8" stroke-width="4"/>
+  <line x1="686" y1="340" x2="686" y2="412" stroke="#A64045" stroke-width="3"/>
+  <path d="M 320 390 C 390 374, 452 334, 540 326 C 622 324, 694 350, 744 390" fill="none" stroke="#2F5EA8" stroke-width="3"/>
+  <text x="390" y="438" font-family="Arial" font-size="11" fill="#2E7660">p10 -8.2%</text>
+  <text x="510" y="438" font-family="Arial" font-size="11" fill="#244C8A">p50 +5.8%</text>
+  <text x="654" y="438" font-family="Arial" font-size="11" fill="#A64045">p90 +18.6%</text>
+  <text x="264" y="338" font-family="PingFang SC,Arial" font-size="11" fill="#727D8B">Downside 8.2% · Confidence 0.61 · 点估计 +5.9%</text>
+
+  <rect x="832" y="278" width="582" height="184" fill="#FFFFFF" stroke="#C8CDD4"/>
+  <text x="850" y="308" font-family="PingFang SC,Arial" font-size="14" font-weight="600" fill="#18202A">闭合校验与版本绑定</text>
+  <g font-family="PingFang SC,Arial" font-size="11">
+    <text x="850" y="342" fill="#4E5968">分项合计</text><text x="1368" y="342" text-anchor="end" fill="#18202A">+5.8%</text>
+    <text x="850" y="372" fill="#4E5968">Residual</text><text x="1368" y="372" text-anchor="end" fill="#18202A">+0.1%</text>
+    <text x="850" y="402" fill="#4E5968">Point Estimate</text><text x="1368" y="402" text-anchor="end" fill="#18202A">+5.9%</text>
+    <text x="850" y="432" fill="#287A55">✓ 5.8% + 0.1% = 5.9%，Decimal 闭合通过</text>
+  </g>
+
+  <rect x="246" y="478" width="1168" height="182" fill="#FFFFFF" stroke="#C8CDD4"/>
+  <text x="264" y="508" font-family="PingFang SC,Arial" font-size="14" font-weight="600" fill="#18202A">四分项瀑布与状态语义</text>
+  <text x="1388" y="508" text-anchor="end" font-family="Arial" font-size="8" fill="#727D8B">QUANTIFIED · CONSTRAINED · UNAVAILABLE · NOT_APPLICABLE</text>
+  <line x1="286" y1="630" x2="1360" y2="630" stroke="#C8CDD4"/>
+  <g font-family="Arial" font-size="11" text-anchor="middle">
+    <rect x="316" y="630" width="120" height="1" fill="#687383"/><text x="376" y="646" fill="#4E5968">Start 0.0%</text>
+    <line x1="436" y1="630" x2="484" y2="630" stroke="#AEB6C0" stroke-dasharray="3 3"/>
+    <rect x="484" y="598" width="120" height="32" fill="#A64045"/><text x="544" y="590" fill="#A64045">+2.1%</text><text x="544" y="646" fill="#4E5968">Quality</text>
+    <line x1="604" y1="598" x2="652" y2="598" stroke="#AEB6C0" stroke-dasharray="3 3"/>
+    <rect x="652" y="551" width="120" height="47" fill="#A64045"/><text x="712" y="543" fill="#A64045">+3.1%</text><text x="712" y="646" fill="#4E5968">Valuation</text>
+    <line x1="772" y1="551" x2="820" y2="551" stroke="#AEB6C0" stroke-dasharray="3 3"/>
+    <rect x="820" y="536" width="120" height="15" fill="#A64045"/><text x="880" y="528" fill="#A64045">+1.0%</text><text x="880" y="646" fill="#4E5968">Improvement</text>
+    <line x1="940" y1="536" x2="988" y2="536" stroke="#AEB6C0" stroke-dasharray="3 3"/>
+    <rect x="988" y="535" width="120" height="2" fill="#687383"/><text x="1048" y="528" fill="#687383">UNAVAILABLE · excluded</text><text x="1048" y="646" fill="#4E5968">Event</text>
+    <line x1="1108" y1="536" x2="1156" y2="536" stroke="#AEB6C0" stroke-dasharray="3 3"/>
+    <rect x="1156" y="536" width="120" height="6" fill="#315F9B"/><text x="1216" y="556" fill="#315F9B">-0.4%</text><text x="1216" y="646" fill="#4E5968">Constraints</text>
+    <line x1="1276" y1="542" x2="1310" y2="542" stroke="#AEB6C0" stroke-dasharray="3 3"/>
+    <rect x="1310" y="540" width="50" height="2" fill="#315F9B"/><text x="1335" y="533" fill="#315F9B">+0.1%</text><text x="1335" y="646" fill="#4E5968">Residual</text>
+  </g>
+  <text x="264" y="656" font-family="PingFang SC,Arial" font-size="8" fill="#727D8B">NOT_APPLICABLE：仅在期限/行业/口径明确不适用时使用，不等同于 UNAVAILABLE，不参与数值闭合。</text>
+
+  <g font-family="PingFang SC,Arial">
+    <rect x="246" y="676" width="278" height="214" fill="#FFFFFF" stroke="#C8CDD4"/>
+    <text x="264" y="706" font-size="14" font-weight="600" fill="#18202A">公司质量</text>
+    <rect x="424" y="690" width="82" height="22" fill="#F0FAF5" stroke="#80AD98"/>
+    <text x="465" y="705" text-anchor="middle" font-family="Arial" font-size="8" fill="#287A55">QUANTIFIED</text>
+    <text x="264" y="746" font-size="11" fill="#4E5968">ROIC / CFO / 治理</text><text x="492" y="746" text-anchor="end" font-size="11" fill="#A64045">+2.1%</text>
+    <text x="264" y="776" font-size="11" fill="#4E5968">行业分位</text><text x="492" y="776" text-anchor="end" font-size="11" fill="#18202A">91%</text>
+    <text x="264" y="824" font-size="10" fill="#727D8B">dataset:financial-normalized-current:v3</text>
+    <text x="264" y="846" font-size="10" fill="#727D8B">formula:quality:v8 · run:992</text>
+
+    <rect x="538" y="676" width="278" height="214" fill="#FFFFFF" stroke="#C8CDD4"/>
+    <text x="556" y="706" font-size="14" font-weight="600" fill="#18202A">估值预期差</text>
+    <rect x="716" y="690" width="82" height="22" fill="#F0FAF5" stroke="#80AD98"/>
+    <text x="757" y="705" text-anchor="middle" font-family="Arial" font-size="8" fill="#287A55">QUANTIFIED</text>
+    <text x="556" y="746" font-size="11" fill="#4E5968">E/P · 隐含增长 · 同业</text><text x="784" y="746" text-anchor="end" font-size="11" fill="#A64045">+3.1%</text>
+    <text x="556" y="776" font-size="11" fill="#4E5968">相对分位</text><text x="784" y="776" text-anchor="end" font-size="11" fill="#18202A">64%</text>
+    <text x="556" y="824" font-size="10" fill="#727D8B">bundle:valuation:v12</text>
+    <text x="556" y="846" font-size="10" fill="#727D8B">comparable-set:v5 · normalized_current</text>
+
+    <rect x="830" y="676" width="278" height="214" fill="#FFFFFF" stroke="#C8CDD4"/>
+    <text x="848" y="706" font-size="14" font-weight="600" fill="#18202A">基本面改善</text>
+    <rect x="1004" y="690" width="86" height="22" fill="#FFF9E9" stroke="#C7A96B"/>
+    <text x="1047" y="705" text-anchor="middle" font-family="Arial" font-size="8" fill="#8A651A">CONSTRAINED</text>
+    <text x="848" y="746" font-size="11" fill="#4E5968">收入 / 利润率 / 现金流</text><text x="1076" y="746" text-anchor="end" font-size="11" fill="#A64045">+1.0%</text>
+    <text x="848" y="776" font-size="11" fill="#4E5968">约束</text><text x="1076" y="776" text-anchor="end" font-size="11" fill="#8A651A">仅年度 normalized_current</text>
+    <text x="848" y="824" font-size="10" fill="#727D8B">季度/TTM unavailable</text>
+    <text x="848" y="846" font-size="10" fill="#727D8B">一次性项目需人工确认</text>
+
+    <rect x="1122" y="676" width="292" height="214" fill="#FFFFFF" stroke="#C8CDD4"/>
+    <text x="1140" y="706" font-size="14" font-weight="600" fill="#18202A">事件影响</text>
+    <rect x="1300" y="690" width="96" height="22" fill="#FFF3F4" stroke="#BD858B"/>
+    <text x="1348" y="705" text-anchor="middle" font-family="Arial" font-size="8" fill="#8E4A57">UNAVAILABLE</text>
+    <text x="1140" y="746" font-size="11" fill="#4E5968">P8 事件影响链尚未实施</text>
+    <text x="1140" y="776" font-size="11" fill="#8E4A57">不得用 0 表示没有影响</text>
+    <text x="1140" y="824" font-size="10" fill="#727D8B">启用条件：引用、影响路径、</text>
+    <text x="1140" y="846" font-size="10" fill="#727D8B">增量价值与失效条件通过 Gate</text>
+  </g>
+
+  <rect x="246" y="906" width="760" height="134" fill="#FFFFFF" stroke="#C8CDD4"/>
+  <text x="264" y="936" font-family="PingFang SC,Arial" font-size="14" font-weight="600" fill="#18202A">催化剂、失效条件与证据</text>
+  <text x="264" y="970" font-family="PingFang SC,Arial" font-size="11" fill="#4E5968">Catalysts：中秋动销、批价、渠道库存；每项绑定 evidence_id 和观察期限。</text>
+  <text x="264" y="998" font-family="PingFang SC,Arial" font-size="11" fill="#8E4A57">Invalidators：批价持续下破、现金回款恶化、核心渠道库存异常。</text>
+  <text x="264" y="1024" font-family="PingFang SC,Arial" font-size="10" fill="#727D8B">model:expected-return-v0 · dataset versions 3 · run:iv-20260813-001 · content hash: 8f2…</text>
+
+  <rect x="1022" y="906" width="392" height="134" fill="#FFF9E9" stroke="#C7A96B"/>
+  <text x="1040" y="936" font-family="PingFang SC,Arial" font-size="14" font-weight="600" fill="#694B16">Frozen Artifact</text>
+  <text x="1040" y="968" font-family="PingFang SC,Arial" font-size="12" fill="#8A651A">未生成 · 不伪造 Artifact ID</text>
+  <text x="1040" y="996" font-family="PingFang SC,Arial" font-size="10" fill="#694B16">当前 View 为 PARTIAL，缺事件与完整季度输入。</text>
+  <rect x="1198" y="1000" width="194" height="28" fill="#E2E6EA" stroke="#AEB6C0"/>
+  <text x="1295" y="1019" text-anchor="middle" font-family="PingFang SC,Arial" font-size="10" fill="#687383">证据不完整 · 禁止提交</text>
+
+  <g font-family="PingFang SC,Arial" font-size="10">
+    <rect x="246" y="1056" width="214" height="100" fill="#EDF3FA" stroke="#BDCAD9"/>
+    <text x="260" y="1080" font-weight="600" fill="#58708E">INPUT · 输入</text><text x="260" y="1104" fill="#27394F">版本化四问结果、分布、</text><text x="260" y="1122" fill="#27394F">证据、期限与运行上下文</text>
+    <rect x="470" y="1056" width="214" height="100" fill="#EDF3FA" stroke="#BDCAD9"/>
+    <text x="484" y="1080" font-weight="600" fill="#58708E">PROCESS · 处理</text><text x="484" y="1104" fill="#27394F">服务端编译四分项、分布、</text><text x="484" y="1122" fill="#27394F">约束与 residual 闭合</text>
+    <rect x="694" y="1056" width="214" height="100" fill="#EDF3FA" stroke="#BDCAD9"/>
+    <text x="708" y="1080" font-weight="600" fill="#58708E">OUTPUT · 输出</text><text x="708" y="1104" fill="#27394F">不可变 InvestmentView、</text><text x="708" y="1122" fill="#27394F">hash、版本与 evidence</text>
+    <rect x="918" y="1056" width="214" height="100" fill="#EDF3FA" stroke="#BDCAD9"/>
+    <text x="932" y="1080" font-weight="600" fill="#58708E">ACTION · 操作</text><text x="932" y="1104" fill="#27394F">打开证据、保存 Case、</text><text x="932" y="1122" fill="#27394F">提交 Reviewer；无下单</text>
+    <rect x="1142" y="1056" width="272" height="100" fill="#EDF3FA" stroke="#BDCAD9"/>
+    <text x="1156" y="1080" font-weight="600" fill="#58708E">GATE · 门禁</text><text x="1156" y="1104" fill="#27394F">闭合/证据/版本不完整不可提交；</text><text x="1156" y="1122" fill="#27394F">current 不冒充 PIT，失败对象不晋级</text>
+  </g>
+  <text x="246" y="1184" font-family="PingFang SC,Arial" font-size="9" fill="#727D8B">Prototype Notes · P5 InvestmentView / Expected Return Compiler · 测试通过不等于模型科学有效</text>
+</svg>

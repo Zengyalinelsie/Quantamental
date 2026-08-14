@@ -1,0 +1,259 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1900" viewBox="0 0 1440 1900">
+  <title>Fundamental Quant · Security Overview fused product prototype</title>
+  <defs>
+    <style>
+      .zh{font-family:"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",Arial,sans-serif}
+      .en{font-family:Arial,sans-serif}
+      .h1{font-size:24px;font-weight:700;fill:#18202A}.h2{font-size:15px;font-weight:700;fill:#18202A}
+      .h3{font-size:12px;font-weight:700;fill:#27313E}.body{font-size:12px;fill:#4E5968}
+      .small{font-size:10px;fill:#727D8B}.tiny{font-size:9px;fill:#727D8B}.mono{font-family:Arial,sans-serif;font-size:10px;fill:#4E5968}
+      .nav{font-size:13px;fill:#CBD2DB}.navOn{font-size:13px;font-weight:700;fill:#FFFFFF}
+      .tab{font-size:12px;fill:#536070}.tabOn{font-size:12px;font-weight:700;fill:#2F5EA8}
+      .metric{font-family:Arial,sans-serif;font-size:21px;font-weight:700;fill:#18202A}
+      .up{fill:#A64045}.down{fill:#2E7660}.blue{fill:#2F5EA8}.amber{fill:#8A651A}.muted{fill:#727D8B}
+      .card{fill:#FFFFFF;stroke:#D7DDE5;stroke-width:1}.soft{fill:#F5F7FA;stroke:#E4E8EE;stroke-width:1}
+      .line{stroke:#D7DDE5;stroke-width:1}.blueLine{stroke:#2F5EA8;stroke-width:2;fill:none}
+      .redLine{stroke:#A64045;stroke-width:2;fill:none}.greenLine{stroke:#2E7660;stroke-width:2;fill:none}
+    </style>
+  </defs>
+
+  <rect width="1440" height="1900" fill="#F3F5F7"/>
+
+  <!-- persistent product navigation -->
+  <rect x="0" y="0" width="224" height="1900" fill="#17212D"/>
+  <rect x="20" y="18" width="28" height="28" rx="3" fill="#2F5EA8"/>
+  <text x="34" y="37" text-anchor="middle" class="en" font-size="12" font-weight="700" fill="#FFFFFF">FQ</text>
+  <text x="58" y="30" class="en" font-size="13" font-weight="700" fill="#FFFFFF">Fundamental Quant</text>
+  <text x="58" y="46" class="zh" font-size="9" fill="#99A6B5">基本面量化研究平台</text>
+  <line x1="20" y1="66" x2="204" y2="66" stroke="#2D3947"/>
+  <g class="zh">
+    <text x="24" y="105" class="nav">01 今日工作台</text>
+    <rect x="12" y="124" width="200" height="40" rx="2" fill="#2B4364"/>
+    <rect x="12" y="124" width="3" height="40" fill="#5D8FD5"/>
+    <text x="24" y="149" class="navOn">02 研究</text>
+    <text x="24" y="199" class="nav">03 因子</text>
+    <text x="24" y="249" class="nav">04 组合</text>
+    <text x="24" y="299" class="nav">05 监控</text>
+    <text x="24" y="349" class="nav">06 数据与治理</text>
+  </g>
+  <text x="24" y="420" class="en" font-size="9" fill="#718095">RESEARCH LOOP</text>
+  <text x="24" y="446" class="zh" font-size="10" fill="#AEB8C5">发现 → 研究 → View</text>
+  <text x="24" y="468" class="zh" font-size="10" fill="#AEB8C5">审批 → 组合 → 复盘</text>
+  <rect x="20" y="1742" width="184" height="104" rx="2" fill="#1C2734" stroke="#354354"/>
+  <text x="34" y="1768" class="en" font-size="9" fill="#6F9BD8">PROTOTYPE ONLY</text>
+  <text x="34" y="1791" class="zh" font-size="9" fill="#AEB8C5">DESIGN FIXTURE / 非生产数据</text>
+  <text x="34" y="1813" class="zh" font-size="9" fill="#AEB8C5">不代表 PIT / 科学有效</text>
+  <text x="34" y="1835" class="zh" font-size="9" fill="#AEB8C5">无真实账户与交易入口</text>
+
+  <!-- command context -->
+  <rect x="224" y="0" width="1216" height="72" fill="#FFFFFF"/>
+  <line x1="224" y1="71" x2="1440" y2="71" stroke="#D7DDE5"/>
+  <rect x="246" y="19" width="338" height="34" rx="2" fill="#F7F8FA" stroke="#D7DDE5"/>
+  <text x="262" y="40" class="zh small">搜索证券、公司、Case、Artifact…</text>
+  <text x="620" y="25" class="en tiny">RESEARCH TIME</text><text x="620" y="44" class="en" font-size="11" fill="#18202A">2024-12-06 15:30 CST</text>
+  <text x="805" y="25" class="en tiny">DATA MODE</text><text x="805" y="44" class="en" font-size="11" fill="#2F5EA8">current_research</text>
+  <text x="962" y="25" class="en tiny">DEPLOYMENT STAGE</text><text x="962" y="44" class="en" font-size="11" fill="#8A651A">research</text>
+  <text x="1136" y="25" class="en tiny">UNIVERSE</text><text x="1136" y="44" class="en" font-size="11" fill="#18202A">CSI 800</text>
+  <rect x="1280" y="17" width="134" height="38" rx="2" fill="#FFF7E6" stroke="#D5B46C"/>
+  <text x="1347" y="33" text-anchor="middle" class="en" font-size="8" fill="#8A651A">DESIGN FIXTURE</text>
+  <text x="1347" y="47" text-anchor="middle" class="zh" font-size="8" fill="#8A651A">非生产数据</text>
+
+  <!-- security identity -->
+  <rect x="224" y="72" width="1216" height="124" fill="#FFFFFF"/>
+  <text x="246" y="103" class="en" font-size="9" fill="#2F5EA8">SECURITY / RESEARCH DECISION OBJECT</text>
+  <text x="246" y="137" class="zh h1">600519.SH 贵州茅台 · Security Overview</text>
+  <text x="246" y="164" class="zh body">白酒 · 沪市主板</text>
+  <rect x="344" y="149" width="108" height="22" rx="2" fill="#E8F4EF" stroke="#7DB49F"/>
+  <text x="398" y="164" text-anchor="middle" class="en" font-size="9" fill="#2E7660">normalized_current</text>
+  <text x="476" y="164" class="zh small">可信但非 PIT 验证</text>
+  <text x="790" y="132" class="en" font-size="22" font-weight="700" fill="#A64045">¥1,856.20</text>
+  <text x="790" y="158" class="en" font-size="11" fill="#A64045">+1.2% · DESIGN FIXTURE</text>
+  <rect x="1248" y="118" width="166" height="38" rx="2" fill="#2F5EA8"/>
+  <text x="1331" y="142" text-anchor="middle" class="zh" font-size="12" font-weight="700" fill="#FFFFFF">＋ 加入 Research Case</text>
+  <text x="1414" y="178" text-anchor="end" class="zh tiny">研究时点 2024-12-06 · 数据可追溯</text>
+
+  <!-- local navigation -->
+  <rect x="224" y="196" width="1216" height="52" fill="#FFFFFF"/>
+  <line x1="224" y1="247" x2="1440" y2="247" stroke="#D7DDE5"/>
+  <g class="zh">
+    <text x="248" y="226" class="tabOn">概览</text><rect x="246" y="244" width="32" height="3" fill="#2F5EA8"/>
+    <text x="310" y="226" class="tab">公司质量</text><text x="390" y="226" class="tab">估值</text>
+    <text x="444" y="226" class="tab">边际改善</text><text x="530" y="226" class="tab">事件</text>
+    <text x="584" y="226" class="tab">财务</text><text x="638" y="226" class="tab">证据</text>
+    <text x="692" y="226" class="tab">产业链</text><text x="758" y="226" class="tab">情景</text>
+    <text x="812" y="226" class="tab">对标</text><text x="866" y="226" class="tab">跟踪</text>
+    <text x="930" y="226" class="tab">InvestmentView</text>
+  </g>
+
+  <!-- decision brief -->
+  <rect x="246" y="268" width="746" height="294" rx="3" class="card"/>
+  <rect x="246" y="268" width="4" height="294" fill="#2F5EA8"/>
+  <text x="266" y="294" class="en" font-size="9" font-weight="700" fill="#2F5EA8">DECISION BRIEF · CORE CONTRADICTION</text>
+  <rect x="846" y="282" width="124" height="22" rx="2" fill="#FFF7E6" stroke="#D5B46C"/>
+  <text x="908" y="297" text-anchor="middle" class="en" font-size="9" fill="#8A651A">PARTIAL · REVIEW</text>
+  <text x="266" y="330" class="zh" font-size="18" font-weight="700" fill="#18202A">高端白酒定价权  vs  渠道库存与需求韧性</text>
+  <text x="266" y="354" class="zh body">把 HTML 的“结论置顶”转译为可证伪研究命题；结论只在证据、时点与版本闭合后进入 InvestmentView。</text>
+  <rect x="266" y="378" width="706" height="46" rx="2" class="soft"/>
+  <text x="280" y="397" class="zh h3">必须成立 ① 品牌与渠道</text><text x="280" y="415" class="zh small">批价与渠道库存保持健康，回款没有显著恶化。</text>
+  <rect x="870" y="389" width="88" height="22" rx="2" fill="#E8F4EF" stroke="#7DB49F"/><text x="914" y="404" text-anchor="middle" class="en" font-size="8" fill="#2E7660">QUANTIFIED</text>
+  <rect x="266" y="432" width="706" height="46" rx="2" class="soft"/>
+  <text x="280" y="451" class="zh h3">必须成立 ② 盈利质量</text><text x="280" y="469" class="zh small">收入、净利与自由现金流同向，非经常项目影响透明。</text>
+  <rect x="870" y="443" width="88" height="22" rx="2" fill="#FFF7E6" stroke="#D5B46C"/><text x="914" y="458" text-anchor="middle" class="en" font-size="8" fill="#8A651A">CONSTRAINED</text>
+  <rect x="266" y="486" width="706" height="46" rx="2" class="soft"/>
+  <text x="280" y="505" class="zh h3">必须成立 ③ 事件验证</text><text x="280" y="523" class="zh small">决策时点公告与渠道调研证据尚不完整；UNAVAILABLE 不填 0。</text>
+  <rect x="870" y="497" width="88" height="22" rx="2" fill="#F9ECEF" stroke="#C78C98"/><text x="914" y="512" text-anchor="middle" class="en" font-size="8" fill="#8E4A57">UNAVAILABLE</text>
+  <text x="266" y="548" class="zh tiny">Evidence coverage 18/24 · 3 stale · 3 missing · hash pending</text>
+
+  <!-- InvestmentView readiness -->
+  <rect x="1012" y="268" width="402" height="294" rx="3" class="card"/>
+  <rect x="1012" y="268" width="4" height="294" fill="#2F5EA8"/>
+  <text x="1032" y="296" class="zh h2">InvestmentView 就绪度</text>
+  <rect x="1306" y="281" width="88" height="22" rx="2" fill="#FFF7E6" stroke="#D5B46C"/><text x="1350" y="296" text-anchor="middle" class="en" font-size="8" fill="#8A651A">DRAFT</text>
+  <text x="1032" y="326" class="zh small">60D 研究分布 · 非目标价 / 非交易建议</text>
+  <line x1="1032" y1="342" x2="1394" y2="342" class="line"/>
+  <text x="1032" y="370" class="zh body">公司质量</text><text x="1378" y="370" text-anchor="end" class="en" font-size="10" fill="#2E7660">QUANTIFIED · 0.82</text>
+  <text x="1032" y="400" class="zh body">估值预期差</text><text x="1378" y="400" text-anchor="end" class="en" font-size="10" fill="#8A651A">CONSTRAINED · 0.61</text>
+  <text x="1032" y="430" class="zh body">边际改善</text><text x="1378" y="430" text-anchor="end" class="en" font-size="10" fill="#2E7660">QUANTIFIED · 0.74</text>
+  <text x="1032" y="460" class="zh body">事件影响</text><text x="1378" y="460" text-anchor="end" class="en" font-size="10" fill="#8E4A57">UNAVAILABLE · —</text>
+  <text x="1032" y="490" class="zh tiny">NOT_APPLICABLE 仅用于明确不适用，不得作为缺失替代。</text>
+  <rect x="1032" y="510" width="170" height="34" rx="2" fill="#2F5EA8"/>
+  <text x="1117" y="532" text-anchor="middle" class="zh" font-size="11" font-weight="700" fill="#FFFFFF">进入 InvestmentView</text>
+  <rect x="1214" y="510" width="180" height="34" rx="2" fill="#E7EAF0" stroke="#CDD3DB"/>
+  <text x="1304" y="532" text-anchor="middle" class="zh" font-size="10" fill="#788391">证据不完整 · 禁止提交</text>
+
+  <!-- company anatomy / catalysts -->
+  <rect x="246" y="582" width="560" height="258" rx="3" class="card"/>
+  <text x="266" y="610" class="zh h2">公司画像与价值链定位</text><text x="786" y="610" text-anchor="end" class="en tiny">FROM PROFILE + VALUE CHAIN</text>
+  <line x1="266" y1="624" x2="786" y2="624" class="line"/>
+  <rect x="266" y="644" width="158" height="66" rx="2" class="soft"/>
+  <text x="280" y="664" class="zh small">核心业务</text><text x="280" y="688" class="zh h3">高端白酒 / 茅台酒</text>
+  <rect x="434" y="644" width="158" height="66" rx="2" class="soft"/>
+  <text x="448" y="664" class="zh small">价值链位置</text><text x="448" y="688" class="zh h3">品牌方 · 渠道定价锚</text>
+  <rect x="602" y="644" width="184" height="66" rx="2" class="soft"/>
+  <text x="616" y="664" class="zh small">研究分类</text><text x="616" y="688" class="zh h3">成熟现金流 / 消费龙头</text>
+  <text x="266" y="738" class="zh h3">产业链证据链</text>
+  <rect x="266" y="754" width="98" height="36" rx="2" fill="#EEF3FA" stroke="#B9CBE5"/><text x="315" y="776" text-anchor="middle" class="zh small">上游原料</text>
+  <line x1="364" y1="772" x2="390" y2="772" stroke="#93A3B7"/><text x="398" y="776" class="zh small">生产与基酒</text>
+  <line x1="486" y1="772" x2="512" y2="772" stroke="#93A3B7"/><text x="520" y="776" class="zh small">经销渠道</text>
+  <line x1="604" y1="772" x2="630" y2="772" stroke="#93A3B7"/><text x="638" y="776" class="zh small">终端动销</text>
+  <text x="266" y="820" class="zh tiny">来源：年报、公告、渠道证据；不得以 LLM 文本替代权威财务数值。</text>
+
+  <rect x="826" y="582" width="588" height="258" rx="3" class="card"/>
+  <text x="846" y="610" class="zh h2">Catalysts / Invalidators / 证据变化</text>
+  <line x1="846" y1="624" x2="1394" y2="624" class="line"/>
+  <rect x="846" y="642" width="264" height="148" rx="2" fill="#F2F8F5" stroke="#B9D6CA"/>
+  <text x="862" y="666" class="zh h3" fill="#2E7660">核心催化剂</text>
+  <text x="862" y="692" class="zh body">• 批价与终端动销验证</text><text x="862" y="718" class="zh body">• 渠道库存回归健康区间</text>
+  <text x="862" y="744" class="zh body">• 现金回款质量持续改善</text><text x="862" y="770" class="zh tiny">每项必须绑定 evidence_id 与期限</text>
+  <rect x="1122" y="642" width="272" height="148" rx="2" fill="#FBF1F3" stroke="#DEC0C7"/>
+  <text x="1138" y="666" class="zh h3" fill="#8E4A57">失效条件</text>
+  <text x="1138" y="692" class="zh body">• 批价持续下破阈值</text><text x="1138" y="718" class="zh body">• 现金回款与利润背离</text>
+  <text x="1138" y="744" class="zh body">• 渠道库存异常抬升</text><text x="1138" y="770" class="zh tiny">命中后只触发 Review，不自动交易</text>
+  <rect x="846" y="802" width="548" height="24" rx="2" fill="#FFF7E6"/>
+  <text x="1120" y="818" text-anchor="middle" class="zh tiny" fill="#8A651A">当前 2 项 stale、1 项 unavailable；Research Case 保持开放</text>
+
+  <!-- financial trajectory -->
+  <rect x="246" y="860" width="746" height="300" rx="3" class="card"/>
+  <text x="266" y="888" class="zh h2">财务轨迹 · 5Y（可追溯摘要）</text><text x="972" y="888" text-anchor="end" class="en tiny">NORMALIZED_CURRENT · DESIGN FIXTURE</text>
+  <line x1="266" y1="902" x2="972" y2="902" class="line"/>
+  <g>
+    <rect x="266" y="920" width="162" height="90" rx="2" class="soft"/>
+    <text x="280" y="944" class="zh small">营业收入（亿）</text><text x="280" y="978" class="metric">1,505.6</text><text x="397" y="944" text-anchor="end" class="en tiny up">+18.5% YoY</text>
+    <path d="M280 997 L310 991 L340 984 L370 973 L410 958" class="redLine"/>
+    <rect x="438" y="920" width="162" height="90" rx="2" class="soft"/>
+    <text x="452" y="944" class="zh small">归母净利（亿）</text><text x="452" y="978" class="metric">747.3</text><text x="569" y="944" text-anchor="end" class="en tiny up">+19.1% YoY</text>
+    <path d="M452 997 L482 993 L512 984 L542 973 L582 954" class="redLine"/>
+    <rect x="610" y="920" width="162" height="90" rx="2" class="soft"/>
+    <text x="624" y="944" class="zh small">加权 ROE</text><text x="624" y="978" class="metric">30.2%</text><text x="741" y="944" text-anchor="end" class="en tiny up">+0.8pt</text>
+    <path d="M624 998 L654 974 L684 982 L714 990 L754 968" class="redLine"/>
+    <rect x="782" y="920" width="190" height="90" rx="2" class="soft"/>
+    <text x="796" y="944" class="zh small">自由现金流（亿）</text><text x="796" y="978" class="metric">682.1</text><text x="941" y="944" text-anchor="end" class="en tiny up">+22.3% YoY</text>
+    <path d="M796 997 L830 994 L865 982 L900 975 L954 951" class="redLine"/>
+  </g>
+  <text x="266" y="1042" class="zh h3">收入 → 利润 → 现金流闭合检查</text>
+  <rect x="266" y="1058" width="706" height="18" rx="2" fill="#E8ECF1"/>
+  <rect x="266" y="1058" width="556" height="18" rx="2" fill="#5D8FD5"/>
+  <text x="278" y="1071" class="en" font-size="8" fill="#FFFFFF">QUALITY OF EARNINGS 79%</text>
+  <text x="266" y="1100" class="zh small">异常项：合同负债与经营现金流时点差；需展开季度证据，不以年度同比替代。</text>
+  <text x="266" y="1128" class="zh tiny">注：示例数值仅表达信息结构；运行时必须来自冻结 dataset/version/formula。</text>
+
+  <!-- quality score -->
+  <rect x="1012" y="860" width="402" height="300" rx="3" class="card"/>
+  <text x="1032" y="888" class="zh h2">公司质地评分 · 与交易评分分离</text>
+  <line x1="1032" y1="902" x2="1394" y2="902" class="line"/>
+  <text x="1032" y="934" class="zh body">品牌定价权</text><rect x="1146" y="924" width="190" height="10" rx="2" fill="#E5E9EE"/><rect x="1146" y="924" width="171" height="10" rx="2" fill="#2F5EA8"/><text x="1378" y="934" text-anchor="end" class="en small">9.0</text>
+  <text x="1032" y="970" class="zh body">盈利质量</text><rect x="1146" y="960" width="190" height="10" rx="2" fill="#E5E9EE"/><rect x="1146" y="960" width="156" height="10" rx="2" fill="#2F5EA8"/><text x="1378" y="970" text-anchor="end" class="en small">8.2</text>
+  <text x="1032" y="1006" class="zh body">资本效率</text><rect x="1146" y="996" width="190" height="10" rx="2" fill="#E5E9EE"/><rect x="1146" y="996" width="163" height="10" rx="2" fill="#2F5EA8"/><text x="1378" y="1006" text-anchor="end" class="en small">8.6</text>
+  <text x="1032" y="1042" class="zh body">治理与证据</text><rect x="1146" y="1032" width="190" height="10" rx="2" fill="#E5E9EE"/><rect x="1146" y="1032" width="127" height="10" rx="2" fill="#D0A24B"/><text x="1378" y="1042" text-anchor="end" class="en small">6.7</text>
+  <rect x="1032" y="1074" width="362" height="58" rx="2" fill="#FFF7E6" stroke="#D5B46C"/>
+  <text x="1048" y="1096" class="zh h3" fill="#8A651A">产品判断</text>
+  <text x="1048" y="1116" class="zh small">评分服务于问题排序，不直接映射买入、仓位或收益承诺。</text>
+  <text x="1032" y="1150" class="zh tiny">测试通过 ≠ 模型科学有效。</text>
+
+  <!-- valuation scenario -->
+  <rect x="246" y="1180" width="560" height="300" rx="3" class="card"/>
+  <text x="266" y="1208" class="zh h2">估值预期差与情景区间</text><text x="786" y="1208" text-anchor="end" class="zh tiny">非目标价 · 非买卖建议</text>
+  <line x1="266" y1="1222" x2="786" y2="1222" class="line"/>
+  <text x="266" y="1250" class="zh body">核心假设：未来现金流质量与行业估值锚的相对变化。</text>
+  <g>
+    <rect x="266" y="1272" width="160" height="112" rx="2" fill="#F1F7F4" stroke="#B9D6CA"/>
+    <text x="346" y="1296" text-anchor="middle" class="zh h3" fill="#2E7660">压力情景</text><text x="346" y="1324" text-anchor="middle" class="en metric down">-12% ~ -4%</text><text x="346" y="1350" text-anchor="middle" class="zh small">需求与批价承压</text><text x="346" y="1372" text-anchor="middle" class="en tiny">probability 25%</text>
+    <rect x="436" y="1272" width="160" height="112" rx="2" fill="#EEF3FA" stroke="#B9CBE5"/>
+    <text x="516" y="1296" text-anchor="middle" class="zh h3" fill="#2F5EA8">基准情景</text><text x="516" y="1324" text-anchor="middle" class="en metric blue">+2% ~ +9%</text><text x="516" y="1350" text-anchor="middle" class="zh small">现金流保持韧性</text><text x="516" y="1372" text-anchor="middle" class="en tiny">probability 50%</text>
+    <rect x="606" y="1272" width="180" height="112" rx="2" fill="#FBF1F3" stroke="#DEC0C7"/>
+    <text x="696" y="1296" text-anchor="middle" class="zh h3" fill="#A64045">改善情景</text><text x="696" y="1324" text-anchor="middle" class="en metric up">+10% ~ +18%</text><text x="696" y="1350" text-anchor="middle" class="zh small">动销与回款超预期</text><text x="696" y="1372" text-anchor="middle" class="en tiny">probability 25%</text>
+  </g>
+  <text x="266" y="1416" class="zh small">状态：CONSTRAINED · 同业口径与季度事件证据不完整</text>
+  <text x="266" y="1444" class="zh tiny">区间用于展示研究分布；Residual 在 InvestmentView 中显式闭合。</text>
+
+  <!-- peer comparison -->
+  <rect x="826" y="1180" width="588" height="300" rx="3" class="card"/>
+  <text x="846" y="1208" class="zh h2">行业同业对比 · Peer Analysis</text><text x="1394" y="1208" text-anchor="end" class="en tiny">AS-OF 2024-12-06</text>
+  <line x1="846" y1="1222" x2="1394" y2="1222" class="line"/>
+  <rect x="846" y="1240" width="548" height="34" fill="#EEF1F5"/>
+  <text x="858" y="1261" class="zh tiny">公司</text><text x="1050" y="1261" text-anchor="end" class="en tiny">PE TTM</text><text x="1140" y="1261" text-anchor="end" class="en tiny">ROE</text><text x="1260" y="1261" text-anchor="end" class="zh tiny">营收增速</text><text x="1380" y="1261" text-anchor="end" class="zh tiny">证据状态</text>
+  <rect x="846" y="1274" width="548" height="38" fill="#EAF2FC"/>
+  <text x="858" y="1298" class="zh h3" fill="#2F5EA8">贵州茅台</text><text x="1050" y="1298" text-anchor="end" class="en body">32.4x</text><text x="1140" y="1298" text-anchor="end" class="en body">30.2%</text><text x="1260" y="1298" text-anchor="end" class="en body up">+18.5%</text><text x="1380" y="1298" text-anchor="end" class="en tiny" fill="#2E7660">ready</text>
+  <text x="858" y="1338" class="zh body">五粮液</text><text x="1050" y="1338" text-anchor="end" class="en body">18.2x</text><text x="1140" y="1338" text-anchor="end" class="en body">24.5%</text><text x="1260" y="1338" text-anchor="end" class="en body up">+12.1%</text><text x="1380" y="1338" text-anchor="end" class="en tiny">partial</text>
+  <line x1="846" y1="1352" x2="1394" y2="1352" class="line"/>
+  <text x="858" y="1378" class="zh body">泸州老窖</text><text x="1050" y="1378" text-anchor="end" class="en body">16.1x</text><text x="1140" y="1378" text-anchor="end" class="en body">28.3%</text><text x="1260" y="1378" text-anchor="end" class="en body up">+15.6%</text><text x="1380" y="1378" text-anchor="end" class="en tiny">partial</text>
+  <line x1="846" y1="1392" x2="1394" y2="1392" class="line"/>
+  <text x="858" y="1418" class="zh body">山西汾酒</text><text x="1050" y="1418" text-anchor="end" class="en body">22.5x</text><text x="1140" y="1418" text-anchor="end" class="en body">27.1%</text><text x="1260" y="1418" text-anchor="end" class="en body up">+20.2%</text><text x="1380" y="1418" text-anchor="end" class="en tiny">partial</text>
+  <text x="846" y="1454" class="zh tiny">比较口径绑定 dataset/version；不可用值显示 —，不得补 0。</text>
+
+  <!-- tracking plan -->
+  <rect x="246" y="1500" width="560" height="306" rx="3" class="card"/>
+  <text x="266" y="1528" class="zh h2">跟踪计划 · 从静态研报到持续 Research Case</text>
+  <line x1="266" y1="1542" x2="786" y2="1542" class="line"/>
+  <text x="266" y="1570" class="en tiny">FREQUENCY</text><text x="350" y="1570" class="en tiny">OBSERVATION</text><text x="660" y="1570" class="en tiny">OWNER / STATE</text>
+  <rect x="266" y="1582" width="520" height="52" rx="2" class="soft"/>
+  <text x="280" y="1604" class="zh h3">高频</text><text x="350" y="1604" class="zh body">批价、渠道库存、动销与重要公告</text><text x="660" y="1604" class="en tiny">Research · active</text><text x="350" y="1623" class="zh tiny">命中阈值只创建 Review / Incident</text>
+  <rect x="266" y="1642" width="520" height="52" rx="2" class="soft"/>
+  <text x="280" y="1664" class="zh h3">季度</text><text x="350" y="1664" class="zh body">收入、利润、现金流与合同负债闭合</text><text x="660" y="1664" class="en tiny">Analyst · due</text><text x="350" y="1683" class="zh tiny">更新 bundle 后重新编译 InvestmentView</text>
+  <rect x="266" y="1702" width="520" height="52" rx="2" class="soft"/>
+  <text x="280" y="1724" class="zh h3">事件</text><text x="350" y="1724" class="zh body">定价、渠道、治理与政策相关事实</text><text x="660" y="1724" class="en tiny">Event desk · partial</text><text x="350" y="1743" class="zh tiny">无引用的结论不得进入 View</text>
+  <rect x="266" y="1766" width="520" height="24" rx="2" fill="#EEF3FA"/>
+  <text x="526" y="1782" text-anchor="middle" class="zh tiny" fill="#2F5EA8">打开 Case 时间线 · 查看证据变更与责任人</text>
+
+  <!-- feeds -->
+  <rect x="826" y="1500" width="588" height="306" rx="3" class="card"/>
+  <text x="846" y="1528" class="zh h2">最新公告与证据时间线 · Security Feeds</text>
+  <line x1="846" y1="1542" x2="1394" y2="1542" class="line"/>
+  <g class="zh">
+    <rect x="846" y="1560" width="548" height="44" rx="2" class="soft"/>
+    <text x="860" y="1578" class="en tiny blue">11-28 17:30</text><text x="860" y="1595" class="body">公司公告：回购进展与锁定期说明</text><text x="1378" y="1584" text-anchor="end" class="tiny">evidence · ready</text>
+    <rect x="846" y="1612" width="548" height="44" rx="2" class="soft"/>
+    <text x="860" y="1630" class="en tiny blue">11-25 10:15</text><text x="860" y="1647" class="body">渠道证据：年度任务部署与回款观察</text><text x="1378" y="1636" text-anchor="end" class="tiny">source · partial</text>
+    <rect x="846" y="1664" width="548" height="44" rx="2" class="soft"/>
+    <text x="860" y="1682" class="en tiny blue">11-20 09:00</text><text x="860" y="1699" class="body">终端动销：样本口径变化，需要重新校准</text><text x="1378" y="1688" text-anchor="end" class="tiny">blocker</text>
+    <rect x="846" y="1716" width="548" height="44" rx="2" class="soft"/>
+    <text x="860" y="1734" class="en tiny blue">11-15 16:45</text><text x="860" y="1751" class="body">治理事项：责任人与影响范围已登记</text><text x="1378" y="1740" text-anchor="end" class="tiny">lineage</text>
+  </g>
+  <text x="846" y="1788" class="zh tiny">所有新闻只作为事实候选；去重、引用和人工确认后方可晋级。</text>
+
+  <!-- footer notes -->
+  <rect x="246" y="1824" width="1168" height="54" rx="2" fill="#EAF0F7" stroke="#C8D4E3"/>
+  <text x="266" y="1847" class="zh tiny">原型融合来源：现有 Security Overview + stock-analysis HTML 的结论置顶、画像、产业链、风险、对标与跟踪结构。</text>
+  <text x="266" y="1867" class="zh tiny">产品约束：DESIGN FIXTURE；不连接运行时假数据；不构成投资建议；无 PIT 时严格路径失败关闭；审批由服务端拥有。</text>
+  <text x="246" y="1892" class="zh" font-size="8" fill="#727D8B">Prototype Notes · Security Research Hub / 信息结构融合，不代表模型科学有效</text>
+</svg>

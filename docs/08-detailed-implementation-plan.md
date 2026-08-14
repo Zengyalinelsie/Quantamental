@@ -624,9 +624,9 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [ ] 隐含增长/利润率；
 - [ ] 趋势/加速度/一次性调整；
 - [ ] 分析师修正 adapter（若数据源通过资格）；
-- [ ] scenario/sensitivity。
+- [x] scenario/sensitivity。
 
-状态（2026-08-11）：已有行业模板相关的估值/改善领域基线；本轮新增 provider-neutral 的
+状态（2026-08-14）：已有行业模板相关的估值/改善领域基线；本轮新增 provider-neutral 的
 base/bull/bear scenario/sensitivity，以及按 security、decision time、data mode、trust 和 bundle
 version 精确冻结的 application 编排。缺少从真实 PostgreSQL financial/price/comparable inputs
 构造 bundle 的 adapter、历史/行业/同业相对估值服务、分析师修正资格链路和真实运行产物，
@@ -634,51 +634,56 @@ version 精确冻结的 application 编排。缺少从真实 PostgreSQL financia
 
 ### P5-W02：Expected Return Compiler V0
 
-- [ ] 统一 20/60/120 日期限；
-- [ ] quality/valuation/revision/event 分项及各自 status；
-- [ ] P8 前 event 固定为 `unavailable`，不得用数值 0 表示“没有影响”；
-- [ ] 显式 residual；
-- [ ] p10/p50/p90 和 downside；
-- [ ] calibration/outcome ledger；
-- [ ] catalyst/invalidator；
-- [ ] 不可量化约束路径。
+- [x] 统一 20/60/120 日期限；
+- [x] quality/valuation/revision/event 分项及各自 status；
+- [x] P8 前 event 固定为 `unavailable`，不得用数值 0 表示“没有影响”；
+- [x] 显式 residual；
+- [x] p10/p50/p90 和 downside；
+- [x] calibration/outcome ledger；
+- [x] catalyst/invalidator；
+- [x] 不可量化约束路径；
+- [ ] outcome 到期写入 worker。
 
-状态（2026-08-11）：20/60/120 日、四分项、P8 前 event unavailable、Decimal residual 闭合、
+状态（2026-08-14）：20/60/120 日、四分项、P8 前 event unavailable、Decimal residual 闭合、
 分布/downside、catalyst/invalidator、约束路径和确定性 hash 的领域合同已实现；View、Outcome、
-Calibration 的 append-only application/memory ledger 与 PostgreSQL 空表迁移已实现。缺少
-PostgreSQL repository、真实合格输入编译、API projection 和 outcome 到期写入 worker，故本工作包
-尚未完成，测试产物不得视为真实收益预测。
+Calibration 的 append-only application/memory ledger、PostgreSQL migration/repository 和只读 API
+projection 已实现。仍缺真实合格输入编译、outcome 到期写入 worker 和 Frozen Artifact export，
+故本工作包尚未完成，测试产物不得视为真实收益预测。
 
 ### P5-W03：SignalSnapshot
 
-- [ ] 只接受对当前用途获批的 model/factor；
-- [ ] 排名、score、expected return、confidence；
-- [ ] universe/data cutoff；
-- [ ] trust 和 version binding；
-- [ ] immutable hash；
-- [ ] production 与 research API 隔离。
+- [x] 只接受对当前用途获批的 model/factor；
+- [x] 排名、score、expected return、confidence；
+- [x] universe/data cutoff；
+- [x] trust 和 version binding；
+- [x] immutable hash；
+- [x] production 与 research API 隔离。
 
-状态（2026-08-11）：SignalSnapshot 已绑定 exact FactorVersion、FactorPromotionReview、approval
+状态（2026-08-14）：SignalSnapshot 已绑定 exact FactorVersion、FactorPromotionReview、approval
 scope、Universe/cutoff/trust/version、rank/score/expected return/confidence 和 immutable hash；
-append-only ledger、research/forward query service 隔离、PostgreSQL 空表及两个 serving view 已完成。
-当前 P4 没有通过 PIT/科学验证门，也没有获批因子，所以真实 Snapshot 必须保持 0 条。缺少
-PostgreSQL repository 和 FastAPI 的物理路由隔离，W03 尚未完成。
+append-only ledger、research/forward query service 隔离、PostgreSQL migration/repository、两个
+serving view 和 FastAPI 只读查询面已完成。当前 P4 没有通过 PIT/科学验证门，也没有获批因子，
+所以真实 Snapshot 必须保持 0 条；不得用 fixture 或 current 数据补齐。本工作包的工程合同已完成，
+但真实 Snapshot 产物和 P5 Gate 仍被上游资格门阻断。
 
 ### P5-W04：前端 Security 与 Screen
 
 - [ ] 公司质量、估值、改善三问接真实结果；
-- [ ] 事件区在 P8 前显示证据化 unavailable 原因，不展示伪结论；
-- [ ] InvestmentView 分布和分项瀑布；
-- [ ] evidence/invalidators；
-- [ ] industry peers；
-- [ ] current/strict 标签；
-- [ ] ranking changes；
+- [x] 事件区在 P8 前显示证据化 unavailable 原因，不展示伪结论；
+- [x] InvestmentView 分布和分项瀑布；
+- [x] evidence/invalidators；
+- [x] industry peers；
+- [x] current/strict 标签；
+- [x] ranking changes；
 - [ ] frozen Artifact export。
 
-状态（2026-08-11）：InvestmentView distribution/waterfall/residual/evidence/invalidator/trust/version
+状态（2026-08-14）：InvestmentView distribution/waterfall/residual/evidence/invalidator/trust/version
 组件，以及 server-owned Screen ranking、industry peers、Alpha Model readiness/approval blocker 组件
-已完成合同测试；前端不重算闭合、rank change 或排序。组件尚未连接真实 P5 API 和 `/research`
-路由，Security 详情、frozen Artifact export 与浏览器端到端验收仍未完成，运行时不得注入 demo 值。
+已完成合同测试并接入 `/api/research/workspace` 和 `/research` 产品路由；前端不重算闭合、
+rank change 或排序。当前页面只能展示数据库中真实存在且满足查询合同的对象，空库会诚实显示
+blocker。仍缺真实数据详情、Frozen Artifact export、320/768/1024 响应式实现和最终浏览器验收，
+运行时不得注入 demo 值。产品蓝图、黄金路径与当前原型证据见
+`docs/18-product-blueprint-and-prototype.md`。
 
 ### Gate P5
 
@@ -688,9 +693,11 @@ PostgreSQL repository 和 FastAPI 的物理路由隔离，W03 尚未完成。
 - 组合层无需读取新闻文本或页面计算；
 - SPEC-018–019、024–025 通过；SPEC-030 的输入合同完成，输出和组合验收留到 P6。
 
-状态（2026-08-11）：**未通过**。工程骨架正在推进，但缺少合格 PIT/获批 factor/model、真实决策日
-InvestmentView/SignalSnapshot、持久化 API 与浏览器黄金路径。不能以单元测试、空表迁移或展示
-组件替代 Capability Gate，更不能据此声称模型科学有效。
+状态（2026-08-14）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
+原型黄金路径已经具备，但仍缺合格 PIT/获批 factor/model、真实决策日 InvestmentView/
+SignalSnapshot、outcome 到期 worker、Frozen Artifact export、320/768/1024 运行时响应式证据和最终
+浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，更不能据此声称
+模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测
 
@@ -1089,6 +1096,13 @@ Shadow
 | System / Approvals | P1 空状态 | P4 | P9/P10 |
 
 生产前端只能使用 contract fixture 做自动测试；运行时空状态不得注入 demo 值。
+
+产品原型说明（2026-08-13）：在继续扩展 P5–P7 产品页面前，先按研究员工作流完成全系统
+产品蓝图和 Figma 原型。31 页信息架构、逐页 `INPUT → PROCESS → OUTPUT → ACTION → GATE`、
+黄金路径、失败关闭状态机和原型验收标准以
+`docs/18-product-blueprint-and-prototype.md` 为真源。原型中的 `DESIGN FIXTURE` 只用于设计表达，
+不得进入生产运行时或冒充 `pit_verified`。现有 Shell/API/领域合同继续复用；当前 Desk 的工程阶段
+状态表将在原型确认后由真正的每日研究工作台替换。
 
 ## 17. Spec 追踪矩阵
 

@@ -23,6 +23,10 @@ Capability Gate 通过。主动 Timing 仍 `unavailable`；P3.5 已完成 CSI500
 统计引擎及独立库交叉验证、Experiment/Reviewer 生命周期、Qlib exchange 和完整 Factor
 Workspace 均已接线。真实开发库的三因子资格审计已失败关闭；冻结窗口缺合格 `pit_verified`
 输入，因此没有计算因子 score/IC/RankIC、没有晋级，P4 Gate 仍未通过。
+P5 已完成 InvestmentView/SignalSnapshot 领域合同、PostgreSQL append-only ledger、只读研究 API、
+`/research` 产品接线和 1440 px 原型黄金路径；仍缺真实 PostgreSQL 估值输入 bundle、合格 PIT
+InvestmentView、Outcome 到期 worker、Frozen Artifact export 及 320/768/1024 运行时验收，
+因此 P5 Gate 也未通过，尚未进入 P6。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
 
@@ -69,6 +73,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [数据源总清单与 Agent 选择路由](docs/14-data-source-catalog-and-agent-routing.md)
 - [P4 实现与验证证据](docs/15-p4-implementation-evidence.md)
 - [PostgreSQL 数据分层方案（待批准）](docs/16-postgresql-data-layering-proposal.md)
+- [产品蓝图与 Figma 原型真源](docs/18-product-blueprint-and-prototype.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)
