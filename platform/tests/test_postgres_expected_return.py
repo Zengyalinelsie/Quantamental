@@ -48,6 +48,8 @@ def outcome(
         realized_at=DECISION_TIME + timedelta(days=100),
         realized_return=Decimal("-0.03"),
         dataset_version_id="dataset:realized-return:v1",
+        source_policy_version="outcome-price-policy:test:v1",
+        source_available_at=DECISION_TIME + timedelta(days=100),
         recorded_at=DECISION_TIME + timedelta(days=101),
     )
 
@@ -191,7 +193,7 @@ class PostgresExpectedReturnLedgerRepositoryTest(unittest.TestCase):
             if "INSERT INTO research.expected_return_calibrations" in call[0]
         )
         self.assertEqual(json_value(view_insert[1][11]), self.view.hash_payload())
-        self.assertEqual(json_value(outcome_insert[1][8]), self.outcome.hash_payload())
+        self.assertEqual(json_value(outcome_insert[1][10]), self.outcome.hash_payload())
         self.assertEqual(
             json_value(calibration_insert[1][4]),
             self.calibration.hash_payload(),

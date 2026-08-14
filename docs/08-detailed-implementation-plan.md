@@ -645,7 +645,7 @@ bundle、append-only Repository/migration 和 dry-run-by-default worker。curren
 - [x] calibration/outcome ledger；
 - [x] catalyst/invalidator；
 - [x] 不可量化约束路径；
-- [ ] outcome 到期写入 worker。
+- [x] provider-neutral outcome 到期写入 worker；真实价格 adapter 待 `P5-D1-01`。
 
 状态（2026-08-14）：20/60/120 日、四分项、P8 前 event unavailable、Decimal residual 闭合、
 分布/downside、catalyst/invalidator、约束路径和确定性 hash 的领域合同已实现；View、Outcome、
@@ -659,8 +659,13 @@ content-addressed object、Artifact/lineage 和幂等已完成；本轮进一步
 Governance adapter、0032–0034 数据库不可变/Run transition/失败原因/非空字段约束、精确 lookup、
 Artifact+lineage 单事务、
 私有 metadata/download API、生成的前端 OpenAPI snapshot/types 和受控本地对象 reader。Viewer 在
-没有发布绑定时拒绝，Run/Artifact 只列 research stage，P11 不授权。仍缺页面下载入口和 outcome 到期
-写入 worker，故本工作包尚未完成，测试产物不得视为真实收益预测。
+没有发布绑定时拒绝，Run/Artifact 只列 research stage，P11 不授权。本轮再完成 provider-neutral
+Outcome maturity source/worker：来源负责交易日历、复权收益和公司行动资格，应用层只扫描并核对
+view/security/decision time/horizon/evaluation time；pending、price unavailable、corporate-action
+incomplete、source unqualified 分别表达，默认 dry-run，execute 需本地研究 ack，非 research stage
+不处理。0035 冻结 source policy/version 与 source availability，既有 Outcome 不允许猜测迁移。真实
+价格 adapter 仍被 `P5-D1-01` 阻断，故本工作包的 provider-neutral 工程合同完成但没有真实 outcome；
+测试产物不得视为真实收益预测。
 
 ### P5-W03：SignalSnapshot
 
@@ -709,7 +714,7 @@ blocker。Frozen Artifact durable/API 已完成，仍缺真实数据详情、页
 状态（2026-08-14）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
 原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
 strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
-InvestmentView/SignalSnapshot、outcome 到期 worker、Frozen Artifact 页面入口、320/768/1024 运行时
+InvestmentView/SignalSnapshot、获批真实 outcome price adapter、Frozen Artifact 页面入口、320/768/1024 运行时
 响应式证据和最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
 更不能据此声称模型科学有效。
 

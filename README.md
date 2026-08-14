@@ -304,6 +304,28 @@ PYTHONPATH=src .venv/bin/python -m unittest \
   tests.test_postgres_schema_layers -v
 ```
 
+P5 Outcome 成熟度 worker 同样默认 dry-run。它扫描 frozen research InvestmentView，但把交易日历、
+到期日、复权收益和公司行动完整性留给 provider-neutral source adapter；应用层不会按自然日猜测或
+补零。当前 `P5-D1-01` 尚未批准真实价格政策，默认 adapter 会明确返回 `source_unqualified`，不会连接
+真实供应商或写 Outcome：
+
+```bash
+cd platform
+PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.investment_view_outcomes \
+  --database-url postgresql://a_share_platform_dev:local-only@127.0.0.1:55432/a_share_platform_layered_dev \
+  --evaluated-at 2026-08-14T15:00:00+08:00
+
+PYTHONPATH=src .venv/bin/python -m unittest \
+  tests.test_investment_view_outcome_worker \
+  tests.test_expected_return_ledger \
+  tests.test_postgres_expected_return \
+  tests.test_migrations -v
+```
+
+未来只有在 `P5-D1-01` 冻结并接入合格 source 后，才可加
+`--private-local-research-ack --execute`。Outcome 持久化会冻结 dataset、source policy/version 和
+source availability；paper/limited-live 等 P11 stage 仍不授权。
+
 运行当前全量验证；若要包含真实 PostgreSQL migration smoke，显式传入本地验证库 URL：
 
 ```bash

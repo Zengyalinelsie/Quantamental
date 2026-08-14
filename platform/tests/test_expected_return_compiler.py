@@ -193,6 +193,8 @@ class ExpectedReturnOutcomeLedgerTest(unittest.TestCase):
             realized_at=DECISION_TIME + timedelta(days=100),
             realized_return=Decimal("-0.03"),
             dataset_version_id="dataset:realized-return:v1",
+            source_policy_version="outcome-price-policy:test:v1",
+            source_available_at=DECISION_TIME + timedelta(days=100),
             recorded_at=DECISION_TIME + timedelta(days=101),
         )
         calibration = ExpectedReturnCalibrationRecord.from_view_and_outcome(
@@ -208,8 +210,11 @@ class ExpectedReturnOutcomeLedgerTest(unittest.TestCase):
         self.assertTrue(calibration.inside_p10_p90)
         self.assertFalse(calibration.direction_correct)
 
-    def test_outcome_cannot_be_recorded_before_it_is_realized(self) -> None:
-        with self.assertRaisesRegex(ValueError, "recorded_at cannot precede realized_at"):
+    def test_outcome_cannot_be_recorded_before_source_availability(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError,
+            "recorded_at cannot precede source_available_at",
+        ):
             InvestmentViewOutcome(
                 outcome_id="outcome:invalid",
                 view_id="investment-view:invalid",
@@ -219,6 +224,8 @@ class ExpectedReturnOutcomeLedgerTest(unittest.TestCase):
                 realized_at=DECISION_TIME + timedelta(days=100),
                 realized_return=Decimal("0.01"),
                 dataset_version_id="dataset:realized-return:v1",
+                source_policy_version="outcome-price-policy:test:v1",
+                source_available_at=DECISION_TIME + timedelta(days=100),
                 recorded_at=DECISION_TIME + timedelta(days=99),
             )
 

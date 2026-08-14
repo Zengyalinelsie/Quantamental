@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 
+MIGRATION_DATABASE_URL="${ASP_DATABASE_URL:-}"
+unset ASP_DATABASE_URL
 export PYTHON_BIN="${PYTHON_BIN:-python3.11}"
 
 "$PYTHON_BIN" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
@@ -9,8 +11,9 @@ PYTHONPYCACHEPREFIX=/tmp/a-share-platform-pycache "$PYTHON_BIN" -m compileall -q
 "$PYTHON_BIN" -m ruff check src tests
 "$PYTHON_BIN" -m mypy src
 
-if [ -n "${ASP_DATABASE_URL:-}" ]; then
-  PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.adapters.postgres.cli
+if [ -n "$MIGRATION_DATABASE_URL" ]; then
+  ASP_DATABASE_URL="$MIGRATION_DATABASE_URL" \
+    PYTHONPATH=src "$PYTHON_BIN" -m a_share_platform.adapters.postgres.cli
 fi
 
 if [ -f frontend/package-lock.json ]; then

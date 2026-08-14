@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`；Task 1 application export 已验证
+> 状态：`in_progress`；Task 1–3 已验证
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -85,6 +85,12 @@ Viewer 因缺少发布/审批绑定而拒绝，Run 列表也鉴权并限定 rese
 DB 事务失败时可能留下不可下载的孤儿对象，后续由对象清理任务处理，不能据此登记 Artifact。
 
 ### Task 3：Outcome source 与 worker
+
+状态：`verified`。已完成 provider-neutral maturity source、明确的 pending/unavailable/mature、
+research-only 扫描、dry-run 默认、execute ack、append-only 幂等写入和 identity mismatch 拒绝。
+`0035_outcome_source_policy.sql` 强制冻结 source policy/version 和 source availability；迁移遇到既有
+Outcome 时拒绝猜测回填。默认运行时 source 因 `P5-D1-01` 未批准而返回 `source_unqualified`，不制造
+价格或收益；真实价格 adapter 仍待决策。
 
 预计文件：
 

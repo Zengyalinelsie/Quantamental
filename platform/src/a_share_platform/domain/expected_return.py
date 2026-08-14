@@ -12,7 +12,7 @@ import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 
 from .investment_view import (
     ExpectedReturnDistribution,
@@ -81,6 +81,119 @@ class InvestmentHorizon(IntEnum):
 
 class ExpectedReturnUnavailable(RuntimeError):
     """Raised when the compiler has no quantified signal to assemble."""
+
+
+class OutcomeObservationStatus(StrEnum):
+    """Provider-neutral maturity state for one frozen InvestmentView."""
+
+    PENDING = "pending"
+    UNAVAILABLE = "unavailable"
+    MATURE = "mature"
+
+
+class OutcomeObservationReason(StrEnum):
+    """Explicit reasons that prevent a realized outcome from being frozen."""
+
+    HORIZON_NOT_REACHED = "horizon_not_reached"
+    PRICE_UNAVAILABLE = "price_unavailable"
+    CORPORATE_ACTIONS_INCOMPLETE = "corporate_actions_incomplete"
+    SOURCE_UNQUALIFIED = "source_unqualified"
+
+
+@dataclass(frozen=True)
+class InvestmentViewOutcomeObservation:
+    """One source-owned maturity decision without an application-layer price guess.
+
+    The source adapter owns trading-calendar and adjusted-return policy.  The
+    application layer only validates that the returned identity closes against
+    the frozen view before it may construct an append-only outcome.
+    """
+
+    view_id: str
+    security_id: str
+    decision_time: datetime
+    horizon_trading_days: int
+    evaluated_at: datetime
+    status: OutcomeObservationStatus
+    source_policy_version: str
+    reason_code: OutcomeObservationReason | None = None
+    reason: str | None = None
+    realized_at: datetime | None = None
+    realized_return: Decimal | None = None
+    dataset_version_id: str | None = None
+    source_available_at: datetime | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("view_id", "security_id", "source_policy_version"):
+            _text(getattr(self, name), name)
+        decision_time = _aware(self.decision_time, "decision_time")
+        evaluated_at = _aware(self.evaluated_at, "evaluated_at")
+        if evaluated_at < decision_time:
+            raise ValueError("evaluated_at cannot precede decision_time")
+        if type(self.horizon_trading_days) is not int or self.horizon_trading_days not in {
+            20,
+            60,
+            120,
+        }:
+            raise ValueError("horizon_trading_days must be 20, 60, or 120")
+        status = OutcomeObservationStatus(self.status)
+        object.__setattr__(self, "status", status)
+        reason_code = (
+            None
+            if self.reason_code is None
+            else OutcomeObservationReason(self.reason_code)
+        )
+        object.__setattr__(self, "reason_code", reason_code)
+
+        realized_values = (
+            self.realized_at,
+            self.realized_return,
+            self.dataset_version_id,
+            self.source_available_at,
+        )
+        if status is OutcomeObservationStatus.MATURE:
+            if (
+                self.realized_at is None
+                or self.realized_return is None
+                or self.dataset_version_id is None
+                or self.source_available_at is None
+            ):
+                raise ValueError(
+                    "mature observation requires realized_at, realized_return, "
+                    "dataset_version_id, and source_available_at"
+                )
+            if reason_code is not None or self.reason is not None:
+                raise ValueError("mature observation cannot carry an unavailable reason")
+            realized_at = _aware(self.realized_at, "realized_at")
+            source_available_at = _aware(
+                self.source_available_at,
+                "source_available_at",
+            )
+            _decimal(self.realized_return, "realized_return")
+            _text(self.dataset_version_id, "dataset_version_id")
+            if realized_at <= decision_time:
+                raise ValueError("realized_at must be later than decision_time")
+            if source_available_at < realized_at:
+                raise ValueError("source_available_at cannot precede realized_at")
+            if source_available_at > evaluated_at:
+                raise ValueError("source_available_at cannot exceed evaluated_at")
+            return
+
+        if any(value is not None for value in realized_values):
+            raise ValueError("non-mature observation cannot carry realized values")
+        if self.reason is None:
+            raise ValueError("reason must not be empty")
+        _text(self.reason, "reason")
+        if status is OutcomeObservationStatus.PENDING:
+            if reason_code is not OutcomeObservationReason.HORIZON_NOT_REACHED:
+                raise ValueError("pending observation requires horizon_not_reached")
+            return
+        if reason_code not in {
+            OutcomeObservationReason.PRICE_UNAVAILABLE,
+            OutcomeObservationReason.CORPORATE_ACTIONS_INCOMPLETE,
+            OutcomeObservationReason.SOURCE_UNQUALIFIED,
+        }:
+            raise ValueError("unavailable observation requires an unavailable reason code")
 
 
 @dataclass(frozen=True)
@@ -276,14 +389,23 @@ class InvestmentViewOutcome:
     realized_at: datetime
     realized_return: Decimal
     dataset_version_id: str
+    source_policy_version: str
+    source_available_at: datetime
     recorded_at: datetime
     content_hash: str = field(init=False)
 
     def __post_init__(self) -> None:
-        for name in ("outcome_id", "view_id", "security_id", "dataset_version_id"):
+        for name in (
+            "outcome_id",
+            "view_id",
+            "security_id",
+            "dataset_version_id",
+            "source_policy_version",
+        ):
             _text(getattr(self, name), name)
         decision_time = _aware(self.decision_time, "decision_time")
         realized_at = _aware(self.realized_at, "realized_at")
+        source_available_at = _aware(self.source_available_at, "source_available_at")
         recorded_at = _aware(self.recorded_at, "recorded_at")
         if type(self.horizon_trading_days) is not int or self.horizon_trading_days not in {
             20,
@@ -293,8 +415,10 @@ class InvestmentViewOutcome:
             raise ValueError("horizon_trading_days must be 20, 60, or 120")
         if realized_at <= decision_time:
             raise ValueError("realized_at must be later than decision_time")
-        if recorded_at < realized_at:
-            raise ValueError("recorded_at cannot precede realized_at")
+        if source_available_at < realized_at:
+            raise ValueError("source_available_at cannot precede realized_at")
+        if recorded_at < source_available_at:
+            raise ValueError("recorded_at cannot precede source_available_at")
         _decimal(self.realized_return, "realized_return")
         object.__setattr__(self, "content_hash", _canonical_hash(self.hash_payload()))
 
@@ -308,6 +432,8 @@ class InvestmentViewOutcome:
             "realized_at": _canonical_time(self.realized_at),
             "realized_return": _decimal_text(self.realized_return),
             "dataset_version_id": self.dataset_version_id,
+            "source_policy_version": self.source_policy_version,
+            "source_available_at": _canonical_time(self.source_available_at),
             "recorded_at": _canonical_time(self.recorded_at),
         }
 

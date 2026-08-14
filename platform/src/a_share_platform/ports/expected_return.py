@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Protocol
 
 from a_share_platform.domain.expected_return import (
     ExpectedReturnCalibrationRecord,
     InvestmentViewOutcome,
+    InvestmentViewOutcomeObservation,
 )
 from a_share_platform.domain.investment_view import InvestmentView
 
@@ -52,8 +54,20 @@ class ExpectedReturnLedgerRepository(Protocol):
     def list_calibrations(self) -> tuple[ExpectedReturnCalibrationRecord, ...]: ...
 
 
+class InvestmentViewOutcomeSource(Protocol):
+    """Resolve maturity and adjusted return without exposing a vendor SDK."""
+
+    def observe(
+        self,
+        *,
+        view: InvestmentView,
+        evaluated_at: datetime,
+    ) -> InvestmentViewOutcomeObservation: ...
+
+
 __all__ = [
     "ExpectedReturnLedgerConflict",
     "ExpectedReturnLedgerRepository",
     "ExpectedReturnLedgerUnavailable",
+    "InvestmentViewOutcomeSource",
 ]

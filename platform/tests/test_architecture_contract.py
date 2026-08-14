@@ -50,6 +50,19 @@ class ArchitectureContractTest(unittest.TestCase):
             with self.subTest(relative_path=relative_path):
                 self.assertTrue((PLATFORM_ROOT / relative_path).is_file())
 
+    def test_ci_keeps_real_migration_database_out_of_default_runtime_tests(self) -> None:
+        script = (PLATFORM_ROOT / "ci" / "verify.sh").read_text(encoding="utf-8")
+        capture = 'MIGRATION_DATABASE_URL="${ASP_DATABASE_URL:-}"'
+        isolation = "unset ASP_DATABASE_URL"
+        migration_injection = 'ASP_DATABASE_URL="$MIGRATION_DATABASE_URL"'
+
+        self.assertIn(capture, script)
+        self.assertIn(isolation, script)
+        self.assertIn(migration_injection, script)
+        self.assertLess(script.index(capture), script.index(isolation))
+        self.assertLess(script.index(isolation), script.index("unittest discover"))
+        self.assertLess(script.index("unittest discover"), script.index(migration_injection))
+
 
 if __name__ == "__main__":
     unittest.main()

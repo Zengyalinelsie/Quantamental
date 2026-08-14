@@ -33,6 +33,8 @@ def outcome_for(view: object, *, outcome_id: str = "outcome:view:001") -> Invest
         realized_at=DECISION_TIME + timedelta(days=100),
         realized_return=Decimal("-0.03"),
         dataset_version_id="dataset:realized-return:v1",
+        source_policy_version="outcome-price-policy:test:v1",
+        source_available_at=DECISION_TIME + timedelta(days=100),
         recorded_at=DECISION_TIME + timedelta(days=101),
     )
 

@@ -231,11 +231,14 @@ class PostgresExpectedReturnLedgerRepository:
                     INSERT INTO research.investment_view_outcomes (
                         outcome_id, content_hash, view_id, security_id,
                         decision_time, horizon_trading_days, realized_at,
-                        dataset_version_id, outcome_document, recorded_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        dataset_version_id, source_policy_version,
+                        source_available_at, outcome_document, recorded_at
+                    ) VALUES (
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                    )
                     ON CONFLICT (outcome_id) DO NOTHING
                     """,
-                    (*row[:8], _json_parameter(row[8]), row[9]),
+                    (*row[:10], _json_parameter(row[10]), row[11]),
                 )
                 stored = self._get_outcome(connection, value.outcome_id)
                 if stored is None:
@@ -379,7 +382,8 @@ class PostgresExpectedReturnLedgerRepository:
         return """
             SELECT outcome_id, content_hash, view_id, security_id,
                    decision_time, horizon_trading_days, realized_at,
-                   dataset_version_id, outcome_document, recorded_at
+                   dataset_version_id, source_policy_version,
+                   source_available_at, outcome_document, recorded_at
             FROM research.investment_view_outcomes
         """
 
@@ -470,6 +474,8 @@ class PostgresExpectedReturnLedgerRepository:
             value.horizon_trading_days,
             value.realized_at,
             value.dataset_version_id,
+            value.source_policy_version,
+            value.source_available_at,
             value.hash_payload(),
             value.recorded_at,
         )
@@ -594,7 +600,7 @@ class PostgresExpectedReturnLedgerRepository:
 
     @staticmethod
     def _outcome_from_row(row: Sequence[object]) -> InvestmentViewOutcome:
-        document = _mapping(row[8], "outcome_document")
+        document = _mapping(row[10], "outcome_document")
         value = InvestmentViewOutcome(
             outcome_id=str(_required(document, "outcome_id")),
             view_id=str(_required(document, "view_id")),
@@ -616,6 +622,13 @@ class PostgresExpectedReturnLedgerRepository:
                 "realized_return",
             ),
             dataset_version_id=str(_required(document, "dataset_version_id")),
+            source_policy_version=str(
+                _required(document, "source_policy_version")
+            ),
+            source_available_at=_datetime(
+                _required(document, "source_available_at"),
+                "source_available_at",
+            ),
             recorded_at=_datetime(
                 _required(document, "recorded_at"),
                 "recorded_at",
@@ -629,7 +642,9 @@ class PostgresExpectedReturnLedgerRepository:
             and _integer(row[5], "horizon_trading_days") == value.horizon_trading_days
             and _datetime(row[6], "realized_at") == value.realized_at
             and str(row[7]) == value.dataset_version_id
-            and _datetime(row[9], "recorded_at") == value.recorded_at
+            and str(row[8]) == value.source_policy_version
+            and _datetime(row[9], "source_available_at") == value.source_available_at
+            and _datetime(row[11], "recorded_at") == value.recorded_at
         )
         if not duplicates_match:
             raise ValueError(f"stored InvestmentView outcome columns mismatch: {value.outcome_id}")

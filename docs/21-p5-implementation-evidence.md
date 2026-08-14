@@ -1,7 +1,7 @@
 # P5 实现与验证证据
 
 > 状态快照：2026-08-14  
-> 范围：P5 当前工程进度；Frozen InvestmentView Artifact export + durable PostgreSQL/API
+> 范围：P5 当前工程进度；Frozen Artifact durable/API + provider-neutral Outcome worker
 > Gate：P5 Capability Gate 仍未通过
 
 ## 1. Frozen InvestmentView Artifact application export
@@ -52,7 +52,23 @@ Artifact 或对象存储合同。
 冒充已登记 Artifact。PostgreSQL 保存 Run 当前状态投影并强制单向 transition；独立 append-only Run
 state event history 尚未成为 port 合同。
 
-## 3. TDD 证据
+## 3. Provider-neutral Outcome maturity worker
+
+本工作包没有选择或连接真实价格供应商。新增 `InvestmentViewOutcomeSource` port，由 adapter 负责
+交易日历、到期日、复权收益和公司行动完整性；应用层不按自然日猜成熟度，也不计算价格：
+
+- source 返回 `pending / unavailable / mature`；
+- 未到期固定为 `horizon_not_reached`；价格缺失、公司行动不完整、来源未获资格使用三个不同
+  unavailable reason，均不得生成数值零；
+- source 返回的 view/security/decision time/horizon/evaluated-at 任一不闭合即零写入失败；
+- 只扫描 research-stage View；P11 的 paper/limited-live View 不进入 source；
+- 默认 CLI 是 dry-run；`--execute` 还要求 private-local research ack；
+- mature Outcome 使用 frozen View hash 的确定性 ID，重复扫描先读取既有 Outcome，不改写、不再访问 source；
+- Outcome 继续 append-only，并新增 `source_policy_version`、`source_available_at` 到领域 hash、PostgreSQL
+  列和 JSON 文档；0035 若发现旧 Outcome 会拒绝猜测政策后再迁移；
+- 默认 unavailable adapter 明确报告 `P5-D1-01` 未批准，绝不注入 runtime 假价格或假收益。
+
+## 4. TDD 证据
 
 首次定向执行结果：
 
@@ -81,7 +97,16 @@ ImportError: cannot import name 'LocalArtifactReader'
 随后分别增加权限、OpenAPI、P11 scope、producer provenance、reader resource guard、精确 lookup、
 单事务、adapter 一致性和并发 winner 红测；最终核心 Artifact 相关 57 项定向测试通过。
 
-## 4. 真实 PostgreSQL 证据
+Task 3 首次执行按预期失败：
+
+```text
+ModuleNotFoundError:
+a_share_platform.application.investment_view_outcomes
+```
+
+实现后 Outcome、Expected Return ledger、PostgreSQL adapter 和 migration 共 58 项定向测试通过。
+
+## 5. 真实 PostgreSQL 证据
 
 迁移前只读预检：
 
@@ -100,12 +125,17 @@ Artifact+lineage round-trip、exact lookup、同 hash 冲突、Artifact UPDATE �
 smoke 事务整体回滚，测试行未留库，迁移记录保留。另以真实 CHECK violation 验证
 `failed + NULL failure_reason`、空白 lineage 被拒绝，并验证 pending→running→terminal；均未留记录。
 
-## 5. 全量验证
+Outcome 迁移前 `research.investment_view_outcomes=0`；`0035_outcome_source_policy` 已应用。真实
+PostgreSQL 事务 smoke 成功写入并读取 source policy/source availability，随后整体 rollback，临时
+View/Outcome 均为 0。真实库 dry-run maturity scan 返回 `items=[]`、`writes_performed=false`；这只
+证明安全运行路径，不代表已有真实 Outcome。
+
+## 6. 全量验证
 
 ```text
-Backend unittest: 775/775 passed
+Backend unittest: 785/785 passed
 Ruff: passed
-mypy: 172 source files passed
+mypy: 174 source files passed
 compileall: passed
 git diff --check: passed
 Frontend Vitest: 59/59 passed
@@ -114,9 +144,11 @@ Frontend build: passed
 ```
 
 Vite 仍报告既有 AntD 大 chunk warning；本工作包没有修改前端 bundle，也没有把 warning 隐藏或
-改成通过项。
+改成通过项。`ci/verify.sh` 现在先隔离 `ASP_DATABASE_URL` 再运行默认空运行时测试，仅在 migration
+阶段重新注入真实本地 URL；对应回归测试已覆盖，避免真实 13,314 条 DatasetVersion 污染 fixture-free
+API 合同。
 
-## 6. 主要文件
+## 7. 主要文件
 
 - `platform/src/a_share_platform/application/investment_view_artifacts.py`；
 - `platform/src/a_share_platform/application/governance_ledger.py`；
@@ -129,14 +161,19 @@ Vite 仍报告既有 AntD 大 chunk warning；本工作包没有修改前端 bun
 - `platform/scripts/export_openapi.py`、`platform/frontend/src/api/openapi.json`、`schema.d.ts`；
 - `platform/tests/test_investment_view_artifacts.py`；
 - `platform/tests/test_postgres_governance.py`；
-- `platform/tests/test_investment_view_artifact_api.py`。
+- `platform/tests/test_investment_view_artifact_api.py`；
+- `platform/src/a_share_platform/application/investment_view_outcomes.py`；
+- `platform/src/a_share_platform/workers/investment_view_outcomes.py`；
+- `platform/migrations/0035_outcome_source_policy.sql`；
+- `platform/tests/test_investment_view_outcome_worker.py`；
+- `platform/ci/verify.sh`、`platform/tests/test_architecture_contract.py`。
 
-## 7. 未完成和 Gate 边界
+## 8. 未完成和 Gate 边界
 
 Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成。以下仍未完成：
 
 - Research/InvestmentView 页面查看或下载入口；
-- Outcome 到期 worker；
+- 获批的真实 Outcome price/calendar/corporate-action adapter 与真实到期产物；
 - P5 估值/改善剩余服务和 320/768/1024 最终浏览器验收；
 - 真实 qualified PIT bundle、InvestmentView、Review 和 SignalSnapshot。
 

@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Never
 
 from a_share_platform.domain.expected_return import (
     ExpectedReturnCalibrationRecord,
     InvestmentViewOutcome,
+    InvestmentViewOutcomeObservation,
+    OutcomeObservationReason,
+    OutcomeObservationStatus,
 )
 from a_share_platform.domain.investment_view import InvestmentView
 from a_share_platform.ports.expected_return import (
@@ -174,7 +178,40 @@ class UnavailableExpectedReturnLedgerRepository:
         self._raise()
 
 
+class UnavailableInvestmentViewOutcomeSource:
+    """Honest runtime adapter used until a real price policy is approved."""
+
+    def __init__(self, *, reason: str, source_policy_version: str) -> None:
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("unavailable outcome source reason must not be empty")
+        if not isinstance(source_policy_version, str) or not source_policy_version.strip():
+            raise ValueError("source_policy_version must not be empty")
+        self._reason = reason
+        self._source_policy_version = source_policy_version
+
+    def observe(
+        self,
+        *,
+        view: InvestmentView,
+        evaluated_at: datetime,
+    ) -> InvestmentViewOutcomeObservation:
+        if not isinstance(view, InvestmentView):
+            raise TypeError("view must be an InvestmentView")
+        return InvestmentViewOutcomeObservation(
+            view_id=view.view_id,
+            security_id=view.security_id,
+            decision_time=view.decision_time,
+            horizon_trading_days=view.horizon_trading_days,
+            evaluated_at=evaluated_at,
+            status=OutcomeObservationStatus.UNAVAILABLE,
+            source_policy_version=self._source_policy_version,
+            reason_code=OutcomeObservationReason.SOURCE_UNQUALIFIED,
+            reason=self._reason,
+        )
+
+
 __all__ = [
     "InMemoryExpectedReturnLedgerRepository",
     "UnavailableExpectedReturnLedgerRepository",
+    "UnavailableInvestmentViewOutcomeSource",
 ]

@@ -90,8 +90,28 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0032_governance_integrity.sql",
                 "0033_failed_run_reason_guard.sql",
                 "0034_governance_nonblank_fields.sql",
+                "0035_outcome_source_policy.sql",
             ),
         )
+
+    def test_outcome_source_policy_is_required_and_never_invented_for_old_rows(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0035_outcome_source_policy.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "IF EXISTS (SELECT 1 FROM research.investment_view_outcomes LIMIT 1)",
+            "source policy cannot be inferred",
+            "ADD COLUMN source_policy_version TEXT NOT NULL",
+            "btrim(source_policy_version) <> ''",
+            "ADD COLUMN source_available_at TIMESTAMPTZ NOT NULL",
+            "source_available_at >= realized_at AND recorded_at >= source_available_at",
+            "outcome_document ? 'source_policy_version'",
+            "outcome_document ->> 'source_policy_version' = source_policy_version",
+            "outcome_document ? 'source_available_at'",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_governance_identifiers_cannot_bypass_domain_with_blank_text(self) -> None:
         sql = (
