@@ -122,6 +122,7 @@ export interface paths {
   "/api/capabilities": { get: ReadOperation };
   "/api/companies/{company_id}": { get: ReadOperation };
   "/api/datasets": { get: ReadOperation };
+  "/api/desk": { get: ReadOperation };
   "/api/experiments/runs": { get: ReadOperation };
   "/api/experiments/runs/{run_id}": { get: ReadOperation };
   "/api/factors/reviews": { get: ReadOperation };

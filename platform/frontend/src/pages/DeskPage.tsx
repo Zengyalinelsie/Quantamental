@@ -1,117 +1,139 @@
-import { ProTable, type ProColumns } from '@ant-design/pro-components'
-import { Tag } from 'antd'
-import type { SorterResult } from 'antd/es/table/interface'
-import { useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 
+import { getDesk } from '../api/client'
 import { PageHeading } from '../components/PageHeading'
+import { WorkspaceState } from '../components/WorkspaceState'
+import {
+  ActiveFailureSection,
+  DataHealthSection,
+  EventFeedSection,
+  PendingTaskSection,
+  PortfolioTrackingSection,
+  ScreenShiftSection,
+  TimingShadowSection,
+} from '../features/desk/deskSections'
+import type { DeskSection, DeskSectionKey } from '../features/desk/deskTypes'
 
-interface CapabilityRow {
-  key: string
-  area: string
-  capability: string
-  state: 'ready' | 'blocked'
-  reason: string
-}
-
-const capabilityRows: CapabilityRow[] = [
-  { key: 'run-context', area: '核心合同', capability: '双轴 RunContext', state: 'ready', reason: '合法组合由领域合同 fail closed' },
-  { key: 'pit', area: '核心合同', capability: 'PIT 时间与可信状态', state: 'ready', reason: '双时间查询、修订链和 available_at 门已接入真实 P3 样本' },
-  { key: 'ledger', area: '治理', capability: '版本、运行与 Artifact 账本', state: 'ready', reason: 'DatasetVersion、Run、Lineage 和质量报告已持久化' },
-  { key: 'universe', area: '数据', capability: '历史股票池', state: 'ready', reason: 'CSI800 当前身份 799/800；CSI500 当前 Universe 500 家已落库，历史 Universe 仍待补齐' },
-  { key: 'market-data', area: '数据', capability: '市场基础数据', state: 'ready', reason: '原始行情、复权因子、状态与 Parquet 查询就绪；免费源上限为 normalized_current' },
-  { key: 'financials', area: '数据', capability: 'PIT 财务事实', state: 'ready', reason: '4 家真实样本、8 份官方 PDF、2 条修订链已接入；不代表全市场财务覆盖' },
-  { key: 'quality', area: '研究', capability: '公司质量', state: 'blocked', reason: '等待行业模板与特征版本' },
-  { key: 'valuation', area: '研究', capability: '估值预期差', state: 'blocked', reason: '等待 P5 估值服务' },
-  { key: 'revision', area: '研究', capability: '改善与恶化', state: 'blocked', reason: '等待 PIT 财务与特征快照' },
-  { key: 'events', area: '事件', capability: '事件影响', state: 'blocked', reason: '等待 P8 事件证据链' },
-  { key: 'factors', area: '验证', capability: 'Factor Lab', state: 'blocked', reason: '等待 P4 统计引擎' },
-  { key: 'timing', area: '择时', capability: '主动 Timing', state: 'blocked', reason: 'P3 被动波动率 Shadow baseline 已开始追加；主动预测仍等待 P7 验证' },
-  { key: 'portfolio', area: '组合', capability: '目标组合', state: 'blocked', reason: '等待 P6 组合政策' },
-  { key: 'risk', area: '风险', capability: 'Risk R0', state: 'blocked', reason: '等待 P6 风险模型' },
-  { key: 'execution', area: '执行', capability: 'Paper OMS', state: 'blocked', reason: '等待 P10 且不连接真实账户' },
-  { key: 'approval', area: '治理', capability: '审批与晋级', state: 'blocked', reason: '等待服务端身份与审批工作流' },
+const SECTION_ORDER: DeskSectionKey[] = [
+  'data_health',
+  'screen_shifts',
+  'portfolio_tracking',
+  'timing_shadow',
+  'event_feed',
+  'pending_tasks',
+  'active_failures',
 ]
 
+const FALLBACK_TITLES: Record<DeskSectionKey, string> = {
+  data_health: '数据健康',
+  screen_shifts: '最新 Screen 排名变化',
+  portfolio_tracking: '组合偏离与风险',
+  timing_shadow: 'Timing Shadow',
+  event_feed: '重大事件/公告流',
+  pending_tasks: '因子审核与待处理',
+  active_failures: '运行异常',
+}
+
+/**
+ * Resolve one section, tolerating a server that omitted it.
+ *
+ * The contract guarantees all seven, but if one is ever missing the page shows
+ * an explicit unavailable card rather than silently dropping a domain: a desk
+ * that quietly loses a section would read as "nothing to report".
+ */
+function sectionFor(sections: DeskSection[] | undefined, key: DeskSectionKey): DeskSection {
+  const found = sections?.find((item) => item.key === key)
+  if (found) return found
+  return {
+    key,
+    status: 'unavailable',
+    title: FALLBACK_TITLES[key],
+    blockers: [{
+      code: 'DESK_SECTION_MISSING',
+      reason: '服务端未返回该分区，无法确认其真实状态。',
+      affected_binding: `desk.${key}`,
+      evidence_ids: [],
+    }],
+    coverage: {},
+    payload: null,
+  }
+}
+
 export function DeskPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const selectedArea = searchParams.get('area')
-  const selectedSort = searchParams.get('sort')
-  const selectedOrder = searchParams.get('order') === 'descend' ? 'descend' : 'ascend'
-  const areaFilters = [...new Set(capabilityRows.map(({ area }) => area))]
-    .sort()
-    .map((value) => ({ text: value, value }))
-  const columns: ProColumns<CapabilityRow>[] = [
-    {
-      title: '领域',
-      dataIndex: 'area',
-      width: 90,
-      filters: areaFilters,
-      filteredValue: selectedArea ? [selectedArea] : null,
-      onFilter: (value, row) => row.area === value,
-      sorter: (left, right) => left.area.localeCompare(right.area, 'zh-CN'),
-      sortOrder: selectedSort === 'area' ? selectedOrder : null,
-    },
-    {
-      title: '能力',
-      dataIndex: 'capability',
-      width: 180,
-      sorter: (left, right) => left.capability.localeCompare(right.capability, 'zh-CN'),
-      sortOrder: selectedSort === 'capability' ? selectedOrder : null,
-    },
-    {
-      title: '状态',
-      dataIndex: 'state',
-      width: 100,
-      sorter: (left, right) => left.state.localeCompare(right.state),
-      sortOrder: selectedSort === 'state' ? selectedOrder : null,
-      render: (_, row) => row.state === 'ready'
-        ? <Tag color="success">合同就绪</Tag>
-        : <Tag>未启用</Tag>,
-    },
-    { title: '真实说明 / 启用条件', dataIndex: 'reason', ellipsis: true },
-  ]
+  const desk = useQuery({
+    queryKey: ['desk'],
+    queryFn: ({ signal }) => getDesk(signal),
+  })
+
+  const sections = desk.data?.data.sections
+  const loading = desk.isPending
+  const error = desk.error ? String((desk.error as Error).message ?? desk.error) : undefined
+  const context = desk.data?.context
+  const shared = { loading, error }
+
+  if (loading) {
+    return (
+      <div className="workspacePage">
+        <PageHeading
+          description="服务端 Desk 投影正在读取七个分区的真实状态。"
+          eyebrow="FUNDAMENTAL QUANT"
+          title="今日工作台"
+        />
+        <WorkspaceState
+          reason="正在读取七个分区的服务端状态。"
+          state="loading"
+          title="正在加载今日工作台"
+        />
+      </div>
+    )
+  }  if (error) {
+    return (
+      <div className="workspacePage">
+        <PageHeading
+          description="服务端 Desk 投影读取失败；页面不会用示例数据替代真实状态。"
+          eyebrow="FUNDAMENTAL QUANT"
+          title="今日工作台"
+        />
+        <WorkspaceState reason={error} state="error" title="今日工作台读取失败" />
+      </div>
+    )
+  }
+
   return (
     <div className="workspacePage">
       <PageHeading
-        title="今日工作台"
-        description="先看数据和能力是否可信，再看研究输出。当前页面只显示真实建设状态，不展示模拟行情或组合数字。"
+        description="七个分区各自报告真实状态，不可用的能力显示明确原因，不展示模拟数据。"
         eyebrow="FUNDAMENTAL QUANT"
-        extra={<Tag color="processing">P3 · RESEARCH EVIDENCE</Tag>}
+        title="今日工作台"
       />
-      <section aria-label="平台能力状态" className="deskSection">
-        <div className="sectionHeading">
-          <div>
-            <h2>能力与数据就绪度</h2>
-            <p>16 项核心能力逐项说明当前状态和启用条件。</p>
+      <section aria-label="今日研究态势" className="deskBanner">
+        <h2>今日研究态势 / Platform Pulse</h2>
+        {context ? (
+          <p>
+            {`数据模式 ${context.data_mode} · 部署阶段 ${context.deployment_stage} · 系统时间 ${context.system_as_of}`}
+          </p>
+        ) : null}
+      </section>
+      <div className="deskGrid">
+        <div className="deskColumn">
+          <ScreenShiftSection section={sectionFor(sections, 'screen_shifts')} {...shared} />
+          <DataHealthSection section={sectionFor(sections, 'data_health')} {...shared} />
+          <div className="deskMetricRow">
+            <PortfolioTrackingSection
+              section={sectionFor(sections, 'portfolio_tracking')}
+              {...shared}
+            />
+            <TimingShadowSection section={sectionFor(sections, 'timing_shadow')} {...shared} />
           </div>
         </div>
-        <ProTable<CapabilityRow>
-          columns={columns}
-          dataSource={capabilityRows}
-          rowKey="key"
-          search={false}
-          cardBordered={false}
-          dateFormatter="string"
-          pagination={{ pageSize: 20, hideOnSinglePage: true }}
-          options={{ density: true, fullScreen: true, setting: true, reload: false }}
-          onChange={(_, filters, sorter) => {
-            const updated = new URLSearchParams(searchParams)
-            const area = filters.area?.[0]
-            if (area) updated.set('area', String(area))
-            else updated.delete('area')
-            const selected = (Array.isArray(sorter) ? sorter[0] : sorter) as SorterResult<CapabilityRow>
-            if (selected?.order && typeof selected.field === 'string') {
-              updated.set('sort', selected.field)
-              updated.set('order', selected.order)
-            } else {
-              updated.delete('sort')
-              updated.delete('order')
-            }
-            setSearchParams(updated, { replace: true })
-          }}
-          toolBarRender={false}
-        />
-      </section>
+        <div className="deskColumn">
+          <EventFeedSection section={sectionFor(sections, 'event_feed')} {...shared} />
+          <PendingTaskSection section={sectionFor(sections, 'pending_tasks')} {...shared} />
+          <ActiveFailureSection section={sectionFor(sections, 'active_failures')} {...shared} />
+        </div>
+      </div>
     </div>
   )
 }
+
+export { SECTION_ORDER }

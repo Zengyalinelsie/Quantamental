@@ -1,9 +1,23 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, render, screen } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AppShell } from './AppShell'
 import { useWorkspaceStore } from '../state/workspace'
+
+/**
+ * The shell hosts pages that read server projections, so its tests need the
+ * same QueryClientProvider the real app supplies in App.tsx.
+ */
+function shell(entries: string[], children: ReactNode = <AppShell />) {
+  return render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter initialEntries={entries}>{children}</MemoryRouter>
+    </QueryClientProvider>,
+  )
+}
 
 describe('AppShell', () => {
   afterEach(() => {
@@ -16,11 +30,7 @@ describe('AppShell', () => {
   })
 
   it('shows brand, blank security search, and separate run axes', async () => {
-    render(
-      <MemoryRouter initialEntries={['/research?tab=events']}>
-        <AppShell />
-      </MemoryRouter>,
-    )
+    shell(['/research?tab=events'])
     expect(screen.getAllByText('Fundamental Quant').length).toBeGreaterThan(0)
     expect(screen.getByRole('searchbox', { name: '全局证券搜索' })).toHaveValue('')
     expect(screen.getByText('current_research')).toBeInTheDocument()
@@ -33,24 +43,17 @@ describe('AppShell', () => {
   })
 
   it('redirects legacy dashboard route explicitly', async () => {
-    render(
-      <MemoryRouter initialEntries={['/dashboard']}>
-        <AppShell />
-      </MemoryRouter>,
-    )
+    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => undefined)))
+    shell(['/dashboard'])
     expect(await screen.findByRole('heading', { name: '今日工作台' }, { timeout: 3_000 }))
       .toBeInTheDocument()
   })
 
   it('reflects URL universe and historical as-of without relabelling the data mode', async () => {
-    render(
-      <MemoryRouter initialEntries={[
-        '/research?tab=events&universe=universe-version%3Acore-a-share%3Av1'
-        + '&point=historical&as_of=2020-05-22',
-      ]}>
-        <AppShell />
-      </MemoryRouter>,
-    )
+    shell([
+      '/research?tab=events&universe=universe-version%3Acore-a-share%3Av1'
+      + '&point=historical&as_of=2020-05-22',
+    ])
     expect(await screen.findByRole('heading', { name: '研究' }, { timeout: 3_000 }))
       .toBeInTheDocument()
     expect(screen.getByText('universe-version:core-a-share:v1')).toBeInTheDocument()
@@ -70,11 +73,7 @@ describe('AppShell', () => {
       dispatchEvent: vi.fn(),
     })))
 
-    const { container } = render(
-      <MemoryRouter initialEntries={['/research?tab=events']}>
-        <AppShell />
-      </MemoryRouter>,
-    )
+    const { container } = shell(['/research?tab=events'])
 
     expect(await screen.findByRole('heading', { name: '研究' }, { timeout: 3_000 }))
       .toBeInTheDocument()

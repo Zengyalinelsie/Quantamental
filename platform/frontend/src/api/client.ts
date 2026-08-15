@@ -38,6 +38,44 @@ export interface ResearchWorkspaceData {
   alpha_model: AlphaModelReadinessProjection
 }
 
+export type DeskSectionKey =
+  | 'data_health'
+  | 'screen_shifts'
+  | 'portfolio_tracking'
+  | 'timing_shadow'
+  | 'event_feed'
+  | 'pending_tasks'
+  | 'active_failures'
+
+/**
+ * Server-owned data facts only.  `loading` and `error` belong to the request
+ * lifecycle and are resolved by the client, so they are absent here.  `empty`
+ * and `unavailable` stay distinct: empty means the capability works and holds
+ * no record, unavailable means the capability or its store is missing.
+ */
+export type DeskSectionStatus = 'ready' | 'partial' | 'empty' | 'unavailable'
+
+export interface DeskBlocker {
+  code: string
+  reason: string
+  affected_binding: string
+  evidence_ids: string[]
+}
+
+export interface DeskSection {
+  key: DeskSectionKey
+  status: DeskSectionStatus
+  title: string
+  blockers: DeskBlocker[]
+  coverage: Record<string, unknown>
+  payload: unknown
+}
+
+export interface DeskProjection {
+  /** Always seven sections, in prototype order: a blocked domain reports itself. */
+  sections: DeskSection[]
+}
+
 export interface ArtifactMetadataProjection {
   artifact_id: string
   run_id: string
@@ -385,6 +423,10 @@ export function getResearchWorkspace(securityId?: string, signal?: AbortSignal) 
 
 export function getIdentity(signal?: AbortSignal) {
   return getEnvelope<IdentityProjection>('/api/identity', signal)
+}
+
+export function getDesk(signal?: AbortSignal) {
+  return getEnvelope<DeskProjection>('/api/desk', signal)
 }
 
 export function getArtifactMetadata(artifactId: string, signal?: AbortSignal) {
