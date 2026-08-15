@@ -24,6 +24,16 @@
 - P5–P10 的领域、数据、API、审批、组合、Timing、事件、监控和 Paper OMS 能力没有因为 Figma
   原型完成而自动存在。
 
+**2026-08-15 PUI-01 完成后的增量更新**（上表为审计时点事实，保留不改写）：
+
+- `/desk` 已改为消费服务端 `GET /api/desk`，七分区各自报告真实六态，硬编码 `capabilityRows`
+  已删除；
+- Desk 的 Design Parity 为 `parity_verified_with_known_deviation`，**不是** `parity_verified`：
+  侧栏 280 px vs Figma 248 px 的差异已登记，320/768/1024 无 Figma Frame 依据；
+- 因此 31 页的「完全逐像素 parity」计数仍为 **0/31**；Desk 是第一个完成结构级对照并显式记录
+  差异的页面，不能据此宣称 parity 已通过；
+- 设计输入阻断已解除（见 §2.2.1），17 个关键页均有仓库内精确视觉真源。
+
 因此：
 
 1. 只完成 `CLAUDE.md` 原先指定的 Step 02 Task 1，不会让前端接近完整原型；
@@ -69,6 +79,26 @@ Figma Starter 方案返回 MCP 调用额度已用尽；当前账号为 Starter/V
 真正开始某个 Figma 页面设计到代码时，仍必须先恢复该精确节点的 `get_design_context`；只有上述两页可在
 工具受限时使用仓库 SVG 作为结构与视觉真源。不能用一张缩放截图猜其余页面的尺寸和组件细节。
 
+### 2.2.1 设计输入阻断已解除（2026-08-15 更新）
+
+§2.2 的 MCP 配额限制**已通过 Figma REST API 解决**；上节保留作为事实历史，不改写。
+
+改用 `GET /v1/files/{key}/nodes` 与 `GET /v1/images/{key}`（Personal Access Token，scope 仅
+`File content: read`）取得全部 17 个业务 Frame 的结构化节点树与精确 SVG，已入库
+`docs/assets/prototype/`：
+
+- 17 个 SVG 保留图层 id 与**可读文字**，合计 1.0 MB；
+- `figma-node-summary.json` 含层级、尺寸、`layoutMode`、`itemSpacing`、文字、字号、字重、字体族；
+- 导出参数、全部 18 个 node id 与复现命令见 `docs/assets/prototype/README.md`。
+
+关键参数 `svg_outline_text=false`：默认导出把文字转成矢量路径，单页约 1.7 MB（17 页共 33 MB）
+且文字不可读、不可搜索，对实现没有参考价值。
+
+因此「除 Security/InvestmentView 外不得开始视觉编码」的限制不再适用于任何页面：
+**17 个关键页现在都有仓库内精确视觉真源**，不依赖 Figma 会话或配额。
+
+仍然成立：320/768/1024 没有独立 Figma Frame（见 §2.3），三档只有文档级响应式合同。
+
 ### 2.3 原型自身的覆盖边界
 
 Figma 当前有 14 个关键 1440 高保真业务 Frame，以及一个 31 页完整产品蓝图。两者不是同一完成度：
@@ -78,6 +108,9 @@ Figma 当前有 14 个关键 1440 高保真业务 Frame，以及一个 31 页完
 - 320、768、1024 没有独立 Figma Frame；这三档只有响应式重排合同；
 - `security-investmentview` 是 Security 的详情/黄金路径页面，不是六工作区 31 个 tab 中的一个独立 tab；
 - SPEC-045 的 280 px 桌面侧栏继续高于蓝图表中的 224 px，未获批准前运行时保持 280/72 px。
+  **2026-08-15 更新**：Figma `desk-daily-workstation` node `3:398` 实测侧栏为 **248 px**，
+  使冲突从两值升级为三值（SPEC-045 = 280 / `docs/18` = 224 / Figma = 248）。用户已裁决
+  运行时继续使用 280 px 并登记差异，但三者的最终统一**仍未裁决**，需要未来一次显式决定。
 
 所以，在补齐非关键页高保真设计和三档响应式设计前，不能承诺“31 页四视口逐像素与 Figma 一致”。
 可以承诺的是：按已存在的高保真节点、设计系统和响应式合同开发，并对每个没有精确 Frame 的推导页
@@ -156,7 +189,7 @@ P5 Task 5 的真实 Chrome 验收是有效工程证据，但验收对象是当�
 
 | # | 工作区 / 页面 | 当前运行时 | 独立高保真参照 | 能力阶段 | 原型轨道 |
 |---:|---|---|---|---:|---|
-| 1 | Desk / 今日工作台 | `runtime_partial`：硬编码工程状态表，必须替换 | `desk-daily-workstation` | P9 聚合；P2–P8 渐进 | PUI-01 |
+| 1 | Desk / 今日工作台 | `runtime_verified`：服务端 Desk projection 七分区六态（2026-08-15） | `desk-daily-workstation` | P9 聚合；P2–P8 渐进 | PUI-01 |
 | 2 | Research / Universe & Screen | `runtime_partial`：Universe 查询、P5 blocker/Screen 接线 | `research-universe-screen` | P2/P5 | PUI-02 |
 | 3 | Research / Security | `runtime_partial`：P5 View 组件接线，缺融合页信息架构 | `security-overview-600519-fused-v2` | P5/P8 | PUI-03 |
 | 4 | Research / Events | `placeholder` | `10-events-intelligence` | P8 | PUI-07 |

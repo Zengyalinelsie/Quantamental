@@ -110,31 +110,71 @@ Desk
 
 ### PUI-00：设计基线、节点清单和视觉测试基础
 
-状态：`in_progress`；Figma 文件和节点可由 Chrome 查看，但 2026-08-15 Starter MCP 调用额度已用尽。
+状态：`verified`（2026-08-15；设计输入阻断已解除）。
 
-任务：
+2026-08-15 Figma Starter MCP 调用额度用尽后，改用 **Figma REST API**（Personal Access Token，
+scope 仅 `File content: read`）取得结构化节点上下文与精确 SVG，并全部入库。因此后续任何 PUI
+工作包都不再依赖 Figma 会话或配额。
 
-1. 为 14 个关键页冻结 file key、node id、Frame 名、1440 尺寸和黄金路径；
-2. 对可恢复 Security/InvestmentView SVG 校验与 Figma node 一致；
-3. 为其余 31 页建立 `design_status`，缺独立高保真 Frame 时明确 `missing`；
-4. 建立截图命名、viewport、运行时状态和允许差异模板；
-5. Figma MCP 恢复后逐节点执行 `get_design_context`，不得凭本轮 rate-limit 结果跳过；
-6. 如采用截图 diff 工具，先由用户批准基线和容差，不用像素抗锯齿噪声代替结构审查。
+已完成：
 
-预计文件：
+1. 全部 18 个顶层 Frame 的 file key、node id、Frame 名和 1440 尺寸已冻结，见
+   `docs/assets/prototype/README.md`；
+2. 17 个业务 Frame 的精确 SVG 已入库（保留图层 id 与可读文字，合计 1.0 MB）；
+3. `docs/assets/prototype/figma-node-summary.json` 记录层级、尺寸、`layoutMode`、`itemSpacing`、
+   文字内容、字号、字重和字体族；
+4. 导出参数已记录并说明 `svg_outline_text=false` 的必要性：默认导出把文字转为矢量路径，
+   17 页共 33 MB 且文字不可读、不可搜索，对实现没有参考价值；
+5. 截图产物命名为 `/tmp/desk-<viewport>.png`，验收脚本为
+   `platform/scripts/verify_desk_browser.py`。
 
-- `docs/18-product-blueprint-and-prototype.md`；
-- `docs/22-prototype-runtime-gap-audit.md`；
-- `docs/assets/prototype/README.md`；
-- 后续视觉测试基线目录和测试配置（引入前先更新本 Plan）。
+仍然成立的边界：
+
+- 17 个 Frame **全部为 1440 宽**；320/768/1024 没有独立 Figma Frame，三档仍只有文档级响应式
+  合同，不是已通过的视觉证据；
+- 31 页蓝图为全部页面提供信息架构，但不是每页都有独立高保真 Frame；
+- 尚未引入截图 diff 工具；如需引入，先由用户批准基线和容差。
 
 ### PUI-01：全局 Shell 与今日工作台
 
-状态：`ready_for_implementation`（编码前先取得 `desk-daily-workstation` design context）。
+状态：`in_progress`（2026-08-15 完成第一个垂直切片；三轴状态见下）。
 
-目标：删除硬编码工程能力表的产品职责，实现原型的研究员 Platform Pulse。
+三轴结论（不得互相替代）：
 
-TDD 切片：
+| 轴 | 结论 | 依据 |
+|---|---|---|
+| Design Parity | `parity_verified_with_known_deviation` | 结构、分栏、字号层级、token 对照 node `3:398`；已知差异见下 |
+| Runtime Product | `verified` | 七分区六态由真实 `GET /api/desk` 驱动，四视口真实浏览器验收通过，无 runtime fixture |
+| Domain/Capability | `blocked` | 组合跟踪属 P6、事件流属 P8，均未实现；P2/P4/P5 Gate 未通过 |
+
+已完成：
+
+- 删除 `DeskPage.tsx` 中 16 行硬编码 `capabilityRows`，改为消费服务端 Desk projection；
+- 新增 `domain/desk.py` 分区契约：四个服务端状态（`ready`/`partial`/`empty`/`unavailable`），
+  `partial` 必须声明 coverage 或 blocker，`sections` 恒为 7 项；
+- 新增 `application/desk_projection.py`：分区级隔离，单一数据源不可用只降级该分区；
+- 新增 `GET /api/desk`，复用既有 Envelope 与 `ResponseContext`；
+- `WorkspaceStateKind` 扩展为六态并保留 `blocked` 作为 `unavailable` 的兼容别名；
+- 组合跟踪（P6）与事件流（P8）由服务端声明 unavailable 并附阶段 blocker，不伪造持仓或事件。
+
+与 Figma 的已知差异（必须保留记录，不得声称逐像素一致）：
+
+1. **侧栏宽度**：Figma node `3:398` 实测 248 px，SPEC-045 规定 280 px，`docs/18` 写 224 px。
+   用户 2026-08-15 裁决运行时继续使用 280 px 并登记差异，因此 1440 下主内容区为 1160 px 而非
+   Figma 的 1192 px。两栏以比例（740fr/380fr）声明，使 32 px 差异被两栏吸收而不产生水平溢出。
+   三值冲突本身**仍未最终裁决**；
+2. **卡片高度与页面总高**：Figma 页面高 1238 px，当前运行时 1128 px。差异来自内容而非布局——
+   Figma 卡片装的是 DESIGN FIXTURE（8 行排名、6 条事件），真实运行时装的是 blocker。
+   不为了对齐设计稿高度而填充假数据；
+3. **320/768/1024**：无独立 Figma Frame，按 `docs/18` 响应式合同重排，非 Figma 视觉验收。
+
+本切片未覆盖（留待后续）：
+
+- 顶部证券搜索、Universe 选择器等 Shell 控件沿用既有实现，未按 Figma `topbar` 逐项对照；
+- 排名表在有真实 Screen 数据后才能验收 1440 高密度表格与 320 记录卡形态；
+- 分区跳转（Desk → Universe/事件/审批/故障）待对应目标页在 PUI-02/PUI-03 落地后接线。
+
+TDD 切片（原计划，已执行）：
 
 1. 红测：Desk 不再渲染 `capabilityRows` 工程阶段表；
 2. API contract：新增服务端 Desk projection，分别返回数据健康、Screen shifts、重大事件、组合跟踪、
