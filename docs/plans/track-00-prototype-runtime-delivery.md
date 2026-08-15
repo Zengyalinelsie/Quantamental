@@ -257,6 +257,13 @@ TDD 切片（原计划，已执行）：
 - `/factors` 在 320 视口存在**页面级水平溢出**（`pageHeading` 溢出）。该缺陷早于本工作包，
   与 Screen 无关，登记待 PUI-04 处理，不在本切片修复。
 
+> **2026-08-16 说明**：PUI-03 至 PUI-09 的可执行展开已写成实现级 plan，见
+> `docs/superpowers/plans/`：PUI-03 → `2026-08-16-p3-frontend-golden-path.md`、
+> PUI-04 → `p4-frontend-factor-system.md`、PUI-05 → `p5-portfolio-backtest.md`、
+> PUI-06 → `p6-active-timing.md`、PUI-07 → `p7-events-agents.md`、
+> PUI-08 → `p8-monitoring-governance.md`、PUI-09 → `p9-paper-execution.md`。
+> 本 Track 继续作为 PUI 范围与三轴状态真源；新 plan 是它的 TDD 展开，不改变其状态定义。
+
 ### PUI-03：Security、InvestmentView、Approvals 与 Alpha 黄金路径
 
 状态：`ready_for_implementation`（Security/InvestmentView 有仓库 SVG；其余节点仍先取 design context）。

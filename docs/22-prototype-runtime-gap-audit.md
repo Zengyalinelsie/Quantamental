@@ -19,7 +19,7 @@
 - 0 个页面完成了“对精确 Figma 节点的 1440 视觉一致性验收”；
 - P5 已完成的 1440/1024/768/320 浏览器验收，范围是当前 empty/unavailable 运行态的布局、交互、
   网络和控制台，不是 Figma 视觉一致性 Gate；
-- `/desk` 仍显示硬编码的工程能力表，和 `desk-daily-workstation` 原型的研究员工作台完全不同；
+- `/desk` 仍显示硬编码的工程能力表，和 `desk-daily-workstation` 原型的研究员工作台完全不同（**此条为 2026-08-15 审计时点事实；PUI-01 已于同日完成替换，见 §1 增量更新**）；
 - `/portfolios`、`/monitoring` 的所有主要页仍是占位；
 - P5–P10 的领域、数据、API、审批、组合、Timing、事件、监控和 Paper OMS 能力没有因为 Figma
   原型完成而自动存在。
@@ -78,7 +78,7 @@ Figma Starter 方案返回 MCP 调用额度已用尽；当前账号为 Starter/V
 
 - Desk 原型是 Platform Pulse、Screen 变化、重大事件、组合跟踪、Timing、待办和故障的复合工作台；
 - Universe 原型是左侧筛选/因子构建器与右侧高密度排名表；
-- 当前运行时 `/desk` 是单一工程能力表；
+- 当前运行时 `/desk` 是单一工程能力表（**审计时点事实；PUI-01 已完成替换**）；
 - 当前 `/research` 是 Universe 查询、空态和 P5 blocker 的纵向技术页。
 
 仓库内只有两份可恢复的精确 SVG：
