@@ -74,7 +74,7 @@ midpoint_revision = midpoint(current) - midpoint(prior)
 
 - 公式版本为 `v0`，行业口径版本为 `industry-valuation-policy:v0`；
 - 价格、每股基本面和利率/增长假设分别携带 provenance；价格和基本面明确使用 `CURRENCY_PER_SHARE`，利率使用 `RATIO`；输出 lineage 是三类 provenance 的闭合并集；
-- 纯函数 fixture 可以单独手算，但不注册新的 application 输入入口。当前 `ValuationImprovementInputBundle` 尚未携带本 ADR 新增的 relative reference、anchor raw input/result 或 analyst revision，因此既有 orchestration **尚未调用**这些新模型；后续只能扩展现有 exact frozen bundle、qualification/compiler 和 orchestration，不能增加第二运行时输入真源；
+- 纯函数 fixture 可以单独手算，但不注册新的 application 输入入口。2026-08-15 的 runtime 实现继续以 `ValuationImprovementInputBundle` 为唯一真源：legacy v1 原 JSON/hash 只读兼容且不得继续执行；v2 冻结 relative reference、anchor raw input、analyst revision、industry policy、模型与 compiler 版本，并由既有 orchestration 运行时调用，不增加第二输入入口；
 - 缺 FCF/book/价格/假设时使用显式 unavailable input/result，不允许为了调用公式而补数值；historical、industry、peer 三类参考必须各自提供数值或 unavailable reason，不能静默省略；
 - 分析师数值必须携带 provider field policy、用途、许可证据、审批、有效期和 qualification 时间组成的 attestation，并冻结目标期、预测期限、current/prior snapshot 和 consensus definition version；current/prior 快照分别携带 provider ID 与 provenance，且两者必须与 attested provider 完全一致；
 - 领域 dataclass 只能校验资格证据的结构与一致性，不能凭自身证明审批或许可证真实存在；未来 adapter 必须从治理 registry/repository 精确读取资格记录后才能构造数值输入；
@@ -83,6 +83,6 @@ midpoint_revision = midpoint(current) - midpoint(prior)
 
 ## 后果
 
-- P5 已具备确定性区间和明确 unavailable/partial 状态的纯领域工程基线；安全 frozen runtime 接线仍是独立待完成工作；
+- P5 已具备确定性区间、明确 unavailable/partial 状态和安全 frozen v2 runtime 接线的工程基线；
 - 真实数据不满足 FCF、可比参考或分析师资格时，真实 bundle 继续失败关闭或保持分项 unavailable；
 - 后续如改变公式、端点组合、非正值政策或行业适用范围，必须产生新公式版本、ADR 和新 frozen artifact，不能重写旧结果。

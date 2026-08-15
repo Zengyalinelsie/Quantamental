@@ -19,8 +19,8 @@ from a_share_platform.domain.valuation_input_qualification import (
 from tests.test_valuation_improvement_service import (
     AVAILABLE_AT,
     DECISION_TIME,
-    bundle,
     request,
+    v2_bundle,
 )
 
 
@@ -149,7 +149,7 @@ class ValuationInputQualificationTest(unittest.TestCase):
     def test_freeze_persists_only_exact_qualified_lineage_and_is_idempotent(self) -> None:
         repository = MemoryValuationImprovementInputRepository()
         service = ValuationInputFreezeService(repository)
-        frozen = bundle()
+        frozen = v2_bundle()
 
         self.assertEqual(service.freeze(frozen, qualification()), frozen)
         self.assertEqual(service.freeze(frozen, qualification()), frozen)
@@ -160,7 +160,7 @@ class ValuationInputQualificationTest(unittest.TestCase):
 
     def test_freeze_rejects_axis_or_dataset_mismatch(self) -> None:
         service = ValuationInputFreezeService(MemoryValuationImprovementInputRepository())
-        frozen = bundle()
+        frozen = v2_bundle()
         with self.assertRaisesRegex(ValuationInputFreezeBlocked, "security_id"):
             service.freeze(
                 frozen,
@@ -188,6 +188,30 @@ class ValuationInputQualificationTest(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValuationInputFreezeBlocked, "dataset lineage"):
             service.freeze(frozen, wrong_dataset)
+
+        suite = frozen.valuation_model_suite_inputs
+        assert suite is not None
+        first = suite.relative_references[0]
+        extra_dataset = "dataset:unqualified-extra:v1"
+        extra = replace(
+            frozen,
+            dataset_version_ids=(*frozen.dataset_version_ids, extra_dataset),
+            valuation_model_suite_inputs=replace(
+                suite,
+                relative_references=(
+                    replace(
+                        first,
+                        provenance=replace(
+                            first.provenance,
+                            additional_dataset_version_ids=(extra_dataset,),
+                        ),
+                    ),
+                    *suite.relative_references[1:],
+                ),
+            ),
+        )
+        with self.assertRaisesRegex(ValuationInputFreezeBlocked, "exactly"):
+            service.freeze(extra, qualification())
 
 
 if __name__ == "__main__":

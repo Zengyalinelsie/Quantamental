@@ -41,13 +41,12 @@ class ValuationInputFreezeService:
                 )
         if not qualification.is_qualified:
             raise ValuationInputFreezeBlocked("; ".join(qualification.blockers))
-        missing_datasets = set(qualification.dataset_version_ids) - set(
-            value.dataset_version_ids
-        )
-        if missing_datasets:
+        qualified_datasets = set(qualification.dataset_version_ids)
+        bundle_datasets = set(value.dataset_version_ids)
+        if qualified_datasets != bundle_datasets:
             raise ValuationInputFreezeBlocked(
-                "bundle dataset lineage does not include qualified inputs: "
-                + ", ".join(sorted(missing_datasets))
+                "bundle dataset lineage must exactly equal qualified inputs; difference: "
+                + ", ".join(sorted(qualified_datasets ^ bundle_datasets))
             )
         latest_qualified = max(
             evidence.latest_source_available_at

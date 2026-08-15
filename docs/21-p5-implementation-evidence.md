@@ -130,10 +130,21 @@ DatasetVersion/observation/hash。ADR-0011 同步冻结这些边界；全部仍�
 compiler 没有一次性项目或基数效应证据时输出无数值 unavailable，不填零、不用 reported 数字冒充
 adjusted 数字。
 
-第二轮只读复审确认，新模型尚未进入现有 frozen bundle/persistence/orchestration。Task 4 因此拆为
-4A 纯领域模型 `verified` 与 4B 安全 frozen runtime 接线 `pending`；本 Evidence 不再把 Task 4 整体
-描述为完成。领域测试中构造的 attestation 只是合同 fixture，不是治理 registry 的真实资格记录。
-Task 4A 最终定向命令共 `43/43` 通过。
+第二轮只读复审确认，新模型尚未进入现有 frozen bundle/persistence/orchestration，Task 4 因此拆为
+4A 纯领域模型和 4B 安全 frozen runtime 接线。4B 继续扩展原 `ValuationImprovementInputBundle`，没有
+建立第二套输入真源：legacy v1 保持原 JSON/hash 只读兼容但执行失败关闭；v2 冻结 industry policy、
+每个适用 metric 的 historical/industry/peer reference、anchor raw input、analyst input、四个模型版本
+和 compiler 版本。v2 不保存或信任旧的预计算 market-implied/fundamental-anchor 区间，orchestration
+运行时调用 relative、anchor、implied、analyst、improvement 和 scenario，再把合法模型结果临时转换为
+既有 gap engine 所需区间。分析师 unavailable 只令内部 suite 为 partial，不增加第五种
+`InvestmentComponent` status，也不阻断其他合法核心服务。
+
+PostgreSQL compiler 没有真实 reference、FCF/折现率/增长率政策或合格分析师来源时，生成显式
+unavailable input，不制造数值、provider、snapshot、available-at 或 provenance。`0036` 增加显式 v2
+schema 与 DatasetVersion child links；新写入只接受 v2，same ID/different semantics 保持 immutable
+conflict，freeze 要求 qualification datasets 与 bundle datasets 完全相等。Task 4B 定向测试 `79/79`
+通过；领域 fixture 中的数值和 attestation 只验证合同，不是治理 registry 的真实资格记录。Task 4
+工程能力至此 `verified`，但真实数据资格和 P5 Gate 仍未完成。
 
 Task 5 先增加 Artifact ID 串链测试：metadata 返回另一 Artifact 时，旧实现按预期错误地生成了另一
 下载 URL；加入 exact identity guard 和缺 permissions 失败关闭后，6 项 Frozen Artifact 定向测试
@@ -169,10 +180,16 @@ PostgreSQL 事务 smoke 成功写入并读取 source policy/source availability�
 View/Outcome 均为 0。真实库 dry-run maturity scan 返回 `items=[]`、`writes_performed=false`；这只
 证明安全运行路径，不代表已有真实 Outcome。
 
+`0036_p5_valuation_bundle_v2` 已应用到同一本地开发库。迁移时库内 legacy/v2 valuation bundle 均为
+0，因此没有可声称的真实 legacy 行样本；legacy 原 JSON/hash 不改写由 migration contract 与 v1
+round-trip/hash 测试覆盖。随后在外层强制 rollback 事务中完成真实 v2 append/load、重复 append 幂等、
+same-ID/different-semantics 冲突和三个 DatasetVersion child links 验证；退出后临时 bundle 为 0，未污染
+业务数据。
+
 ## 6. 全量验证
 
 ```text
-Backend unittest: 809/809 passed
+Backend unittest: 817/817 passed
 Ruff: passed
 mypy: 175 source files passed
 compileall: passed
@@ -207,9 +224,15 @@ API 合同。
 - `platform/tests/test_investment_view_outcome_worker.py`；
 - `platform/src/a_share_platform/domain/valuation_models.py`；
 - `platform/src/a_share_platform/domain/fundamental_improvement.py`；
+- `platform/src/a_share_platform/ports/valuation_inputs.py`；
 - `platform/src/a_share_platform/application/valuation_improvement.py`；
+- `platform/src/a_share_platform/application/valuation_input_freeze.py`；
+- `platform/src/a_share_platform/adapters/memory/valuation_inputs.py`；
+- `platform/src/a_share_platform/adapters/postgres/valuation_inputs.py`；
 - `platform/src/a_share_platform/adapters/postgres/valuation_input_qualification.py`；
+- `platform/migrations/0036_p5_valuation_bundle_v2.sql`；
 - `platform/tests/test_valuation_models.py`、`test_fundamental_improvement.py`；
+- `platform/tests/test_valuation_improvement_service.py`、`test_postgres_valuation_inputs.py`；
 - `platform/frontend/src/features/investment-view/FrozenArtifactPanel.tsx` 及测试；
 - `platform/frontend/src/pages/ResearchP5Screen.tsx/.less/.test.tsx`；
 - `platform/frontend/src/features/screen/ScreenRankingPanel.tsx/.test.tsx`、`screen.less`；
@@ -223,7 +246,6 @@ Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成�
 
 - 获批的真实 Outcome price/calendar/corporate-action adapter 与真实到期产物；
 - 真实 historical/industry/peer、FCF、合格分析师输入 adapter/产物；
-- 新估值模型的 exact frozen bundle、持久化和 orchestration 安全接线；
 - 320/768/1024/1440 最终浏览器验收；
 - 真实 qualified PIT bundle、InvestmentView、Review 和 SignalSnapshot。
 

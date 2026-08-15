@@ -11,12 +11,26 @@ from a_share_platform.domain.fundamental_improvement import (
     ImprovementResultStatus,
     fundamental_improvement_definition_v0,
 )
+from a_share_platform.domain.metrics import MetricUnit
 from a_share_platform.domain.pit import DataTrustState
 from a_share_platform.domain.run_context import DataMode
 from a_share_platform.domain.valuation_expectation_gap import (
     ValuationExpectationGapResult,
+    ValuationExpectationRangeInput,
+    ValuationExpectationSource,
     ValuationResultStatus,
     valuation_expectation_gap_definition_v0,
+)
+from a_share_platform.domain.valuation_models import (
+    AnalystRevisionResult,
+    FundamentalAnchorResult,
+    ImpliedExpectationResult,
+    RelativeValuationResult,
+    ValuationModelStatus,
+    analyst_revision_model_v0,
+    fundamental_anchor_model_v0,
+    implied_expectation_model_v0,
+    relative_valuation_model_v0,
 )
 from a_share_platform.domain.valuation_scenarios import (
     ValuationScenarioSensitivityDefinition,
@@ -61,9 +75,14 @@ class ValuationImprovementAnalysis:
     valuation_status: ValuationImprovementComponentStatus
     improvement_status: ValuationImprovementComponentStatus
     scenario_status: ValuationImprovementComponentStatus
+    model_suite_status: ValuationImprovementComponentStatus
     valuation_result: ValuationExpectationGapResult | None
     improvement_result: FundamentalImprovementResult | None
     scenario_result: ValuationScenarioSensitivityResult | None
+    relative_valuation_results: tuple[RelativeValuationResult, ...]
+    fundamental_anchor_model_result: FundamentalAnchorResult | None
+    implied_expectation_result: ImpliedExpectationResult | None
+    analyst_revision_result: AnalystRevisionResult | None
     unavailable_reasons: tuple[str, ...]
     warnings: tuple[str, ...]
     scientific_status: ValuationImprovementScientificStatus
@@ -108,14 +127,54 @@ class ValuationImprovementOrchestrationService:
                 valuation_status=ValuationImprovementComponentStatus.UNAVAILABLE,
                 improvement_status=ValuationImprovementComponentStatus.UNAVAILABLE,
                 scenario_status=ValuationImprovementComponentStatus.UNAVAILABLE,
+                model_suite_status=ValuationImprovementComponentStatus.UNAVAILABLE,
                 valuation_result=None,
                 improvement_result=None,
                 scenario_result=None,
+                relative_valuation_results=(),
+                fundamental_anchor_model_result=None,
+                implied_expectation_result=None,
+                analyst_revision_result=None,
                 unavailable_reasons=("frozen valuation/improvement input bundle is unavailable",),
                 warnings=warnings,
                 scientific_status=ValuationImprovementScientificStatus.NOT_EVALUATED,
             )
         self._validate_response(request, bundle)
+
+        suite = bundle.valuation_model_suite_inputs
+        if suite is None:
+            warnings = (
+                ("current_research orchestration is current-only, not historical evidence",)
+                if request.data_mode is DataMode.CURRENT_RESEARCH
+                else ()
+            )
+            return ValuationImprovementAnalysis(
+                status=ValuationImprovementAnalysisStatus.UNAVAILABLE,
+                security_id=request.security_id,
+                decision_time=request.decision_time,
+                latest_input_available_at=bundle.latest_source_available_at,
+                data_mode=request.data_mode,
+                trust_state=request.trust_state,
+                historical_eligible=False,
+                bundle_version_id=bundle.bundle_version_id,
+                input_dataset_version_ids=bundle.dataset_version_ids,
+                valuation_status=ValuationImprovementComponentStatus.UNAVAILABLE,
+                improvement_status=ValuationImprovementComponentStatus.UNAVAILABLE,
+                scenario_status=ValuationImprovementComponentStatus.UNAVAILABLE,
+                model_suite_status=ValuationImprovementComponentStatus.UNAVAILABLE,
+                valuation_result=None,
+                improvement_result=None,
+                scenario_result=None,
+                relative_valuation_results=(),
+                fundamental_anchor_model_result=None,
+                implied_expectation_result=None,
+                analyst_revision_result=None,
+                unavailable_reasons=(
+                    "legacy v1 valuation bundle is read-compatible but not executable",
+                ),
+                warnings=warnings,
+                scientific_status=ValuationImprovementScientificStatus.NOT_EVALUATED,
+            )
 
         valuation_definition = valuation_expectation_gap_definition_v0(bundle.industry_template_id)
         improvement_definition = fundamental_improvement_definition_v0()
@@ -124,10 +183,41 @@ class ValuationImprovementOrchestrationService:
             valuation_formula_version=valuation_definition.formula_version,
             improvement_formula_version=improvement_definition.formula_version,
         )
+        relative_model = relative_valuation_model_v0()
+        anchor_model = fundamental_anchor_model_v0()
+        implied_model = implied_expectation_model_v0()
+        analyst_model = analyst_revision_model_v0()
+        self._validate_model_suite_versions(
+            suite.relative_model_version,
+            suite.fundamental_anchor_model_version,
+            suite.implied_expectation_model_version,
+            suite.analyst_revision_model_version,
+            actual=(
+                relative_model.model_version,
+                anchor_model.model_version,
+                implied_model.model_version,
+                analyst_model.model_version,
+            ),
+        )
+        anchor_model_result = anchor_model.calculate(suite.fundamental_anchor_input)
+        implied_result = implied_model.calculate(suite.fundamental_anchor_input)
+        analyst_result = analyst_model.calculate(suite.analyst_revision_input)
+        market_implied = self._expectation_input(
+            bundle,
+            source=ValuationExpectationSource.MARKET_IMPLIED,
+            result=implied_result,
+            latest_source_available_at=suite.fundamental_anchor_input.latest_source_available_at,
+        )
+        fundamental_anchor = self._expectation_input(
+            bundle,
+            source=ValuationExpectationSource.FUNDAMENTAL_ANCHOR,
+            result=anchor_model_result,
+            latest_source_available_at=suite.fundamental_anchor_input.latest_source_available_at,
+        )
         valuation_result = valuation_definition.calculate(
             {value.metric: value for value in bundle.valuation_metric_inputs},
-            market_implied=bundle.market_implied,
-            fundamental_anchor=bundle.fundamental_anchor,
+            market_implied=market_implied,
+            fundamental_anchor=fundamental_anchor,
             exposures=bundle.valuation_exposures,
             data_mode=request.data_mode,
             currency=bundle.currency,
@@ -141,6 +231,36 @@ class ValuationImprovementOrchestrationService:
         scenario_result = self._scenario_definition.calculate(
             bundle.scenario_inputs,
             data_mode=request.data_mode,
+        )
+
+        relative_results = tuple(
+            relative_model.calculate(
+                valuation_result.component(metric),
+                tuple(value for value in suite.relative_references if value.metric is metric),
+            )
+            for metric in suite.industry_policy.relative_metrics
+        )
+        model_statuses = (
+            *(value.status for value in relative_results),
+            anchor_model_result.status,
+            implied_result.status,
+            analyst_result.status,
+        )
+        model_suite_status = self._model_suite_status(model_statuses)
+        model_suite_reasons = tuple(
+            dict.fromkeys(
+                (
+                    *(
+                        reason
+                        for result in relative_results
+                        for comparison in result.comparisons
+                        for reason in comparison.unavailable_reasons
+                    ),
+                    *anchor_model_result.unavailable_reasons,
+                    *implied_result.unavailable_reasons,
+                    *analyst_result.unavailable_reasons,
+                )
+            )
         )
 
         valuation_status = self._valuation_status(valuation_result.status)
@@ -172,6 +292,7 @@ class ValuationImprovementOrchestrationService:
                         if value.status is ValuationScenarioStatus.UNAVAILABLE
                         for reason in value.unavailable_reasons
                     ),
+                    *model_suite_reasons,
                 )
             )
         )
@@ -202,12 +323,49 @@ class ValuationImprovementOrchestrationService:
             valuation_status=valuation_status,
             improvement_status=improvement_status,
             scenario_status=scenario_status,
+            model_suite_status=model_suite_status,
             valuation_result=valuation_result,
             improvement_result=improvement_result,
             scenario_result=scenario_result,
+            relative_valuation_results=relative_results,
+            fundamental_anchor_model_result=anchor_model_result,
+            implied_expectation_result=implied_result,
+            analyst_revision_result=analyst_result,
             unavailable_reasons=unavailable_reasons,
             warnings=warnings,
             scientific_status=ValuationImprovementScientificStatus.NOT_EVALUATED,
+        )
+
+    @staticmethod
+    def _expectation_input(
+        bundle: ValuationImprovementInputBundle,
+        *,
+        source: ValuationExpectationSource,
+        result: FundamentalAnchorResult | ImpliedExpectationResult,
+        latest_source_available_at: datetime,
+    ) -> ValuationExpectationRangeInput:
+        if isinstance(result, FundamentalAnchorResult):
+            lower = result.fundamental_expectation_lower
+            upper = result.fundamental_expectation_upper
+        elif isinstance(result, ImpliedExpectationResult):
+            lower = result.lower
+            upper = result.upper
+        else:
+            raise TypeError("result must be a frozen valuation model result")
+        return ValuationExpectationRangeInput(
+            source=source,
+            expectation_metric=result.expectation_metric,
+            lower=lower,
+            upper=upper,
+            unit=MetricUnit.RATIO,
+            assumptions=result.assumptions,
+            invalidation_conditions=result.invalidation_conditions,
+            provenance=result.provenance,
+            data_mode=bundle.data_mode,
+            trust_state=bundle.trust_state,
+            unavailable_reasons=result.unavailable_reasons,
+            decision_time=bundle.decision_time,
+            latest_source_available_at=latest_source_available_at,
         )
 
     @staticmethod
@@ -243,6 +401,29 @@ class ValuationImprovementOrchestrationService:
             raise ValueError("scenario method does not match frozen bundle")
         if bundle.scenario_method_version != self._scenario_definition.method_version:
             raise ValueError("scenario method version does not match frozen bundle")
+
+    @staticmethod
+    def _validate_model_suite_versions(
+        relative: str,
+        anchor: str,
+        implied: str,
+        analyst: str,
+        *,
+        actual: tuple[str, str, str, str],
+    ) -> None:
+        frozen = (relative, anchor, implied, analyst)
+        if frozen != actual:
+            raise ValueError("valuation model suite version does not match frozen bundle")
+
+    @staticmethod
+    def _model_suite_status(
+        values: tuple[ValuationModelStatus, ...],
+    ) -> ValuationImprovementComponentStatus:
+        if all(value is ValuationModelStatus.QUANTIFIED for value in values):
+            return ValuationImprovementComponentStatus.QUANTIFIED
+        if all(value is ValuationModelStatus.UNAVAILABLE for value in values):
+            return ValuationImprovementComponentStatus.UNAVAILABLE
+        return ValuationImprovementComponentStatus.PARTIAL
 
     @staticmethod
     def _valuation_status(

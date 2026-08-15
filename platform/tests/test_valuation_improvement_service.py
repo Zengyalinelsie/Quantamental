@@ -37,6 +37,15 @@ from a_share_platform.domain.valuation_expectation_gap import (
     ValuationMetric,
     ValuationMetricInput,
 )
+from a_share_platform.domain.valuation_models import (
+    FundamentalAnchorInput,
+    FundamentalAnchorMethod,
+    RelativeReferenceKind,
+    RelativeValuationReferenceInput,
+    UnavailableAnalystRevisionInput,
+    ValuationModelStatus,
+    industry_valuation_policy_v0,
+)
 from a_share_platform.domain.valuation_scenarios import (
     ScenarioScientificStatus,
     SensitivityDirection,
@@ -46,8 +55,10 @@ from a_share_platform.domain.valuation_scenarios import (
     ValuationScenarioSensitivityDefinition,
 )
 from a_share_platform.ports.valuation_inputs import (
+    VALUATION_INPUT_BUNDLE_V2,
     ValuationImprovementInputBundle,
     ValuationImprovementInputRequest,
+    ValuationModelSuiteInputs,
 )
 
 HASH_A = "sha256:" + "a" * 64
@@ -244,6 +255,78 @@ def scenario_definition() -> ValuationScenarioSensitivityDefinition:
     )
 
 
+def model_suite_inputs(
+    *,
+    data_mode: DataMode = DataMode.CURRENT_RESEARCH,
+    trust_state: DataTrustState = DataTrustState.NORMALIZED_CURRENT,
+) -> ValuationModelSuiteInputs:
+    policy = industry_valuation_policy_v0(IndustryTemplateId.NON_FINANCIAL_GENERAL)
+    relative_references = tuple(
+        RelativeValuationReferenceInput(
+            metric=metric,
+            reference_kind=kind,
+            median_value=Decimal("0.08"),
+            observation_count=12,
+            unit=MetricUnit.RATIO,
+            comparable_set_version_id="comparable-set:C30:2025q1:v1",
+            provenance=valuation_provenance(f"relative:{metric.value}:{kind.value}"),
+            data_mode=data_mode,
+            trust_state=trust_state,
+            decision_time=DECISION_TIME,
+            latest_source_available_at=AVAILABLE_AT,
+        )
+        for metric in policy.relative_metrics
+        for kind in RelativeReferenceKind
+    )
+    anchor_input = FundamentalAnchorInput(
+        method=FundamentalAnchorMethod.FCF_GROWING_PERPETUITY,
+        industry_template_id=IndustryTemplateId.NON_FINANCIAL_GENERAL,
+        current_price=Decimal(10),
+        base_value_per_share_lower=Decimal(1),
+        base_value_per_share_upper=Decimal("1.2"),
+        profitability_lower=None,
+        profitability_upper=None,
+        discount_rate_lower=Decimal("0.10"),
+        discount_rate_upper=Decimal("0.12"),
+        perpetual_growth_lower=Decimal("0.02"),
+        perpetual_growth_upper=Decimal("0.03"),
+        current_price_unit=MetricUnit.CURRENCY_PER_SHARE,
+        base_value_per_share_unit=MetricUnit.CURRENCY_PER_SHARE,
+        rate_unit=MetricUnit.RATIO,
+        currency="CNY",
+        assumptions=("Frozen V0 engineering assumptions.",),
+        invalidation_conditions=("Recompile when the normalized base changes.",),
+        price_provenance=valuation_provenance("anchor-price"),
+        fundamental_provenance=valuation_provenance("anchor-fundamental"),
+        assumption_provenance=valuation_provenance("anchor-assumptions"),
+        data_mode=data_mode,
+        trust_state=trust_state,
+        decision_time=DECISION_TIME,
+        latest_source_available_at=AVAILABLE_AT,
+    )
+    analyst_input = UnavailableAnalystRevisionInput(
+        expectation_metric=ValuationExpectationMetric.GROWTH,
+        unit=MetricUnit.RATIO,
+        provenances=(),
+        data_mode=data_mode,
+        trust_state=trust_state,
+        decision_time=DECISION_TIME,
+        latest_source_available_at=None,
+        unavailable_reasons=("qualified analyst source unavailable",),
+    )
+    return ValuationModelSuiteInputs(
+        industry_policy=policy,
+        relative_references=relative_references,
+        fundamental_anchor_input=anchor_input,
+        analyst_revision_input=analyst_input,
+        relative_model_version="relative-valuation-model:v0",
+        fundamental_anchor_model_version="fundamental-anchor-model:v0",
+        implied_expectation_model_version="implied-expectation-model:v0",
+        analyst_revision_model_version="analyst-revision-model:v0",
+        bundle_compiler_version="test-valuation-input-compiler:v2",
+    )
+
+
 def bundle(
     *,
     data_mode: DataMode = DataMode.CURRENT_RESEARCH,
@@ -335,6 +418,28 @@ def bundle(
     )
 
 
+def v2_bundle(
+    *,
+    data_mode: DataMode = DataMode.CURRENT_RESEARCH,
+    trust_state: DataTrustState = DataTrustState.NORMALIZED_CURRENT,
+    bull_available: bool = True,
+) -> ValuationImprovementInputBundle:
+    return replace(
+        bundle(
+            data_mode=data_mode,
+            trust_state=trust_state,
+            bull_available=bull_available,
+        ),
+        market_implied=None,
+        fundamental_anchor=None,
+        document_schema_version=VALUATION_INPUT_BUNDLE_V2,
+        valuation_model_suite_inputs=model_suite_inputs(
+            data_mode=data_mode,
+            trust_state=trust_state,
+        ),
+    )
+
+
 def request(
     *,
     data_mode: DataMode = DataMode.CURRENT_RESEARCH,
@@ -361,8 +466,59 @@ class FixedSource:
 
 
 class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
+    def test_v2_executes_every_frozen_valuation_model_without_a_second_input_source(self) -> None:
+        frozen = v2_bundle()
+        service = ValuationImprovementOrchestrationService(
+            MemoryValuationImprovementInputSource((frozen,)),
+            scenario_definition(),
+        )
+
+        result = service.evaluate(request())
+
+        self.assertEqual(len(result.relative_valuation_results), 4)
+        self.assertTrue(
+            all(item.status is ValuationModelStatus.QUANTIFIED for item in result.relative_valuation_results)
+        )
+        self.assertIs(result.fundamental_anchor_model_result.status, ValuationModelStatus.QUANTIFIED)
+        self.assertIs(result.implied_expectation_result.status, ValuationModelStatus.QUANTIFIED)
+        self.assertIs(result.analyst_revision_result.status, ValuationModelStatus.UNAVAILABLE)
+        self.assertEqual(
+            result.analyst_revision_result.unavailable_reasons,
+            ("qualified analyst source unavailable",),
+        )
+        self.assertEqual(result.model_suite_status, ValuationImprovementComponentStatus.PARTIAL)
+        self.assertEqual(
+            result.valuation_result.fundamental_anchor_interval.lower,
+            result.fundamental_anchor_model_result.fundamental_expectation_lower,
+        )
+        self.assertEqual(
+            result.valuation_result.market_implied_interval.lower,
+            result.implied_expectation_result.lower,
+        )
+        self.assertNotEqual(
+            result.valuation_result.fundamental_anchor_interval.lower,
+            Decimal("0.12"),
+        )
+        self.assertEqual(result.scientific_status.value, "not_evaluated")
+
+    def test_bundle_schema_is_explicit_and_unknown_or_incomplete_v2_fails_closed(self) -> None:
+        legacy = bundle()
+        self.assertIsNone(legacy.valuation_model_suite_inputs)
+
+        with self.assertRaisesRegex(ValueError, "unknown.*schema"):
+            replace(legacy, document_schema_version="valuation-input-bundle:v999")
+        with self.assertRaisesRegex(ValueError, "v2.*suite"):
+            replace(legacy, document_schema_version=VALUATION_INPUT_BUNDLE_V2)
+
+        result = ValuationImprovementOrchestrationService(
+            MemoryValuationImprovementInputSource((legacy,)),
+            scenario_definition(),
+        ).evaluate(request())
+        self.assertEqual(result.status, ValuationImprovementAnalysisStatus.UNAVAILABLE)
+        self.assertTrue(any("legacy v1" in reason for reason in result.unavailable_reasons))
+
     def test_executes_three_provider_neutral_domain_calculations_from_frozen_bundle(self) -> None:
-        frozen = bundle()
+        frozen = v2_bundle()
         service = ValuationImprovementOrchestrationService(
             MemoryValuationImprovementInputSource((frozen,)),
             scenario_definition(),
@@ -382,7 +538,10 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
         self.assertIsNotNone(result.valuation_result)
         self.assertIsNotNone(result.improvement_result)
         self.assertIsNotNone(result.scenario_result)
-        self.assertEqual(result.unavailable_reasons, ())
+        self.assertEqual(
+            result.unavailable_reasons,
+            ("qualified analyst source unavailable",),
+        )
         self.assertFalse(result.historical_eligible)
         self.assertTrue(any("current" in value for value in result.warnings))
         self.assertEqual(result.scientific_status.value, "not_evaluated")
@@ -408,7 +567,7 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
     def test_request_and_returned_bundle_identity_cutoff_trust_mode_and_version_must_match(
         self,
     ) -> None:
-        current = bundle()
+        current = v2_bundle()
         mismatches = (
             (replace(current, security_id="security:000002.XSHE"), request(), "security_id"),
             (
@@ -449,7 +608,7 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
                 ).evaluate(query)
 
     def test_bundle_rejects_internal_cutoff_trust_dataset_and_duplicate_inconsistency(self) -> None:
-        valid = bundle()
+        valid = v2_bundle()
         first = valid.valuation_metric_inputs[0]
         earlier = DECISION_TIME - timedelta(days=1)
         invalid_builders = (
@@ -486,7 +645,7 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
                 invalid_builder()
 
     def test_domain_definition_versions_must_match_frozen_bundle_versions(self) -> None:
-        valid = bundle()
+        valid = v2_bundle()
         mismatches = (
             replace(valid, valuation_formula_version="not-v0"),
             replace(valid, improvement_formula_version="not-v0"),
@@ -510,7 +669,7 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
                 trust_state=DataTrustState.NORMALIZED_CURRENT,
             )
 
-        strict_bundle = bundle(
+        strict_bundle = v2_bundle(
             data_mode=DataMode.STRICT_HISTORICAL,
             trust_state=DataTrustState.PIT_VERIFIED,
         )
@@ -533,12 +692,12 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
 
         with self.assertRaisesRegex(PermissionError, "data_mode"):
             ValuationImprovementOrchestrationService(
-                FixedSource(bundle()),
+                FixedSource(v2_bundle()),
                 scenario_definition(),
             ).evaluate(strict_request)
 
     def test_partial_component_remains_partial_and_unavailable_is_not_zero(self) -> None:
-        partial = bundle(bull_available=False)
+        partial = v2_bundle(bull_available=False)
         result = ValuationImprovementOrchestrationService(
             MemoryValuationImprovementInputSource((partial,)),
             scenario_definition(),
@@ -552,7 +711,7 @@ class ValuationImprovementOrchestrationServiceTest(unittest.TestCase):
         self.assertTrue(bull.unavailable_reasons)
 
     def test_memory_source_is_exact_keyed_and_rejects_duplicate_frozen_bundles(self) -> None:
-        frozen = bundle()
+        frozen = v2_bundle()
         source = MemoryValuationImprovementInputSource((frozen,))
         self.assertIs(source.load(request()), frozen)
         self.assertIsNone(source.load(replace(request(), bundle_version_id="bundle:missing:v1")))

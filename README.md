@@ -294,7 +294,10 @@ PYTHONPATH=src .venv/bin/python -m a_share_platform.workers.valuation_inputs \
 
 只有三域全部合格后，增加 `--private-local-research-ack --execute` 才会走 append-only freeze。
 `strict_historical` 必须同时请求 `pit_verified`，且每项事实仍需满足自己的
-`available_at <= decision_time`/双时间条件；该命令不会提升数据 trust。定向验证：
+`available_at <= decision_time`/双时间条件；该命令不会提升数据 trust。新冻结只写
+`valuation-input-bundle:v2`，并把行业政策、三类相对参考、anchor/analyst 输入及模型/compiler 版本纳入
+同一个不可变 bundle。旧 v1 仅保持原文档/hash 的读取兼容，不能继续执行；真实 reference、FCF 政策或
+分析师资格缺失时显式 unavailable，不填运行时假数。定向验证：
 
 ```bash
 cd platform

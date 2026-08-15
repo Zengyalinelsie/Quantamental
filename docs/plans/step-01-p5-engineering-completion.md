@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`；Task 1–3、Task 4A 已验证，Task 4B 待完成，Task 5 `implemented_unverified`
+> 状态：`in_progress`；Task 1–4 已验证，Task 5 `implemented_unverified`
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -115,11 +115,18 @@ attestation 时显式 unavailable。PostgreSQL compiler 对未知基数效应/�
 
 ### Task 4B：估值模型 frozen runtime 接线
 
-状态：`pending`。当前 `ValuationImprovementInputBundle`、持久化文档和 orchestration 尚未携带或调用
-Task 4A 的 relative reference、anchor 和 analyst revision 模型。真实 historical/industry/peer 分布、
-FCF 和分析师来源也尚未通过资格。完成时必须扩展现有 exact frozen bundle、qualification/compiler、
-append-only persistence 和 orchestration；不得另建可绕过 bundle ID/decision time/mode/trust 的输入入口。
-在此之前 Task 4 整体和 P5 Gate 都不能标记完成。
+状态：`verified`（工程能力）。现有 `ValuationImprovementInputBundle` 仍是唯一输入真源：legacy v1
+保持原 JSON/hash 语义且仅兼容读取，v2 冻结完整 industry policy、每个适用 metric 的
+historical/industry/peer reference、fundamental anchor raw input、analyst revision input、四个模型版本
+和 compiler 版本。未知 schema 与 v1 runtime 均失败关闭；v2 orchestration 运行时调用 relative、anchor、
+implied、analyst、improvement 和 scenario，不再信任旧的预计算 implied/anchor 区间。
+
+PostgreSQL qualification/compiler 在真实 reference、FCF/折现率/增长率政策或合格分析师来源缺失时构造
+显式 unavailable input，不制造数值、provider、快照或 provenance。`0036_p5_valuation_bundle_v2.sql`
+保留旧行文档/hash，新增 schema 约束和 DatasetVersion child links；新写入只接受 v2，bundle ID 覆盖
+完整 schema/policy/model/compiler 语义，freeze 要求 qualification datasets 与 bundle datasets 完全一致。
+真实 historical/industry/peer 分布、FCF 政策和分析师来源仍未通过资格，因此 Task 4 工程能力完成不等于
+P5 Gate 通过，也不等于任何模型科学有效。
 
 预计文件：
 
@@ -161,7 +168,7 @@ InvestmentView 重排，空/部分态显式保留 Trust。组件/API 合同测�
 cd platform
 PYTHONPATH=src .venv/bin/python -m unittest tests.test_investment_view_artifacts -v
 PYTHONPATH=src .venv/bin/python -m unittest tests.test_investment_view_compilation tests.test_expected_return_ledger tests.test_research_workspace_api -v
-PYTHONPATH=src .venv/bin/python -m unittest tests.test_valuation_models tests.test_fundamental_improvement tests.test_postgres_valuation_input_qualification tests.test_valuation_improvement_service -v
+PYTHONPATH=src .venv/bin/python -m unittest tests.test_valuation_models tests.test_fundamental_improvement tests.test_valuation_input_qualification tests.test_postgres_valuation_input_qualification tests.test_postgres_valuation_inputs tests.test_valuation_improvement_service tests.test_investment_view_compilation tests.test_migrations -v
 npm --prefix frontend test -- --run ResearchP5Screen InvestmentViewSummary WorkspacePage.research
 ```
 

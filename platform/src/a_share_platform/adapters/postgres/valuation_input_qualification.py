@@ -7,7 +7,7 @@ import json
 import re
 from collections.abc import Callable, Sequence
 from contextlib import AbstractContextManager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -35,9 +35,6 @@ from a_share_platform.domain.metrics import MetricUnit
 from a_share_platform.domain.pit import DataTrustState
 from a_share_platform.domain.run_context import DataMode
 from a_share_platform.domain.valuation_expectation_gap import (
-    ValuationExpectationMetric,
-    ValuationExpectationRangeInput,
-    ValuationExpectationSource,
     ValuationExposures,
     ValuationInputProvenance,
     ValuationMetric,
@@ -49,12 +46,26 @@ from a_share_platform.domain.valuation_input_qualification import (
     ValuationInputQualification,
     ValuationInputQualificationRequest,
 )
+from a_share_platform.domain.valuation_models import (
+    FundamentalAnchorMethod,
+    RelativeReferenceKind,
+    RelativeValuationReferenceInput,
+    UnavailableAnalystRevisionInput,
+    UnavailableFundamentalAnchorInput,
+    industry_valuation_policy_v0,
+)
 from a_share_platform.domain.valuation_scenarios import (
     ValuationScenario,
     ValuationScenarioInput,
     ValuationScenarioProvenance,
 )
-from a_share_platform.ports.valuation_inputs import ValuationImprovementInputBundle
+from a_share_platform.ports.valuation_inputs import (
+    VALUATION_INPUT_BUNDLE_V2,
+    ValuationImprovementInputBundle,
+    ValuationModelSuiteInputs,
+)
+
+from .valuation_inputs import bundle_document
 
 _SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
 _REQUIRED_FINANCIAL_METRICS = frozenset(
@@ -300,22 +311,32 @@ class PostgresValuationInputQualificationSource:
                 industry_rows = connection.execute(
                     """
                     /* subject industry code */
-                    SELECT industry_code
-                    FROM canonical.industry_memberships
-                    WHERE security_id = %s
-                      AND valid_from <= %s
-                      AND (valid_to IS NULL OR %s < valid_to)
-                      AND trust_state = %s
-                      AND dataset_version_id IS NOT NULL
-                      AND observed_at <= %s
-                      AND industry_code IS NOT NULL
-                    ORDER BY observed_at DESC, industry_membership_id DESC
+                    SELECT industry.industry_code
+                    FROM canonical.industry_memberships AS industry
+                    WHERE industry.security_id = %s
+                      AND industry.valid_from <= %s
+                      AND (industry.valid_to IS NULL OR %s < industry.valid_to)
+                      AND industry.trust_state = %s
+                      AND industry.dataset_version_id IS NOT NULL
+                      AND industry.observed_at <= %s
+                      AND (
+                          %s <> 'pit_verified'
+                          OR (
+                              industry.available_at IS NOT NULL
+                              AND industry.available_at <= %s
+                          )
+                      )
+                      AND industry.industry_code IS NOT NULL
+                    ORDER BY industry.observed_at DESC,
+                             industry.industry_membership_id DESC
                     LIMIT 1
                     """,
                     (
                         request.security_id,
                         request.decision_time.date(),
                         request.decision_time.date(),
+                        request.requested_trust_state.value,
+                        request.decision_time,
                         request.requested_trust_state.value,
                         request.decision_time,
                     ),
@@ -511,37 +532,6 @@ class PostgresValuationInputQualificationSource:
             ),
         )
 
-        market_implied = ValuationExpectationRangeInput(
-            source=ValuationExpectationSource.MARKET_IMPLIED,
-            expectation_metric=ValuationExpectationMetric.GROWTH,
-            lower=None,
-            upper=None,
-            unit=MetricUnit.RATIO,
-            assumptions=("No approved market-implied expectation model is bound to this bundle.",),
-            invalidation_conditions=("Compile a new bundle after an approved model is available.",),
-            provenance=price_only_provenance,
-            data_mode=request.data_mode,
-            trust_state=request.requested_trust_state,
-            unavailable_reasons=("market-implied expectation interval is unavailable",),
-            decision_time=request.decision_time,
-            latest_source_available_at=price_available,
-        )
-        fundamental_anchor = ValuationExpectationRangeInput(
-            source=ValuationExpectationSource.FUNDAMENTAL_ANCHOR,
-            expectation_metric=ValuationExpectationMetric.GROWTH,
-            lower=None,
-            upper=None,
-            unit=MetricUnit.RATIO,
-            assumptions=("No approved fundamental-anchor model is bound to this bundle.",),
-            invalidation_conditions=("Compile a new bundle after an approved model is available.",),
-            provenance=financial_only_provenance,
-            data_mode=request.data_mode,
-            trust_state=request.requested_trust_state,
-            unavailable_reasons=("fundamental-anchor expectation interval is unavailable",),
-            decision_time=request.decision_time,
-            latest_source_available_at=financial_available,
-        )
-
         def improvement_provenance(
             metric: FundamentalImprovementMetric,
             rows: tuple[Sequence[object], ...],
@@ -692,26 +682,6 @@ class PostgresValuationInputQualificationSource:
         comparable_hash = hashlib.sha256(
             json.dumps(comparable_payload, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest()
-        bundle_payload = {
-            "security_id": request.security_id,
-            "decision_time": request.decision_time.isoformat(),
-            "data_mode": request.data_mode.value,
-            "trust_state": request.requested_trust_state.value,
-            "datasets": qualification.dataset_version_ids,
-            "observations": tuple(
-                observation_id
-                for evidence in qualification.domain_evidence
-                for observation_id in evidence.observation_ids
-            ),
-            "hashes": tuple(
-                content_hash
-                for evidence in qualification.domain_evidence
-                for content_hash in evidence.content_hashes
-            ),
-        }
-        bundle_hash = hashlib.sha256(
-            json.dumps(bundle_payload, sort_keys=True, separators=(",", ":")).encode()
-        ).hexdigest()
         market_cap = price.close * shares
         template = (
             IndustryTemplateId.BANK
@@ -730,11 +700,85 @@ class PostgresValuationInputQualificationSource:
             log_market_cap=market_cap.ln(),
             beta=None,
         )
-        return ValuationImprovementInputBundle(
-            bundle_version_id=(
-                f"bundle:{request.security_id}:{request.decision_time.date().isoformat()}:"
-                f"{bundle_hash[:24]}:v1"
+        comparable_set_version_id = f"comparable-set:{comparable_hash[:24]}:v1"
+        policy = industry_valuation_policy_v0(template)
+        relative_references = tuple(
+            RelativeValuationReferenceInput(
+                metric=metric,
+                reference_kind=kind,
+                median_value=None,
+                observation_count=0,
+                unit=MetricUnit.RATIO,
+                comparable_set_version_id=comparable_set_version_id,
+                provenance=valuation_provenance(
+                    method_id=(
+                        f"valuation:relative-{kind.value}-{metric.value}-unavailable:v1"
+                    ),
+                    evidence=(comparable_evidence,),
+                ),
+                data_mode=request.data_mode,
+                trust_state=request.requested_trust_state,
+                decision_time=request.decision_time,
+                latest_source_available_at=comparable_available,
+                unavailable_reasons=(
+                    f"qualified {kind.value} {metric.value} distribution is unavailable",
+                ),
+            )
+            for metric in policy.relative_metrics
+            for kind in RelativeReferenceKind
+        )
+        anchor_input = UnavailableFundamentalAnchorInput(
+            method=policy.anchor_method,
+            industry_template_id=template,
+            currency=currency,
+            current_price_unit=MetricUnit.CURRENCY_PER_SHARE,
+            base_value_per_share_unit=MetricUnit.CURRENCY_PER_SHARE,
+            rate_unit=MetricUnit.RATIO,
+            assumptions=(
+                "No unapproved discount, growth, profitability, or FCF assumption was inferred.",
             ),
+            invalidation_conditions=(
+                "Compile a new v2 bundle after qualified anchor inputs and policies exist.",
+            ),
+            provenances=(price_only_provenance, financial_only_provenance),
+            data_mode=request.data_mode,
+            trust_state=request.requested_trust_state,
+            decision_time=request.decision_time,
+            latest_source_available_at=max(financial_available, price_available),
+            unavailable_reasons=(
+                (
+                    "qualified book value, ROE, discount, and growth intervals are unavailable"
+                    if policy.anchor_method
+                    is FundamentalAnchorMethod.BANK_JUSTIFIED_PRICE_TO_BOOK
+                    else "qualified FCF per share and discount/growth intervals are unavailable"
+                ),
+            ),
+        )
+        analyst_input = UnavailableAnalystRevisionInput(
+            expectation_metric=policy.expectation_metric,
+            unit=MetricUnit.RATIO,
+            provenances=(),
+            data_mode=request.data_mode,
+            trust_state=request.requested_trust_state,
+            decision_time=request.decision_time,
+            latest_source_available_at=None,
+            unavailable_reasons=(
+                "qualified analyst consensus source and governance attestation are unavailable",
+            ),
+        )
+        suite = ValuationModelSuiteInputs(
+            industry_policy=policy,
+            relative_references=relative_references,
+            fundamental_anchor_input=anchor_input,
+            analyst_revision_input=analyst_input,
+            relative_model_version="relative-valuation-model:v0",
+            fundamental_anchor_model_version="fundamental-anchor-model:v0",
+            implied_expectation_model_version="implied-expectation-model:v0",
+            analyst_revision_model_version="analyst-revision-model:v0",
+            bundle_compiler_version="postgres-valuation-input-compiler:v2",
+        )
+        pending = ValuationImprovementInputBundle(
+            bundle_version_id="bundle:pending:v2",
             security_id=request.security_id,
             decision_time=request.decision_time,
             latest_source_available_at=max(
@@ -751,14 +795,33 @@ class PostgresValuationInputQualificationSource:
             scenario_method_id="valuation-sensitivity:affine-expectation:v1",
             scenario_method_version="v1",
             valuation_metric_inputs=valuation_metrics,
-            market_implied=market_implied,
-            fundamental_anchor=fundamental_anchor,
+            market_implied=None,
+            fundamental_anchor=None,
             valuation_exposures=exposures,
             currency=currency,
-            comparable_set_version_id=f"comparable-set:{comparable_hash[:24]}:v1",
+            comparable_set_version_id=comparable_set_version_id,
             improvement_inputs=tuple(improvement_inputs),
             improvement_exposures=improvement_exposures,
             scenario_inputs=scenario_inputs,
+            document_schema_version=VALUATION_INPUT_BUNDLE_V2,
+            valuation_model_suite_inputs=suite,
+        )
+        semantic_document = bundle_document(pending)
+        semantic_document.pop("bundle_version_id")
+        semantic_hash = hashlib.sha256(
+            json.dumps(
+                semantic_document,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest()
+        return replace(
+            pending,
+            bundle_version_id=(
+                f"bundle:{request.security_id}:{request.decision_time.date().isoformat()}:"
+                f"{semantic_hash[:24]}:v2"
+            ),
         )
 
     @staticmethod

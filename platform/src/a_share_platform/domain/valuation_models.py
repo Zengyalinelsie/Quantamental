@@ -848,6 +848,53 @@ class AnalystSourceAttestation:
 
 
 @dataclass(frozen=True)
+class UnavailableAnalystRevisionInput:
+    """Evidence that analyst consensus is unavailable, without invented snapshots."""
+
+    expectation_metric: ValuationExpectationMetric
+    unit: MetricUnit
+    provenances: tuple[ValuationInputProvenance, ...]
+    data_mode: DataMode
+    trust_state: DataTrustState
+    decision_time: datetime
+    latest_source_available_at: datetime | None
+    unavailable_reasons: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        metric = ValuationExpectationMetric(self.expectation_metric)
+        if MetricUnit(self.unit) is not MetricUnit.RATIO:
+            raise ValueError("analyst revision unit must be ratio")
+        provenances = tuple(self.provenances)
+        if any(not isinstance(value, ValuationInputProvenance) for value in provenances):
+            raise ValueError("unavailable analyst provenance evidence is invalid")
+        reasons = _unique_reasons(self.unavailable_reasons)
+        if not reasons:
+            raise ValueError("unavailable analyst input requires reasons")
+        mode = DataMode(self.data_mode)
+        trust = DataTrustState(self.trust_state)
+        decision = _aware(self.decision_time, "decision_time")
+        if trust is DataTrustState.RAW:
+            raise ValueError("raw inputs cannot enter analyst revision")
+        if mode is DataMode.STRICT_HISTORICAL and trust is not DataTrustState.PIT_VERIFIED:
+            raise PermissionError(
+                "strict_historical analyst revision requires pit_verified inputs"
+            )
+        if self.latest_source_available_at is not None:
+            available = _aware(
+                self.latest_source_available_at,
+                "latest_source_available_at",
+            )
+            if available > decision:
+                raise ValueError("available_at cannot exceed decision_time")
+        object.__setattr__(self, "expectation_metric", metric)
+        object.__setattr__(self, "unit", MetricUnit.RATIO)
+        object.__setattr__(self, "provenances", provenances)
+        object.__setattr__(self, "data_mode", mode)
+        object.__setattr__(self, "trust_state", trust)
+        object.__setattr__(self, "unavailable_reasons", reasons)
+
+
+@dataclass(frozen=True)
 class AnalystRevisionInput:
     expectation_metric: ValuationExpectationMetric
     current_lower: Decimal | None
@@ -977,16 +1024,16 @@ class AnalystRevisionResult:
     revision_upper: Decimal | None
     midpoint_revision: Decimal | None
     unit: MetricUnit
-    consensus_definition_version: str
-    target_period_end: date
-    forecast_horizon_days: int
-    current_snapshot_at: datetime
-    prior_snapshot_at: datetime
+    consensus_definition_version: str | None
+    target_period_end: date | None
+    forecast_horizon_days: int | None
+    current_snapshot_at: datetime | None
+    prior_snapshot_at: datetime | None
     source_attestation_id: str | None
     source_policy_version: str | None
-    current_provider_id: str
-    prior_provider_id: str
-    provenance: ValuationInputProvenance
+    current_provider_id: str | None
+    prior_provider_id: str | None
+    provenance: ValuationInputProvenance | None
     input_method_versions: tuple[str, ...]
     unavailable_reasons: tuple[str, ...]
     model_version: str
@@ -997,9 +1044,40 @@ class AnalystRevisionResult:
 class AnalystRevisionModelV0:
     model_version: str = "analyst-revision-model:v0"
 
-    def calculate(self, value: AnalystRevisionInput) -> AnalystRevisionResult:
-        if not isinstance(value, AnalystRevisionInput):
-            raise TypeError("value must be AnalystRevisionInput")
+    def calculate(
+        self,
+        value: AnalystRevisionInput | UnavailableAnalystRevisionInput,
+    ) -> AnalystRevisionResult:
+        if not isinstance(value, (AnalystRevisionInput, UnavailableAnalystRevisionInput)):
+            raise TypeError("value must be an analyst revision input")
+        if isinstance(value, UnavailableAnalystRevisionInput):
+            provenance = (
+                None
+                if not value.provenances
+                else _merge_provenance(value.provenances, method_id=self.model_version)
+            )
+            return AnalystRevisionResult(
+                status=ValuationModelStatus.UNAVAILABLE,
+                expectation_metric=value.expectation_metric,
+                revision_lower=None,
+                revision_upper=None,
+                midpoint_revision=None,
+                unit=value.unit,
+                consensus_definition_version=None,
+                target_period_end=None,
+                forecast_horizon_days=None,
+                current_snapshot_at=None,
+                prior_snapshot_at=None,
+                source_attestation_id=None,
+                source_policy_version=None,
+                current_provider_id=None,
+                prior_provider_id=None,
+                provenance=provenance,
+                input_method_versions=_method_lineage(value.provenances),
+                unavailable_reasons=value.unavailable_reasons,
+                model_version=self.model_version,
+                scientific_status=ValuationModelScientificStatus.NOT_EVALUATED,
+            )
         provenances = (value.current_provenance, value.prior_provenance)
         provenance = _merge_provenance(
             provenances,
@@ -1088,6 +1166,7 @@ __all__ = [
     "RelativeValuationModelV0",
     "RelativeValuationReferenceInput",
     "RelativeValuationResult",
+    "UnavailableAnalystRevisionInput",
     "UnavailableFundamentalAnchorInput",
     "ValuationModelScientificStatus",
     "ValuationModelStatus",

@@ -33,14 +33,14 @@ from tests.test_expected_return_compiler import request as expected_request
 from tests.test_valuation_improvement_service import (
     AVAILABLE_AT,
     DATASET_IDS,
-    bundle,
     scenario_definition,
+    v2_bundle,
 )
 from tests.test_valuation_improvement_service import request as valuation_request
 
 
 def strict_inputs():  # type: ignore[no-untyped-def]
-    frozen = bundle(
+    frozen = v2_bundle(
         data_mode=DataMode.STRICT_HISTORICAL,
         trust_state=DataTrustState.PIT_VERIFIED,
     )
@@ -152,7 +152,7 @@ class InvestmentViewCompilationServiceTest(unittest.TestCase):
 
     def test_current_or_missing_pit_bundle_is_explained_and_never_written(self) -> None:
         current_analysis = ValuationImprovementOrchestrationService(
-            MemoryValuationImprovementInputSource((bundle(),)),
+            MemoryValuationImprovementInputSource((v2_bundle(),)),
             scenario_definition(),
         )
         use_case, repository = service(current_analysis)
@@ -202,7 +202,7 @@ class InvestmentViewCompilationServiceTest(unittest.TestCase):
         self.assertEqual(repository.list_views(), ())
 
     def test_partial_analysis_and_non_research_stage_fail_closed(self) -> None:
-        partial_bundle = bundle(
+        partial_bundle = v2_bundle(
             data_mode=DataMode.STRICT_HISTORICAL,
             trust_state=DataTrustState.PIT_VERIFIED,
             bull_available=False,

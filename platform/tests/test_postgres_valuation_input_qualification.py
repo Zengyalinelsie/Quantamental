@@ -24,8 +24,16 @@ from a_share_platform.domain.valuation_input_qualification import (
     ValuationInputDomain,
     ValuationInputQualificationRequest,
 )
+from a_share_platform.domain.valuation_models import (
+    UnavailableAnalystRevisionInput,
+    UnavailableFundamentalAnchorInput,
+    ValuationModelStatus,
+)
 from a_share_platform.domain.valuation_scenarios import ValuationScenarioStatus
-from a_share_platform.ports.valuation_inputs import ValuationImprovementInputRequest
+from a_share_platform.ports.valuation_inputs import (
+    VALUATION_INPUT_BUNDLE_V2,
+    ValuationImprovementInputRequest,
+)
 from tests.test_valuation_improvement_service import DECISION_TIME, scenario_definition
 
 HASH = "sha256:" + "a" * 64
@@ -251,20 +259,22 @@ class PostgresValuationInputQualificationSourceTest(unittest.TestCase):
 
     def test_strict_path_uses_only_pit_bitemporal_facts_and_exact_trust(self) -> None:
         source, connection = self.source(trust=DataTrustState.PIT_VERIFIED)
-        result = source.inspect(
-            request(
-                data_mode=DataMode.STRICT_HISTORICAL,
-                trust_state=DataTrustState.PIT_VERIFIED,
-            )
+        strict_request = request(
+            data_mode=DataMode.STRICT_HISTORICAL,
+            trust_state=DataTrustState.PIT_VERIFIED,
         )
+        result = source.inspect(strict_request)
+        compiled = source.compile(strict_request)
 
         self.assertTrue(result.is_qualified)
+        self.assertIsNotNone(compiled.bundle)
         sql = "\n".join(query for query, _ in connection.calls)
         self.assertIn("canonical.financial_fact_observations", sql)
         self.assertIn("trust_state = 'pit_verified'", sql)
         self.assertIn("known_from <=", sql)
         self.assertIn("available_at <=", sql)
         self.assertNotIn("observation.normalized_current_financial_observations", sql)
+        self.assertIn("industry.available_at <=", sql)
 
     def test_qualified_real_rows_compile_a_deterministic_partial_bundle_without_fake_inputs(
         self,
@@ -276,6 +286,23 @@ class PostgresValuationInputQualificationSourceTest(unittest.TestCase):
         self.assertIsNotNone(compiled.bundle)
         frozen = compiled.bundle
         assert frozen is not None
+        self.assertEqual(frozen.document_schema_version, VALUATION_INPUT_BUNDLE_V2)
+        self.assertIsNone(frozen.market_implied)
+        self.assertIsNone(frozen.fundamental_anchor)
+        suite = frozen.valuation_model_suite_inputs
+        assert suite is not None
+        self.assertTrue(all(item.median_value is None for item in suite.relative_references))
+        self.assertTrue(all(item.unavailable_reasons for item in suite.relative_references))
+        self.assertIsInstance(
+            suite.fundamental_anchor_input,
+            UnavailableFundamentalAnchorInput,
+        )
+        self.assertIsInstance(
+            suite.analyst_revision_input,
+            UnavailableAnalystRevisionInput,
+        )
+        self.assertNotIn("provider:analyst:unavailable", repr(suite.analyst_revision_input))
+        self.assertIn(":v2", frozen.bundle_version_id)
         self.assertEqual(
             frozen.dataset_version_ids,
             tuple(
@@ -294,28 +321,33 @@ class PostgresValuationInputQualificationSourceTest(unittest.TestCase):
         self.assertEqual(metrics[ValuationMetric.EARNINGS_TO_PRICE].denominator, Decimal(10))
         self.assertEqual(metrics[ValuationMetric.BOOK_TO_PRICE].numerator, Decimal(2))
         self.assertIsNone(metrics[ValuationMetric.FREE_CASH_FLOW_YIELD].numerator)
-        self.assertIsNone(frozen.market_implied.lower)
-        self.assertTrue(frozen.market_implied.unavailable_reasons)
         self.assertTrue(all(item.level is None for item in frozen.improvement_inputs))
         self.assertTrue(all(item.unavailable_reasons for item in frozen.improvement_inputs))
         self.assertTrue(all(item.driver_lower is None for item in frozen.scenario_inputs))
+        analysis = ValuationImprovementOrchestrationService(
+            MemoryValuationImprovementInputSource((frozen,)),
+            scenario_definition(),
+        ).evaluate(
+            ValuationImprovementInputRequest(
+                security_id=frozen.security_id,
+                decision_time=frozen.decision_time,
+                data_mode=frozen.data_mode,
+                trust_state=frozen.trust_state,
+                bundle_version_id=frozen.bundle_version_id,
+            )
+        )
+        self.assertIs(
+            analysis.fundamental_anchor_model_result.status,
+            ValuationModelStatus.UNAVAILABLE,
+        )
+        self.assertIs(
+            analysis.implied_expectation_result.status,
+            ValuationModelStatus.UNAVAILABLE,
+        )
         self.assertEqual(
             {
                 item.status
-                for item in ValuationImprovementOrchestrationService(
-                    MemoryValuationImprovementInputSource((frozen,)),
-                    scenario_definition(),
-                )
-                .evaluate(
-                    ValuationImprovementInputRequest(
-                        security_id=frozen.security_id,
-                        decision_time=frozen.decision_time,
-                        data_mode=frozen.data_mode,
-                        trust_state=frozen.trust_state,
-                        bundle_version_id=frozen.bundle_version_id,
-                    )
-                )
-                .scenario_result.scenario_results
+                for item in analysis.scenario_result.scenario_results
             },
             {ValuationScenarioStatus.UNAVAILABLE},
         )

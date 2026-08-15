@@ -624,10 +624,10 @@ series 时不从 artifact hash 或空值生成图表。浏览器验收确认六�
 - [x] 隐含增长/ROE 纯函数；
 - [x] 趋势/加速度/一次性调整编译器；
 - [ ] 分析师修正 adapter（若数据源通过资格）；
-- [ ] 新估值模型的 exact frozen bundle / persistence / orchestration 安全接线；
+- [x] 新估值模型的 exact frozen bundle / persistence / orchestration 安全接线；
 - [x] scenario/sensitivity。
 
-状态（2026-08-14）：已有行业模板相关的估值/改善领域基线和 provider-neutral 的
+状态（2026-08-15）：已有行业模板相关的估值/改善领域基线和 provider-neutral 的
 base/bull/bear scenario/sensitivity。本轮完成真实 PostgreSQL financial、price/share-capital、
 versioned comparable 三域的只读资格检查、repeatable-read 确定性编译、完整 lineage 的 frozen
 bundle、append-only Repository/migration 和 dry-run-by-default worker。current 路径只消费
@@ -636,14 +636,16 @@ bundle、append-only Repository/migration 和 dry-run-by-default worker。curren
 没有生成 bundle。ADR-0011 已冻结 V0 估值工程默认；历史/行业/同业相对估值、非金融 FCF
 永续增长、银行 justified P/B、价格反解隐含增长/ROE、分析师区间修正和四期改善编译器已实现为
 provider-neutral 纯函数，并保持 `scientific_status=not_evaluated`。新模型没有新增 application
-输入真源；但现有 frozen bundle 和 orchestration 尚未携带或调用这些新模型，安全 runtime 接线仍待
-完成。价格、每股基本面和假设分别绑定单位/provenance；分析师 current/prior 快照分别绑定 provider
+输入真源；现有 frozen bundle 已升为显式 v2 schema，冻结 industry policy、三类 relative reference、
+anchor raw input、analyst input、模型与 compiler 版本，orchestration 运行时调用完整 suite。legacy v1
+保持原文档/hash 只读兼容但不得继续执行，未知 schema 失败关闭；`0036` 增加关系型 schema 判别和
+DatasetVersion child links，新写入只接受 v2。价格、每股基本面和假设分别绑定单位/provenance；分析师 current/prior 快照分别绑定 provider
 与 provenance，并与 attestation provider 一致；领域 dataclass 不能替代治理 registry 的真实 lookup。
 缺 anchor、三类相对参考或可核验分析师 attestation 时显式 unavailable。PostgreSQL compiler 遇到
-未知基数效应/一次性项目时现在生成无数值的 unavailable 输入。仍缺真实
-historical/industry/peer 估值分布、FCF、合格分析师 adapter/运行产物和新模型的 frozen runtime 接线，
-因此 W01 和 P5 Gate 尚未
-完成；不可用分项继续显式 `unavailable`，不得填零。
+未知基数效应/一次性项目、真实 reference、FCF 假设政策或合格分析师来源缺失时生成无数值的
+unavailable 输入，不制造 provider、快照或 provenance。仍缺真实 historical/industry/peer 估值分布、
+FCF/折现率/增长率政策、合格分析师 adapter/运行产物，因此 W01 的真实输入和 P5 Gate 尚未完成；
+不可用分项继续显式 `unavailable`，不得填零。runtime 接线和测试只证明工程合同，不证明模型科学有效。
 
 ### P5-W02：Expected Return Compiler V0
 
@@ -734,7 +736,7 @@ implemented、不能标记 visually verified；
 状态（2026-08-15）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
 原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
 strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
-InvestmentView/SignalSnapshot、获批真实 outcome price adapter、新估值模型 frozen runtime 接线、
+InvestmentView/SignalSnapshot、获批真实 outcome price adapter、真实 reference/FCF/分析师输入、
 真实三问详情和 320/768/1024/1440 最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
 更不能据此声称模型科学有效。
 

@@ -3,17 +3,21 @@ import unittest
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import replace
+from decimal import Decimal
 
 import psycopg
 
 from a_share_platform.adapters.postgres.valuation_inputs import (
     PostgresValuationImprovementInputRepository,
+    bundle_content_hash,
+    bundle_document,
+    bundle_from_document,
 )
 from a_share_platform.ports.valuation_inputs import (
     ValuationImprovementInputConflict,
     ValuationImprovementInputUnavailable,
 )
-from tests.test_valuation_improvement_service import bundle, request
+from tests.test_valuation_improvement_service import bundle, request, v2_bundle
 
 
 def json_value(value: object) -> object:
@@ -62,6 +66,10 @@ class FakeConnection:
             self.rows.setdefault(str(params[0]), params)
             return FakeResult()
         if "FROM research.valuation_input_bundles" in normalized:
+            if len(params) == 1:
+                return FakeResult(
+                    [] if (row := self.rows.get(str(params[0]))) is None else [row]
+                )
             row = self.rows.get(str(params[4]))
             if row is None:
                 return FakeResult()
@@ -85,7 +93,29 @@ class PostgresValuationImprovementInputRepositoryTest(unittest.TestCase):
             yield self.connection
 
         self.repository = PostgresValuationImprovementInputRepository(factory)
-        self.value = bundle()
+        self.value = v2_bundle()
+
+    def test_legacy_v1_document_and_hash_remain_byte_semantically_compatible(self) -> None:
+        legacy = bundle()
+        document = bundle_document(legacy)
+
+        self.assertNotIn("document_schema_version", document)
+        self.assertNotIn("valuation_model_suite_inputs", document)
+        self.assertEqual(bundle_from_document(document), legacy)
+        self.assertEqual(bundle_content_hash(bundle_from_document(document)), bundle_content_hash(legacy))
+
+    def test_v2_document_round_trips_complete_model_suite_and_rejects_unknown_schema(self) -> None:
+        document = bundle_document(self.value)
+
+        self.assertEqual(document["document_schema_version"], "valuation-input-bundle:v2")
+        self.assertNotIn("market_implied", document)
+        self.assertNotIn("fundamental_anchor", document)
+        self.assertIn("valuation_model_suite_inputs", document)
+        self.assertEqual(bundle_from_document(document), self.value)
+
+        document["document_schema_version"] = "valuation-input-bundle:v999"
+        with self.assertRaisesRegex(ValueError, "unknown.*schema"):
+            bundle_from_document(document)
 
     def test_append_then_exact_key_load_round_trips_complete_frozen_bundle(self) -> None:
         self.assertEqual(self.repository.append(self.value), self.value)
@@ -101,12 +131,25 @@ class PostgresValuationImprovementInputRepositoryTest(unittest.TestCase):
         self.assertEqual(insert[1][2], self.value.decision_time)
         self.assertEqual(insert[1][4], self.value.data_mode.value)
         self.assertEqual(insert[1][5], self.value.trust_state.value)
+        self.assertEqual(insert[1][7], self.value.document_schema_version)
         self.assertEqual(
-            json_value(insert[1][7]),
+            json_value(insert[1][8]),
             sorted(self.value.dataset_version_ids),
         )
-        self.assertIsInstance(json_value(insert[1][8]), dict)
+        self.assertIsInstance(json_value(insert[1][9]), dict)
         self.assertIn("ON CONFLICT (bundle_version_id) DO NOTHING", insert[0])
+        dataset_links = [
+            params
+            for query, params in self.connection.calls
+            if "INSERT INTO research.valuation_input_bundle_datasets" in query
+        ]
+        self.assertEqual(
+            dataset_links,
+            [
+                (self.value.bundle_version_id, dataset_id)
+                for dataset_id in self.value.dataset_version_ids
+            ],
+        )
         self.assertFalse(any("UPDATE" in query for query, _ in self.connection.calls))
         self.assertTrue(
             any("SET TRANSACTION READ ONLY" in query for query, _ in self.connection.calls)
@@ -122,7 +165,16 @@ class PostgresValuationImprovementInputRepositoryTest(unittest.TestCase):
         ]
         self.assertEqual(len(inserts), 1)
 
-        changed = replace(self.value, comparable_set_version_id="comparable-set:other:v1")
+        suite = self.value.valuation_model_suite_inputs
+        assert suite is not None
+        changed_reference = replace(suite.relative_references[0], median_value=Decimal("0.09"))
+        changed = replace(
+            self.value,
+            valuation_model_suite_inputs=replace(
+                suite,
+                relative_references=(changed_reference, *suite.relative_references[1:]),
+            ),
+        )
         with self.assertRaisesRegex(ValuationImprovementInputConflict, "immutable"):
             self.repository.append(changed)
 
@@ -144,6 +196,18 @@ class PostgresValuationImprovementInputRepositoryTest(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "hash mismatch"):
             self.repository.load(request())
+
+    def test_same_identifier_with_other_axes_is_an_immutable_conflict(self) -> None:
+        self.repository.append(self.value)
+
+        with self.assertRaisesRegex(ValuationImprovementInputConflict, "immutable"):
+            self.repository.append(
+                replace(self.value, security_id="security:000002.XSHE")
+            )
+
+    def test_repository_writes_only_v2_but_legacy_remains_read_compatible(self) -> None:
+        with self.assertRaisesRegex(ValueError, "v2"):
+            self.repository.append(bundle())
 
     def test_database_failures_are_translated_without_fixture_fallback(self) -> None:
         self.connection.operational_error = True

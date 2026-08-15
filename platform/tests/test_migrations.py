@@ -91,8 +91,27 @@ class MigrationRunnerTest(unittest.TestCase):
                 "0033_failed_run_reason_guard.sql",
                 "0034_governance_nonblank_fields.sql",
                 "0035_outcome_source_policy.sql",
+                "0036_p5_valuation_bundle_v2.sql",
             ),
         )
+
+    def test_p5_valuation_bundle_v2_is_schema_explicit_and_dataset_linked(self) -> None:
+        sql = (
+            PLATFORM_ROOT / "migrations" / "0036_p5_valuation_bundle_v2.sql"
+        ).read_text(encoding="utf-8")
+        normalized_sql = " ".join(sql.split())
+        for contract in (
+            "ADD COLUMN document_schema_version TEXT",
+            "valuation-input-bundle:v1",
+            "valuation-input-bundle:v2",
+            "bundle_document ? 'document_schema_version'",
+            "bundle_document ? 'valuation_model_suite_inputs'",
+            "CREATE TABLE research.valuation_input_bundle_datasets",
+            "REFERENCES governance.dataset_versions(dataset_version_id)",
+            "BEFORE UPDATE OR DELETE ON research.valuation_input_bundle_datasets",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, normalized_sql)
 
     def test_outcome_source_policy_is_required_and_never_invented_for_old_rows(self) -> None:
         sql = (

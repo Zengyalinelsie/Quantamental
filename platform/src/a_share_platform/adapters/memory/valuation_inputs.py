@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from a_share_platform.ports.valuation_inputs import (
+    VALUATION_INPUT_BUNDLE_V2,
     ValuationImprovementInputBundle,
     ValuationImprovementInputRequest,
 )
@@ -57,6 +58,8 @@ class MemoryValuationImprovementInputRepository(MemoryValuationImprovementInputS
     ) -> ValuationImprovementInputBundle:
         if not isinstance(value, ValuationImprovementInputBundle):
             raise TypeError("value must be a ValuationImprovementInputBundle")
+        if value.document_schema_version != VALUATION_INPUT_BUNDLE_V2:
+            raise ValueError("new frozen valuation input writes require bundle v2")
         existing = self._values.get(value.frozen_key)
         if existing is not None:
             if existing != value:

@@ -27,6 +27,14 @@ from a_share_platform.domain.fundamental_improvement import (
 from a_share_platform.domain.industry_templates import IndustryTemplateId
 from a_share_platform.domain.metrics import MetricUnit
 from a_share_platform.domain.pit import DataTrustState
+from a_share_platform.domain.provider import (
+    CoverageStatus,
+    DataField,
+    LicenseStatus,
+    ProviderFieldPolicy,
+    ProviderTier,
+    ProviderUse,
+)
 from a_share_platform.domain.run_context import DataMode
 from a_share_platform.domain.valuation_expectation_gap import (
     ValuationExpectationMetric,
@@ -37,16 +45,30 @@ from a_share_platform.domain.valuation_expectation_gap import (
     ValuationMetric,
     ValuationMetricInput,
 )
+from a_share_platform.domain.valuation_models import (
+    AnalystRevisionInput,
+    AnalystSourceAttestation,
+    FundamentalAnchorInput,
+    FundamentalAnchorMethod,
+    IndustryValuationPolicy,
+    RelativeReferenceKind,
+    RelativeValuationReferenceInput,
+    UnavailableAnalystRevisionInput,
+    UnavailableFundamentalAnchorInput,
+)
 from a_share_platform.domain.valuation_scenarios import (
     ValuationScenario,
     ValuationScenarioInput,
     ValuationScenarioProvenance,
 )
 from a_share_platform.ports.valuation_inputs import (
+    VALUATION_INPUT_BUNDLE_V1,
+    VALUATION_INPUT_BUNDLE_V2,
     ValuationImprovementInputBundle,
     ValuationImprovementInputConflict,
     ValuationImprovementInputRequest,
     ValuationImprovementInputUnavailable,
+    ValuationModelSuiteInputs,
 )
 
 
@@ -91,6 +113,13 @@ def _optional_decimal(value: object, field_name: str) -> Decimal | None:
         return Decimal(str(value))
     except Exception as error:
         raise ValueError(f"stored {field_name} is not a Decimal") from error
+
+
+def _required_decimal(value: object, field_name: str) -> Decimal:
+    result = _optional_decimal(value, field_name)
+    if result is None:
+        raise ValueError(f"stored {field_name} must not be null")
+    return result
 
 
 def _datetime(value: object, field_name: str) -> datetime:
@@ -421,12 +450,469 @@ def _scenario_document(value: ValuationScenarioInput) -> dict[str, object]:
     }
 
 
+def _industry_policy_document(value: IndustryValuationPolicy) -> dict[str, object]:
+    return {
+        "industry_template_id": value.industry_template_id.value,
+        "anchor_method": value.anchor_method.value,
+        "expectation_metric": value.expectation_metric.value,
+        "relative_metrics": [item.value for item in value.relative_metrics],
+        "policy_version": value.policy_version,
+    }
+
+
+def _industry_policy(value: object) -> IndustryValuationPolicy:
+    document = _mapping(value, "industry valuation policy")
+    return IndustryValuationPolicy(
+        industry_template_id=IndustryTemplateId(
+            str(_required(document, "industry_template_id"))
+        ),
+        anchor_method=FundamentalAnchorMethod(str(_required(document, "anchor_method"))),
+        expectation_metric=ValuationExpectationMetric(
+            str(_required(document, "expectation_metric"))
+        ),
+        relative_metrics=tuple(
+            ValuationMetric(str(item))
+            for item in _array(_required(document, "relative_metrics"), "relative_metrics")
+        ),
+        policy_version=str(_required(document, "policy_version")),
+    )
+
+
+def _relative_reference_document(
+    value: RelativeValuationReferenceInput,
+) -> dict[str, object]:
+    return {
+        "metric": value.metric.value,
+        "reference_kind": value.reference_kind.value,
+        "median_value": None if value.median_value is None else str(value.median_value),
+        "observation_count": value.observation_count,
+        "unit": value.unit.value,
+        "comparable_set_version_id": value.comparable_set_version_id,
+        "provenance": _provenance_document(value.provenance),
+        "data_mode": value.data_mode.value,
+        "trust_state": value.trust_state.value,
+        "decision_time": value.decision_time.isoformat(),
+        "latest_source_available_at": value.latest_source_available_at.isoformat(),
+        "unavailable_reasons": list(value.unavailable_reasons),
+    }
+
+
+def _relative_reference(value: object) -> RelativeValuationReferenceInput:
+    document = _mapping(value, "relative valuation reference")
+    observation_count = _required(document, "observation_count")
+    if not isinstance(observation_count, int) or isinstance(observation_count, bool):
+        raise TypeError("stored observation_count must be an integer")
+    return RelativeValuationReferenceInput(
+        metric=ValuationMetric(str(_required(document, "metric"))),
+        reference_kind=RelativeReferenceKind(str(_required(document, "reference_kind"))),
+        median_value=_optional_decimal(document.get("median_value"), "median_value"),
+        observation_count=observation_count,
+        unit=MetricUnit(str(_required(document, "unit"))),
+        comparable_set_version_id=str(_required(document, "comparable_set_version_id")),
+        provenance=_valuation_provenance(_required(document, "provenance")),
+        data_mode=DataMode(str(_required(document, "data_mode"))),
+        trust_state=DataTrustState(str(_required(document, "trust_state"))),
+        decision_time=_datetime(_required(document, "decision_time"), "decision_time"),
+        latest_source_available_at=_datetime(
+            _required(document, "latest_source_available_at"),
+            "latest_source_available_at",
+        ),
+        unavailable_reasons=_strings(
+            _required(document, "unavailable_reasons"),
+            "unavailable_reasons",
+        ),
+    )
+
+
+def _anchor_document(
+    value: FundamentalAnchorInput | UnavailableFundamentalAnchorInput,
+) -> dict[str, object]:
+    common: dict[str, object] = {
+        "method": value.method.value,
+        "industry_template_id": value.industry_template_id.value,
+        "currency": value.currency,
+        "current_price_unit": value.current_price_unit.value,
+        "base_value_per_share_unit": value.base_value_per_share_unit.value,
+        "rate_unit": value.rate_unit.value,
+        "assumptions": list(value.assumptions),
+        "invalidation_conditions": list(value.invalidation_conditions),
+        "data_mode": value.data_mode.value,
+        "trust_state": value.trust_state.value,
+        "decision_time": value.decision_time.isoformat(),
+        "latest_source_available_at": value.latest_source_available_at.isoformat(),
+    }
+    if isinstance(value, UnavailableFundamentalAnchorInput):
+        return {
+            **common,
+            "availability": "unavailable",
+            "provenances": [_provenance_document(item) for item in value.provenances],
+            "unavailable_reasons": list(value.unavailable_reasons),
+        }
+    return {
+        **common,
+        "availability": "available",
+        "current_price": str(value.current_price),
+        "base_value_per_share_lower": str(value.base_value_per_share_lower),
+        "base_value_per_share_upper": str(value.base_value_per_share_upper),
+        "profitability_lower": (
+            None if value.profitability_lower is None else str(value.profitability_lower)
+        ),
+        "profitability_upper": (
+            None if value.profitability_upper is None else str(value.profitability_upper)
+        ),
+        "discount_rate_lower": str(value.discount_rate_lower),
+        "discount_rate_upper": str(value.discount_rate_upper),
+        "perpetual_growth_lower": str(value.perpetual_growth_lower),
+        "perpetual_growth_upper": str(value.perpetual_growth_upper),
+        "price_provenance": _provenance_document(value.price_provenance),
+        "fundamental_provenance": _provenance_document(value.fundamental_provenance),
+        "assumption_provenance": _provenance_document(value.assumption_provenance),
+    }
+
+
+def _anchor(value: object) -> FundamentalAnchorInput | UnavailableFundamentalAnchorInput:
+    document = _mapping(value, "fundamental anchor input")
+    method = FundamentalAnchorMethod(str(_required(document, "method")))
+    template = IndustryTemplateId(str(_required(document, "industry_template_id")))
+    currency = str(_required(document, "currency"))
+    current_price_unit = MetricUnit(str(_required(document, "current_price_unit")))
+    base_value_unit = MetricUnit(str(_required(document, "base_value_per_share_unit")))
+    rate_unit = MetricUnit(str(_required(document, "rate_unit")))
+    assumptions = _strings(_required(document, "assumptions"), "assumptions")
+    invalidations = _strings(
+        _required(document, "invalidation_conditions"),
+        "invalidation_conditions",
+    )
+    data_mode = DataMode(str(_required(document, "data_mode")))
+    trust_state = DataTrustState(str(_required(document, "trust_state")))
+    decision_time = _datetime(_required(document, "decision_time"), "decision_time")
+    latest_available = _datetime(
+        _required(document, "latest_source_available_at"),
+        "latest_source_available_at",
+    )
+    availability = str(_required(document, "availability"))
+    if availability == "unavailable":
+        return UnavailableFundamentalAnchorInput(
+            method=method,
+            industry_template_id=template,
+            currency=currency,
+            current_price_unit=current_price_unit,
+            base_value_per_share_unit=base_value_unit,
+            rate_unit=rate_unit,
+            assumptions=assumptions,
+            invalidation_conditions=invalidations,
+            provenances=tuple(
+                _valuation_provenance(item)
+                for item in _array(_required(document, "provenances"), "provenances")
+            ),
+            data_mode=data_mode,
+            trust_state=trust_state,
+            decision_time=decision_time,
+            latest_source_available_at=latest_available,
+            unavailable_reasons=_strings(
+                _required(document, "unavailable_reasons"),
+                "unavailable_reasons",
+            ),
+        )
+    if availability != "available":
+        raise ValueError("stored fundamental anchor availability is unknown")
+    return FundamentalAnchorInput(
+        method=method,
+        industry_template_id=template,
+        current_price=_required_decimal(
+            _required(document, "current_price"),
+            "current_price",
+        ),
+        base_value_per_share_lower=_required_decimal(
+            _required(document, "base_value_per_share_lower"),
+            "base_value_per_share_lower",
+        ),
+        base_value_per_share_upper=_required_decimal(
+            _required(document, "base_value_per_share_upper"),
+            "base_value_per_share_upper",
+        ),
+        profitability_lower=_optional_decimal(
+            document.get("profitability_lower"), "profitability_lower"
+        ),
+        profitability_upper=_optional_decimal(
+            document.get("profitability_upper"), "profitability_upper"
+        ),
+        discount_rate_lower=_required_decimal(
+            _required(document, "discount_rate_lower"),
+            "discount_rate_lower",
+        ),
+        discount_rate_upper=_required_decimal(
+            _required(document, "discount_rate_upper"),
+            "discount_rate_upper",
+        ),
+        perpetual_growth_lower=_required_decimal(
+            _required(document, "perpetual_growth_lower"),
+            "perpetual_growth_lower",
+        ),
+        perpetual_growth_upper=_required_decimal(
+            _required(document, "perpetual_growth_upper"),
+            "perpetual_growth_upper",
+        ),
+        current_price_unit=current_price_unit,
+        base_value_per_share_unit=base_value_unit,
+        rate_unit=rate_unit,
+        currency=currency,
+        assumptions=assumptions,
+        invalidation_conditions=invalidations,
+        price_provenance=_valuation_provenance(_required(document, "price_provenance")),
+        fundamental_provenance=_valuation_provenance(
+            _required(document, "fundamental_provenance")
+        ),
+        assumption_provenance=_valuation_provenance(
+            _required(document, "assumption_provenance")
+        ),
+        data_mode=data_mode,
+        trust_state=trust_state,
+        decision_time=decision_time,
+        latest_source_available_at=latest_available,
+    )
+
+
+def _provider_policy_document(value: ProviderFieldPolicy) -> dict[str, object]:
+    return {
+        "provider_id": value.provider_id,
+        "field": value.field.value,
+        "tier": value.tier.value,
+        "markets": sorted(value.markets),
+        "permitted_uses": sorted(item.value for item in value.permitted_uses),
+        "license_status": value.license_status.value,
+        "trust_ceiling": value.trust_ceiling.value,
+        "coverage": value.coverage.value,
+        "warning": value.warning,
+        "retention_prohibited": value.retention_prohibited,
+    }
+
+
+def _provider_policy(value: object) -> ProviderFieldPolicy:
+    document = _mapping(value, "provider field policy")
+    retention = _required(document, "retention_prohibited")
+    if not isinstance(retention, bool):
+        raise TypeError("stored retention_prohibited must be a boolean")
+    return ProviderFieldPolicy(
+        provider_id=str(_required(document, "provider_id")),
+        field=DataField(str(_required(document, "field"))),
+        tier=ProviderTier(str(_required(document, "tier"))),
+        markets=frozenset(_strings(_required(document, "markets"), "markets")),
+        permitted_uses=frozenset(
+            ProviderUse(item)
+            for item in _strings(_required(document, "permitted_uses"), "permitted_uses")
+        ),
+        license_status=LicenseStatus(str(_required(document, "license_status"))),
+        trust_ceiling=DataTrustState(str(_required(document, "trust_ceiling"))),
+        coverage=CoverageStatus(str(_required(document, "coverage"))),
+        warning=str(_required(document, "warning")),
+        retention_prohibited=retention,
+    )
+
+
+def _attestation_document(value: AnalystSourceAttestation) -> dict[str, object]:
+    return {
+        "attestation_id": value.attestation_id,
+        "provider_policy": _provider_policy_document(value.provider_policy),
+        "market": value.market,
+        "provider_use": value.provider_use.value,
+        "source_policy_version": value.source_policy_version,
+        "license_evidence_id": value.license_evidence_id,
+        "approval_id": value.approval_id,
+        "qualified_at": value.qualified_at.isoformat(),
+        "valid_until": None if value.valid_until is None else value.valid_until.isoformat(),
+    }
+
+
+def _attestation(value: object) -> AnalystSourceAttestation:
+    document = _mapping(value, "analyst source attestation")
+    return AnalystSourceAttestation(
+        attestation_id=str(_required(document, "attestation_id")),
+        provider_policy=_provider_policy(_required(document, "provider_policy")),
+        market=str(_required(document, "market")),
+        provider_use=ProviderUse(str(_required(document, "provider_use"))),
+        source_policy_version=str(_required(document, "source_policy_version")),
+        license_evidence_id=str(_required(document, "license_evidence_id")),
+        approval_id=str(_required(document, "approval_id")),
+        qualified_at=_datetime(_required(document, "qualified_at"), "qualified_at"),
+        valid_until=(
+            None
+            if document.get("valid_until") is None
+            else _datetime(document["valid_until"], "valid_until")
+        ),
+    )
+
+
+def _analyst_document(
+    value: AnalystRevisionInput | UnavailableAnalystRevisionInput,
+) -> dict[str, object]:
+    common: dict[str, object] = {
+        "expectation_metric": value.expectation_metric.value,
+        "unit": value.unit.value,
+        "data_mode": value.data_mode.value,
+        "trust_state": value.trust_state.value,
+        "decision_time": value.decision_time.isoformat(),
+        "latest_source_available_at": (
+            None
+            if value.latest_source_available_at is None
+            else value.latest_source_available_at.isoformat()
+        ),
+        "unavailable_reasons": list(value.unavailable_reasons),
+    }
+    if isinstance(value, UnavailableAnalystRevisionInput):
+        return {
+            **common,
+            "availability": "unavailable",
+            "provenances": [_provenance_document(item) for item in value.provenances],
+        }
+    return {
+        **common,
+        "availability": "available",
+        "current_lower": None if value.current_lower is None else str(value.current_lower),
+        "current_upper": None if value.current_upper is None else str(value.current_upper),
+        "prior_lower": None if value.prior_lower is None else str(value.prior_lower),
+        "prior_upper": None if value.prior_upper is None else str(value.prior_upper),
+        "consensus_definition_version": value.consensus_definition_version,
+        "target_period_end": value.target_period_end.isoformat(),
+        "forecast_horizon_days": value.forecast_horizon_days,
+        "current_snapshot_at": value.current_snapshot_at.isoformat(),
+        "prior_snapshot_at": value.prior_snapshot_at.isoformat(),
+        "source_attestation": (
+            None
+            if value.source_attestation is None
+            else _attestation_document(value.source_attestation)
+        ),
+        "current_provider_id": value.current_provider_id,
+        "prior_provider_id": value.prior_provider_id,
+        "current_provenance": _provenance_document(value.current_provenance),
+        "prior_provenance": _provenance_document(value.prior_provenance),
+    }
+
+
+def _analyst(value: object) -> AnalystRevisionInput | UnavailableAnalystRevisionInput:
+    document = _mapping(value, "analyst revision input")
+    metric = ValuationExpectationMetric(str(_required(document, "expectation_metric")))
+    unit = MetricUnit(str(_required(document, "unit")))
+    data_mode = DataMode(str(_required(document, "data_mode")))
+    trust_state = DataTrustState(str(_required(document, "trust_state")))
+    decision_time = _datetime(_required(document, "decision_time"), "decision_time")
+    latest_available = (
+        None
+        if document.get("latest_source_available_at") is None
+        else _datetime(
+            document["latest_source_available_at"],
+            "latest_source_available_at",
+        )
+    )
+    reasons = _strings(
+        _required(document, "unavailable_reasons"),
+        "unavailable_reasons",
+    )
+    availability = str(_required(document, "availability"))
+    if availability == "unavailable":
+        return UnavailableAnalystRevisionInput(
+            expectation_metric=metric,
+            unit=unit,
+            provenances=tuple(
+                _valuation_provenance(item)
+                for item in _array(_required(document, "provenances"), "provenances")
+            ),
+            data_mode=data_mode,
+            trust_state=trust_state,
+            decision_time=decision_time,
+            latest_source_available_at=latest_available,
+            unavailable_reasons=reasons,
+        )
+    if availability != "available":
+        raise ValueError("stored analyst revision availability is unknown")
+    horizon = _required(document, "forecast_horizon_days")
+    if not isinstance(horizon, int) or isinstance(horizon, bool):
+        raise TypeError("stored forecast_horizon_days must be an integer")
+    attestation = document.get("source_attestation")
+    if latest_available is None:
+        raise ValueError("available analyst revision requires latest_source_available_at")
+    return AnalystRevisionInput(
+        expectation_metric=metric,
+        current_lower=_optional_decimal(document.get("current_lower"), "current_lower"),
+        current_upper=_optional_decimal(document.get("current_upper"), "current_upper"),
+        prior_lower=_optional_decimal(document.get("prior_lower"), "prior_lower"),
+        prior_upper=_optional_decimal(document.get("prior_upper"), "prior_upper"),
+        unit=unit,
+        consensus_definition_version=str(
+            _required(document, "consensus_definition_version")
+        ),
+        target_period_end=_date(_required(document, "target_period_end"), "target_period_end"),
+        forecast_horizon_days=horizon,
+        current_snapshot_at=_datetime(
+            _required(document, "current_snapshot_at"), "current_snapshot_at"
+        ),
+        prior_snapshot_at=_datetime(
+            _required(document, "prior_snapshot_at"), "prior_snapshot_at"
+        ),
+        source_attestation=None if attestation is None else _attestation(attestation),
+        current_provider_id=str(_required(document, "current_provider_id")),
+        prior_provider_id=str(_required(document, "prior_provider_id")),
+        current_provenance=_valuation_provenance(
+            _required(document, "current_provenance")
+        ),
+        prior_provenance=_valuation_provenance(_required(document, "prior_provenance")),
+        data_mode=data_mode,
+        trust_state=trust_state,
+        decision_time=decision_time,
+        latest_source_available_at=latest_available,
+        unavailable_reasons=reasons,
+    )
+
+
+def _suite_document(value: ValuationModelSuiteInputs) -> dict[str, object]:
+    return {
+        "industry_policy": _industry_policy_document(value.industry_policy),
+        "relative_references": [
+            _relative_reference_document(item) for item in value.relative_references
+        ],
+        "fundamental_anchor_input": _anchor_document(value.fundamental_anchor_input),
+        "analyst_revision_input": _analyst_document(value.analyst_revision_input),
+        "relative_model_version": value.relative_model_version,
+        "fundamental_anchor_model_version": value.fundamental_anchor_model_version,
+        "implied_expectation_model_version": value.implied_expectation_model_version,
+        "analyst_revision_model_version": value.analyst_revision_model_version,
+        "bundle_compiler_version": value.bundle_compiler_version,
+    }
+
+
+def _suite(value: object) -> ValuationModelSuiteInputs:
+    document = _mapping(value, "valuation model suite inputs")
+    return ValuationModelSuiteInputs(
+        industry_policy=_industry_policy(_required(document, "industry_policy")),
+        relative_references=tuple(
+            _relative_reference(item)
+            for item in _array(
+                _required(document, "relative_references"),
+                "relative_references",
+            )
+        ),
+        fundamental_anchor_input=_anchor(_required(document, "fundamental_anchor_input")),
+        analyst_revision_input=_analyst(_required(document, "analyst_revision_input")),
+        relative_model_version=str(_required(document, "relative_model_version")),
+        fundamental_anchor_model_version=str(
+            _required(document, "fundamental_anchor_model_version")
+        ),
+        implied_expectation_model_version=str(
+            _required(document, "implied_expectation_model_version")
+        ),
+        analyst_revision_model_version=str(
+            _required(document, "analyst_revision_model_version")
+        ),
+        bundle_compiler_version=str(_required(document, "bundle_compiler_version")),
+    )
+
+
 def bundle_document(value: ValuationImprovementInputBundle) -> dict[str, object]:
     """Return a complete canonical JSON-compatible frozen bundle document."""
 
     if not isinstance(value, ValuationImprovementInputBundle):
         raise TypeError("value must be a ValuationImprovementInputBundle")
-    return {
+    document: dict[str, object] = {
         "bundle_version_id": value.bundle_version_id,
         "security_id": value.security_id,
         "decision_time": value.decision_time.isoformat(),
@@ -442,8 +928,6 @@ def bundle_document(value: ValuationImprovementInputBundle) -> dict[str, object]
         "valuation_metric_inputs": [
             _valuation_metric_document(item) for item in value.valuation_metric_inputs
         ],
-        "market_implied": _expectation_document(value.market_implied),
-        "fundamental_anchor": _expectation_document(value.fundamental_anchor),
         "valuation_exposures": {
             "industry_code": value.valuation_exposures.industry_code,
             "log_market_cap": (
@@ -477,12 +961,36 @@ def bundle_document(value: ValuationImprovementInputBundle) -> dict[str, object]
         },
         "scenario_inputs": [_scenario_document(item) for item in value.scenario_inputs],
     }
+    if value.document_schema_version == VALUATION_INPUT_BUNDLE_V1:
+        assert value.market_implied is not None and value.fundamental_anchor is not None
+        document.update(
+            {
+                "market_implied": _expectation_document(value.market_implied),
+                "fundamental_anchor": _expectation_document(value.fundamental_anchor),
+            }
+        )
+        return document
+    if value.document_schema_version != VALUATION_INPUT_BUNDLE_V2:
+        raise ValueError(f"unknown valuation input bundle schema: {value.document_schema_version}")
+    assert value.valuation_model_suite_inputs is not None
+    document.update(
+        {
+            "document_schema_version": VALUATION_INPUT_BUNDLE_V2,
+            "valuation_model_suite_inputs": _suite_document(
+                value.valuation_model_suite_inputs
+            ),
+        }
+    )
+    return document
 
 
 def bundle_from_document(value: object) -> ValuationImprovementInputBundle:
     """Reconstruct domain values so every invariant is revalidated on read."""
 
     document = _mapping(value, "valuation input bundle")
+    schema_version = str(document.get("document_schema_version", VALUATION_INPUT_BUNDLE_V1))
+    if schema_version not in {VALUATION_INPUT_BUNDLE_V1, VALUATION_INPUT_BUNDLE_V2}:
+        raise ValueError(f"unknown valuation input bundle schema: {schema_version}")
     valuation_exposures = _mapping(
         _required(document, "valuation_exposures"), "valuation_exposures"
     )
@@ -516,8 +1024,16 @@ def bundle_from_document(value: object) -> ValuationImprovementInputBundle:
                 "valuation_metric_inputs",
             )
         ),
-        market_implied=_expectation(_required(document, "market_implied")),
-        fundamental_anchor=_expectation(_required(document, "fundamental_anchor")),
+        market_implied=(
+            _expectation(_required(document, "market_implied"))
+            if schema_version == VALUATION_INPUT_BUNDLE_V1
+            else None
+        ),
+        fundamental_anchor=(
+            _expectation(_required(document, "fundamental_anchor"))
+            if schema_version == VALUATION_INPUT_BUNDLE_V1
+            else None
+        ),
         valuation_exposures=ValuationExposures(
             industry_code=(
                 None
@@ -549,6 +1065,12 @@ def bundle_from_document(value: object) -> ValuationImprovementInputBundle:
         scenario_inputs=tuple(
             _scenario(item)
             for item in _array(_required(document, "scenario_inputs"), "scenario_inputs")
+        ),
+        document_schema_version=schema_version,
+        valuation_model_suite_inputs=(
+            None
+            if schema_version == VALUATION_INPUT_BUNDLE_V1
+            else _suite(_required(document, "valuation_model_suite_inputs"))
         ),
     )
 
@@ -608,9 +1130,11 @@ class PostgresValuationImprovementInputRepository:
     ) -> ValuationImprovementInputBundle:
         if not isinstance(value, ValuationImprovementInputBundle):
             raise TypeError("value must be a ValuationImprovementInputBundle")
+        if value.document_schema_version != VALUATION_INPUT_BUNDLE_V2:
+            raise ValueError("new frozen valuation input writes require bundle v2")
         try:
             with self._connection_factory() as connection, connection.transaction():
-                existing = self._load(connection, self._request_for(value))
+                existing = self._load_by_id(connection, value.bundle_version_id)
                 if existing is not None:
                     if bundle_content_hash(existing) != bundle_content_hash(value):
                         raise ValuationImprovementInputConflict(
@@ -623,18 +1147,28 @@ class PostgresValuationImprovementInputRepository:
                     INSERT INTO research.valuation_input_bundles (
                         bundle_version_id, security_id, decision_time, content_hash,
                         data_mode, trust_state, latest_source_available_at,
-                        dataset_version_ids, bundle_document
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        document_schema_version, dataset_version_ids, bundle_document
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (bundle_version_id) DO NOTHING
                     """,
-                    (*row[:7], _json_parameter(row[7]), _json_parameter(row[8])),
+                    (*row[:8], _json_parameter(row[8]), _json_parameter(row[9])),
                 )
-                stored = self._load(connection, self._request_for(value))
+                stored = self._load_by_id(connection, value.bundle_version_id)
                 if stored is None:
                     raise RuntimeError("valuation input bundle insert was not observable")
                 if bundle_content_hash(stored) != bundle_content_hash(value):
                     raise ValuationImprovementInputConflict(
                         f"immutable valuation input bundle conflict: {value.bundle_version_id}"
+                    )
+                for dataset_version_id in value.dataset_version_ids:
+                    connection.execute(
+                        """
+                        INSERT INTO research.valuation_input_bundle_datasets (
+                            bundle_version_id, dataset_version_id
+                        ) VALUES (%s, %s)
+                        ON CONFLICT (bundle_version_id, dataset_version_id) DO NOTHING
+                        """,
+                        (value.bundle_version_id, dataset_version_id),
                     )
                 return stored
         except psycopg.OperationalError as error:
@@ -674,7 +1208,7 @@ class PostgresValuationImprovementInputRepository:
         return """
             SELECT bundle_version_id, security_id, decision_time, content_hash,
                    data_mode, trust_state, latest_source_available_at,
-                   dataset_version_ids, bundle_document
+                   document_schema_version, dataset_version_ids, bundle_document
             FROM research.valuation_input_bundles
         """
 
@@ -700,6 +1234,17 @@ class PostgresValuationImprovementInputRepository:
         ).fetchone()
         return None if row is None else self.from_row(row)
 
+    def _load_by_id(
+        self,
+        connection: Connection,
+        bundle_version_id: str,
+    ) -> ValuationImprovementInputBundle | None:
+        row = connection.execute(
+            self._select() + " WHERE bundle_version_id = %s",
+            (bundle_version_id,),
+        ).fetchone()
+        return None if row is None else self.from_row(row)
+
     @staticmethod
     def to_row(value: ValuationImprovementInputBundle) -> tuple[object, ...]:
         return (
@@ -710,15 +1255,16 @@ class PostgresValuationImprovementInputRepository:
             value.data_mode.value,
             value.trust_state.value,
             value.latest_source_available_at,
+            value.document_schema_version,
             list(value.dataset_version_ids),
             bundle_document(value),
         )
 
     @staticmethod
     def from_row(row: Sequence[object]) -> ValuationImprovementInputBundle:
-        if len(row) != 9:
+        if len(row) != 10:
             raise ValueError("stored valuation input bundle row has an invalid shape")
-        value = bundle_from_document(row[8])
+        value = bundle_from_document(row[9])
         expected = (
             value.bundle_version_id,
             value.security_id,
@@ -726,6 +1272,7 @@ class PostgresValuationImprovementInputRepository:
             value.data_mode.value,
             value.trust_state.value,
             value.latest_source_available_at,
+            value.document_schema_version,
             tuple(value.dataset_version_ids),
         )
         stored = (
@@ -735,7 +1282,8 @@ class PostgresValuationImprovementInputRepository:
             str(row[4]),
             str(row[5]),
             cast(datetime, row[6]),
-            tuple(str(item) for item in _array(row[7], "dataset_version_ids")),
+            str(row[7]),
+            tuple(str(item) for item in _array(row[8], "dataset_version_ids")),
         )
         if stored != expected:
             raise ValueError("stored valuation input bundle columns do not match document")

@@ -30,6 +30,7 @@ from a_share_platform.domain.valuation_models import (
     FundamentalAnchorMethod,
     RelativeReferenceKind,
     RelativeValuationReferenceInput,
+    UnavailableAnalystRevisionInput,
     UnavailableFundamentalAnchorInput,
     ValuationModelStatus,
     analyst_revision_model_v0,
@@ -440,6 +441,29 @@ class FundamentalAnchorAndImpliedExpectationV0Test(unittest.TestCase):
 
 
 class AnalystRevisionModelV0Test(unittest.TestCase):
+    def test_unavailable_analyst_input_does_not_invent_provider_or_snapshot_identity(self) -> None:
+        value = UnavailableAnalystRevisionInput(
+            expectation_metric=ValuationExpectationMetric.GROWTH,
+            unit=MetricUnit.RATIO,
+            provenances=(),
+            data_mode=DataMode.CURRENT_RESEARCH,
+            trust_state=DataTrustState.NORMALIZED_CURRENT,
+            decision_time=DECISION_TIME,
+            latest_source_available_at=None,
+            unavailable_reasons=("qualified analyst source unavailable",),
+        )
+
+        result = analyst_revision_model_v0().calculate(value)
+
+        self.assertIs(result.status, ValuationModelStatus.UNAVAILABLE)
+        self.assertIsNone(result.current_provider_id)
+        self.assertIsNone(result.prior_provider_id)
+        self.assertIsNone(result.current_snapshot_at)
+        self.assertIsNone(result.prior_snapshot_at)
+        self.assertIsNone(result.consensus_definition_version)
+        self.assertIsNone(result.target_period_end)
+        self.assertIsNone(result.provenance)
+
     def test_revision_interval_and_midpoint_match_hand_calculation(self) -> None:
         result = analyst_revision_model_v0().calculate(analyst(available=True))
 
