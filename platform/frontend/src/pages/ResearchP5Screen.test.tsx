@@ -238,6 +238,7 @@ describe('ResearchP5Screen', () => {
     })))
     renderResearch('security')
     expect(await screen.findByText('尚无可展示的 InvestmentView')).toBeInTheDocument()
+    expect(screen.getByText('TRUST pit_verified')).toBeInTheDocument()
     expect(screen.getByText(/全局证券搜索输入真实代码或名称/)).toBeInTheDocument()
     expect(screen.getByText('Alpha Model 当前不可用')).toBeInTheDocument()
   })
@@ -263,14 +264,26 @@ describe('ResearchP5Screen', () => {
   })
 
   it('renders a ready InvestmentView and exact approved Alpha package', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => payload({
-      status: 'ready', blockers: [], screen: screenProjection,
-      investment_view: investmentView, alpha_model: alphaReady,
-    })))
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => (
+      String(input) === '/api/identity'
+        ? {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            data: { subject_id: 'anonymous', roles: [], permissions: ['read_public'] },
+            context,
+          }),
+        } as Response
+        : payload({
+          status: 'ready', blockers: [], screen: screenProjection,
+          investment_view: investmentView, alpha_model: alphaReady,
+        })
+    )))
     renderResearch('security')
     expect(await screen.findByRole('heading', { name: '宇通客车 · 600066' })).toBeInTheDocument()
     expect(screen.getByTestId('approved-alpha-model')).toBeInTheDocument()
     expect(screen.getByText('factor-version:quality:v1')).toBeInTheDocument()
+    expect(await screen.findByText('Frozen Artifact 下载受限')).toBeInTheDocument()
   })
 
   it('passes the global securityQuery unchanged for server-side parsing', async () => {

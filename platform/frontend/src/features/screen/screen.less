@@ -150,6 +150,10 @@
   border: 1px solid @secondary-border;
 }
 
+.screenMobileRecordList {
+  display: none;
+}
+
 .screenRankingRow--selected > td {
   background: #f1f5fb !important;
 }
@@ -322,5 +326,70 @@
   .screenIndustryPeers {
     border-top: 1px solid @secondary-border;
     border-left: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .screenPanelHeader,
+  .alphaReadyHeader,
+  .screenSelectedSecurity,
+  .screenIndustryPeers {
+    padding: 12px;
+  }
+
+  .screenRankingTable {
+    display: none;
+  }
+
+  .screenMobileRecordList {
+    display: grid;
+    gap: 8px;
+    margin: 0 12px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .screenMobileRecordList li {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid @secondary-border;
+    background: @container;
+  }
+
+  .screenMobileRecord--selected {
+    border-left: 3px solid @primary !important;
+    background: #f1f5fb !important;
+  }
+
+  .screenMobileRecordList header,
+  .screenMobileRecord__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+  }
+
+  .screenMobileRecordList header span,
+  .screenMobileRecord__metrics span,
+  .screenMobileRecordList p {
+    color: @secondary-text;
+    font-size: 10px;
+  }
+
+  .screenMobileRecordList p {
+    margin: 0;
+  }
+
+  .screenMobileRecordList code {
+    color: @tertiary-text;
+    font-size: 9px;
+    overflow-wrap: anywhere;
+  }
+
+  .screenMobileRecord__bindings {
+    display: grid;
+    gap: 3px;
   }
 }

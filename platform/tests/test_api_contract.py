@@ -2,7 +2,8 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-from a_share_platform.api.app import create_app
+from a_share_platform.api.app import anonymous_principal, create_app
+from a_share_platform.application.permissions import Principal, Role
 from tests.market_data_fixtures import build_market_data_fixture
 from tests.security_master_fixtures import build_security_master_fixture
 from tests.universe_fixtures import build_universe_fixture
@@ -65,6 +66,38 @@ class ApiContractTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["data"]["subject_id"], "anonymous")
         self.assertEqual(response.json()["data"]["roles"], [])
+        self.assertEqual(response.json()["data"]["permissions"], ["read_public"])
+        self.assertNotIn("read_artifact", response.json()["data"]["permissions"])
+
+    def test_identity_permissions_are_derived_from_the_server_principal(self) -> None:
+        app = create_app()
+        app.dependency_overrides[anonymous_principal] = lambda: Principal(
+            "subject:researcher",
+            frozenset({Role.RESEARCHER}),
+        )
+
+        payload = TestClient(app).get("/api/identity").json()["data"]
+
+        self.assertEqual(payload["subject_id"], "subject:researcher")
+        self.assertEqual(payload["roles"], ["researcher"])
+        self.assertIn("read_artifact", payload["permissions"])
+        self.assertNotIn("send_order", payload["permissions"])
+
+    def test_identity_openapi_contract_is_strict_and_explicit(self) -> None:
+        schema = self.client.get("/openapi.json").json()
+        response_schema = schema["paths"]["/api/identity"]["get"]["responses"]["200"][
+            "content"
+        ]["application/json"]["schema"]
+        self.assertEqual(
+            response_schema,
+            {"$ref": "#/components/schemas/IdentityEnvelope"},
+        )
+        identity_schema = schema["components"]["schemas"]["IdentityProjection"]
+        self.assertEqual(
+            identity_schema["required"],
+            ["subject_id", "roles", "permissions"],
+        )
+        self.assertFalse(identity_schema["additionalProperties"])
 
     def test_openapi_exposes_only_permission_guarded_research_write_endpoints(self) -> None:
         schema = self.client.get("/openapi.json").json()

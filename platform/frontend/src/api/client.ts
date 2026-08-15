@@ -3,6 +3,7 @@ import type {
   AlphaModelReadinessProjection,
   ScreenRankingProjection,
 } from '../features/screen/screenProjection'
+import type { IdentityProjection } from './schema'
 
 export interface ResponseContext {
   as_of: string
@@ -35,6 +36,18 @@ export interface ResearchWorkspaceData {
   screen: ScreenRankingProjection | null
   investment_view: InvestmentViewProjection | null
   alpha_model: AlphaModelReadinessProjection
+}
+
+export interface ArtifactMetadataProjection {
+  artifact_id: string
+  run_id: string
+  content_hash: string
+  media_type: string
+  created_at: string
+  producer_context: {
+    data_mode: ResponseContext['data_mode']
+    deployment_stage: ResponseContext['deployment_stage']
+  }
 }
 
 export interface UniverseVersion {
@@ -368,6 +381,17 @@ export function getResearchWorkspace(securityId?: string, signal?: AbortSignal) 
     ? ''
     : `?security_id=${encodeURIComponent(securityId)}`
   return getEnvelope<ResearchWorkspaceData>(`/api/research/workspace${query}`, signal)
+}
+
+export function getIdentity(signal?: AbortSignal) {
+  return getEnvelope<IdentityProjection>('/api/identity', signal)
+}
+
+export function getArtifactMetadata(artifactId: string, signal?: AbortSignal) {
+  return getEnvelope<ArtifactMetadataProjection>(
+    `/api/artifacts/${encodeURIComponent(artifactId)}`,
+    signal,
+  )
 }
 
 export function getRawEvidence(rawObjectId: string, signal?: AbortSignal) {

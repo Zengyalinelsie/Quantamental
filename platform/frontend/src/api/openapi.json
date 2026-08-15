@@ -1141,6 +1141,73 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "IdentityEnvelope": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/ResponseContext"
+          },
+          "data": {
+            "$ref": "#/components/schemas/IdentityProjection"
+          }
+        },
+        "required": [
+          "data",
+          "context"
+        ],
+        "title": "IdentityEnvelope",
+        "type": "object"
+      },
+      "IdentityProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "permissions": {
+            "items": {
+              "enum": [
+                "read_public",
+                "read_artifact",
+                "create_experiment",
+                "manage_data",
+                "approve_research",
+                "approve_portfolio",
+                "send_order",
+                "administer"
+              ],
+              "type": "string"
+            },
+            "title": "Permissions",
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "enum": [
+                "viewer",
+                "researcher",
+                "data_operator",
+                "reviewer",
+                "portfolio_manager",
+                "trader",
+                "administrator",
+                "agent"
+              ],
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "subject_id": {
+            "title": "Subject Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject_id",
+          "roles",
+          "permissions"
+        ],
+        "title": "IdentityProjection",
+        "type": "object"
+      },
       "IndustryPeerProjection": {
         "additionalProperties": false,
         "properties": {
@@ -3758,7 +3825,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Envelope"
+                  "$ref": "#/components/schemas/IdentityEnvelope"
                 }
               }
             },

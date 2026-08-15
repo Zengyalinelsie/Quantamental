@@ -1,5 +1,6 @@
-import { Alert, Descriptions, Empty, Table, Tag } from 'antd'
+import { Alert, Button, Descriptions, Drawer, Empty, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { useEffect, useState } from 'react'
 
 import type {
   IndustryPeerProjection,
@@ -51,6 +52,7 @@ const columns: ColumnsType<ScreenRankingRowProjection> = [
   {
     title: 'Rank',
     key: 'rank',
+    fixed: 'left',
     width: 72,
     render: (_, row) => <strong className="screenTabularValue">{row.rank.display}</strong>,
   },
@@ -125,6 +127,34 @@ const columns: ColumnsType<ScreenRankingRowProjection> = [
   },
 ]
 
+const compactColumnKeys = new Set([
+  'rank',
+  'security',
+  'score',
+  'expected_return',
+  'confidence',
+])
+
+function useCompactScreenTable() {
+  const query = '(max-width: 1100px) and (min-width: 821px)'
+  const [compact, setCompact] = useState(() => (
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia(query).matches
+      : false
+  ))
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return undefined
+    const media = window.matchMedia(query)
+    const update = () => setCompact(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  return compact
+}
+
 function PeerList({ peers }: { peers: IndustryPeerProjection[] }) {
   if (peers.length === 0) {
     return <Empty description="服务端未返回合格行业 peers" image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -148,6 +178,35 @@ function PeerList({ peers }: { peers: IndustryPeerProjection[] }) {
 }
 
 export function ScreenRankingPanel({ projection }: ScreenRankingPanelProps) {
+  const compactTable = useCompactScreenTable()
+  const [detailSnapshotId, setDetailSnapshotId] = useState<string | null>(null)
+  const detailRow = projection.rows.find((row) => row.snapshot_id === detailSnapshotId) ?? null
+
+  useEffect(() => {
+    if (detailSnapshotId !== null && detailRow === null) {
+      setDetailSnapshotId(null)
+    }
+  }, [detailRow, detailSnapshotId])
+
+  const compactColumns: ColumnsType<ScreenRankingRowProjection> = [
+    ...columns.filter((column) => compactColumnKeys.has(String(column.key))),
+    {
+      title: 'Details',
+      key: 'details',
+      width: 90,
+      render: (_, row) => (
+        <Button
+          aria-label={`查看${row.security.display_name}详情`}
+          onClick={() => setDetailSnapshotId(row.snapshot_id)}
+          size="small"
+          type="link"
+        >
+          详情
+        </Button>
+      ),
+    },
+  ]
+
   return (
     <section className="screenRankingPanel">
       <header className="screenPanelHeader">
@@ -192,7 +251,7 @@ export function ScreenRankingPanel({ projection }: ScreenRankingPanelProps) {
 
       <div className="screenRankingTable">
         <Table
-          columns={columns}
+          columns={compactTable ? compactColumns : columns}
           dataSource={projection.rows}
           onRow={(row) => ({
             'aria-label': `screen-ranking-row-${row.snapshot_id}`,
@@ -200,10 +259,76 @@ export function ScreenRankingPanel({ projection }: ScreenRankingPanelProps) {
           pagination={false}
           rowClassName={(row) => row.selected ? 'screenRankingRow--selected' : ''}
           rowKey="snapshot_id"
-          scroll={{ x: 1400 }}
+          scroll={{ x: compactTable ? 760 : 1400 }}
           size="small"
         />
       </div>
+
+      <ul className="screenMobileRecordList" data-testid="screen-mobile-record-list">
+        {projection.rows.map((row) => (
+          <li
+            className={row.selected ? 'screenMobileRecord--selected' : ''}
+            key={row.snapshot_id}
+          >
+            <header>
+              <strong>{row.security.display_name} · {row.security.symbol}</strong>
+              <span>Rank {row.rank.display}</span>
+            </header>
+            <div className="screenMobileRecord__metrics">
+              {row.previous_rank.display === null ? (
+                <span>Previous <NullableRank value={row.previous_rank} /></span>
+              ) : (
+                <span>Previous {row.previous_rank.display}</span>
+              )}
+              <span>Δ Rank <RankChange value={row.rank_change} /></span>
+              <span>Score {row.score.display}</span>
+              <span>Expected return {row.expected_return.display}</span>
+              <span>Confidence {row.confidence.display}</span>
+              <span>Trust {row.trust_state}</span>
+            </div>
+            <p>{row.industry.display_name} · {row.industry.code} · {row.security.exchange}</p>
+            <div className="screenMobileRecord__bindings">
+              <code>{row.snapshot_id}</code>
+              <code>{row.investment_view_id}</code>
+              <code>{row.content_hash}</code>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <Drawer
+        aria-label={detailRow
+          ? `${detailRow.security.display_name} · ${detailRow.security.symbol}`
+          : 'Screen row detail'}
+        onClose={() => setDetailSnapshotId(null)}
+        open={detailRow !== null}
+        title={detailRow
+          ? `${detailRow.security.display_name} · ${detailRow.security.symbol}`
+          : 'Screen row detail'}
+        size={380}
+      >
+        {detailRow ? (
+          <Descriptions bordered column={1} size="small">
+            <Descriptions.Item label="Industry">
+              {detailRow.industry.display_name} · <code>{detailRow.industry.code}</code>
+            </Descriptions.Item>
+            <Descriptions.Item label="Previous rank">
+              <NullableRank value={detailRow.previous_rank} />
+            </Descriptions.Item>
+            <Descriptions.Item label="Rank change">
+              <RankChange value={detailRow.rank_change} />
+            </Descriptions.Item>
+            <Descriptions.Item label="Trust">{detailRow.trust_state}</Descriptions.Item>
+            <Descriptions.Item label="Snapshot"><code>{detailRow.snapshot_id}</code></Descriptions.Item>
+            <Descriptions.Item label="InvestmentView">
+              <code>{detailRow.investment_view_id}</code>
+            </Descriptions.Item>
+            <Descriptions.Item label="Content hash">
+              <code>{detailRow.content_hash}</code>
+            </Descriptions.Item>
+          </Descriptions>
+        ) : null}
+      </Drawer>
 
       <Descriptions bordered className="screenLineage" column={{ xs: 1, sm: 1, md: 2 }} size="small">
         <Descriptions.Item label="Decision time">{projection.decision_time}</Descriptions.Item>

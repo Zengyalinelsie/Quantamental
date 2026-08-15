@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`；Task 1–3、Task 4A 已验证，Task 4B/5 待完成
+> 状态：`in_progress`；Task 1–3、Task 4A 已验证，Task 4B 待完成，Task 5 `implemented_unverified`
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -68,14 +68,14 @@
 
 状态：`verified`。PostgreSQL repository、0032–0034 数据库约束、精确 lookup、Artifact+lineage 单事务、
 私有 metadata/download API、严格 OpenAPI、受控本地 reader 和真实 PostgreSQL rollback smoke 已完成。
-浏览器入口仍属于 Task 5，不以本 Task 的 API 完成冒充 UI 完成。
+页面入口由 Task 5 接入；四档浏览器视觉证据仍 pending，不以 API 或组件测试冒充 UI 验收。
 
 预计文件：
 
 - `platform/tests/test_research_workspace_api.py` 或新增 `test_investment_view_artifact_api.py`；
 - `platform/src/a_share_platform/api/app.py`、`api/schemas.py`；
 - `platform/src/a_share_platform/adapters/postgres/governance.py`（若现有能力不足）；
-- 前端 client/schema 和页面入口移至 Task 5，避免在没有可信身份提供者时做伪可用按钮。
+- Task 5 的前端 client 和页面入口（通过 server permission 后才开放下载）。
 
 先写缺失、无权限、成功读取和 immutable cache/header 合同，再接只读元数据/下载入口。
 
@@ -131,6 +131,19 @@ append-only persistence 和 orchestration；不得另建可绕过 bundle ID/deci
 按行业口径、相对估值、锚定估值、隐含预期、趋势/加速度、一次性项目逐个纯函数红绿；每项含单位、缺失、异常值和手算 fixture。
 
 ### Task 5：P5 产品页和响应式
+
+状态：`implemented_unverified`。Artifact ID 为 null 时显示未生成；非空时先读取服务端 identity 的
+`read_artifact` 权限，再读取 exact metadata，只有权限、元数据和响应/请求 Artifact ID 完全一致才
+暴露 download URL。Identity 使用严格 OpenAPI Envelope，前端消费生成类型；匿名默认保持禁用，不能
+用会返回 403 的链接冒充可下载。Screen 在 320 px 使用 server-projected 等价记录卡，不重排或重算
+rank change，并保留 score/previous rank/trust/InvestmentView/hash；1024 使用文字详情抽屉承载低
+优先字段，768 横向滚动并冻结首列。1024/768/320 已实现导航、上下文文字保留、表格/记录卡和
+InvestmentView 重排，空/部分态显式保留 Trust。组件/API 合同测试已通过；当前浏览器控制没有可
+操作页面 tab，因此 1440/1024/768/320 运行时视觉验收仍为 `pending`，不能把实现或构建通过写成
+浏览器验收通过。
+
+待裁决：SPEC-045 的桌面展开侧栏为 280 px，产品蓝图响应式表为 224 px。本轮运行时遵守权威 Spec
+并保留 280 px，1024 窄桌面使用真实 72 px collapsed state；采用 224 px 前必须先批准并统一文档。
 
 预计文件：
 

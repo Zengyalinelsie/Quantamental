@@ -64,6 +64,39 @@ class StrictResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", use_enum_values=True)
 
 
+IdentityRole = Literal[
+    "viewer",
+    "researcher",
+    "data_operator",
+    "reviewer",
+    "portfolio_manager",
+    "trader",
+    "administrator",
+    "agent",
+]
+IdentityPermission = Literal[
+    "read_public",
+    "read_artifact",
+    "create_experiment",
+    "manage_data",
+    "approve_research",
+    "approve_portfolio",
+    "send_order",
+    "administer",
+]
+
+
+class IdentityProjection(StrictResponse):
+    subject_id: str
+    roles: list[IdentityRole]
+    permissions: list[IdentityPermission]
+
+
+class IdentityEnvelope(StrictResponse):
+    data: IdentityProjection
+    context: ResponseContext
+
+
 class ArtifactProducerContext(StrictResponse):
     data_mode: DataMode
     deployment_stage: DeploymentStage

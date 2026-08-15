@@ -1,12 +1,15 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AppShell } from './AppShell'
 import { useWorkspaceStore } from '../state/workspace'
 
 describe('AppShell', () => {
-  afterEach(cleanup)
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+  })
 
   beforeEach(() => {
     useWorkspaceStore.getState().reset()
@@ -53,5 +56,35 @@ describe('AppShell', () => {
     expect(screen.getByText('universe-version:core-a-share:v1')).toBeInTheDocument()
     expect(screen.getByText('2020-05-22')).toBeInTheDocument()
     expect(screen.getByText('current_research')).toBeInTheDocument()
+  })
+
+  it('uses the real collapsed navigation contract at the 1024 breakpoint', async () => {
+    vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+      matches: query === '(max-width: 1100px) and (min-width: 821px)',
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })))
+
+    const { container } = render(
+      <MemoryRouter initialEntries={['/research?tab=events']}>
+        <AppShell />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('heading', { name: '研究' }, { timeout: 3_000 }))
+      .toBeInTheDocument()
+    expect(container.querySelector('.desktopSider')).toHaveClass('ant-layout-sider-collapsed')
+    expect(screen.getByLabelText('较窄屏幕自动收起')).toHaveTextContent('AUTO')
+    expect(screen.getByText('UNIVERSE').closest('.contextItem'))
+      .toHaveClass('contextItem--responsive-required')
+    expect(screen.getByText('AS OF').closest('.contextItem'))
+      .toHaveClass('contextItem--responsive-required')
+    expect(screen.getByText('SYSTEM AS OF').closest('.contextItem'))
+      .toHaveClass('contextItem--responsive-required')
   })
 })

@@ -7,6 +7,7 @@ import {
   type ResearchWorkspaceBlocker,
 } from '../api/client'
 import { WorkspaceState } from '../components/WorkspaceState'
+import { FrozenArtifactPanel } from '../features/investment-view/FrozenArtifactPanel'
 import { InvestmentViewSummary } from '../features/investment-view/InvestmentViewSummary'
 import { AlphaModelReadinessPanel } from '../features/screen/AlphaModelReadinessPanel'
 import { ScreenRankingPanel } from '../features/screen/ScreenRankingPanel'
@@ -102,6 +103,7 @@ export function ResearchP5Screen({ section }: ResearchP5ScreenProps) {
         <Tag>{data.status}</Tag>
         <Tag>{context.data_mode}</Tag>
         <Tag>{context.deployment_stage}</Tag>
+        <Tag>TRUST {context.trust_state ?? 'unavailable'}</Tag>
         <span>SYSTEM AS OF {context.system_as_of}</span>
       </section>
 
@@ -130,7 +132,14 @@ export function ResearchP5Screen({ section }: ResearchP5ScreenProps) {
         requestedProjection ? (
           section === 'universe-screen'
             ? <ScreenRankingPanel projection={data.screen!} />
-            : <InvestmentViewSummary projection={data.investment_view!} />
+            : (
+              <>
+                <InvestmentViewSummary projection={data.investment_view!} />
+                <FrozenArtifactPanel
+                  artifactId={data.investment_view!.versions.artifact_id}
+                />
+              </>
+            )
         ) : (
           <WorkspaceState reason={emptyReason} state="empty" title={emptyTitle} />
         )

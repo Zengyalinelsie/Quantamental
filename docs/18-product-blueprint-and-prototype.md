@@ -229,6 +229,10 @@ Data Quality、Attribution、Approvals 重叠的 `15-golden-path-state-machine` 
 | 768 | 抽屉导航；上下文变两行粘性条 | 单栏，关键摘要在详情前 | 表格横向滚动并冻结首列 | 主操作粘底，阻断原因在按钮旁 |
 | 320 | 单一页面标题；Mode/Stage/Trust 可展开且默认显示文本值 | 单栏；INPUT–GATE 折叠但 Gate 默认展开 | 图表提供数值表，表格转记录列表 | 只保留一个主操作；危险或越权动作不存在 |
 
+> 待裁决冲突（2026-08-14）：本表 1440 原型记录为 224 px 左导航，但权威 SPEC-045 要求桌面展开
+> 280 px、收起 72 px。当前工程实现遵守 SPEC-045 的 280/72 px；224 px 只保留为原型差异，不构成
+> Spec 变更。若采用 224 px，必须先由用户批准并同步更新 Spec 与本蓝图。
+
 所有视口中 `normalized_current`/`pit_verified`、`current_research`/`strict_historical` 和
 `research`/`shadow`/`paper` 都保留原始文本标签，不仅依赖颜色或 tooltip。
 

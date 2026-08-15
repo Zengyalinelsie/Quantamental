@@ -1,5 +1,5 @@
-import { cleanup, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ScreenRankingPanel } from './ScreenRankingPanel'
 import type { ScreenRankingProjection } from './screenProjection'
@@ -101,7 +101,10 @@ const projection: ScreenRankingProjection = {
 }
 
 describe('ScreenRankingPanel', () => {
-  afterEach(cleanup)
+  afterEach(() => {
+    cleanup()
+    vi.unstubAllGlobals()
+  })
 
   it('keeps server row order and server-owned rank change without sorting or recomputing', () => {
     render(<ScreenRankingPanel projection={projection} />)
@@ -148,5 +151,91 @@ describe('ScreenRankingPanel', () => {
     expect(screen.getByText('expected-return-compiler:v0')).toBeInTheDocument()
     expect(screen.getByText('factor-version:quality:v1')).toBeInTheDocument()
     expect(screen.getByText('dataset:financials:v1')).toBeInTheDocument()
+  })
+
+  it('provides a 320px record-list projection without recomputing server fields', () => {
+    render(<ScreenRankingPanel projection={projection} />)
+
+    const list = screen.getByTestId('screen-mobile-record-list')
+    const records = within(list).getAllByRole('listitem', { hidden: true })
+    expect(within(records[0]).getByText('宇通客车 · 600066')).toBeInTheDocument()
+    expect(within(records[0]).getByText('↑ 99')).toBeInTheDocument()
+    expect(within(records[0]).getByText('Previous 80')).toBeInTheDocument()
+    expect(within(records[0]).getByText('Score 1.921')).toBeInTheDocument()
+    expect(within(records[0]).getByText('Trust pit_verified')).toBeInTheDocument()
+    expect(within(records[0]).getByText('investment-view:600066:v1')).toBeInTheDocument()
+    expect(within(records[0]).getByText('a'.repeat(64))).toBeInTheDocument()
+    expect(within(records[1]).getByText('四川路桥 · 600039')).toBeInTheDocument()
+    expect(within(records[1]).getByLabelText('上一冻结截面不存在该证券。'))
+      .toHaveTextContent('—')
+    expect(within(records[1]).getByLabelText('缺少 previous_rank，不能计算排名变化。'))
+      .toHaveTextContent('—')
+  })
+
+  it('moves low-priority 1024 fields into a textual detail drawer', async () => {
+    vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+      matches: query === '(max-width: 1100px) and (min-width: 821px)',
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })))
+
+    render(<ScreenRankingPanel projection={projection} />)
+
+    const firstRow = screen.getAllByRole('row', { name: /^screen-ranking-row-/ })[0]
+    expect(within(firstRow).queryByText('商用车')).not.toBeInTheDocument()
+    fireEvent.click(within(firstRow).getByRole('button', { name: '查看宇通客车详情' }))
+
+    const drawer = await screen.findByRole('dialog', { name: '宇通客车 · 600066' })
+    expect(within(drawer).getByText('CI005012')).toBeInTheDocument()
+    expect(within(drawer).getByText('investment-view:600066:v1')).toBeInTheDocument()
+    expect(within(drawer).getByText('a'.repeat(64))).toBeInTheDocument()
+  })
+
+  it('keeps an open detail drawer bound to the latest server projection', async () => {
+    vi.stubGlobal('matchMedia', vi.fn((query: string) => ({
+      matches: query === '(max-width: 1100px) and (min-width: 821px)',
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })))
+    const { rerender } = render(<ScreenRankingPanel projection={projection} />)
+    const firstRow = screen.getAllByRole('row', { name: /^screen-ranking-row-/ })[0]
+    fireEvent.click(within(firstRow).getByRole('button', { name: '查看宇通客车详情' }))
+    const drawer = await screen.findByRole('dialog', { name: '宇通客车 · 600066' })
+    expect(within(drawer).getByText('a'.repeat(64))).toBeInTheDocument()
+
+    const refreshed: ScreenRankingProjection = {
+      ...projection,
+      rows: projection.rows.map((row) => row.snapshot_id === 'signal-snapshot:second-server-row'
+        ? { ...row, content_hash: 'c'.repeat(64), investment_view_id: 'investment-view:600066:v2' }
+        : row),
+    }
+    rerender(<ScreenRankingPanel projection={refreshed} />)
+
+    expect(within(drawer).getByText('c'.repeat(64))).toBeInTheDocument()
+    expect(within(drawer).getByText('investment-view:600066:v2')).toBeInTheDocument()
+    expect(within(drawer).queryByText('a'.repeat(64))).not.toBeInTheDocument()
+
+    rerender(<ScreenRankingPanel projection={{ ...refreshed, rows: refreshed.rows.slice(1) }} />)
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: '宇通客车 · 600066' }))
+        .not.toBeInTheDocument()
+    })
+  })
+
+  it('freezes the first table column for horizontal tablet scrolling', () => {
+    render(<ScreenRankingPanel projection={projection} />)
+
+    expect(screen.getByRole('columnheader', { name: 'Rank' }))
+      .toHaveClass('ant-table-cell-fix-start')
   })
 })

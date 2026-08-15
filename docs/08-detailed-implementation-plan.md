@@ -702,16 +702,26 @@ serving view 和 FastAPI 只读查询面已完成。当前 P4 没有通过 PIT/�
 - [x] industry peers；
 - [x] current/strict 标签；
 - [x] ranking changes；
-- [ ] frozen Artifact export。
+- [x] Frozen Artifact metadata/download 权限入口。
 
-状态（2026-08-14）：InvestmentView distribution/waterfall/residual/evidence/invalidator/trust/version
+状态（2026-08-15）：InvestmentView distribution/waterfall/residual/evidence/invalidator/trust/version
 组件，以及 server-owned Screen ranking、industry peers、Alpha Model readiness/approval blocker 组件
 已完成合同测试并接入 `/api/research/workspace` 和 `/research` 产品路由；前端不重算闭合、
 rank change 或排序。当前页面只能展示数据库中真实存在且满足查询合同的对象，空库会诚实显示
-blocker。Frozen Artifact durable/API 已完成，仍缺真实数据详情、页面下载入口、320/768/1024
-响应式实现和最终浏览器验收；
+blocker。Frozen Artifact 页面入口已接入：未生成时不构造 ID，非空时先读取服务端 identity 权限，
+只有 `read_artifact`、exact metadata 和响应/请求 Artifact ID 完全一致才显示下载链接；匿名默认禁用。
+`/api/identity` 已使用严格响应模型和生成的前端类型，不接受角色请求头伪造权限。1024/768/320 已实现
+侧栏/抽屉、上下文文字保留与重排、InvestmentView 单栏、1024 Screen 低优先字段详情抽屉、768 横向
+滚动冻结首列和 320 px 等价记录卡；记录卡继续消费服务端顺序与 rank change，并保留 score、previous
+rank、trust、InvestmentView 和 content hash。空/部分态继续显示 Trust 文本。仍缺真实数据详情和
+1440/1024/768/320 最终浏览器验收；浏览器控制当前没有可操作页面 tab，因此这些断点只能标记
+implemented、不能标记 visually verified；
 运行时不得注入 demo 值。产品蓝图、黄金路径与当前原型证据见
 `docs/18-product-blueprint-and-prototype.md`。
+
+布局文档存在待裁决冲突：权威 SPEC-045 要求桌面展开侧栏 280 px，而产品蓝图响应式表写 224 px
+且声称不改变 Spec。本轮运行时继续遵守 SPEC-045 的 280 px，1024 窄桌面收起为 72 px；未擅自修改
+任一权威要求。后续若采用 224 px，必须先由用户批准并同步升版 Spec/蓝图。
 
 ### Gate P5
 
@@ -721,11 +731,11 @@ blocker。Frozen Artifact durable/API 已完成，仍缺真实数据详情、页
 - 组合层无需读取新闻文本或页面计算；
 - SPEC-018–019、024–025 通过；SPEC-030 的输入合同完成，输出和组合验收留到 P6。
 
-状态（2026-08-14）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
+状态（2026-08-15）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
 原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
 strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
-InvestmentView/SignalSnapshot、获批真实 outcome price adapter、Frozen Artifact 页面入口、320/768/1024 运行时
-响应式证据和最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
+InvestmentView/SignalSnapshot、获批真实 outcome price adapter、新估值模型 frozen runtime 接线、
+真实三问详情和 320/768/1024/1440 最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
 更不能据此声称模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测

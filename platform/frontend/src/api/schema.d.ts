@@ -28,6 +28,38 @@ export interface ProblemDetails {
   instance: string;
 }
 
+export type IdentityRole =
+  | 'viewer'
+  | 'researcher'
+  | 'data_operator'
+  | 'reviewer'
+  | 'portfolio_manager'
+  | 'trader'
+  | 'administrator'
+  | 'agent';
+
+export type IdentityPermission =
+  | 'read_public'
+  | 'read_artifact'
+  | 'create_experiment'
+  | 'manage_data'
+  | 'approve_research'
+  | 'approve_portfolio'
+  | 'send_order'
+  | 'administer';
+
+export interface IdentityProjection {
+  subject_id: string;
+  roles: IdentityRole[];
+  permissions: IdentityPermission[];
+}
+
+export interface IdentityOperation {
+  responses: {
+    200: { content: { 'application/json': Envelope<IdentityProjection> } };
+  };
+}
+
 export interface ArtifactProducerContext {
   data_mode: DataMode;
   deployment_stage: DeploymentStage;
@@ -95,7 +127,7 @@ export interface paths {
   "/api/factors/reviews": { get: ReadOperation };
   "/api/factors/reviews/{review_id}": { get: ReadOperation };
   "/api/health": { get: ReadOperation };
-  "/api/identity": { get: ReadOperation };
+  "/api/identity": { get: IdentityOperation };
   "/api/listings/resolve": { get: ReadOperation };
   "/api/market-data/bars": { get: ReadOperation };
   "/api/market-data/corporate-actions": { get: ReadOperation };

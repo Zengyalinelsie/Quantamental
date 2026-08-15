@@ -79,6 +79,14 @@
   border-top: 1px solid @secondary-border;
 }
 
+.responsiveSiderNotice {
+  display: block;
+  color: @tertiary-text;
+  font-size: 9px;
+  line-height: 1.35;
+  text-align: center;
+}
+
 .mainLayout {
   min-width: 0;
   margin-left: 280px;
@@ -580,14 +588,20 @@
 }
 
 @media (max-width: 1280px) {
-  .contextItem--scope,
-  .contextItem--time,
-  .environmentTag {
-    display: none;
+  .globalHeader {
+    height: auto;
+    min-height: 72px;
+    flex-wrap: wrap;
   }
 
   .securitySearch {
-    width: min(300px, 34vw);
+    width: min(260px, 28vw);
+  }
+
+  .runContext {
+    min-width: 0;
+    flex: 1 1 620px;
+    flex-wrap: wrap;
   }
 }
 
@@ -680,5 +694,21 @@
 
   .runContext {
     padding-left: 0;
+  }
+
+  .globalHeader {
+    padding: 8px 10px;
+  }
+
+  .appContent {
+    padding: 14px 10px;
+  }
+
+  .pageHeading {
+    margin-bottom: 12px;
+  }
+
+  .pageHeading h1 {
+    font-size: 19px;
   }
 }

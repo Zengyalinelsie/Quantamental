@@ -397,6 +397,74 @@
   font-weight: 600;
 }
 
+.frozenArtifactPanel {
+  overflow: hidden;
+  border: 1px solid @border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.frozenArtifactPanel > header {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 16px;
+  border-top: 3px solid @primary;
+  border-bottom: 1px solid @secondary-border;
+}
+
+.frozenArtifactPanel > header p,
+.frozenArtifactPanel > header h3 {
+  margin: 0;
+}
+
+.frozenArtifactPanel > header p {
+  margin-bottom: 4px;
+  color: @primary;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.frozenArtifactPanel > header h3 {
+  font-size: 15px;
+}
+
+.frozenArtifactPanel__detail {
+  margin: 0;
+  padding: 14px 16px;
+  color: @secondary-text;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.frozenArtifactPanel--restricted > button {
+  margin: 0 16px 16px;
+}
+
+.frozenArtifactPanel__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.frozenArtifactPanel__actions .ant-tag {
+  margin: 0;
+}
+
+.frozenArtifactPanel .ant-descriptions {
+  margin: 16px;
+}
+
+.frozenArtifactPanel code {
+  color: @secondary-text;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1024px) {
   .returnDistributionGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -489,5 +557,79 @@
   .evidenceLedger li > div:last-child {
     flex-wrap: wrap;
     justify-content: flex-start;
+  }
+
+  .frozenArtifactPanel > header,
+  .frozenArtifactPanel__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .frozenArtifactPanel__actions .ant-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .investmentViewSummary {
+    gap: 10px;
+  }
+
+  .investmentViewHeader {
+    min-height: 0;
+    gap: 14px;
+    padding: 14px 12px;
+  }
+
+  .investmentViewHeader h2 {
+    font-size: 19px;
+  }
+
+  .investmentViewSection__heading,
+  .frozenArtifactPanel > header {
+    min-height: 0;
+    gap: 10px;
+    padding: 11px 12px;
+  }
+
+  .returnMetric,
+  .investmentThesisColumn,
+  .evidenceLedger {
+    padding: 12px;
+  }
+
+  .returnMetric strong {
+    font-size: 18px;
+  }
+
+  .waterfallRows {
+    padding: 0 10px 10px;
+  }
+
+  .waterfallRow {
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .waterfallRow__identity strong {
+    font-size: 11px;
+  }
+
+  .investmentViewClosure {
+    margin: 4px 10px 10px;
+  }
+
+  .investmentViewVersions .ant-descriptions,
+  .frozenArtifactPanel .ant-descriptions {
+    margin: 10px;
+  }
+
+  .frozenArtifactPanel__detail {
+    padding: 12px;
+  }
+
+  .frozenArtifactPanel--restricted > button {
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
   }
 }

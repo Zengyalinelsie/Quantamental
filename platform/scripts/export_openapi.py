@@ -25,6 +25,7 @@ def main() -> None:
         "/api/artifacts": "ArtifactMetadataListOperation",
         "/api/artifacts/{artifact_id}": "ArtifactMetadataOperation",
         "/api/artifacts/{artifact_id}/download": "ArtifactDownloadOperation",
+        "/api/identity": "IdentityOperation",
     }
     path_contracts = "\n".join(
         f'  "{path}": {{ get: {operation_types.get(path, "ReadOperation")} }};'
@@ -59,6 +60,38 @@ export interface ProblemDetails {
   status: number;
   detail: string;
   instance: string;
+}
+
+export type IdentityRole =
+  | 'viewer'
+  | 'researcher'
+  | 'data_operator'
+  | 'reviewer'
+  | 'portfolio_manager'
+  | 'trader'
+  | 'administrator'
+  | 'agent';
+
+export type IdentityPermission =
+  | 'read_public'
+  | 'read_artifact'
+  | 'create_experiment'
+  | 'manage_data'
+  | 'approve_research'
+  | 'approve_portfolio'
+  | 'send_order'
+  | 'administer';
+
+export interface IdentityProjection {
+  subject_id: string;
+  roles: IdentityRole[];
+  permissions: IdentityPermission[];
+}
+
+export interface IdentityOperation {
+  responses: {
+    200: { content: { 'application/json': Envelope<IdentityProjection> } };
+  };
 }
 
 export interface ArtifactProducerContext {

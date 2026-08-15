@@ -1,7 +1,7 @@
 # P5 实现与验证证据
 
-> 状态快照：2026-08-14  
-> 范围：P5 当前工程进度；Frozen Artifact、Outcome worker、估值/改善工程模型
+> 状态快照：2026-08-15
+> 范围：P5 当前工程进度；Frozen Artifact、Outcome worker、估值/改善工程模型、P5 产品页
 > Gate：P5 Capability Gate 仍未通过
 
 ## 1. Frozen InvestmentView Artifact application export
@@ -45,7 +45,13 @@ Artifact 或对象存储合同。
 - 下载提供 ETag、conditional 304、private immutable cache、nosniff 和安全文件名；
 - producer Run 缺失、路径或 hash 不一致使用 409；对象/DB 不可用使用 503。
 - exporter/本地 CAS 对等价并发 winner 幂等恢复；不兼容 winner 继续冲突关闭；
-- 前端 `openapi.json` 和 `schema.d.ts` 已刷新，metadata、download bytes、304 和错误响应有显式类型。
+- 前端 `openapi.json` 和 `schema.d.ts` 已刷新，identity、metadata、download bytes、304 和错误响应有显式类型。
+
+页面侧新增 Frozen Artifact 权限入口：Artifact ID 缺失时明确“尚未生成”且不发请求；存在 ID 时
+先从 `/api/identity` 读取服务端权限，只有 `read_artifact` 后才读取 exact metadata 并显示下载 URL。
+Identity 使用 strict Envelope，前端消费生成的权限类型；角色请求头不能提升匿名主体。匿名主体只有
+`read_public`，按钮保持禁用。metadata 失败或响应 Artifact ID 与请求不一致时，不暴露未经校验的
+下载链接。
 
 对象存储和 PostgreSQL 不能形成跨系统事务：CAS 写入成功、DB 事务失败时可能留下无法由 API 发现或
 下载的孤儿对象。数据库侧 Artifact+lineage 已原子；孤儿对象清理仍是后续运维工作，不允许用孤儿对象
@@ -129,6 +135,16 @@ adjusted 数字。
 描述为完成。领域测试中构造的 attestation 只是合同 fixture，不是治理 registry 的真实资格记录。
 Task 4A 最终定向命令共 `43/43` 通过。
 
+Task 5 先增加 Artifact ID 串链测试：metadata 返回另一 Artifact 时，旧实现按预期错误地生成了另一
+下载 URL；加入 exact identity guard 和缺 permissions 失败关闭后，6 项 Frozen Artifact 定向测试
+通过。Identity OpenAPI 红测要求
+`IdentityEnvelope` 和 `extra=forbid` 的 `IdentityProjection`，实现严格 response model、重新生成
+OpenAPI/TypeScript 类型后，3 项 Identity 定向测试通过。响应式复审继续发现 1024 详情抽屉、768
+冻结首列、320 等价字段和空态 Trust 缺口；补红测后四个相关组件文件共 23/23 通过。组件和 API
+测试不替代浏览器视觉验收。最终复审还发现详情抽屉缓存整行会在后台刷新后显示旧版本；新增
+rerender 红测后改为只保存 `snapshot_id` 并从最新 projection 派生，行消失时自动关闭，相关组件
+合计 24/24 通过。
+
 ## 5. 真实 PostgreSQL 证据
 
 迁移前只读预检：
@@ -156,18 +172,18 @@ View/Outcome 均为 0。真实库 dry-run maturity scan 返回 `items=[]`、`wri
 ## 6. 全量验证
 
 ```text
-Backend unittest: 807/807 passed
+Backend unittest: 809/809 passed
 Ruff: passed
 mypy: 175 source files passed
 compileall: passed
 git diff --check: passed
-Frontend Vitest: 59/59 passed
+Frontend Vitest: 70/70 passed
 Frontend lint: passed
 Frontend build: passed
 ```
 
-Vite 仍报告既有 AntD 大 chunk warning；本工作包没有修改前端 bundle，也没有把 warning 隐藏或
-改成通过项。`ci/verify.sh` 现在先隔离 `ASP_DATABASE_URL` 再运行默认空运行时测试，仅在 migration
+Vite 仍报告既有 AntD 大 chunk warning；本工作包没有把 warning 隐藏或改成通过项。
+`ci/verify.sh` 现在先隔离 `ASP_DATABASE_URL` 再运行默认空运行时测试，仅在 migration
 阶段重新注入真实本地 URL；对应回归测试已覆盖，避免真实 13,314 条 DatasetVersion 污染 fixture-free
 API 合同。
 
@@ -194,6 +210,10 @@ API 合同。
 - `platform/src/a_share_platform/application/valuation_improvement.py`；
 - `platform/src/a_share_platform/adapters/postgres/valuation_input_qualification.py`；
 - `platform/tests/test_valuation_models.py`、`test_fundamental_improvement.py`；
+- `platform/frontend/src/features/investment-view/FrozenArtifactPanel.tsx` 及测试；
+- `platform/frontend/src/pages/ResearchP5Screen.tsx/.less/.test.tsx`；
+- `platform/frontend/src/features/screen/ScreenRankingPanel.tsx/.test.tsx`、`screen.less`；
+- `platform/frontend/src/app/AppShell.tsx`、`shell.less`；
 - `docs/adr/0011-valuation-model-engineering-defaults.md`；
 - `platform/ci/verify.sh`、`platform/tests/test_architecture_contract.py`。
 
@@ -201,12 +221,19 @@ API 合同。
 
 Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成。以下仍未完成：
 
-- Research/InvestmentView 页面查看或下载入口；
 - 获批的真实 Outcome price/calendar/corporate-action adapter 与真实到期产物；
 - 真实 historical/industry/peer、FCF、合格分析师输入 adapter/产物；
 - 新估值模型的 exact frozen bundle、持久化和 orchestration 安全接线；
-- 320/768/1024 最终浏览器验收；
+- 320/768/1024/1440 最终浏览器验收；
 - 真实 qualified PIT bundle、InvestmentView、Review 和 SignalSnapshot。
 
 因此 P5 Capability Gate 仍未通过。自动测试证明工程合同按预期工作，不证明 Expected Return、
 InvestmentView、因子或策略科学有效。
+
+本轮已确认本项目服务继续使用 `5173`/`8010`，未占用用户其他项目的 `8000`。前端/API 健康检查
+通过，但浏览器控制当前没有可操作页面 tab，无法形成四档截图和交互证据；因此响应式视觉验收保持
+pending，不能用组件测试或构建结果替代。
+
+另有一项未裁决的设计冲突：SPEC-045 固定桌面展开侧栏为 280 px，产品蓝图响应式表写 224 px。
+本轮实现恢复并保持权威 Spec 的 280 px，窄桌面收起宽度为 72 px；没有擅自修改 Spec 或把 224 px
+写入运行时。该差异需用户批准后统一文档，不能由测试通过替代决策。

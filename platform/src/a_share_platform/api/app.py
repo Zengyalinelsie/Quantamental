@@ -100,6 +100,8 @@ from .schemas import (
     Envelope,
     ExperimentRunInput,
     FactorReviewInput,
+    IdentityEnvelope,
+    IdentityProjection,
     ProblemDetails,
     ResearchWorkspaceEnvelope,
     ResponseContext,
@@ -524,17 +526,23 @@ def create_app(
             context,
         )
 
-    @app.get("/api/identity", response_model=Envelope)
+    @app.get("/api/identity", response_model=IdentityEnvelope)
     def identity(
         principal: Annotated[Principal, Depends(anonymous_principal)],
         context: Annotated[RunContext, Depends(fixed_read_context)],
-    ) -> Envelope:
-        return envelope(
-            {
-                "subject_id": principal.subject_id,
-                "roles": sorted(role.value for role in principal.roles),
-            },
-            context,
+    ) -> IdentityEnvelope:
+        permission_policy = PermissionPolicy.default()
+        return IdentityEnvelope(
+            data=IdentityProjection(
+                subject_id=principal.subject_id,
+                roles=sorted(role.value for role in principal.roles),
+                permissions=sorted(
+                    permission.value
+                    for permission in Permission
+                    if permission_policy.allows(principal, permission)
+                ),
+            ),
+            context=response_context(context),
         )
 
     @app.get("/api/datasets", response_model=Envelope)

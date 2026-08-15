@@ -1,6 +1,6 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined, SearchOutlined } from '@ant-design/icons'
 import { Button, Drawer, Input, Layout, Menu, Tag, Tooltip } from 'antd'
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import { primaryNavigation, workspaceDefinitions } from '../navigation/routes'
@@ -49,6 +49,26 @@ function RouteWorkspace({ definition }: { definition: (typeof workspaceDefinitio
   return <WorkspacePage {...definition} />
 }
 
+function useCompactDesktopNavigation() {
+  const query = '(max-width: 1100px) and (min-width: 821px)'
+  const [compact, setCompact] = useState(() => (
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia(query).matches
+      : false
+  ))
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return undefined
+    const media = window.matchMedia(query)
+    const update = () => setCompact(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  return compact
+}
+
 export function AppShell() {
   const location = useLocation()
   const routeContext = new URLSearchParams(location.search)
@@ -62,30 +82,38 @@ export function AppShell() {
   const setDesktopCollapsed = useWorkspaceStore((state) => state.setDesktopCollapsed)
   const setMobileDrawerOpen = useWorkspaceStore((state) => state.setMobileDrawerOpen)
   const setSecurityQuery = useWorkspaceStore((state) => state.setSecurityQuery)
+  const compactDesktopNavigation = useCompactDesktopNavigation()
+  const navigationCollapsed = desktopCollapsed || compactDesktopNavigation
 
   return (
     <Layout className="appShell">
       <Sider
         className="desktopSider"
-        collapsed={desktopCollapsed}
+        collapsed={navigationCollapsed}
         collapsedWidth={72}
         trigger={null}
         width={280}
       >
-        <Brand compact={desktopCollapsed} />
+        <Brand compact={navigationCollapsed} />
         <NavigationMenu />
         <div className="siderFooter">
-          <Tooltip title={desktopCollapsed ? '展开侧栏' : '收起侧栏'} placement="right">
-            <Button
-              aria-label={desktopCollapsed ? '展开侧栏' : '收起侧栏'}
-              block
-              icon={desktopCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setDesktopCollapsed(!desktopCollapsed)}
-              type="text"
-            >
-              {desktopCollapsed ? null : '收起导航'}
-            </Button>
-          </Tooltip>
+          {compactDesktopNavigation ? (
+            <Tooltip title="较窄屏幕自动收起" placement="right">
+              <span aria-label="较窄屏幕自动收起" className="responsiveSiderNotice">AUTO</span>
+            </Tooltip>
+          ) : (
+            <Tooltip title={desktopCollapsed ? '展开侧栏' : '收起侧栏'} placement="right">
+              <Button
+                aria-label={desktopCollapsed ? '展开侧栏' : '收起侧栏'}
+                block
+                icon={desktopCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setDesktopCollapsed(!desktopCollapsed)}
+                type="text"
+              >
+                {desktopCollapsed ? null : '收起导航'}
+              </Button>
+            </Tooltip>
+          )}
         </div>
       </Sider>
 
@@ -129,7 +157,7 @@ export function AppShell() {
               <small>DEPLOYMENT</small>
               <Tag color="blue">research</Tag>
             </span>
-            <span className="contextItem contextItem--scope">
+            <span className="contextItem contextItem--scope contextItem--responsive-required">
               <small>UNIVERSE</small>
               <strong title={selectedUniverse ?? undefined}>{selectedUniverse ?? '未选择'}</strong>
             </span>
@@ -137,11 +165,11 @@ export function AppShell() {
               <small>PORTFOLIO</small>
               <strong>未选择</strong>
             </span>
-            <span className="contextItem contextItem--time">
+            <span className="contextItem contextItem--time contextItem--responsive-required">
               <small>AS OF</small>
               <strong>{selectedAsOf ?? (pointMode === 'current' ? '当前日期' : '未选择')}</strong>
             </span>
-            <span className="contextItem contextItem--time">
+            <span className="contextItem contextItem--time contextItem--responsive-required">
               <small>SYSTEM AS OF</small>
               <strong>{systemAsOf ?? 'API 未连接'}</strong>
             </span>
