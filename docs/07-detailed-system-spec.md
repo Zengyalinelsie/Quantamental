@@ -1,10 +1,17 @@
 # A 股基本面量化平台详细 Spec
 
-> 文档状态：Draft for User Review  
-> 版本：0.9.1  
-> 日期：2026-08-10  
-> 产品范围：A 股优先、多头选股、主动市场择时、事件研究、现实回测、未来模拟盘与实盘  
-> 前端视觉真源：用户原项目最新本地工作树中的机构研究工作台风格  
+> 文档状态：Draft for User Review
+>
+> 版本：0.9.2
+>
+> 日期：2026-08-15
+>
+> 产品范围：A 股优先、多头选股、主动市场择时、事件研究、现实回测、未来模拟盘与实盘
+>
+> 前端产品/交互真源：`docs/18-product-blueprint-and-prototype.md` 与目标页面精确 Figma node
+>
+> 前端 token/组件 provenance：用户原项目最新本地工作树中的机构研究工作台风格
+>
 > 本文是需求与验收真源；实现顺序见 `08-detailed-implementation-plan.md`
 
 ## 0. 阅读方法
@@ -35,7 +42,7 @@
 | 市场择时 | 必须研究主动预测，不只做被动风险控仓 |
 | 实盘目标 | 平台必须为未来实盘设计，但按 Shadow → Paper → Limited Live 晋级 |
 | 本金 | 不是平台常量，由 Portfolio/Account Policy 配置 |
-| 前端风格 | 使用用户原项目最新机构级风格 |
+| 前端风格 | 使用 `docs/18` 与精确 Figma node 的产品结构，复用用户原项目机构级 token/组件 provenance |
 | DSA 的角色 | 产品体验、Agent、报告、新闻与通知供体；不是数据权威 |
 | Legacy 的角色 | PIT、版本、因子、信号、组合和现实回测合同供体 |
 | 架构 | 独立模块化单体；不直接合并两个来源运行时 |
@@ -515,6 +522,15 @@ TargetPortfolioSnapshot
 
 ## 13. 前端详细规格
 
+前端交付必须同时区分：
+
+- `Design Parity`：与精确 Figma node 或批准的响应式合同一致；
+- `Runtime Product`：真实 API 驱动 loading/error/empty/partial/unavailable/ready，且权限、证据和上下文正确；
+- `Domain/Capability`：对应领域、存储、API、工作流和真实小样本满足阶段 Gate。
+
+一个结论通过不自动提升另外两个。当前差距审计和跨阶段计划分别见
+`docs/22-prototype-runtime-gap-audit.md` 与 `docs/plans/track-00-prototype-runtime-delivery.md`。
+
 ### SPEC-042：前端技术栈
 
 采用用户原项目技术栈：
@@ -529,7 +545,12 @@ TargetPortfolioSnapshot
 
 不引入 Next.js、第二套 Design System 或来源仓库运行时依赖。旧 `frontend.md` 中“Chart.js”描述被实际 package 和现有 Recharts 实现取代。
 
-验收：单一应用、单一 token 系统、单一数据请求和本地状态边界。
+任何目标页面设计到代码前 MUST 读取精确 Figma node 的 design context，检查并复用现有组件/token，
+再适配为本项目 React/AntD/Less 实现。Figma 参考代码不是可直接复制的运行时代码。精确节点不可读时，
+除仓库已有对应可恢复 SVG 外，不得仅凭缩放截图宣称高保真实现完成。
+
+验收：单一应用、单一 token 系统、单一数据请求和本地状态边界；目标页面记录 Figma file/node、
+viewport、状态和允许差异。
 
 ### SPEC-043：视觉令牌真源
 
@@ -565,7 +586,9 @@ TargetPortfolioSnapshot
 - 可分享状态写入 URL query；个人偏好可写 local storage；
 - 所有空状态说明真实原因和启用条件，不展示假数据。
 
-验收：静态合同测试和 320/768/1024/1440 视觉回归通过。
+验收：静态合同测试和 320/768/1024/1440 视觉回归通过；1440 有独立高保真 Frame 时必须做精确
+设计对照，不能只检查无溢出或“风格接近”。三档没有独立 Figma Frame 时按批准的响应式合同验收，
+并明确记录这是运行时重排证据而非 Figma Frame parity。
 
 ### SPEC-045：全局 Shell
 
@@ -605,7 +628,11 @@ TargetPortfolioSnapshot
 - Events；
 - Watchlists/Cases。
 
-验收：从股票池/排名/事件能进入精确证券和 Research Case；普通股票更新不自动触发昂贵 Agent 深度研究。
+Desk 的最终产品结构 MUST 消费服务端聚合 projection；硬编码 P0–P11 工程能力状态表只可作为历史技术壳，
+不能作为原型实现或最终 Desk。
+
+验收：从股票池/排名/事件能进入精确证券和 Research Case；普通股票更新不自动触发昂贵 Agent 深度研究；
+Desk 与 Research 分别通过其高保真节点的 1440 对照和三档响应式验收。
 
 ### SPEC-048：因子、组合和监控页面
 
@@ -615,13 +642,15 @@ TargetPortfolioSnapshot
 
 `/monitoring` tabs：Signals、Portfolios、Timing、Drift、Rebalance、Execution、Incidents。
 
-验收：每个 tab 有 loading/error/empty/ready；Backtests 必须标注具体回测类型；Timing Lab 与生产 Timing Monitor 分离。
+验收：每个 tab 有 loading/error/empty/partial/unavailable/ready；Backtests 必须标注具体回测类型；
+Timing Lab 与生产 Timing Monitor 分离；通用 `WorkspaceUnavailable` 占位不构成对应产品页完成。
 
 ### SPEC-049：数据与管理页面
 
 `/system` tabs：Catalog、Quality、Lineage、Jobs、Entitlements、Users、Agents、Approvals。
 
-验收：未实现 RBAC、授权或审批 API 时显示明确未启用原因；不能把本地 human 字符串冒充身份认证。
+验收：未实现 RBAC、授权或审批 API 时显示明确未启用原因；不能把本地 human 字符串冒充身份认证；
+通用不可用壳不构成该 tab 的 Design Parity 或 Runtime Product 完成。
 
 ### SPEC-050：可信状态和证据展示
 

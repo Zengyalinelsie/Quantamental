@@ -72,6 +72,8 @@
 ### Task 5：API 和 31 页研究/治理面
 
 增加 cursor pagination 和服务端聚合；实现 Monitoring、Desk、Correlation、Production、Users、Entitlements、Approvals 页面及六态。
+成熟 Desk、Monitoring、Governance 和统一 Attribution 的页面交付按 PUI-08 执行；这里只能在对应
+Capability/API 和 PUI 三轴证据分别满足后更新各自状态，不能用“31 页已画出”替代 P9 Gate。
 
 ### Task 6：故障注入和 Gate
 

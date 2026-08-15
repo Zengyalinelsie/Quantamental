@@ -10,10 +10,11 @@
 
 ## 当前状态
 
-P0 领域合同和 P1 工程底座已通过 Capability Gate。P2 代码底座已完成，真实库已有
+P0 核心合同已实现但权威 Plan 仍保留历史 `in_progress` 状态；P1 工程底座已通过 Capability Gate。P2 代码底座已完成，真实库已有
 CSI800 当前 Security Master 799/800、CSI500 当日 Universe 500/500 和私人本地
-`normalized_current` 数据；但多尺寸浏览器证据、完整历史 Universe、XBSE、2018+ 全范围行情、
-股本和公司行动仍未完成，因此不宣称 P2 Gate 通过。P3 已完成 4 家公司、8 份官方 PDF、
+`normalized_current` 数据；`/research` 的当前 empty/unavailable Universe 运行态已在四视口复验，
+但完整历史 Universe、XBSE、2018+ 全范围行情、股本、公司行动和真实 populated 历史页仍未完成，
+因此不宣称 P2 Gate 通过。P3 已完成 4 家公司、8 份官方 PDF、
 2 条修订链、双时财务、真实数据诊断页面和首条 CSI500 被动波动率 Shadow baseline，
 Capability Gate 通过。主动 Timing 仍 `unavailable`；P3.5 已完成 CSI500 当前 500 家、
 2018–2025 年末三表的 12,000/12,000 工作单元，写入 35,505 条 `normalized_current` 观测，
@@ -30,17 +31,23 @@ comparable 缺口失败关闭，bundle 表仍为 0；Frozen Artifact 的 applica
 adapter、数据库不可变约束和私有 metadata/download API 已完成；页面已有服务端权限控制的
 metadata/download 入口，匿名、元数据失败或响应 Artifact ID 与请求不一致时保持禁用；
 provider-neutral Outcome 到期 worker 已完成，但真实价格/日历/公司行动 source 尚未获资格；
-ADR-0011 已冻结并实现相对估值、FCF/银行锚定、价格隐含预期、分析师资格门和四期改善纯领域工程
-模型；新估值模型尚未安全接入现有 frozen bundle/orchestration，真实 historical/industry/peer、FCF
-和分析师输入仍不可用。仍缺合格 PIT InvestmentView 及
-320/768/1024/1440 运行时浏览器验收，因此 P5 Gate 也未通过，尚未进入 P6。
+ADR-0011 已冻结并实现相对估值、FCF/银行锚定、价格隐含预期、分析师资格门和四期改善模型，
+valuation bundle v2 的 frozen runtime 接线也已完成；真实 historical/industry/peer、FCF 和分析师输入
+仍不可用。P5 当前 empty/unavailable 运行态已经完成 1440/1024/768/320 浏览器验收，但这只证明
+响应式、真实 blocker、控制台和网络合同，不代表页面已经按 Figma 高保真原型实现。仍缺合格 PIT
+InvestmentView、真实 ready/partial Screen/View/Artifact 和 Design Parity，因此 P5 Gate 仍未通过，
+尚未进入 P6。
 
 Expected Return Compiler 前已有独立的 strict PIT application gate：只有 exact frozen bundle、
 量化的 quality/valuation/revision、量化 scenario、完整 DatasetVersion/definition/bundle evidence 和
 可用时间全部闭合时，才允许幂等写入 InvestmentView ledger。当前没有获批模型输出 adapter，也没有
 合格 PIT bundle，因此运行库 InvestmentView 仍为 0；平台不会用 CLI 参数或运行时 demo 值补造。
 
-运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为 `normalized_current`，不能冒充 `pit_verified`。当前状态不代表已经具备可盈利策略、模型科学有效、真实交易或真实账户连接能力。
+运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为
+`normalized_current`，不能冒充 `pit_verified`。当前 31 页中约 12 页只有不同程度的合同/API 接线，
+19 页仍是占位，0 页完成精确 Figma 节点的运行时 Design Parity 验收；详细审计见
+`docs/22-prototype-runtime-gap-audit.md`。当前状态不代表已经具备可盈利策略、模型科学有效、完整原型能力、
+真实交易或真实账户连接能力。
 
 ```text
 sources/                     # 只读来源仓库
@@ -90,6 +97,8 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [P5–P11 开发前 Spec / Plan 完整性审计](docs/20-pre-development-spec-plan-audit.md)
 - [逐步骤实现级 Spec / Plan 包](docs/plans/README.md)
 - [P5 实现与验证证据](docs/21-p5-implementation-evidence.md)
+- [原型到运行时产品差距审计](docs/22-prototype-runtime-gap-audit.md)
+- [原型驱动的运行时产品交付 Plan](docs/plans/track-00-prototype-runtime-delivery.md)
 - [A 股数据源资格 ADR](docs/adr/0002-a-share-data-source-qualification.md)
 - [私人本地研究持久化 ADR](docs/adr/0003-private-local-research-persistence.md)
 - [组合式当前身份与 CSI 历史成分 ADR](docs/adr/0004-composed-current-identity-and-csi-membership.md)

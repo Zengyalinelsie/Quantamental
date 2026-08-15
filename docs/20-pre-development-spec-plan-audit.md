@@ -1,8 +1,11 @@
 # P5–P11 开发前 Spec / Plan 完整性审计
 
-> 审计日期：2026-08-14  
-> 审计基线：`0ea1a92`  
-> 目的：在继续功能开发前，明确哪些设计已经冻结、哪些计划只是阶段清单、哪些决策仍会改变实现。  
+> 审计日期：2026-08-15
+>
+> 审计基线：`f703d08`
+>
+> 目的：在继续功能开发前，明确哪些设计已经冻结、哪些计划只是阶段清单、哪些决策仍会改变实现。
+>
 > 方法参考：借鉴 Superpowers 的“设计 Spec 与可执行 Plan 分离、精确文件、TDD 小步、逐任务验证”思想；不安装、不依赖 Superpowers 或其插件。
 
 ## 1. 结论
@@ -13,10 +16,13 @@
 - `08-detailed-implementation-plan.md` 已覆盖 P0–P11 的阶段、工作包、依赖和 Gate；
 - `18-product-blueprint-and-prototype.md` 已定义六工作区、31 页、黄金路径和页面六态；
 - `19-end-to-end-product-roadmap.md` 已说明从当前状态到最终产品的 10 个执行步骤；
+- `22-prototype-runtime-gap-audit.md` 已确认当前 31 页中约 12 页局部接线、19 页占位、0 页完成
+  精确 Figma node 的运行时 Design Parity；
 - P5–P11 仍缺逐步骤的实现级设计：具体领域对象、端口、表、API、前端状态、测试文件、验证命令和提交边界；
 - 仍有若干产品/供应商决策必须在对应代码开始前或 Gate 前冻结。
 
-因此本轮新增 `docs/plans/` 规划包。它不替代 Spec 和总 Plan，只把每个 Roadmap Step 展开到 implementation-ready 所需粒度。
+因此 `docs/plans/` 除 Roadmap Step 包外，新增跨阶段 PUI 原型运行时轨道。它不替代 Spec 和总 Plan，
+分别把领域 Gate 与产品页面展开到 implementation-ready 所需粒度。
 
 ## 2. 文档职责
 
@@ -27,8 +33,10 @@
 | 总实施 Plan | `08-detailed-implementation-plan.md` | P0–P11 如何分阶段和过 Gate |
 | 一致性审查 | `09-spec-plan-consistency-review.md` | Spec 与 Plan 是否冲突 |
 | 产品原型 | `18-product-blueprint-and-prototype.md` | 用户在 31 页中看到什么、如何操作 |
+| 原型运行时差距 | `22-prototype-runtime-gap-audit.md` | 当前页面与 Figma/产品能力实际差多少 |
 | 全局路线图 | `19-end-to-end-product-roadmap.md` | 从现在到最终产品的顺序和里程碑 |
 | 步骤 Spec / Plan | `docs/plans/step-*.md` | 该步骤具体改什么文件、先写什么测试、如何验收 |
+| PUI 跨阶段 Plan | `docs/plans/track-00-prototype-runtime-delivery.md` | Figma 如何逐页变成真实运行时产品 |
 | ADR | `docs/adr/*.md` | 重大或难以逆转的选择为什么这样定 |
 | Evidence | `docs/*-implementation-evidence.md` | 实际做了什么、测试和真实证据是什么 |
 
@@ -44,12 +52,14 @@
 4. 数据来源资格、存储层、append-only/可变边界和 lineage 清楚；
 5. API 资源、读写权限、幂等和错误合同清楚；
 6. 页面六态、操作、Gate 和响应式行为清楚；
-7. 失败关闭和“不填零”语义清楚；
-8. TDD 任务写到预计文件和测试文件；
-9. 定向、全量、数据库、浏览器和科学交叉验证命令清楚；
-10. migration、rollback/restore、证据文档和提交边界清楚；
-11. 没有未解决的 `D0` 决策；
-12. 用户未授权的外部写入、数据许可或交易动作不在执行范围。
+7. 前端页面有精确 Figma node 或明确标记缺少独立高保真 Frame；Design Parity、Runtime Product、
+   Domain/Capability 三轴分开；
+8. 失败关闭和“不填零”语义清楚；
+9. TDD 任务写到预计文件和测试文件；
+10. 定向、全量、数据库、浏览器和科学交叉验证命令清楚；
+11. migration、rollback/restore、证据文档和提交边界清楚；
+12. 没有未解决的 `D0` 决策；
+13. 用户未授权的外部写入、数据许可或交易动作不在执行范围。
 
 计划状态：
 
@@ -74,7 +84,8 @@
 
 | Roadmap Step | 顶层 Spec | 总 Plan | 原型 | 实现级 Spec/Plan | 当前状态 |
 |---|---|---|---|---|---|
-| 1 P5 工程收口 | 有 | 有 | 有 | 本轮补充 | `in_progress`；已有 Frozen Artifact 红测 |
+| PUI 原型运行时轨道 | SPEC-042–050 | 有 | 14 个关键 1440 + 31 页蓝图 | `track-00` | `in_progress`；Design Parity 0/31 |
+| 1 P5 工程收口 | 有 | 有 | 有 | `step-01` | `verified`；不等于 P5 Gate 或原型 parity |
 | 2 P2/PIT 数据补齐 | 有 | 有 | 数据治理页有 | 本轮补充 | `ready_for_implementation`；先做资格探针，bulk importer 仍需字段主源 ADR |
 | 3 P4 真实 Gate | 有 | 有 | Factor Workspace 有 | 本轮补充 | `gate_blocked`；等待 Step 2 |
 | 4 P5 真实产物 Gate | 有 | 有 | P5 黄金路径有 | 本轮补充 | `gate_blocked`；等待 Step 2/3 |
@@ -91,6 +102,7 @@
 
 | ID | 决策 | 推荐默认 | 最迟时点 |
 |---|---|---|---|
+| PUI-D0-01 | 非关键页和 320/768/1024 缺独立高保真 Frame 时如何验收 | 先用 14 个关键页建立设计系统；每个缺失页先补精确设计或记录用户批准的推导方案 | 对应页面视觉编码前 |
 | DATA-D0-01 | strict PIT 财务/公告/历史成分的合格主源与保存许可 | ADR-0007：先探针 Wind/同花顺内部服务等；字段主源资格不通过则失败关闭 | Step 2 strict importer 前 |
 | P6-D0-01 | 第一研究 benchmark | ADR-0006：CSI800，总体之外保留 CSI300/CSI500 分组 | 已冻结 |
 | P6-D0-02 | 第一外部回测引擎 | ADR-0006：RQAlpha adapter | 已冻结 |
@@ -133,6 +145,7 @@
 
 - `docs/plans/README.md` 定义执行纪律和索引；
 - Roadmap Step 1–10 均有独立 Spec/Plan 包；
+- 原型到运行时有独立 PUI Track、31 页差距矩阵和三轴完成定义；
 - 每个包列出精确关联、对象、存储/API/UI、TDD 任务、命令和 Evidence；
 - D0/D1/D2/AUTH 决策集中登记；
 - README 增加规划入口；
