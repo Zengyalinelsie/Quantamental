@@ -757,9 +757,10 @@ CSS `innerWidth` 完成 1440/1024/768/320 验收，四档 `document.scrollWidth`
 `research-universe-screen`、Security fused overview 或 `security-investmentview` 精确 Figma node 的
 Design Parity 验收。高保真替换继续进入 PUI-02/PUI-03；当前页面不能因此标成原型完成。
 
-布局文档存在待裁决冲突：权威 SPEC-045 要求桌面展开侧栏 280 px，而产品蓝图响应式表写 224 px
-且声称不改变 Spec。本轮运行时继续遵守 SPEC-045 的 280 px，1024 窄桌面收起为 72 px；未擅自修改
-任一权威要求。后续若采用 224 px，必须先由用户批准并同步升版 Spec/蓝图。
+布局侧栏宽度冲突已于 2026-08-15 裁决：桌面展开侧栏统一为 **280 px**，1024 窄桌面收起为 72 px，
+与权威 SPEC-045 一致。冲突一度为三值（SPEC-045 = 280、产品蓝图原写 224、Figma node `3:398`
+实测 248）；用户明确裁决采用 280 px，`docs/18` 与 `CLAUDE.md` 已同步，224 px 不再有效。
+Figma 的 248 px 保留为已批准的设计差异：1440 下主内容区为 1160 px 而非 1192 px，栅格以比例吸收。
 
 ### Gate P5
 

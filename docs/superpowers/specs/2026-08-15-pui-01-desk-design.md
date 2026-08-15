@@ -355,21 +355,25 @@ class DeskProjection(StrictResponse):
 | 来源 | 值 | 优先级 |
 |---|---|---|
 | SPEC-045（`docs/07-detailed-system-spec.md`） | 280 px | 最高 |
-| `docs/18-product-blueprint-and-prototype.md` 响应式表 | 224 px | 较低 |
-| Figma `desk-daily-workstation` node `3:398` 实测 | **248 px** | 视觉真源 |
+| `docs/18-product-blueprint-and-prototype.md` 响应式表（原值） | 224 px | 较低 |
+| Figma `desk-daily-workstation` node `3:398` 实测 | 248 px | 视觉真源 |
 | 当前运行时 | 280 px / 收起 72 px | — |
 
-**用户裁决（2026-08-15）：运行时继续使用 280 px，将差异登记为已知差异，不修改任何真源。**
+**用户裁决（2026-08-15）：统一为 280 px。** 三值冲突已收口，不再是待决项：
 
-后果，必须在 Evidence 中如实记录：
+- 运行时不变（280 / 72 px）；
+- `docs/18` 响应式表已从 224 px 更新为 280 px，224 px 不再有效；
+- `CLAUDE.md`、`docs/08`、`docs/22`、`step-01`、`track-00` 已同步为「已裁决」；
+- SPEC-045 无需修改。
+
+保留的已批准差异，必须在 Evidence 中如实记录：
 
 - 1440 下主内容区为 1160 px，而非 Figma 的 1192 px，差 32 px；
-- 因此 Desk 的 1440 Design Parity **不能记为 `parity_verified`**，只能记为
-  `parity_verified_with_known_deviation`，并明确列出侧栏 280 vs 248 这一项；
-- 内部卡片按比例自适应，不硬编码 740/380，改用比例约束（左右约 66% / 34%，gap 24），
+- 因此 Desk 的 1440 Design Parity 记为 `parity_verified_with_known_deviation`，
+  并明确列出侧栏 280 vs 248 这一项；
+- 内部卡片按比例自适应，不硬编码 740/380，改用比例约束（`740fr / 380fr`，gap 24），
   使 32 px 差异被吸收在两栏宽度上而非产生水平溢出；
-- 三值冲突本身**保持未裁决状态**记录在 `docs/22`，等待你未来对 SPEC-045 / docs/18 / Figma
-  三者做一次统一决定。本设计不代替那个决定。
+- 后续页面按同一比例换算，不得为对齐 1192 px 而改回 248 px。
 
 ## 8. 实施计划（TDD，一个 Task 一个可验证行为）
 
