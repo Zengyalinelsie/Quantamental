@@ -67,6 +67,8 @@
 ### Task 5：API 和页面
 
 新增 Timing Experiment/Forecast/Outcome/Calibration/Review API；实现 Timing Lab、Desk latest Shadow、Monitoring Timing、Portfolio active/passive split。
+对应产品面、精确原型对照和四档浏览器验收按 PUI-06 执行；historical/OOS/forward 必须分屏，未晋级
+主动模型的运行时组合影响继续为 0。
 
 ### Task 6：前瞻运行与 Gate
 

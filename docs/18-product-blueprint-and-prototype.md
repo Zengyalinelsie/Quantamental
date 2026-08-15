@@ -1,6 +1,6 @@
 # Fundamental Quant 产品蓝图与原型真源
 
-> 状态：产品原型阶段，2026-08-14
+> 状态：产品/交互真源；14 个关键 1440 高保真业务页 ready，运行时 Design Parity 0/31（2026-08-15）
 > Figma：<https://www.figma.com/design/mrt216q7X7NGqFhRjwQS3f/Fundamental-Quant-%E2%80%94-%E4%BA%A7%E5%93%81%E8%93%9D%E5%9B%BE%E4%B8%8E%E9%AB%98%E4%BF%9D%E7%9C%9F%E5%8E%9F%E5%9E%8B?node-id=9-238&t=R538S55yXyPUxZr9-0>
 > 本文定义产品信息架构和交互逻辑，不改变 `docs/07-detailed-system-spec.md` 的可信、PIT、审批和安全约束。
 
@@ -22,6 +22,25 @@
 ```
 
 原型中的证券、收益、组合和回测数字全部是 `DESIGN FIXTURE`，仅用于表达版式与交互，不进入运行时数据库，不代表 `pit_verified`，不构成模型科学有效证据。
+
+### 1.1 原型覆盖与运行时完成不是一件事
+
+当前 Figma 有 14 个关键 1440 高保真业务页和一个 31 页完整产品蓝图：
+
+- 14 个关键页可作为独立页面的精确 1440 视觉参照；
+- 31 页蓝图定义全部页面的信息架构，但不是 31 个都已有独立高保真 Frame；
+- 320/768/1024 没有独立 Figma Frame，只能按本文的响应式合同开发和验收；
+- 完成 Figma 不产生领域对象、真实 API、PIT 数据、科学结果、审批或 Paper OMS；
+- 完整 31 页非实盘运行时能力仍要完成 P5–P10。
+
+每个页面必须分别报告：
+
+1. `Design Parity`：是否与精确 Figma/批准的响应式合同一致；
+2. `Runtime Product`：是否由真实 API 覆盖六态、权限、证据、网络和控制台；
+3. `Domain/Capability`：对应业务能力是否通过阶段 Gate。
+
+一个轴通过不能替代另外两个。当前逐页差距见 `docs/22-prototype-runtime-gap-audit.md`，执行计划见
+`docs/plans/track-00-prototype-runtime-delivery.md`。
 
 ## 2. 来源与取舍
 
@@ -196,6 +215,7 @@ Data Quality、Attribution、Approvals 重叠的 `15-golden-path-state-machine` 
 | evidence/blocker/run/lineage 往返 | `ready`（代表入口） | InvestmentView 的 evidence、Backtest 的 blocker 卡片与 InvestmentView 的 run id 均可进入 `13-data-quality-lineage`；Lineage 顶层单击执行 Back |
 | 1440 桌面版视觉 | `ready` | 关键业务 Frame 均为 1440 宽，InvestmentView 与主路径首尾已完成云端截图验收 |
 | 320/768/1024 响应式 Frame | `not_started` | 顶层画布未发现这些宽度的独立关键页 Frame；只存在本文的重排合同，不能由 1440 推断通过 |
+| 31 页运行时 Design Parity | `not_started`（0/31） | 当前约 12 页只有局部合同/API 接线、19 页为占位；P5 四视口验收不是 Figma parity |
 
 `partial`、`blocked` 和 `not_started` 不是通过。尤其不能用 1440 桌面截图推断 320、768、1024
 三档符合响应式合同；没有对应 Frame 或运行时视觉证据时必须保持未验收。
@@ -276,15 +296,21 @@ Realistic Backtest → Timing Shadow → Attribution。InvestmentView 的 eviden
 直接打开 Universe 的演示 URL 也可验证新版个股页：
 <https://www.figma.com/proto/mrt216q7X7NGqFhRjwQS3f/Fundamental-Quant-%E2%80%94-%E4%BA%A7%E5%93%81%E8%93%9D%E5%9B%BE%E4%B8%8E%E9%AB%98%E4%BF%9D%E7%9C%9F%E5%8E%9F%E5%9E%8B?node-id=3-726&t=R538S55yXyPUxZr9-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=3%3A398>。
 
-## 8. 原型确认后的实施顺序
+## 8. 原型驱动的实施顺序
 
-1. 用原型替换当前 Desk 的工程能力表；
-2. 按 P5 完成 Security、估值/改善、InvestmentView、Alpha Model 和 Screen；
-3. 按 P6 完成 Construction、Backtests、Risk、Scenarios 和 core Attribution；
-4. 按 P7 完成 Timing Lab、Shadow 和 Timing Monitor；
-5. P8/P9 补 Events、Cases、全监控和统一归因；
-6. 每个页面按合同测试 → API 测试 → 前端测试 → 浏览器验收执行 TDD；
-7. PIT 暂缺时相关严格路径继续失败关闭，不阻塞其他工程能力开发。
+1. PUI-00：恢复每个目标页的精确 design context，登记缺失高保真 Frame；
+2. PUI-01：用服务端 Desk projection 和原型 Platform Pulse 替换当前硬编码工程能力表；
+3. PUI-02/PUI-03：完成 Universe/Screen、Security、InvestmentView、Approvals、Alpha 黄金路径；
+4. PUI-04：把已有 Factor/System API 页面产品化，不提前伪造 P9 能力；
+5. PUI-05：按 P6 完成 Construction、Backtests、Risk、Scenarios 和 core Attribution；
+6. PUI-06：按 P7 完成 Timing Lab、Shadow 和 Timing Monitor；
+7. PUI-07/PUI-08：按 P8/P9 补 Events、Cases、Agents、全监控、治理和统一归因；
+8. PUI-09：按 P10 完成 Paper Execution、对账和恢复产品面；
+9. 每个页面按 design context → 红测 → API/前端实现 → 1440 设计对照 → 三档响应式浏览器验收执行；
+10. PIT 暂缺时相关严格路径继续失败关闭，不阻塞 honest empty/partial/unavailable 产品结构开发。
+
+Data/Gate 的 Step 02 Task 1 与 PUI-00/PUI-01 可以是两个独立 work package 并行推进；不得把它们混进
+一个提交，也不得因为 PUI 视觉完成而跳过 P2/P4/P5 Gate。
 
 ## 9. P5–P7 原型到 TDD 工作包映射
 

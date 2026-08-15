@@ -80,6 +80,8 @@
 ### Task 6：Execution UI
 
 实现 Paper preview、orders/fills/positions/cash/breaks/kill switch 状态；危险操作需明确权限和确认；Agent 视图无操作。
+Paper Execution、Rebalance、Incidents 和 kill switch 产品面按 PUI-09 执行；全局必须保持 `paper`，
+不得出现 Live 切换、真实账户入口或由前端推断的执行状态。
 
 ### Task 7：replay、恢复和 soak
 

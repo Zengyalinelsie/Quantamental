@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`；Task 1–5 工程能力已验证，真实产物 Gate 仍阻断
+> 状态：`verified`（仅本 Step 工程范围）；真实产物 Gate 见 Step 04，PUI Design Parity 见 Track PUI
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -9,9 +9,12 @@
 
 ### 目标与非目标
 
-完成 P5 中不需要伪造真实 PIT 产物的工程能力：Frozen Artifact、Outcome 到期流程、估值/改善服务边界和 P5 响应式产品页。当前不合格数据库仍应产生稳定 blocker 和零真实 SignalSnapshot。
+完成 P5 中不需要伪造真实 PIT 产物的工程能力：Frozen Artifact、Outcome 到期流程、估值/改善服务边界和
+P5 当前运行态的响应式合同页。当前不合格数据库仍应产生稳定 blocker 和零真实 SignalSnapshot。
 
-非目标：不制造 PIT、不批准未验证因子、不从页面推导排名/闭合、不声称预期收益科学有效。
+非目标：不制造 PIT、不批准未验证因子、不从页面推导排名/闭合、不声称预期收益科学有效；本 Step 不以
+当前技术壳的响应式验收代替精确 Figma Design Parity，后者由
+`docs/plans/track-00-prototype-runtime-delivery.md` 继续执行。
 
 ### 领域与应用合同
 
@@ -68,7 +71,8 @@
 
 状态：`verified`。PostgreSQL repository、0032–0034 数据库约束、精确 lookup、Artifact+lineage 单事务、
 私有 metadata/download API、严格 OpenAPI、受控本地 reader 和真实 PostgreSQL rollback smoke 已完成。
-页面入口由 Task 5 接入；四档浏览器视觉证据仍 pending，不以 API 或组件测试冒充 UI 验收。
+页面入口由 Task 5 接入；四档浏览器证据已在 Task 5 完成，范围是当前真实 empty/unavailable 运行态，
+不以 API、组件测试或该响应式证据冒充 Figma parity。
 
 预计文件：
 
@@ -137,7 +141,7 @@ P5 Gate 通过，也不等于任何模型科学有效。
 
 按行业口径、相对估值、锚定估值、隐含预期、趋势/加速度、一次性项目逐个纯函数红绿；每项含单位、缺失、异常值和手算 fixture。
 
-### Task 5：P5 产品页和响应式
+### Task 5：P5 合同页和当前运行态响应式
 
 状态：`verified`（当前真实运行态；ready 产物由 P5 Gate 阻断）。Artifact ID 为 null 时显示未生成；
 非空时先读取服务端 identity 的
@@ -156,6 +160,10 @@ InvestmentView 重排，空/部分态显式保留 Trust。桌面疑似裁切已�
 InvestmentView unavailable blockers、空态和显式请求失败态均完成真实交互。正常加载无 4xx/5xx，
 控制台无 error/warning；故障注入恢复后下一次真实 API 请求为 200。当前库没有 ready/partial Screen 或
 InvestmentView，禁止用 runtime fixture 补齐，因此 `verified` 不包含真实 ready 产物，也不代表 P5 Gate。
+
+本 Task 也不代表原型视觉完成。`research-universe-screen`、Security fused overview、独立
+`security-investmentview`、Approvals 和 Alpha 的高保真结构由 PUI-02/PUI-03 继续实现；当前
+31 页 Design Parity 仍为 0/31。差距证据见 `docs/22-prototype-runtime-gap-audit.md`。
 
 待裁决：SPEC-045 的桌面展开侧栏为 280 px，产品蓝图响应式表为 224 px。本轮运行时遵守权威 Spec
 并保留 280 px，1024 窄桌面使用真实 72 px collapsed state；采用 224 px 前必须先批准并统一文档。

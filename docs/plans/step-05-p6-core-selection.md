@@ -99,6 +99,8 @@
 ### Task 8：Portfolio Workspace
 
 新增 `frontend/src/pages/PortfolioWorkspace.tsx` 与 construction/backtest/risk/scenario/attribution features/tests；完成四视口和黄金路径。
+页面信息架构、精确原型节点、六态和视觉验收按 PUI-05 执行；P6 领域/API 未完成前，运行时只能展示
+真实 blocker，不能用测试或 Figma fixture 生成持仓、曲线、风险或归因。
 
 ### 验证
 

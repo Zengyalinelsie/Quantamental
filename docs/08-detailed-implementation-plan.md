@@ -1,9 +1,13 @@
 # A 股基本面量化平台详细实施 Plan
 
-> 文档状态：Draft for User Review  
-> 版本：0.9.1  
-> 日期：2026-08-10  
-> 需求真源：`07-detailed-system-spec.md`  
+> 文档状态：Draft for User Review
+>
+> 版本：0.9.2
+>
+> 日期：2026-08-15
+>
+> 需求真源：`07-detailed-system-spec.md`
+>
 > 执行原则：按 Gate 交付，不按代码量或页面数量宣布完成
 
 ## 0. Plan 的用途
@@ -75,6 +79,9 @@ flowchart TB
 ```
 
 前端不是最后一次性建设。P1 建 Shell 和诚实空状态，P2–P10 随领域能力逐步接真实 API。
+从 2026-08-15 起另设跨阶段 PUI 轨道，把 Figma/原型落实为运行时产品；它与数据/Gate 工作并行，
+但不能绕过任何领域、PIT、科学、审批或权限依赖。详见
+`docs/plans/track-00-prototype-runtime-delivery.md`。
 
 ## 3. 工作轨道
 
@@ -83,9 +90,30 @@ flowchart TB
 | T-A Domain | 身份、PIT、研究、决策、组合、执行对象 | 不依赖框架 |
 | T-B Data | Provider、ODS、PIT 仓库、质量、血缘 | 不产生投资结论 |
 | T-C Research | 特征、统计、模型、回测、Timing/Event Study | 不发送订单 |
-| T-D Product | FastAPI、前端、任务、报告、通知 | 不提升 trust state |
+| T-D Product | FastAPI、原型驱动前端、任务、报告、通知 | 不提升 trust state，不用视觉完成替代 Capability |
 | T-E Execution | 风险、OMS、Broker、对账 | 不读取非获批研究输出 |
 | T-F Governance | 版本、审批、监控、安全、SLO | 跨域但不绕过域规则 |
+
+### 3.1 T-D/PUI 原型运行时轨道
+
+T-D 不再只在每个阶段末尾追加一个通用页面。它按
+`docs/plans/track-00-prototype-runtime-delivery.md` 维护独立的 PUI-00–PUI-09 工作包，并逐页记录：
+
+- Design Parity；
+- Runtime Product 六态；
+- Domain/Capability。
+
+当前事实为：31 个页面位中约 12 个只有局部合同/API 接线，19 个仍是占位，0 个完成精确 Figma node
+的运行时视觉一致性验收。P5 四视口浏览器通过只证明当前 empty/unavailable 状态的响应式、网络和
+控制台合同，不能写成原型 parity。当前差距证据见 `docs/22-prototype-runtime-gap-audit.md`。
+
+近期允许两条独立 work package 并行：
+
+1. Data/Gate：Step 02 Task 1 strict-PIT 数据源资格探针；
+2. Product/PUI：PUI-00 设计基线恢复，随后 PUI-01 Desk 与 PUI-02/PUI-03 P5 黄金路径。
+
+两条线必须分开测试、Evidence 和提交；缺真实数据时 PUI runtime 保持真实
+`empty/partial/unavailable/blocked`，不得导入 DESIGN FIXTURE。
 
 ## 4. P0：Spec、审计与核心合同
 
@@ -725,6 +753,10 @@ CSS `innerWidth` 完成 1440/1024/768/320 验收，四档 `document.scrollWidth`
 运行时不得注入 demo 值。产品蓝图、黄金路径与当前原型证据见
 `docs/18-product-blueprint-and-prototype.md`。
 
+这里的 browser verified 只描述当前技术壳/产品合同页的响应式和真实状态，不是对
+`research-universe-screen`、Security fused overview 或 `security-investmentview` 精确 Figma node 的
+Design Parity 验收。高保真替换继续进入 PUI-02/PUI-03；当前页面不能因此标成原型完成。
+
 布局文档存在待裁决冲突：权威 SPEC-045 要求桌面展开侧栏 280 px，而产品蓝图响应式表写 224 px
 且声称不改变 Spec。本轮运行时继续遵守 SPEC-045 的 280 px，1024 窄桌面收起为 72 px；未擅自修改
 任一权威要求。后续若采用 224 px，必须先由用户批准并同步升版 Spec/蓝图。
@@ -737,11 +769,12 @@ CSS `innerWidth` 完成 1440/1024/768/320 验收，四档 `document.scrollWidth`
 - 组合层无需读取新闻文本或页面计算；
 - SPEC-018–019、024–025 通过；SPEC-030 的输入合同完成，输出和组合验收留到 P6。
 
-状态（2026-08-15）：**未通过**。持久化 Repository、只读 API、`/research` 产品接线和 1440 px
-原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
+状态（2026-08-15）：**未通过**。持久化 Repository、只读 API、`/research` 黄金路径所需的路由/组件
+合同，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
 strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
 InvestmentView/SignalSnapshot、获批真实 outcome price adapter、真实 reference/FCF/分析师输入、
-真实三问详情以及真实 ready Screen/InvestmentView 浏览器产物。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
+真实三问详情、真实 ready Screen/InvestmentView 浏览器产物以及 PUI Design Parity。不能以单元测试、
+空表迁移、原型或展示组件替代 Capability Gate，
 更不能据此声称模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测
@@ -1116,6 +1149,9 @@ Shadow
 
 ## 16. 前端页面随阶段的上线矩阵
 
+本矩阵只说明能力何时具备，不说明页面已经与 Figma 一致。逐页当前 runtime/design 状态以
+`docs/22-prototype-runtime-gap-audit.md` 为事实审计，具体实现以 PUI Track 为计划真源。
+
 | 页面/Tab | 首次 Shell | 首次真实数据 | 完整目标阶段 |
 |---|---:|---:|---:|
 | Desk | P1 | P2 数据健康 | P9 |
@@ -1142,12 +1178,13 @@ Shadow
 
 生产前端只能使用 contract fixture 做自动测试；运行时空状态不得注入 demo 值。
 
-产品原型说明（2026-08-13）：在继续扩展 P5–P7 产品页面前，先按研究员工作流完成全系统
+产品原型说明（2026-08-15 更新）：全系统
 产品蓝图和 Figma 原型。31 页信息架构、逐页 `INPUT → PROCESS → OUTPUT → ACTION → GATE`、
 黄金路径、失败关闭状态机和原型验收标准以
 `docs/18-product-blueprint-and-prototype.md` 为真源。原型中的 `DESIGN FIXTURE` 只用于设计表达，
 不得进入生产运行时或冒充 `pit_verified`。现有 Shell/API/领域合同继续复用；当前 Desk 的工程阶段
-状态表将在原型确认后由真正的每日研究工作台替换。
+状态表尚未替换，必须由 PUI-01 的服务端 Desk projection 和原型 Platform Pulse 取代。14 个关键页只有
+1440 独立高保真 Frame，其他页面和 320/768/1024 的设计缺口必须显式登记，不能由开发者猜测后宣称一致。
 
 ## 17. Spec 追踪矩阵
 

@@ -1,10 +1,15 @@
 # 从当前状态到最终产品的全局交付路线图
 
-> 状态快照：2026-08-14  
-> 代码基线：`0ea1a92 feat: gate P5 investment view compilation`  
-> 适用范围：当前工程状态到成熟研究产品、Paper 系统，以及可选的 Limited Live  
-> 需求真源：`07-detailed-system-spec.md`  
-> 工作包与 Gate 真源：`08-detailed-implementation-plan.md`  
+> 状态快照：2026-08-15
+>
+> 代码基线：`f703d08 docs: add Claude Code project handoff`
+>
+> 适用范围：当前工程状态到成熟研究产品、Paper 系统，以及可选的 Limited Live
+>
+> 需求真源：`07-detailed-system-spec.md`
+>
+> 工作包与 Gate 真源：`08-detailed-implementation-plan.md`
+>
 > 产品信息架构与交互真源：`18-product-blueprint-and-prototype.md`
 
 逐步骤实现级设计、TDD 任务、预计文件和开发前决策见
@@ -14,15 +19,23 @@
 
 ### 1.1 现在到底开发到哪里
 
-当前准确位置不是“P4 已全部完成、直接进入 P5”，而是：
+当前准确位置不是“P4/P5 已通过、直接进入 P6”，而是：
 
 - P4 的工程工作包 W00–W06 已实现，但真实 `pit_verified` 截面不足，P4 Capability Gate 未通过；
-- P5 已实现较多领域、持久化、API 和前端能力，当前仍在 P5；
+- Roadmap Step 1 的 P5 工程 Task 1–5 已 verified，但 P5 真实产物 Capability Gate 未通过；
 - P2 的工程底座已完成，但历史 Universe、完整行情/股本/公司行动、XBSE 和视觉证据仍有缺口；
 - P3 小样本 PIT 证据链 Gate 已通过；P3.5 的 CSI500 财务扩容是 `normalized_current`，不能代替 PIT；
+- 运行时前端仍是技术验证壳：31 个页面位约 12 个局部接线、19 个占位、0 个完成精确 Figma node
+  的 Design Parity；
 - P6–P11 尚未正式进入。
 
-因此，项目的工程推进点在 **P5**，但关键依赖 Gate 仍停留在 **P2/P4**。后续必须双轨推进：一条完成 P5/P6 产品和工程能力，一条补齐真实 PIT 数据并关闭 P2/P4/P5 的真实产物 Gate。
+因此，后续必须双轨推进：
+
+1. Data/Gate：从 Step 02 Task 1 补齐真实 PIT 资格，依次关闭 P4/P5 真实 Gate；
+2. Prototype/Product：按 PUI Track 先替换 Desk，再实现 P5 黄金路径和后续 P6–P10 页面。
+
+PUI 可以在数据不足时实现真实 empty/partial/unavailable 产品结构，但不能伪造 ready；P6 领域能力仍等待
+P5 合格输入。
 
 ### 1.2 P5–P11 还要不要开发
 
@@ -81,8 +94,8 @@ Figma 产品合同
 | P3 | 小样本 Capability Gate 已通过 | 官方 PDF、修订链、双时间事实、诊断页面、Timing baseline ledger | 不等于全市场 PIT 财务覆盖或主动 Timing |
 | P3.5 | CSI500 current 财务扩容完成 | 500 家、2018–2025 年末、35,505 条 observation | 数据仍是 `normalized_current`；CSI300 去重扩容和 PIT 治理未完成 |
 | P4 | W00–W06 工程能力完成，Gate 未通过 | 三类 baseline、统计交叉验证、Experiment/Reviewer、Qlib exchange、Workspace | 合格 PIT 截面、forward label、真实 IC/RankIC/样本外结果和 Promotion 产物 |
-| P5 | `in_progress`，Gate 未通过 | View/Signal 合同和账本、研究 API/UI、frozen bundle 资格链、strict compilation gate | 完整估值/改善服务、真实 bundle/View/Snapshot、outcome worker、Frozen Artifact、响应式验收 |
-| P6–P11 | `not_started` | 只有 Spec、Plan 和 Figma 产品合同 | 按本路线图逐阶段实现 |
+| P5 | 工程 Step 1 `verified`，真实 Gate 未通过 | View/Signal、bundle v2、Artifact、Outcome worker、API、当前运行态四视口 | 合格 PIT bundle/View/Review/Snapshot/Artifact、真实 ready 页和 PUI Design Parity |
+| P6–P11 | 领域能力未开始/依赖阻断 | Spec、Step Plans、Figma/蓝图和通用占位 Shell | 按本路线图与 PUI Track 逐阶段实现；P11 仍需 AUTH |
 
 ### 已知文档状态冲突
 
@@ -263,9 +276,10 @@ Shadow
 
 ```mermaid
 flowchart TB
-    NOW["当前：P5 工程进行中；P2/P4 Gate 未关"]
-    P5E["Step 1：P5 剩余工程"]
+    NOW["当前：P5 工程 Step 已验证；P2/P4/P5 Gate 未关"]
+    P5E["Step 1：P5 工程能力（verified）"]
     DATA["Step 2：历史数据与 PIT 资格"]
+    PUI["PUI：原型到运行时产品轨道"]
     P4G["Step 3：P4 真实因子 Gate"]
     P5G["Step 4：P5 真实产物 Gate"]
     P6["Step 5：P6 核心选股 MVP"]
@@ -277,6 +291,7 @@ flowchart TB
 
     NOW --> P5E
     NOW --> DATA
+    NOW --> PUI
     DATA --> P4G
     P5E --> P5G
     P4G --> P5G
@@ -288,11 +303,14 @@ flowchart TB
     P8 --> P9
     P9 --> P10
     P10 --> P11
+    PUI --> P6
+    PUI --> P9
+    PUI --> P10
 ```
 
 推荐安排：
 
-- 近期并行：P5 工程收口与 P2/PIT 数据治理；
+- 近期并行：PUI-00/PUI-01/PUI-02/PUI-03 产品实现与 Step 02/PIT 数据治理；
 - 数据合格后：先关闭 P4，再产生真实 P5 View/Snapshot；
 - P5 Gate 后：P6 与 P8 可部分并行，P6 完成后启动 P7；
 - P7/P8 都稳定后汇合到 P9；
@@ -304,14 +322,17 @@ flowchart TB
 | 时点 | 浏览器里能看到什么 | 是否等于完整产品 |
 |---|---|---|
 | 现在 | 六项 Shell、真实数据治理页、P4 失败实验、P5 Research 部分接线和诚实 blocker | 否，仍是技术验证壳与部分产品页 |
-| Step 1 后 | P5 页面视觉和交互基本按原型落地，缺 PIT 时完整展示失败原因 | 否，工程完整不等于真实产物完整 |
+| PUI-01 后 | Desk 从工程能力表变为原型 Platform Pulse，未实现域按分区显示真实 unavailable | 否，只是第一块可见产品面 |
+| PUI-03 后 | Universe → Security → InvestmentView → Approvals → Alpha 的结构和交互按高保真原型落地 | 否，真实 ready 产物仍取决于 P2/P4/P5 Gate |
 | Step 4 后 | 有首条真实合格 Screen/Security/View/Approval/SignalSnapshot 链 | P5 产品切片完整 |
 | Step 5 后 | 可在浏览器走完核心选股、组合、现实回测、风险和核心归因 | 第一版核心研究 MVP |
 | Step 8 后 | 六工作区中的研究、因子、组合、事件、Timing、监控和治理工作流完整 | 成熟研究产品；Paper 专属页面仍待 P10 |
 | Step 9 后 | 加上完整 Paper execution、对账和恢复 | 完整非实盘产品 |
 | Step 10 后 | 仅在明确授权下开放最小受限实盘 | 可选上线阶段 |
 
-用户最早能看到“像一个完整产品而不是工程状态页”的关键节点是 **Step 5 / P6**；要看到 Figma 31 页对应的成熟前后端整体，应以 **Step 8 / P9** 为研究产品验收点、以 **Step 9 / P10** 为完整非实盘产品验收点。
+用户在 PUI-01/PUI-03 后应先看到明显符合原型的 Desk 和 P5 黄金路径；**Step 5 / P6** 才是第一条
+可用核心研究 MVP。Figma 31 页对应的成熟前后端整体仍以 **Step 8 / P9** 为研究产品验收点、
+以 **Step 9 / P10** 为完整非实盘产品验收点。
 
 ## 7. 粗略工作量，不作为承诺日期
 
@@ -319,7 +340,8 @@ flowchart TB
 
 | 范围 | 粗略量级 | 最大不确定性 |
 |---|---:|---|
-| Step 1 P5 工程收口 | 1–3 周 | outcome 价格政策、估值模型边界、响应式页面量 |
+| Step 1 P5 工程收口 | 已完成工程验证 | 真实产物仍在 Step 4 Gate，不等于 PUI parity |
+| PUI-00–PUI-04 当前产品面 | 恢复精确设计上下文后重估 | 非关键页高保真缺口、响应式设计、Desk 聚合 API |
 | Step 2 数据/PIT | 3–10+ 周 | 真 PIT 来源、历史成分/修订覆盖、许可和限流 |
 | Step 3–4 P4/P5 真实 Gate | 2–5 周 | 数据质量、样本外结果和审查迭代 |
 | Step 5 P6 | 4–8 周 | A 股交易规则、双引擎 reconciliation、风险闭合 |
@@ -350,15 +372,15 @@ flowchart TB
 
 按当前工作树和依赖，下一批建议顺序是：
 
-1. 完成当前已写红测的 Frozen InvestmentView Artifact export；
-2. 明确 outcome 的 session/价格/复权/公司行动政策并实现到期 worker；
-3. 补 P5 估值/改善服务剩余合同；
-4. 完成 P5 320/768/1024/1440 运行时前端和浏览器验收；
-5. 与上述工作并行推进历史 Universe、行情、股本、公司行动、XBSE 和真实 PIT 财务；
-6. 数据合格后依次重跑 P4 资格、P5 bundle、InvestmentView 和 SignalSnapshot；
-7. P5 Gate 通过或工程能力完整且真实 blocker 被保存后，开始 P6。
+1. PUI-00 恢复 Desk/Universe/Security/InvestmentView/Approvals/Alpha 精确 design context 和设计状态；
+2. PUI-01 用服务端 Desk projection 与原型 Platform Pulse 替换硬编码工程状态表；
+3. 独立并行执行 Step 02 Task 1 strict-PIT 数据源资格探针；
+4. PUI-02/PUI-03 实现 P5 高保真黄金路径，运行时继续诚实显示真实 blocker；
+5. 数据合格后依次重跑 P4 资格、P5 bundle、InvestmentView 和 SignalSnapshot；
+6. 关闭 Step 4 的真实 P5 Gate 后开始 P6 领域能力，同时按 PUI-05 实现 Portfolio 产品页。
 
-当前工作树有一个未提交的 P5 Frozen Artifact 红测 `platform/tests/test_investment_view_artifacts.py`。它是 Step 1 的合理起点，但红测本身不是已完成功能。
+Step 1 的 Frozen Artifact、Outcome、valuation bundle v2、响应式和浏览器工程工作已经完成；旧的
+“未提交 Artifact 红测”描述已失效，不再作为下一入口。
 
 ## 10. 不变边界
 

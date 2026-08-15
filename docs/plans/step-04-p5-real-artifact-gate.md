@@ -52,6 +52,8 @@
 ### Task 5：端到端 API/浏览器证据
 
 按 Screen → Security → View → Evidence → Approvals → Alpha Model 路径验收；无对象时保持真实 0，不导入原型数字。
+高保真结构、InvestmentView 独立详情、四档视觉对照和页面六态按 PUI-03 执行。真实 P5 Artifact Gate
+与 PUI-03 的 Design Parity/Runtime Product 分别报告，任何一项不得代替另一项。
 
 ### 定向验证
 
