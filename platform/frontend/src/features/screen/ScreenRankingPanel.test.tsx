@@ -239,3 +239,117 @@ describe('ScreenRankingPanel', () => {
       .toHaveClass('ant-table-cell-fix-start')
   })
 })
+
+describe('ScreenRankingPanel factor dimension columns', () => {
+  afterEach(cleanup)
+
+  const withComponents: ScreenRankingProjection = {
+    ...projection,
+    rows: projection.rows.map((row, index) => ({
+      ...row,
+      components: [
+        {
+          component: 'quality' as const,
+          label: '公司质量',
+          status: 'quantified' as const,
+          contribution: { raw: '0.018', display: '+1.80%' },
+          display: '+1.80%',
+          reason: null,
+          evidence_ids: ['evidence:quality:v1'],
+        },
+        {
+          component: 'valuation' as const,
+          label: '估值预期差',
+          status: 'quantified' as const,
+          contribution: { raw: '0.021', display: '+2.10%' },
+          display: '+2.10%',
+          reason: null,
+          evidence_ids: [],
+        },
+        {
+          component: 'revision' as const,
+          label: '基本面改善',
+          status: 'constrained' as const,
+          contribution: null,
+          display: '—',
+          reason: '改善分项受输入区间约束，未量化。',
+          evidence_ids: [],
+        },
+        {
+          component: 'event' as const,
+          label: '事件调整',
+          status: 'unavailable' as const,
+          contribution: null,
+          display: '—',
+          reason: '没有合格事件证据链。',
+          evidence_ids: [],
+        },
+      ],
+      expected_return_interval: index === 0
+        ? {
+          horizon_trading_days: 60,
+          lower: { raw: '0.05', display: '+5.00%' },
+          upper: { raw: '0.12', display: '+12.00%' },
+          display: '[+5.00%, +12.00%]',
+          unavailable_reason: null,
+        }
+        : {
+          horizon_trading_days: 60,
+          lower: null,
+          upper: null,
+          display: null,
+          unavailable_reason: '该行没有绑定的冻结 InvestmentView，无法给出区间。',
+        },
+    })),
+  }
+
+  it('renders the three factor dimensions the prototype table declares', () => {
+    render(<ScreenRankingPanel projection={withComponents} />)
+
+    expect(screen.getByRole('columnheader', { name: '质量' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: '估值预期差' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: '改善' })).toBeInTheDocument()
+  })
+
+  it('renders the horizon expected-return interval column', () => {
+    render(<ScreenRankingPanel projection={withComponents} />)
+
+    expect(screen.getByRole('columnheader', { name: '60日预期收益区间' })).toBeInTheDocument()
+    expect(screen.getByText('[+5.00%, +12.00%]')).toBeInTheDocument()
+  })
+
+  it('shows the server display value and never zero-fills a non-quantified dimension', () => {
+    render(<ScreenRankingPanel projection={withComponents} />)
+
+    expect(screen.getAllByText('+1.80%').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('+2.10%').length).toBeGreaterThan(0)
+    // constrained and unavailable both render an em dash, never 0 or 0.00%.
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0)
+    expect(screen.queryByText('0.00%')).not.toBeInTheDocument()
+    expect(screen.queryByText('+0.00%')).not.toBeInTheDocument()
+  })
+
+  it('keeps constrained distinguishable from unavailable for audit', () => {
+    render(<ScreenRankingPanel projection={withComponents} />)
+
+    // The prototype table carries 质量 / 估值预期差 / 改善 only; the event
+    // dimension belongs to the InvestmentView detail, not this table.  For the
+    // dimensions that are shown, an em dash must still carry its reason so that
+    // "bounded but unquantified" does not read the same as "missing".
+    expect(screen.getAllByTitle(/改善分项受输入区间约束/).length).toBeGreaterThan(0)
+  })
+
+  it('states why an interval is missing instead of showing a bare dash', () => {
+    render(<ScreenRankingPanel projection={withComponents} />)
+
+    expect(screen.getAllByTitle(/没有绑定的冻结 InvestmentView/).length).toBeGreaterThan(0)
+  })
+
+  it('tolerates a projection without component fields', () => {
+    // Older snapshots have no bound view; the table must still render.
+    render(<ScreenRankingPanel projection={projection} />)
+
+    expect(screen.getByRole('columnheader', { name: '质量' })).toBeInTheDocument()
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0)
+  })
+})

@@ -2435,6 +2435,13 @@
       "ScreenRankingRowProjection": {
         "additionalProperties": false,
         "properties": {
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/ScreenRowComponentProjection"
+            },
+            "title": "Components",
+            "type": "array"
+          },
           "confidence": {
             "$ref": "#/components/schemas/ScreenProjectedValue"
           },
@@ -2444,6 +2451,16 @@
           },
           "expected_return": {
             "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "expected_return_interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenReturnIntervalProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "industry": {
             "$ref": "#/components/schemas/ScreenIndustryProjection"
@@ -2500,6 +2517,133 @@
           "selected"
         ],
         "title": "ScreenRankingRowProjection",
+        "type": "object"
+      },
+      "ScreenReturnIntervalProjection": {
+        "additionalProperties": false,
+        "description": "The horizon expected-return interval, from the frozen view's p10/p90.",
+        "properties": {
+          "display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display"
+          },
+          "horizon_trading_days": {
+            "title": "Horizon Trading Days",
+            "type": "integer"
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "horizon_trading_days"
+        ],
+        "title": "ScreenReturnIntervalProjection",
+        "type": "object"
+      },
+      "ScreenRowComponentProjection": {
+        "additionalProperties": false,
+        "description": "One factor dimension's contribution for a single ranked row.\n\nProjected from the exact frozen InvestmentView the snapshot is bound to, not\nderived from the row score.  `display` is an em dash for every non-quantified\nstatus, so an unavailable dimension is never shown as a zero.",
+        "properties": {
+          "component": {
+            "enum": [
+              "quality",
+              "valuation",
+              "revision",
+              "event"
+            ],
+            "title": "Component",
+            "type": "string"
+          },
+          "contribution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "quantified",
+              "constrained",
+              "unavailable",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "component",
+          "label",
+          "status",
+          "display"
+        ],
+        "title": "ScreenRowComponentProjection",
         "type": "object"
       },
       "ScreenSecurityIdentityProjection": {
