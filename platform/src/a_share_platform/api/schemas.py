@@ -407,6 +407,51 @@ class ResearchWorkspaceEnvelope(StrictResponse):
     context: ResearchWorkspaceResponseContext
 
 
+DeskSectionKeyLiteral = Literal[
+    "data_health",
+    "screen_shifts",
+    "portfolio_tracking",
+    "timing_shadow",
+    "event_feed",
+    "pending_tasks",
+    "active_failures",
+]
+
+
+class DeskBlockerProjection(StrictResponse):
+    code: str
+    reason: str
+    affected_binding: str
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class DeskSectionProjection(StrictResponse):
+    """One desk domain.
+
+    ``status`` covers only what the server can know.  ``loading`` and ``error``
+    belong to the request lifecycle and are resolved by the client.  ``empty``
+    and ``unavailable`` stay distinct on purpose: empty means the capability
+    works and holds no record, unavailable means the capability or its store is
+    missing.
+    """
+
+    key: DeskSectionKeyLiteral
+    status: Literal["ready", "partial", "empty", "unavailable"]
+    title: str
+    blockers: list[DeskBlockerProjection] = Field(default_factory=list)
+    coverage: dict[str, JsonValue] = Field(default_factory=dict)
+    payload: JsonValue | None = None
+
+
+class DeskData(StrictResponse):
+    sections: list[DeskSectionProjection]
+
+
+class DeskEnvelope(StrictResponse):
+    data: DeskData
+    context: ResearchWorkspaceResponseContext
+
+
 class ProblemDetails(BaseModel):
     type: str
     title: str
