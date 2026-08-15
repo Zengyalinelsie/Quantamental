@@ -176,6 +176,10 @@ class ScreenRankingRowProjection(StrictResponse):
     score: ScreenProjectedValue
     expected_return: ScreenProjectedValue
     confidence: ScreenProjectedValue
+    # Defined after the component literals below, so these stay as forward
+    # references resolved by model_rebuild() at the end of this module.
+    components: list[ScreenRowComponentProjection] = Field(default_factory=list)
+    expected_return_interval: ScreenReturnIntervalProjection | None = None
     investment_view_id: str
     trust_state: Literal["normalized_current", "pit_verified"]
     content_hash: str
@@ -263,6 +267,36 @@ class ClosureProjection(StrictResponse):
     tolerance: str
     difference: str | None
     checked_by: str
+
+
+class ScreenRowComponentProjection(StrictResponse):
+    """One factor dimension's contribution for a single ranked row.
+
+    Projected from the exact frozen InvestmentView the snapshot is bound to, not
+    derived from the row score.  `display` is an em dash for every non-quantified
+    status, so an unavailable dimension is never shown as a zero.
+    """
+
+    component: InvestmentComponentName
+    label: str
+    status: InvestmentComponentStatus
+    contribution: ScreenProjectedValue | None = None
+    display: str
+    reason: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class ScreenReturnIntervalProjection(StrictResponse):
+    """The horizon expected-return interval, from the frozen view's p10/p90."""
+
+    horizon_trading_days: int
+    lower: ScreenProjectedValue | None = None
+    upper: ScreenProjectedValue | None = None
+    display: str | None = None
+    unavailable_reason: str | None = None
+
+
+ScreenRankingRowProjection.model_rebuild()
 
 
 class ExpectedReturnDistributionProjection(StrictResponse):
