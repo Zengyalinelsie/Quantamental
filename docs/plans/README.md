@@ -60,6 +60,7 @@ empty/partial/unavailable/blocked 产品状态；它不能生成 ready 数据或
 | 1 | `step-01-p5-engineering-completion.md` | `verified`（仅工程范围；P5 Gate 仍阻断） |
 | 2 | `step-02-p2-pit-data-remediation.md` | `ready_for_implementation`（先做资格探针） |
 | 3 | `step-03-p4-real-qualification-gate.md` | `gate_blocked` |
+| 3A | `step-03a-current-only-factor-research.md` | `ready_for_implementation`（current-only 轨道，不替代 Step 3） |
 | 4 | `step-04-p5-real-artifact-gate.md` | `gate_blocked` |
 | 5 | `step-05-p6-core-selection.md` | `dependency_blocked` |
 | 6 | `step-06-p7-active-timing.md` | `dependency_blocked` |
