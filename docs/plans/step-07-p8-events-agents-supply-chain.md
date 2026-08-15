@@ -71,6 +71,8 @@
 ### Task 6：API、Events/Cases 和通知
 
 实现 Document/Event/Claim/Impact/SupplyChain/AgentRun 只读/受权写 API；前端 badges、drill-down、invalidators、pending verification；通知 adapter 只发送 frozen Artifact 链接。
+Events、Cases、Agents 和 Security event enhancement 的页面交付按 PUI-07 执行；Design Parity 不提升
+引用资格，缺引用或 schema invalid 的 Agent 输出仍必须隔离。
 
 ### 验证
 

@@ -59,6 +59,8 @@
 ### Task 5：API、Workspace 和浏览器验收
 
 真实 API 展示窗口、coverage、统计、交叉验证、review 和 blocker；刷新后无运行时 fixture 或控制台错误。
+页面产品化、精确原型对照和四档视觉验收按 PUI-04 执行；本 Task 的 Capability/API 通过不能自动标记
+Design Parity 通过。
 
 ### 定向验证
 

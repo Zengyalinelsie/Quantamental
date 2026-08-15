@@ -280,6 +280,13 @@ Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成�
 - 真实 ready/partial Screen、InvestmentView 和 Frozen Artifact 浏览器产物；
 - 真实 qualified PIT bundle、InvestmentView、Review 和 SignalSnapshot。
 
+2026-08-15 的后续原型运行时审计进一步澄清：Task 5 的 `verified` 只覆盖当前
+empty/unavailable 技术壳/合同页的响应式、交互、网络和控制台，不是精确 Figma node 的 Design Parity。
+当前 Desk 仍是硬编码工程能力表，Universe/Security 尚未实现高保真 Frame 的完整信息架构，Portfolio、
+Monitoring 和多个 System tab 仍是通用占位。31 页逐页事实见
+`docs/22-prototype-runtime-gap-audit.md`；后续视觉产品化进入
+`docs/plans/track-00-prototype-runtime-delivery.md`，不能倒改本 Evidence 已验证的工程事实。
+
 因此 P5 Capability Gate 仍未通过。自动测试证明工程合同按预期工作，不证明 Expected Return、
 InvestmentView、因子或策略科学有效。
 

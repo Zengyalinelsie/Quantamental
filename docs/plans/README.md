@@ -1,6 +1,8 @@
 # Roadmap Step Spec / Plan 包
 
-本目录把 `docs/19-end-to-end-product-roadmap.md` 的 10 个 Step 展开为实现级 Spec/Plan。它借鉴“先设计、后计划、再按 TDD 小步执行”的方法，但不依赖或安装 Superpowers。
+本目录把 `docs/19-end-to-end-product-roadmap.md` 的 10 个 Step 展开为实现级 Spec/Plan，并用
+`track-00-prototype-runtime-delivery.md` 管理跨 P5–P10 的原型运行时产品轨道。它借鉴“先设计、后计划、
+再按 TDD 小步执行”的方法，但不依赖或安装 Superpowers。
 
 为减少成对文件漂移，每个 Step 使用一个文件，前半部分 `## Spec` 冻结行为和边界，后半部分
 `## Plan` 只描述如何实现。Plan 不能覆盖 Spec；需要改变 Spec 时必须先修订 Spec/ADR 并重新审查。
@@ -35,11 +37,27 @@
 
 Plan 中的“预计文件”用于控制改动边界。执行时若发现必须修改未列出的领域主合同，应先更新对应 Spec/Plan 或 ADR，不能悄悄扩张。
 
+## 两条当前执行队列
+
+当前不能再把“下一步”写成只有数据工作：
+
+1. **Data/Gate 队列**：`step-02-p2-pit-data-remediation.md` Task 1，strict-PIT 数据源资格探针；
+2. **Prototype/Product 队列**：`track-00-prototype-runtime-delivery.md`，先 PUI-00 设计基线，再 PUI-01
+   Desk、PUI-02 Universe/Screen、PUI-03 P5 黄金路径。
+
+两条队列可以作为不同 work package 并行。PUI 不需要等待假数据，可以实现真实
+empty/partial/unavailable/blocked 产品状态；它不能生成 ready 数据或提升 Gate。Data/Gate 通过也不会自动
+使页面与 Figma 一致。
+
+每个页面分别报告 `Design Parity`、`Runtime Product` 和 `Domain/Capability`。通用占位、无溢出测试或
+四视口响应式通过，不能单独写成“原型页面完成”。
+
 ## 索引
 
 | Step | Spec / Plan | 状态 |
 |---:|---|---|
-| 1 | `step-01-p5-engineering-completion.md` | `in_progress` |
+| PUI | `track-00-prototype-runtime-delivery.md` | `in_progress`（Design Parity 0/31） |
+| 1 | `step-01-p5-engineering-completion.md` | `verified`（仅工程范围；P5 Gate 仍阻断） |
 | 2 | `step-02-p2-pit-data-remediation.md` | `ready_for_implementation`（先做资格探针） |
 | 3 | `step-03-p4-real-qualification-gate.md` | `gate_blocked` |
 | 4 | `step-04-p5-real-artifact-gate.md` | `gate_blocked` |
@@ -68,4 +86,7 @@ npm --prefix frontend run build
 git diff --check
 ```
 
-前端改动必须另做 320/768/1024/1440 浏览器验证。统计与回测结果必须执行对应计划中的独立库/外部引擎对照；全量测试通过不代表模型科学有效。
+前端改动必须先读取目标 Figma node 的 design context，再做 1440 精确设计对照和 320/768/1024
+响应式浏览器验证。目标没有独立高保真/响应式 Frame 时必须记录设计缺口或用户批准的推导方案。
+统计与回测结果必须执行对应计划中的独立库/外部引擎对照；全量测试、视觉相似或原型通过都不代表
+模型科学有效。

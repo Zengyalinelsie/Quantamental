@@ -2,6 +2,11 @@
 
 本目录保存可重新导入 Figma 的原型资产，避免浏览器会话或 Figma Agent 配额导致关键 Frame 无法恢复。
 
+当前只有下表两页具有仓库内可恢复的精确 SVG。它们不能代表 14 个关键 1440 Frame 全部已有本地资产，
+更不能代表 31 页和 320/768/1024 三档已有逐页高保真设计。逐页现状见
+`docs/22-prototype-runtime-gap-audit.md`，运行时交付计划见
+`docs/plans/track-00-prototype-runtime-delivery.md`。
+
 | 文件 | Figma Frame | 状态 |
 |---|---|---|
 | `investment-view.svg` | `security-investmentview` | XML 与 1440 px 本地渲染已复验；2026-08-13 已作为可编辑矢量导入云端 Figma，Frame 为 `1440 × 1200`，位置 `X=4868, Y=-900` |
@@ -45,3 +50,12 @@ Figma 精确节点：<https://www.figma.com/design/mrt216q7X7NGqFhRjwQS3f/Fundam
 - 原型和测试通过不代表模型科学有效。
 
 融合页精确节点：<https://www.figma.com/design/mrt216q7X7NGqFhRjwQS3f/Fundamental-Quant-%E2%80%94-%E4%BA%A7%E5%93%81%E8%93%9D%E5%9B%BE%E4%B8%8E%E9%AB%98%E4%BF%9D%E7%9C%9F%E5%8E%9F%E5%9E%8B?node-id=24-400&t=R538S55yXyPUxZr9-0>
+
+## 2026-08-15 运行时差距说明
+
+- 当前运行时 Design Parity 为 0/31；P5 的四视口验收只覆盖已有 empty/unavailable 页面合同；
+- 开发任何目标页前应先取得精确 Figma node 的结构化 design context；本目录两份 SVG 仅是工具受限时
+  对应 Security/InvestmentView 的可恢复真源；
+- Figma Starter/View seat 的 MCP 调用额度已用尽，本轮没有取得新的结构化节点上下文；该限制必须作为
+  PUI-00 的设计输入阻断保留，不能用缩放截图推测其余页面并声称高保真；
+- Figma 中的示例数字始终是 DESIGN FIXTURE，严禁进入开发或生产运行时。
