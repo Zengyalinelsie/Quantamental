@@ -34,6 +34,16 @@
   差异的页面，不能据此宣称 parity 已通过；
 - 设计输入阻断已解除（见 §2.2.1），17 个关键页均有仓库内精确视觉真源。
 
+**2026-08-15 PUI-02 完成后的增量更新**：
+
+- `/research?tab=universe-screen` 已改为 Figma 双栏结构：左侧只读 Screen 构建器 + 右侧排名表；
+- 排名表补齐 `质量 / 估值预期差 / 改善 / 60日预期收益区间` 四列，投影自已冻结
+  `InvestmentView.components`，以 view id **与** hash 双重匹配，不新建计算；
+- 构建器为只读，不含权重输入与「运行 Screen」按钮，依据 `ADR-0012`；
+- Universe & Screen 的 Design Parity 同为 `parity_verified_with_known_deviation`
+  （构建器只读、Figma 示例值不入运行时），完全 parity 计数仍为 **0/31**；
+- 新发现待修既有缺陷：`/factors` 在 320 视口存在页面级水平溢出，早于本工作包，登记待 PUI-04。
+
 因此：
 
 1. 只完成 `CLAUDE.md` 原先指定的 Step 02 Task 1，不会让前端接近完整原型；
@@ -190,7 +200,7 @@ P5 Task 5 的真实 Chrome 验收是有效工程证据，但验收对象是当�
 | # | 工作区 / 页面 | 当前运行时 | 独立高保真参照 | 能力阶段 | 原型轨道 |
 |---:|---|---|---|---:|---|
 | 1 | Desk / 今日工作台 | `runtime_verified`：服务端 Desk projection 七分区六态（2026-08-15） | `desk-daily-workstation` | P9 聚合；P2–P8 渐进 | PUI-01 |
-| 2 | Research / Universe & Screen | `runtime_partial`：Universe 查询、P5 blocker/Screen 接线 | `research-universe-screen` | P2/P5 | PUI-02 |
+| 2 | Research / Universe & Screen | `runtime_verified`：双栏构建器+12 列排名表，六态真实（2026-08-15） | `research-universe-screen` | P2/P5 | PUI-02 |
 | 3 | Research / Security | `runtime_partial`：P5 View 组件接线，缺融合页信息架构 | `security-overview-600519-fused-v2` | P5/P8 | PUI-03 |
 | 4 | Research / Events | `placeholder` | `10-events-intelligence` | P8 | PUI-07 |
 | 5 | Research / Watchlists/Cases | `placeholder` | 31 页蓝图 | P8/P9 | PUI-07/PUI-08 |

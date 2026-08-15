@@ -195,11 +195,53 @@ TDD 切片（原计划，已执行）：
 
 ### PUI-02：Universe & Screen
 
-状态：`ready_for_implementation`（视觉编码前读取 `research-universe-screen`）。
+状态：`in_progress`（2026-08-15 完成第一个垂直切片；三轴状态见下）。
 
 目标：从当前纵向技术页变为左侧 Universe/Factor Builder + 右侧受治理排名表，同时保留真实空态和 blocker。
 
-TDD 切片：
+三轴结论（不得互相替代）：
+
+| 轴 | 结论 | 依据 |
+|---|---|---|
+| Design Parity | `parity_verified_with_known_deviation` | 双栏 320/800、构建器分区、排名表 12 列对照 node `3:726`；差异见下 |
+| Runtime Product | `verified` | 四视口真实浏览器验收通过，无 runtime fixture，无 console error |
+| Domain/Capability | `blocked` | 无合格 Screen/Snapshot；P2/P4/P5 Gate 未通过 |
+
+已完成：
+
+- 服务端逐行投影 `质量 / 估值预期差 / 改善` 与 `60日预期收益区间` 四列。这些**不是新数据**：
+  来自已冻结 `InvestmentView.components` 与 `expected_return.p10/p90`，并以
+  `investment_view_id` **和** `investment_view_hash` 双重匹配，确保同证券的新版 View 不会串入；
+- 新增只读 `ScreenBuilderPanel`（Figma 320 栏）：展示该 Screen 实际使用的股票池版本与规模、
+  参与打分的因子版本、模型版本、审批用途、可信状态、决策时点与数据截止；
+- 双栏 `screenWorkspaceGrid`（320fr / 800fr，gap 24），1280 以下堆叠；
+- 构建器在 workspace `unavailable` 时仍然渲染并说明缺失绑定 —— 浏览器验收发现原实现会整体
+  跳过该分支、页面退化为单条泛化提示，已修复；
+- `constrained` / `unavailable` / `not_applicable` 三态均显示 `—` 但 status 各自保留，
+  审计可区分「有界未量化」与「缺失」；**没有任何一项填 0**。
+
+关键决策：**构建器为只读，不渲染权重输入与「运行 Screen」按钮**，依据 `ADR-0012`。
+原型该按钮会产出无定义版本、无 Run 记录、无审批用途的排名，违反 `AGENTS.md`；且 P4 因子资格门
+未通过，没有合格因子可用于重排。ADR-0012 已记录 P4 之后的 scratch/governed 双通道设计与 6 条
+强制要求。
+
+与 Figma 的已知差异：
+
+1. **构建器为只读**，无权重滑块、无流动性阈值输入、无排除条件勾选、无运行按钮（ADR-0012）；
+2. Figma 示例值（40%/30%/30%、96.3%、> 5000 万 CNY）**不进入运行时**；无绑定时显示缺失原因；
+3. 侧栏 280 px 决定使主内容区为 1160 px 而非 1192 px，栅格以比例吸收（见 PUI-01 §已知差异）；
+4. 320/768/1024 无独立 Figma Frame，按 `docs/18` 响应式合同重排；
+5. 320 视口 AntD tab 条在自身容器内滚动，属既有行为（未触碰的 `/monitoring` 同样存在），
+   页面级 `scrollWidth === clientWidth` 成立。
+
+本切片未覆盖（留待后续）：
+
+- 行业多选、流动性门槛、排除条件的服务端配置来源均不存在，构建器暂不展示这些分区；
+- 行点击进入精确 Security 的上下文传递（依赖 PUI-03）；
+- 1440 高密度排名表与 320 记录卡形态需真实 Screen 数据后才能完成视觉验收；
+- 可编辑构建器等待 P4 与 ADR-0012 第二阶段。
+
+原 TDD 切片（参考）：
 
 1. 查询控件、filter builder、资格/排除条件和 URL 状态；
 2. 服务端 Screen projection、stable order、rank change、trust/version/hash；
@@ -209,6 +251,11 @@ TDD 切片：
 6. 无 Universe/Snapshot 时仍保留原型结构并显示分区 blocker。
 
 预计复用：`UniverseScreen`、`ScreenRankingPanel`、`screenProjection`；禁止建立第二套排名计算。
+
+### 待修复的既有缺陷（PUI-02 浏览器验收发现）
+
+- `/factors` 在 320 视口存在**页面级水平溢出**（`pageHeading` 溢出）。该缺陷早于本工作包，
+  与 Screen 无关，登记待 PUI-04 处理，不在本切片修复。
 
 ### PUI-03：Security、InvestmentView、Approvals 与 Alpha 黄金路径
 
