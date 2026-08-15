@@ -156,6 +156,37 @@ OpenAPI/TypeScript 类型后，3 项 Identity 定向测试通过。响应式复�
 rerender 红测后改为只保存 `snapshot_id` 并从最新 projection 派生，行消失时自动关闭，相关组件
 合计 24/24 通过。
 
+2026-08-15 的 Task 5 浏览器验收续作先把桌面截图中的疑似右侧裁切收敛为响应式 CSS 合同：固定侧栏
+后的主内容宽度必须与视口闭合，运行上下文长标识必须可收缩断行，Universe 控件必须允许换行且子控件
+不得超过容器。旧样式定向执行 `3/3` 按预期失败；最小修复为 280/72 px 侧栏分别显式计算主内容宽度、
+长上下文使用 `overflow-wrap:anywhere`、Universe 控件启用 wrap 并限制 Select/Segmented/input。修复后
+P5 相关组件和布局合同定向测试 `31/31` 通过，全量前端测试增加到 `73/73`。该合同用于防回归，仍不
+替代真实浏览器的几何、截图、交互、控制台或网络验收。
+
+### Task 5 真实 Chrome 验收
+
+内置 Browser 不可用后，用户明确批准切换到已连接 Chrome。Chrome 当前站点缩放为 90%，所以按
+`devicePixelRatio=0.9` 校准外层窗口，并以页面报告的 CSS `window.innerWidth` 为验收真值；前三档
+CSS 高度为 1000，320 档为 844：
+
+| CSS 视口 | 导航 | 页面宽度证据 | 结果 |
+|---:|---|---|---|
+| 1440 | 280 px 展开侧栏 | `clientWidth=scrollWidth=1440` | 顶部上下文完整；Universe 的 AS OF 在空间不足时换到下一行，无右侧裁切 |
+| 1024 | 自动收为 72 px | `clientWidth=scrollWidth=1024` | 上下文标签和值完整；Universe Select 独占一行，其余控件在容器内重排 |
+| 768 | 移动 Drawer | `clientWidth=scrollWidth=768` | Drawer 打开/关闭与一级导航可用；上下文两行、Universe 单列，无页面级溢出 |
+| 320 | 移动 Drawer | `clientWidth=scrollWidth=320` | 上下文文本值保留；Tabs 在自身容器提供省略入口；Universe/Security/P5 context 均未撑宽页面 |
+
+真实交互覆盖：Universe current/historical 切换、历史日期警告、空 UniverseVersion、移动 Drawer、
+Universe & Screen/Security tab、全局搜索 `600066` 原样形成真实 API 请求、Screen/InvestmentView/
+Alpha 的 unavailable blockers 和 Trust 文本。当前运行时没有 ready/partial Screen、InvestmentView 或
+Frozen Artifact，故没有用 fixture 伪造浏览器 ready 态；这部分仍受真实 P5 Gate 阻断。
+
+网络失败态通过 CDP 临时阻断一次 `/api/research/workspace` 请求，页面显示
+`P5 研究工作区读取失败 / TypeError: Failed to fetch`；清除阻断后下一证券查询恢复 200。正常整页重载
+记录 68 个 response，0 个 4xx/5xx；React Query 在 Strict Mode 取消的 `/api/universes` 和
+`/api/research/workspace` 初始重复请求标记为 `canceled=true / ERR_ABORTED`，同 URL 后续请求均为
+200。页面控制台 error/warning 列表为空。故障注入已完全恢复，未改变运行时业务数据。
+
 ## 5. 真实 PostgreSQL 证据
 
 迁移前只读预检：
@@ -194,7 +225,7 @@ Ruff: passed
 mypy: 175 source files passed
 compileall: passed
 git diff --check: passed
-Frontend Vitest: 70/70 passed
+Frontend Vitest: 73/73 passed
 Frontend lint: passed
 Frontend build: passed
 ```
@@ -236,7 +267,7 @@ API 合同。
 - `platform/frontend/src/features/investment-view/FrozenArtifactPanel.tsx` 及测试；
 - `platform/frontend/src/pages/ResearchP5Screen.tsx/.less/.test.tsx`；
 - `platform/frontend/src/features/screen/ScreenRankingPanel.tsx/.test.tsx`、`screen.less`；
-- `platform/frontend/src/app/AppShell.tsx`、`shell.less`；
+- `platform/frontend/src/app/AppShell.tsx`、`shell.less`、`responsiveLayoutContract.test.ts`；
 - `docs/adr/0011-valuation-model-engineering-defaults.md`；
 - `platform/ci/verify.sh`、`platform/tests/test_architecture_contract.py`。
 
@@ -246,15 +277,21 @@ Frozen Artifact application、durable PostgreSQL 和 API 工程链路已完成�
 
 - 获批的真实 Outcome price/calendar/corporate-action adapter 与真实到期产物；
 - 真实 historical/industry/peer、FCF、合格分析师输入 adapter/产物；
-- 320/768/1024/1440 最终浏览器验收；
+- 真实 ready/partial Screen、InvestmentView 和 Frozen Artifact 浏览器产物；
 - 真实 qualified PIT bundle、InvestmentView、Review 和 SignalSnapshot。
 
 因此 P5 Capability Gate 仍未通过。自动测试证明工程合同按预期工作，不证明 Expected Return、
 InvestmentView、因子或策略科学有效。
 
-本轮已确认本项目服务继续使用 `5173`/`8010`，未占用用户其他项目的 `8000`。前端/API 健康检查
-通过，但浏览器控制当前没有可操作页面 tab，无法形成四档截图和交互证据；因此响应式视觉验收保持
-pending，不能用组件测试或构建结果替代。
+本轮真实 HTTP 确认 `http://127.0.0.1:5173/research` 与 `/api/health` 均为 200。运行时
+`/api/universes` 返回空集合，`/api/research/workspace` 因未配置持久化且没有真实 InvestmentView、
+SignalSnapshot 和获批 Alpha Model 而显式返回 `unavailable` blockers，匿名 identity 只有
+`read_public`；没有注入 runtime fixture。
+
+用户明确指定的内置 `@Browser` 当前不可用；用户随后明确批准改用已连接 Chrome，以上四档截图、
+导航/控件交互、页面级 `scrollWidth`、右侧边界、控制台和网络证据均来自真实 Chrome 页面，不是
+组件测试或 HTTP 替代。当前真实 unavailable/empty/error 运行态已通过；不存在的 ready 产物没有被
+冒充为已验收。
 
 另有一项未裁决的设计冲突：SPEC-045 固定桌面展开侧栏为 280 px，产品蓝图响应式表写 224 px。
 本轮实现恢复并保持权威 Spec 的 280 px，窄桌面收起宽度为 72 px；没有擅自修改 Spec 或把 224 px

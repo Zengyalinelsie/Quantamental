@@ -715,9 +715,13 @@ blocker。Frozen Artifact 页面入口已接入：未生成时不构造 ID，非
 `/api/identity` 已使用严格响应模型和生成的前端类型，不接受角色请求头伪造权限。1024/768/320 已实现
 侧栏/抽屉、上下文文字保留与重排、InvestmentView 单栏、1024 Screen 低优先字段详情抽屉、768 横向
 滚动冻结首列和 320 px 等价记录卡；记录卡继续消费服务端顺序与 rank change，并保留 score、previous
-rank、trust、InvestmentView 和 content hash。空/部分态继续显示 Trust 文本。仍缺真实数据详情和
-1440/1024/768/320 最终浏览器验收；浏览器控制当前没有可操作页面 tab，因此这些断点只能标记
-implemented、不能标记 visually verified；
+rank、trust、InvestmentView 和 content hash。空/部分态继续显示 Trust 文本。桌面疑似右侧裁切已
+先补 `3/3` 红色响应式 CSS 合同，再显式闭合固定侧栏后的主内容宽度、允许长运行上下文断行并约束
+Universe 子控件；相关定向测试修复后 `31/31` 通过。用户明确批准切换到已连接 Chrome 后，按页面
+CSS `innerWidth` 完成 1440/1024/768/320 验收，四档 `document.scrollWidth` 均等于 client width；
+280 px/72 px/Drawer 导航、上下文、Universe current/historical、Security 搜索、空/unavailable 和
+真实请求失败/恢复态均通过，正常加载无 4xx/5xx 且控制台无 error/warning。因此 Task 5 当前真实运行态
+标记 browser verified；仍缺真实 ready/partial Screen、InvestmentView 和三问详情，不能用 fixture 补齐；
 运行时不得注入 demo 值。产品蓝图、黄金路径与当前原型证据见
 `docs/18-product-blueprint-and-prototype.md`。
 
@@ -737,7 +741,7 @@ implemented、不能标记 visually verified；
 原型黄金路径，以及真实输入资格/freeze 基础设施已经具备；真实库仍没有合格 frozen bundle。
 strict PIT InvestmentView application gate 也已具备，但仍缺合格 PIT/获批 factor/model、真实决策日
 InvestmentView/SignalSnapshot、获批真实 outcome price adapter、真实 reference/FCF/分析师输入、
-真实三问详情和 320/768/1024/1440 最终浏览器验收。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
+真实三问详情以及真实 ready Screen/InvestmentView 浏览器产物。不能以单元测试、空表迁移、原型或展示组件替代 Capability Gate，
 更不能据此声称模型科学有效。
 
 ## 10. P6：组合、风险 R0 与现实 A 股回测

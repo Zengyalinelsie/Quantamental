@@ -1,6 +1,6 @@
 # Step 01 Spec / Plan：P5 工程能力收口
 
-> 状态：`in_progress`；Task 1–4 已验证，Task 5 `implemented_unverified`
+> 状态：`in_progress`；Task 1–5 工程能力已验证，真实产物 Gate 仍阻断
 > 对应：Plan P5-W01/W02/W04、Roadmap Step 1  
 > 关联 SPEC：018–019、024–025、041、047、050–052  
 > 前端：Security、InvestmentView、Universe & Screen、Alpha Model、Approvals
@@ -139,15 +139,23 @@ P5 Gate 通过，也不等于任何模型科学有效。
 
 ### Task 5：P5 产品页和响应式
 
-状态：`implemented_unverified`。Artifact ID 为 null 时显示未生成；非空时先读取服务端 identity 的
+状态：`verified`（当前真实运行态；ready 产物由 P5 Gate 阻断）。Artifact ID 为 null 时显示未生成；
+非空时先读取服务端 identity 的
 `read_artifact` 权限，再读取 exact metadata，只有权限、元数据和响应/请求 Artifact ID 完全一致才
 暴露 download URL。Identity 使用严格 OpenAPI Envelope，前端消费生成类型；匿名默认保持禁用，不能
 用会返回 403 的链接冒充可下载。Screen 在 320 px 使用 server-projected 等价记录卡，不重排或重算
 rank change，并保留 score/previous rank/trust/InvestmentView/hash；1024 使用文字详情抽屉承载低
 优先字段，768 横向滚动并冻结首列。1024/768/320 已实现导航、上下文文字保留、表格/记录卡和
-InvestmentView 重排，空/部分态显式保留 Trust。组件/API 合同测试已通过；当前浏览器控制没有可
-操作页面 tab，因此 1440/1024/768/320 运行时视觉验收仍为 `pending`，不能把实现或构建通过写成
-浏览器验收通过。
+InvestmentView 重排，空/部分态显式保留 Trust。桌面疑似裁切已按 TDD 增加 CSS 合同：主内容宽度与
+280/72 px 固定侧栏闭合、
+长运行上下文可断行、Universe 控件可换行且子控件受容器约束；旧样式 `3/3` 红，修复后 P5 相关
+`31/31` 绿。真实 HTTP 仍只返回空 Universe 和 unavailable P5 blockers，没有注入 runtime fixture。
+用户随后明确批准使用已连接 Chrome；以页面 CSS `innerWidth` 校准的 1440/1024/768/320 四档均满足
+`document.scrollWidth === document.clientWidth`。1440 使用 280 px 展开侧栏，1024 自动收为 72 px，
+768/320 使用移动 Drawer；运行上下文、Universe current/historical 控件、Security 搜索、Screen/
+InvestmentView unavailable blockers、空态和显式请求失败态均完成真实交互。正常加载无 4xx/5xx，
+控制台无 error/warning；故障注入恢复后下一次真实 API 请求为 200。当前库没有 ready/partial Screen 或
+InvestmentView，禁止用 runtime fixture 补齐，因此 `verified` 不包含真实 ready 产物，也不代表 P5 Gate。
 
 待裁决：SPEC-045 的桌面展开侧栏为 280 px，产品蓝图响应式表为 224 px。本轮运行时遵守权威 Spec
 并保留 280 px，1024 窄桌面使用真实 72 px collapsed state；采用 224 px 前必须先批准并统一文档。
