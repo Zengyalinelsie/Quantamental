@@ -92,13 +92,14 @@ describe('DeskPage prototype Platform Pulse', () => {
   })
 
   it('requests the desk projection instead of computing state in the browser', async () => {
-    const fetchMock = vi.fn(async (_input: unknown) => payload(projection()))
-    vi.stubGlobal('fetch', fetchMock)
+    const requests: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (input: unknown) => {
+      requests.push(String(input))
+      return payload(projection())
+    }))
     renderDesk()
     await screen.findByText('今日研究态势 / Platform Pulse')
-    expect(fetchMock).toHaveBeenCalled()
-    const requested = String(fetchMock.mock.calls[0]?.[0] ?? '')
-    expect(requested).toContain('/api/desk')
+    expect(requests.some((url) => url.includes('/api/desk'))).toBe(true)
   })
 
   it('renders a loading state while the desk projection is pending', () => {

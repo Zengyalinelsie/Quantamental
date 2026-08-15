@@ -281,6 +281,54 @@ class DeskEmptyVersusUnavailableTest(unittest.TestCase):
             DeskSectionStatus.EMPTY,
         )
 
+    def test_store_unavailable_blocker_is_not_reported_as_empty(self) -> None:
+        """The workspace reports its own store failures as blockers, not raises.
+
+        Without inspecting them the desk would call an unreachable ledger
+        "empty", telling the operator to wait for data when the real problem is
+        that no store is configured.
+        """
+        workspace = FakeResearchWorkspace({
+            "status": "unavailable",
+            "blockers": [
+                {
+                    "code": "signal_snapshot_store_unavailable",
+                    "reason": "ASP_DATABASE_URL is not configured for SignalSnapshot persistence",
+                    "affected_binding": "serving.research_signal_snapshots",
+                    "evidence_ids": [],
+                },
+            ],
+            "screen": None,
+            "investment_view": None,
+            "alpha_model": {"status": "unavailable"},
+        })
+        projection = service(workspace=workspace).project(now=NOW)
+        section = projection.section(DeskSectionKey.SCREEN_SHIFTS)
+        self.assertEqual(section.status, DeskSectionStatus.UNAVAILABLE)
+        self.assertEqual(section.blockers[0].code, "signal_snapshot_store_unavailable")
+
+    def test_non_store_blocker_still_reads_as_empty(self) -> None:
+        """A reachable ledger with no qualified snapshot is empty, not broken."""
+        workspace = FakeResearchWorkspace({
+            "status": "unavailable",
+            "blockers": [
+                {
+                    "code": "research_signal_snapshot_unavailable",
+                    "reason": "没有 research_backtest scope 的 SignalSnapshot。",
+                    "affected_binding": "approval_scope:research_backtest",
+                    "evidence_ids": [],
+                },
+            ],
+            "screen": None,
+            "investment_view": None,
+            "alpha_model": {"status": "unavailable"},
+        })
+        projection = service(workspace=workspace).project(now=NOW)
+        self.assertEqual(
+            projection.section(DeskSectionKey.SCREEN_SHIFTS).status,
+            DeskSectionStatus.EMPTY,
+        )
+
     def test_reachable_but_recordless_timing_is_empty(self) -> None:
         projection = service(timing=FakeTimingRepository(forecasts=())).project(now=NOW)
         self.assertEqual(

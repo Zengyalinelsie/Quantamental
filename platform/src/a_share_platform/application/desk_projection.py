@@ -57,6 +57,28 @@ def _blocker(code: str, reason: str, binding: str) -> DeskBlocker:
     return DeskBlocker(code=code, reason=reason, affected_binding=binding, evidence_ids=())
 
 
+def _store_unavailable_blockers(projection: dict[str, Any]) -> tuple[DeskBlocker, ...]:
+    """Extract store-level failures the workspace reported instead of raising.
+
+    ``ResearchWorkspaceProjectionService`` catches its own repository failures
+    and returns them as blockers.  The desk must inspect them: an unreachable
+    ledger is unavailable, not empty, and calling it empty would tell the
+    operator to wait for data when no store is configured at all.
+    """
+    found: list[DeskBlocker] = []
+    for item in projection.get("blockers", ()):
+        if not isinstance(item, dict):
+            continue
+        code = str(item.get("code", ""))
+        reason = str(item.get("reason", ""))
+        if not code.endswith("_store_unavailable") or not reason.strip():
+            continue
+        found.append(
+            _blocker(code, reason, str(item.get("affected_binding", "research.workspace")))
+        )
+    return tuple(found)
+
+
 def _unavailable(key: DeskSectionKey, blocker: DeskBlocker) -> DeskSection:
     return DeskSection(
         key=key,
@@ -164,6 +186,16 @@ class DeskProjectionService:
                 ),
             )
         screen = projection.get("screen")
+        store_failures = _store_unavailable_blockers(projection)
+        if store_failures:
+            # The ledger itself is unreachable; that is a blocker, not an
+            # absence of records.
+            return DeskSection(
+                key=key,
+                status=DeskSectionStatus.UNAVAILABLE,
+                title=_TITLES[key],
+                blockers=store_failures,
+            )
         if not screen:
             # The capability exists and the store is reachable; there simply is
             # no qualified SignalSnapshot yet.  That is empty, not unavailable.
