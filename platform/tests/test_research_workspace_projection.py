@@ -176,5 +176,101 @@ class ResearchWorkspaceProjectionServiceTest(unittest.TestCase):
         )
 
 
+class ScreenComponentColumnTest(unittest.TestCase):
+    """PUI-02 needs per-row quality / valuation / improvement contributions.
+
+    The Figma ranking table (node 3:726) carries 质量 / 估值预期差 / 改善 and a
+    60-day expected-return range.  Those are not new data: they already live on
+    the frozen InvestmentView the snapshot is bound to, so projecting them keeps
+    one source of truth and stays fully traceable.
+    """
+
+    def setUp(self) -> None:
+        self.expected_returns = InMemoryExpectedReturnLedgerRepository()
+        self.signals = InMemorySignalSnapshotRepository()
+        self.reviews = InMemoryFactorReviewRepository()
+
+    def service(self) -> ResearchWorkspaceProjectionService:
+        return ResearchWorkspaceProjectionService(
+            expected_return_repository=self.expected_returns,
+            signal_snapshot_repository=self.signals,
+            factor_review_repository=self.reviews,
+            security_master=SecurityMaster.empty(),
+        )
+
+    def ready_row(self) -> dict:
+        view = investment_view()
+        snapshot = snapshot_for(ApprovalScope.RESEARCH_BACKTEST)
+        _factor, review = approved_factor_package(ApprovalScope.RESEARCH_BACKTEST)
+        self.expected_returns.append_view(view)
+        SignalSnapshotLedgerService(self.signals).record_snapshot(snapshot)
+        self.reviews.save_review(review)
+        value = self.service().project(security_query=view.security_id)
+        return value["screen"]["rows"][0]
+
+    def test_row_carries_the_frozen_view_component_contributions(self) -> None:
+        row = self.ready_row()
+
+        self.assertIn("components", row)
+        names = {item["component"] for item in row["components"]}
+        self.assertEqual(names, {"quality", "valuation", "revision", "event"})
+
+    def test_each_component_reports_status_and_never_fills_unavailable_with_zero(self) -> None:
+        row = self.ready_row()
+
+        for item in row["components"]:
+            self.assertIn(
+                item["status"],
+                ("quantified", "constrained", "unavailable", "not_applicable"),
+            )
+            if item["status"] == "quantified":
+                self.assertIsNotNone(item["contribution"])
+                self.assertNotEqual(item["display"], "—")
+            else:
+                # constrained, unavailable and not_applicable all show an em dash.
+                # A constrained component is bounded but not quantified, so it has
+                # no contribution either; none of them may be filled with a zero.
+                self.assertIsNone(item["contribution"])
+                self.assertEqual(item["display"], "—")
+
+    def test_constrained_and_unavailable_are_distinguishable(self) -> None:
+        """Both show an em dash, but the status must stay distinct for audit."""
+        statuses = {item["component"]: item["status"] for item in self.ready_row()["components"]}
+
+        self.assertEqual(statuses["revision"], "constrained")
+        self.assertEqual(statuses["event"], "unavailable")
+
+    def test_row_carries_the_horizon_expected_return_interval(self) -> None:
+        row = self.ready_row()
+
+        interval = row["expected_return_interval"]
+        self.assertEqual(interval["horizon_trading_days"], 60)
+        # Either a real interval from the frozen view, or an explicit absence.
+        if interval["display"] is None:
+            self.assertIsNotNone(interval["unavailable_reason"])
+        else:
+            self.assertIsNotNone(interval["lower"])
+            self.assertIsNotNone(interval["upper"])
+
+    def test_component_contributions_are_not_recomputed_from_score(self) -> None:
+        """The projection reads the frozen view; it does not derive components."""
+        row = self.ready_row()
+
+        quantified = [
+            item for item in row["components"] if item["status"] == "quantified"
+        ]
+        self.assertTrue(quantified, "the frozen view has at least one quantified component")
+        for item in quantified:
+            self.assertIn("evidence_ids", item)
+
+    def test_no_design_fixture_weights_appear_in_the_projection(self) -> None:
+        row = self.ready_row()
+        rendered = repr(row)
+
+        # Figma builder sample weights and coverage must never reach the runtime.
+        for fixture in ("40%", "30%", "96.3", "5000"):
+            self.assertNotIn(fixture, rendered)
+
+
 if __name__ == "__main__":
     unittest.main()

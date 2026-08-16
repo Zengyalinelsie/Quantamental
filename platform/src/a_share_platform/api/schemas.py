@@ -176,6 +176,10 @@ class ScreenRankingRowProjection(StrictResponse):
     score: ScreenProjectedValue
     expected_return: ScreenProjectedValue
     confidence: ScreenProjectedValue
+    # Defined after the component literals below, so these stay as forward
+    # references resolved by model_rebuild() at the end of this module.
+    components: list[ScreenRowComponentProjection] = Field(default_factory=list)
+    expected_return_interval: ScreenReturnIntervalProjection | None = None
     investment_view_id: str
     trust_state: Literal["normalized_current", "pit_verified"]
     content_hash: str
@@ -263,6 +267,36 @@ class ClosureProjection(StrictResponse):
     tolerance: str
     difference: str | None
     checked_by: str
+
+
+class ScreenRowComponentProjection(StrictResponse):
+    """One factor dimension's contribution for a single ranked row.
+
+    Projected from the exact frozen InvestmentView the snapshot is bound to, not
+    derived from the row score.  `display` is an em dash for every non-quantified
+    status, so an unavailable dimension is never shown as a zero.
+    """
+
+    component: InvestmentComponentName
+    label: str
+    status: InvestmentComponentStatus
+    contribution: ScreenProjectedValue | None = None
+    display: str
+    reason: str | None = None
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class ScreenReturnIntervalProjection(StrictResponse):
+    """The horizon expected-return interval, from the frozen view's p10/p90."""
+
+    horizon_trading_days: int
+    lower: ScreenProjectedValue | None = None
+    upper: ScreenProjectedValue | None = None
+    display: str | None = None
+    unavailable_reason: str | None = None
+
+
+ScreenRankingRowProjection.model_rebuild()
 
 
 class ExpectedReturnDistributionProjection(StrictResponse):
@@ -404,6 +438,51 @@ class ResearchWorkspaceResponseContext(StrictResponse):
 
 class ResearchWorkspaceEnvelope(StrictResponse):
     data: ResearchWorkspaceData
+    context: ResearchWorkspaceResponseContext
+
+
+DeskSectionKeyLiteral = Literal[
+    "data_health",
+    "screen_shifts",
+    "portfolio_tracking",
+    "timing_shadow",
+    "event_feed",
+    "pending_tasks",
+    "active_failures",
+]
+
+
+class DeskBlockerProjection(StrictResponse):
+    code: str
+    reason: str
+    affected_binding: str
+    evidence_ids: list[str] = Field(default_factory=list)
+
+
+class DeskSectionProjection(StrictResponse):
+    """One desk domain.
+
+    ``status`` covers only what the server can know.  ``loading`` and ``error``
+    belong to the request lifecycle and are resolved by the client.  ``empty``
+    and ``unavailable`` stay distinct on purpose: empty means the capability
+    works and holds no record, unavailable means the capability or its store is
+    missing.
+    """
+
+    key: DeskSectionKeyLiteral
+    status: Literal["ready", "partial", "empty", "unavailable"]
+    title: str
+    blockers: list[DeskBlockerProjection] = Field(default_factory=list)
+    coverage: dict[str, JsonValue] = Field(default_factory=dict)
+    payload: JsonValue | None = None
+
+
+class DeskData(StrictResponse):
+    sections: list[DeskSectionProjection]
+
+
+class DeskEnvelope(StrictResponse):
+    data: DeskData
     context: ResearchWorkspaceResponseContext
 
 

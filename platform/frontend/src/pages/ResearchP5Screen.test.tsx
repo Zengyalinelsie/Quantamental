@@ -300,4 +300,22 @@ describe('ResearchP5Screen', () => {
       expect.objectContaining({ headers: { Accept: 'application/json' } }),
     )
   })
+
+  it('keeps the prototype two-column shape when the workspace is unavailable', async () => {
+    // The builder is where an operator learns which bindings are missing, so it
+    // must survive an unavailable workspace instead of the page collapsing to a
+    // single generic notice.
+    vi.stubGlobal('fetch', vi.fn(async () => payload({
+      status: 'unavailable', blockers: [], screen: null, investment_view: null,
+      alpha_model: alphaUnavailable,
+    })))
+    renderResearch('universe-screen')
+
+    expect(await screen.findByRole('region', { name: 'Screen 构建器' })).toBeInTheDocument()
+    expect(screen.getByText(/没有合格的冻结 Screen/)).toBeInTheDocument()
+    expect(screen.getByText('P5 研究工作区不可用')).toBeInTheDocument()
+    // Still no prototype sample values.
+    expect(screen.queryByText('CSI500')).not.toBeInTheDocument()
+    expect(screen.queryByText('40%')).not.toBeInTheDocument()
+  })
 })

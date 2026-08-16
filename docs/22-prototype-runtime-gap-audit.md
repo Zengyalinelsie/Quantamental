@@ -19,10 +19,30 @@
 - 0 个页面完成了“对精确 Figma 节点的 1440 视觉一致性验收”；
 - P5 已完成的 1440/1024/768/320 浏览器验收，范围是当前 empty/unavailable 运行态的布局、交互、
   网络和控制台，不是 Figma 视觉一致性 Gate；
-- `/desk` 仍显示硬编码的工程能力表，和 `desk-daily-workstation` 原型的研究员工作台完全不同；
+- `/desk` 仍显示硬编码的工程能力表，和 `desk-daily-workstation` 原型的研究员工作台完全不同（**此条为 2026-08-15 审计时点事实；PUI-01 已于同日完成替换，见 §1 增量更新**）；
 - `/portfolios`、`/monitoring` 的所有主要页仍是占位；
 - P5–P10 的领域、数据、API、审批、组合、Timing、事件、监控和 Paper OMS 能力没有因为 Figma
   原型完成而自动存在。
+
+**2026-08-15 PUI-01 完成后的增量更新**（上表为审计时点事实，保留不改写）：
+
+- `/desk` 已改为消费服务端 `GET /api/desk`，七分区各自报告真实六态，硬编码 `capabilityRows`
+  已删除；
+- Desk 的 Design Parity 为 `parity_verified_with_known_deviation`，**不是** `parity_verified`：
+  侧栏 280 px vs Figma 248 px 的差异已登记，320/768/1024 无 Figma Frame 依据；
+- 因此 31 页的「完全逐像素 parity」计数仍为 **0/31**；Desk 是第一个完成结构级对照并显式记录
+  差异的页面，不能据此宣称 parity 已通过；
+- 设计输入阻断已解除（见 §2.2.1），17 个关键页均有仓库内精确视觉真源。
+
+**2026-08-15 PUI-02 完成后的增量更新**：
+
+- `/research?tab=universe-screen` 已改为 Figma 双栏结构：左侧只读 Screen 构建器 + 右侧排名表；
+- 排名表补齐 `质量 / 估值预期差 / 改善 / 60日预期收益区间` 四列，投影自已冻结
+  `InvestmentView.components`，以 view id **与** hash 双重匹配，不新建计算；
+- 构建器为只读，不含权重输入与「运行 Screen」按钮，依据 `ADR-0012`；
+- Universe & Screen 的 Design Parity 同为 `parity_verified_with_known_deviation`
+  （构建器只读、Figma 示例值不入运行时），完全 parity 计数仍为 **0/31**；
+- 新发现待修既有缺陷：`/factors` 在 320 视口存在页面级水平溢出，早于本工作包，登记待 PUI-04。
 
 因此：
 
@@ -58,7 +78,7 @@ Figma Starter 方案返回 MCP 调用额度已用尽；当前账号为 Starter/V
 
 - Desk 原型是 Platform Pulse、Screen 变化、重大事件、组合跟踪、Timing、待办和故障的复合工作台；
 - Universe 原型是左侧筛选/因子构建器与右侧高密度排名表；
-- 当前运行时 `/desk` 是单一工程能力表；
+- 当前运行时 `/desk` 是单一工程能力表（**审计时点事实；PUI-01 已完成替换**）；
 - 当前 `/research` 是 Universe 查询、空态和 P5 blocker 的纵向技术页。
 
 仓库内只有两份可恢复的精确 SVG：
@@ -69,6 +89,26 @@ Figma Starter 方案返回 MCP 调用额度已用尽；当前账号为 Starter/V
 真正开始某个 Figma 页面设计到代码时，仍必须先恢复该精确节点的 `get_design_context`；只有上述两页可在
 工具受限时使用仓库 SVG 作为结构与视觉真源。不能用一张缩放截图猜其余页面的尺寸和组件细节。
 
+### 2.2.1 设计输入阻断已解除（2026-08-15 更新）
+
+§2.2 的 MCP 配额限制**已通过 Figma REST API 解决**；上节保留作为事实历史，不改写。
+
+改用 `GET /v1/files/{key}/nodes` 与 `GET /v1/images/{key}`（Personal Access Token，scope 仅
+`File content: read`）取得全部 17 个业务 Frame 的结构化节点树与精确 SVG，已入库
+`docs/assets/prototype/`：
+
+- 17 个 SVG 保留图层 id 与**可读文字**，合计 1.0 MB；
+- `figma-node-summary.json` 含层级、尺寸、`layoutMode`、`itemSpacing`、文字、字号、字重、字体族；
+- 导出参数、全部 18 个 node id 与复现命令见 `docs/assets/prototype/README.md`。
+
+关键参数 `svg_outline_text=false`：默认导出把文字转成矢量路径，单页约 1.7 MB（17 页共 33 MB）
+且文字不可读、不可搜索，对实现没有参考价值。
+
+因此「除 Security/InvestmentView 外不得开始视觉编码」的限制不再适用于任何页面：
+**17 个关键页现在都有仓库内精确视觉真源**，不依赖 Figma 会话或配额。
+
+仍然成立：320/768/1024 没有独立 Figma Frame（见 §2.3），三档只有文档级响应式合同。
+
 ### 2.3 原型自身的覆盖边界
 
 Figma 当前有 14 个关键 1440 高保真业务 Frame，以及一个 31 页完整产品蓝图。两者不是同一完成度：
@@ -77,7 +117,10 @@ Figma 当前有 14 个关键 1440 高保真业务 Frame，以及一个 31 页完
 - 31 页蓝图为全部页面提供信息架构和内容意图，但不是每页都有独立高保真 Frame；
 - 320、768、1024 没有独立 Figma Frame；这三档只有响应式重排合同；
 - `security-investmentview` 是 Security 的详情/黄金路径页面，不是六工作区 31 个 tab 中的一个独立 tab；
-- SPEC-045 的 280 px 桌面侧栏继续高于蓝图表中的 224 px，未获批准前运行时保持 280/72 px。
+- 侧栏宽度：**2026-08-15 已裁决统一为 280 px**（展开）/ 72 px（收起）。冲突一度为三值——
+  SPEC-045 = 280、`docs/18` 原写 224、Figma node `3:398` 实测 248；用户明确裁决采用 280，
+  `docs/18` 与 `CLAUDE.md` 已同步。Figma 的 248 px 保留为**已批准的设计差异**：1440 下主内容区
+  为 1160 px 而非 1192 px，栅格以比例吸收该 32 px。
 
 所以，在补齐非关键页高保真设计和三档响应式设计前，不能承诺“31 页四视口逐像素与 Figma 一致”。
 可以承诺的是：按已存在的高保真节点、设计系统和响应式合同开发，并对每个没有精确 Frame 的推导页
@@ -156,8 +199,8 @@ P5 Task 5 的真实 Chrome 验收是有效工程证据，但验收对象是当�
 
 | # | 工作区 / 页面 | 当前运行时 | 独立高保真参照 | 能力阶段 | 原型轨道 |
 |---:|---|---|---|---:|---|
-| 1 | Desk / 今日工作台 | `runtime_partial`：硬编码工程状态表，必须替换 | `desk-daily-workstation` | P9 聚合；P2–P8 渐进 | PUI-01 |
-| 2 | Research / Universe & Screen | `runtime_partial`：Universe 查询、P5 blocker/Screen 接线 | `research-universe-screen` | P2/P5 | PUI-02 |
+| 1 | Desk / 今日工作台 | `runtime_verified`：服务端 Desk projection 七分区六态（2026-08-15） | `desk-daily-workstation` | P9 聚合；P2–P8 渐进 | PUI-01 |
+| 2 | Research / Universe & Screen | `runtime_verified`：双栏构建器+12 列排名表，六态真实（2026-08-15） | `research-universe-screen` | P2/P5 | PUI-02 |
 | 3 | Research / Security | `runtime_partial`：P5 View 组件接线，缺融合页信息架构 | `security-overview-600519-fused-v2` | P5/P8 | PUI-03 |
 | 4 | Research / Events | `placeholder` | `10-events-intelligence` | P8 | PUI-07 |
 | 5 | Research / Watchlists/Cases | `placeholder` | 31 页蓝图 | P8/P9 | PUI-07/PUI-08 |

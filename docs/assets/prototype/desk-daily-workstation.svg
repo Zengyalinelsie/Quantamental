@@ -1,0 +1,633 @@
+<svg width="1458" height="1238" viewBox="0 0 1458 1238" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="desk-daily-workstation">
+<rect width="1440" height="1238" fill="#F3F5F7"/>
+<g id="sidebar">
+<mask id="path-1-inside-1_3_398" fill="white">
+<path d="M0 0H248V1238H0V0Z"/>
+</mask>
+<path d="M0 0H248V1238H0V0Z" fill="white"/>
+<path d="M248 0H247V1238H248H249V0H248Z" fill="#DEE2E7" mask="url(#path-1-inside-1_3_398)"/>
+<g id="brand">
+<text id="Fundamental Quant" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="16" y="31.3182">Fundamental Quant</tspan></text>
+<text id="A&#232;&#130;&#161;&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#233;&#135;&#143;&#229;&#140;&#150;&#231;&#160;&#148;&#231;&#169;&#182;&#229;&#185;&#179;&#229;&#143;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="49.5">A&#x80a1;&#x57fa;&#x672c;&#x9762;&#x91cf;&#x5316;&#x7814;&#x7a76;&#x5e73;&#x53f0;</tspan></text>
+</g>
+<line id="Line" x1="16" y1="75.5" x2="232" y2="75.5" stroke="#DEE2E7"/>
+<g id="nav-list">
+<g id="nav-item-0">
+<rect x="16" y="100" width="216" height="36" rx="3" fill="#EAF2FC"/>
+<g id="layout-dashboard">
+<g id="Vector">
+<path d="M34 112H30.6667C30.2985 112 30 112.298 30 112.667V117.333C30 117.702 30.2985 118 30.6667 118H34C34.3682 118 34.6667 117.702 34.6667 117.333V112.667C34.6667 112.298 34.3682 112 34 112Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+<path d="M41.3333 112H38C37.6318 112 37.3333 112.298 37.3333 112.667V114.667C37.3333 115.035 37.6318 115.333 38 115.333H41.3333C41.7015 115.333 42 115.035 42 114.667V112.667C42 112.298 41.7015 112 41.3333 112Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+<path d="M41.3333 118H38C37.6318 118 37.3333 118.298 37.3333 118.667V123.333C37.3333 123.702 37.6318 124 38 124H41.3333C41.7015 124 42 123.702 42 123.333V118.667C42 118.298 41.7015 118 41.3333 118Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+<path d="M34 120.667H30.6667C30.2985 120.667 30 120.965 30 121.333V123.333C30 123.702 30.2985 124 30.6667 124H34C34.3682 124 34.6667 123.702 34.6667 123.333V121.333C34.6667 120.965 34.3682 120.667 34 120.667Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#228;&#187;&#138;&#230;&#151;&#165;&#229;&#183;&#165;&#228;&#189;&#156;&#229;&#143;&#176;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="56" y="122.727">&#x4eca;&#x65e5;&#x5de5;&#x4f5c;&#x53f0;</tspan></text>
+</g>
+<g id="nav-item-1">
+<g id="book-open">
+<path id="Vector_2" d="M36 154.667V164M36 154.667C36 153.959 35.719 153.281 35.2189 152.781C34.7187 152.281 34.0404 152 33.3331 152H29.9995C29.8227 152 29.6531 152.07 29.5281 152.195C29.403 152.32 29.3328 152.49 29.3328 152.667V161.333C29.3328 161.51 29.403 161.68 29.5281 161.805C29.6531 161.93 29.8227 162 29.9995 162H33.9998C34.5303 162 35.0391 162.211 35.4142 162.586C35.7893 162.961 36 163.47 36 164M36 154.667C36 153.959 36.281 153.281 36.7811 152.781C37.2812 152.281 37.9596 152 38.6669 152H42.0005C42.1773 152 42.3469 152.07 42.4719 152.195C42.597 152.32 42.6672 152.49 42.6672 152.667V161.333C42.6672 161.51 42.597 161.68 42.4719 161.805C42.3469 161.93 42.1773 162 42.0005 162H38.0002C37.4697 162 36.9609 162.211 36.5858 162.586C36.2107 162.961 36 163.47 36 164" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#231;&#160;&#148;&#231;&#169;&#182;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="162.727">&#x7814;&#x7a76;</tspan></text>
+</g>
+<g id="nav-item-2">
+<g id="bar-chart">
+<path id="Vector_3" d="M31.3328 204V200M36 204V196M40.6672 204V192" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#229;&#155;&#160;&#229;&#173;&#144;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="202.727">&#x56e0;&#x5b50;</tspan></text>
+</g>
+<g id="nav-item-3">
+<g id="pie-chart" clip-path="url(#clip0_3_398)">
+<path id="Vector_4" d="M42.1407 240.594C41.7165 241.597 41.0531 242.481 40.2084 243.168C39.3638 243.855 38.3636 244.325 37.2953 244.537C36.227 244.749 35.1231 244.695 34.0802 244.382C33.0372 244.068 32.087 243.504 31.3126 242.738C30.5381 241.973 29.963 241.029 29.6375 239.99C29.312 238.95 29.2461 237.847 29.4455 236.777C29.6448 235.706 30.1034 234.701 30.7812 233.848C31.4589 232.996 32.3352 232.323 33.3334 231.887M42.0004 238.001C42.3684 238.001 42.6704 237.701 42.6338 237.335C42.4801 235.805 41.8018 234.374 40.7138 233.287C39.6259 232.199 38.1954 231.521 36.6647 231.368C36.298 231.331 35.9993 231.633 35.9993 232.001V237.335C35.9993 237.511 36.0695 237.681 36.1946 237.806C36.3196 237.931 36.4892 238.001 36.666 238.001L42.0004 238.001Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="242.727">&#x7ec4;&#x5408;</tspan></text>
+</g>
+<g id="nav-item-4">
+<g id="activity" clip-path="url(#clip1_3_398)">
+<path id="Vector_5" d="M42.6672 278H41.0137C40.7224 277.999 40.4388 278.094 40.2064 278.27C39.974 278.446 39.8056 278.693 39.727 278.973L38.1602 284.547C38.1501 284.582 38.129 284.612 38.1002 284.634C38.0713 284.656 38.0362 284.667 38.0002 284.667C37.9641 284.667 37.929 284.656 37.9001 284.634C37.8713 284.612 37.8502 284.582 37.8401 284.547L34.1598 271.453C34.1497 271.418 34.1287 271.388 34.0998 271.366C34.071 271.345 34.0359 271.333 33.9998 271.333C33.9638 271.333 33.9287 271.345 33.8998 271.366C33.871 271.388 33.8499 271.418 33.8398 271.453L32.273 277.027C32.1947 277.306 32.0273 277.552 31.7962 277.728C31.5652 277.904 31.2832 277.999 30.9929 278H29.3328" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#231;&#155;&#145;&#230;&#142;&#167;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="282.727">&#x76d1;&#x63a7;</tspan></text>
+</g>
+<g id="nav-item-5">
+<g id="settings">
+<path id="Vector_6" d="M34.447 312.758C34.4838 312.372 34.6633 312.013 34.9504 311.751C35.2376 311.49 35.6119 311.346 36 311.346C36.3882 311.346 36.7625 311.49 37.0496 311.751C37.3368 312.013 37.5163 312.372 37.553 312.758C37.5751 313.008 37.657 313.248 37.7918 313.46C37.9266 313.671 38.1103 313.847 38.3274 313.972C38.5444 314.097 38.7885 314.168 39.0388 314.179C39.2892 314.19 39.5385 314.14 39.7657 314.035C40.1185 313.874 40.5182 313.851 40.887 313.97C41.2559 314.088 41.5676 314.339 41.7614 314.675C41.9552 315.01 42.0172 315.406 41.9355 315.784C41.8537 316.163 41.634 316.498 41.319 316.723C41.114 316.867 40.9466 317.058 40.831 317.281C40.7154 317.503 40.6551 317.75 40.6551 318C40.6551 318.251 40.7154 318.498 40.831 318.72C40.9466 318.942 41.114 319.133 41.319 319.277C41.634 319.503 41.8537 319.838 41.9355 320.216C42.0172 320.595 41.9552 320.99 41.7614 321.326C41.5676 321.661 41.2559 321.913 40.887 322.031C40.5182 322.149 40.1185 322.126 39.7657 321.966C39.5385 321.86 39.2892 321.811 39.0388 321.822C38.7885 321.832 38.5444 321.904 38.3274 322.029C38.1103 322.154 37.9266 322.33 37.7918 322.541C37.657 322.752 37.5751 322.993 37.553 323.243C37.5163 323.629 37.3368 323.988 37.0496 324.249C36.7625 324.51 36.3882 324.655 36 324.655C35.6119 324.655 35.2376 324.51 34.9504 324.249C34.6633 323.988 34.4838 323.629 34.447 323.243C34.425 322.993 34.3431 322.752 34.2083 322.541C34.0735 322.329 33.8897 322.154 33.6725 322.028C33.4554 321.903 33.2112 321.832 32.9608 321.821C32.7103 321.81 32.4609 321.86 32.2337 321.966C31.881 322.126 31.4813 322.149 31.1124 322.031C30.7435 321.913 30.4318 321.661 30.238 321.326C30.0442 320.99 29.9822 320.595 30.064 320.216C30.1457 319.838 30.3654 319.503 30.6804 319.277C30.8855 319.133 31.0529 318.942 31.1684 318.72C31.284 318.498 31.3444 318.251 31.3444 318C31.3444 317.75 31.284 317.503 31.1684 317.281C31.0529 317.058 30.8855 316.867 30.6804 316.723C30.3659 316.498 30.1465 316.163 30.065 315.785C29.9834 315.406 30.0455 315.011 30.239 314.676C30.4326 314.341 30.7439 314.089 31.1124 313.971C31.481 313.852 31.8804 313.875 32.233 314.035C32.4602 314.14 32.7095 314.19 32.9599 314.179C33.2103 314.168 33.4543 314.097 33.6714 313.972C33.8885 313.847 34.0722 313.671 34.207 313.46C34.3417 313.248 34.4236 313.008 34.4457 312.758M37.9995 318.001C37.9995 319.105 37.1041 320.001 35.9995 320.001C34.8949 320.001 33.9995 319.105 33.9995 318.001C33.9995 316.896 34.8949 316.001 35.9995 316.001C37.1041 316.001 37.9995 316.896 37.9995 318.001Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#230;&#149;&#176;&#230;&#141;&#174;&#228;&#184;&#142;&#231;&#174;&#161;&#231;&#144;&#134;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="322.727">&#x6570;&#x636e;&#x4e0e;&#x7ba1;&#x7406;</tspan></text>
+</g>
+</g>
+<g id="sidebar-footer">
+<text id="SPEC V2.4.0" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="1202.5">SPEC V2.4.0</tspan></text>
+<text id="Fund Quant Lab &#194;&#169; 2026" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="1219.5">Fund Quant Lab &#xa9; 2026</tspan></text>
+</g>
+</g>
+<g id="main-content">
+<g id="topbar">
+<mask id="path-26-inside-2_3_398" fill="white">
+<path d="M248 0H1440V64H248V0Z"/>
+</mask>
+<path d="M248 0H1440V64H248V0Z" fill="white"/>
+<path d="M1440 64V63H248V64V65H1440V64Z" fill="#DEE2E7" mask="url(#path-26-inside-2_3_398)"/>
+<g id="topbar-left">
+<g id="search-input">
+<rect x="272.5" y="18.5" width="239" height="27" rx="2.5" stroke="#C8CDD4"/>
+<g id="search" clip-path="url(#clip2_3_398)">
+<path id="Vector_7" d="M296.25 37.2501L293.718 34.7184M295.083 31.4167C295.083 33.994 292.994 36.0833 290.417 36.0833C287.839 36.0833 285.75 33.994 285.75 31.4167C285.75 28.8393 287.839 26.75 290.417 26.75C292.994 26.75 295.083 28.8393 295.083 31.4167Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#230;&#144;&#156;&#231;&#180;&#162;&#232;&#175;&#129;&#229;&#136;&#184;&#228;&#187;&#163;&#231;&#160;&#129;/&#229;&#144;&#141;&#231;&#167;&#176;..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="306" y="36.7273">&#x641c;&#x7d22;&#x8bc1;&#x5238;&#x4ee3;&#x7801;/&#x540d;&#x79f0;...</tspan></text>
+</g>
+<g id="research-time">
+<text id="&#231;&#160;&#148;&#231;&#169;&#182;&#230;&#151;&#182;&#231;&#130;&#185;:" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="528" y="36">&#x7814;&#x7a76;&#x65f6;&#x70b9;:</tspan></text>
+<text id="2024-12-06" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="580" y="36.3636">2024-12-06</tspan></text>
+</g>
+</g>
+<g id="topbar-right">
+<g id="data-mode-toggle">
+<rect x="651" y="19.5" width="267" height="25" rx="3" fill="#F3F5F7"/>
+<g id="mode-current">
+<rect x="653" y="21.5" width="135" height="21" rx="3" fill="white"/>
+<text id="CURRENT RESEARCH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="663" y="36">CURRENT RESEARCH</tspan></text>
+</g>
+<g id="mode-historical">
+<text id="STRICT HISTORICAL" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="798" y="36">STRICT HISTORICAL</tspan></text>
+</g>
+</g>
+<g id="stage-selector">
+<rect x="934.5" y="20" width="137" height="24" rx="2.5" fill="white"/>
+<rect x="934.5" y="20" width="137" height="24" rx="2.5" stroke="#C8CDD4"/>
+<text id="STAGE: RESEARCH" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="944" y="36">STAGE: RESEARCH</tspan></text>
+<g id="chevron-down">
+<path id="Vector_8" d="M1054.5 29.25L1057 31.75L1059.5 29.25" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="universe-selector">
+<rect x="1088.5" y="20" width="118" height="24" rx="2.5" fill="white"/>
+<rect x="1088.5" y="20" width="118" height="24" rx="2.5" stroke="#C8CDD4"/>
+<text id="&#232;&#130;&#161;&#231;&#165;&#168;&#230;&#177;&#160;: &#230;&#178;&#170;&#230;&#183;&#177;300" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1098" y="36">&#x80a1;&#x7968;&#x6c60;: &#x6caa;&#x6df1;300</tspan></text>
+<g id="chevron-down_2">
+<path id="Vector_9" d="M1189.5 29.25L1192 31.75L1194.5 29.25" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="env-badge">
+<rect x="1223" y="21.5" width="73" height="21" rx="3" fill="#EAF2FC"/>
+<text id="PROD ENV" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1231" y="36">PROD ENV</tspan></text>
+</g>
+<g id="watermark">
+<rect x="1312.5" y="22" width="145" height="20" rx="2.5" fill="#FCECEE"/>
+<rect x="1312.5" y="22" width="145" height="20" rx="2.5" stroke="#A64045"/>
+<text id="&#229;&#142;&#159;&#229;&#158;&#139;&#231;&#164;&#186;&#228;&#190;&#139;&#230;&#149;&#176;&#230;&#141;&#174; &#194;&#183; &#233;&#157;&#158;&#231;&#148;&#159;&#228;&#186;&#167;&#230;&#149;&#176;&#230;&#141;&#174;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1320" y="36">&#x539f;&#x578b;&#x793a;&#x4f8b;&#x6570;&#x636e; &#xb7; &#x975e;&#x751f;&#x4ea7;&#x6570;&#x636e;</tspan></text>
+</g>
+</g>
+</g>
+<g id="content-body">
+<g id="today-banner">
+<rect x="272" y="88" width="1144" height="73" rx="3" fill="#2F5EA8"/>
+<g id="Frame">
+<text id="&#228;&#187;&#138;&#230;&#151;&#165;&#231;&#160;&#148;&#231;&#169;&#182;&#230;&#128;&#129;&#229;&#138;&#191; / Platform Pulse" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="18" font-weight="bold" letter-spacing="0em"><tspan x="288" y="121.545">&#x4eca;&#x65e5;&#x7814;&#x7a76;&#x6001;&#x52bf; / Platform Pulse</tspan></text>
+<text id="&#229;&#186;&#149;&#229;&#177;&#130;&#230;&#140;&#135;&#230;&#160;&#135;&#230;&#151;&#182;&#231;&#130;&#185;&#233;&#152;&#178;&#230;&#156;&#170;&#230;&#157;&#165;&#230;&#149;&#176;&#230;&#141;&#174;&#230;&#160;&#161;&#233;&#170;&#140;&#233;&#147;&#190;&#229;&#157;&#135;&#230;&#173;&#163;&#229;&#184;&#184;&#232;&#191;&#144;&#232;&#189;&#172;&#228;&#184;&#173;" fill="#DEE2E7" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="288" y="141.864">&#x5e95;&#x5c42;&#x6307;&#x6807;&#x65f6;&#x70b9;&#x9632;&#x672a;&#x6765;&#x6570;&#x636e;&#x6821;&#x9a8c;&#x94fe;&#x5747;&#x6b63;&#x5e38;&#x8fd0;&#x8f6c;&#x4e2d;</tspan></text>
+</g>
+<g id="Frame_2">
+<g id="Frame_3">
+<text id="&#230;&#149;&#176;&#230;&#141;&#174;&#230;&#155;&#180;&#230;&#150;&#176;" fill="#DEE2E7" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1179" y="119.5">&#x6570;&#x636e;&#x66f4;&#x65b0;</tspan></text>
+<text id="2024-12-06 09:35 &#230;&#155;&#180;&#230;&#150;&#176;" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1076" y="136.727">2024-12-06 09:35 &#x66f4;&#x65b0;</tspan></text>
+</g>
+<g id="Frame_4">
+<text id="A&#232;&#130;&#161;&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#232;&#166;&#134;&#231;&#155;&#150;" fill="#DEE2E7" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1247" y="119.5">A&#x80a1;&#x57fa;&#x672c;&#x9762;&#x8986;&#x76d6;</tspan></text>
+<text id="94.2%" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1281" y="136.727">94.2%</tspan></text>
+</g>
+<g id="Frame_5">
+<text id="&#229;&#190;&#133;&#229;&#164;&#132;&#231;&#144;&#134;&#229;&#174;&#161;&#230;&#137;&#185;" fill="#DEE2E7" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1345" y="119.5">&#x5f85;&#x5904;&#x7406;&#x5ba1;&#x6279;</tspan></text>
+<text id="7 &#231;&#172;&#148;" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1376" y="136.727">7 &#x7b14;</tspan></text>
+</g>
+</g>
+</g>
+<g id="grid">
+<g id="grid-left">
+<g id="card-rankings">
+<rect x="272.5" y="185.5" width="739" height="349" rx="2.5" fill="white"/>
+<rect x="272.5" y="185.5" width="739" height="349" rx="2.5" stroke="#DEE2E7"/>
+<g id="card-title-row">
+<rect id="Rectangle" x="290" y="204.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#230;&#156;&#128;&#230;&#150;&#176; Screen &#230;&#142;&#146;&#229;&#144;&#141;&#229;&#143;&#152;&#229;&#140;&#150; / Universe Shift Tracker" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="301" y="216.591">&#x6700;&#x65b0; Screen &#x6392;&#x540d;&#x53d8;&#x5316; / Universe Shift Tracker</tspan></text>
+</g>
+<g id="table">
+<rect x="290.5" y="232.5" width="703" height="284" stroke="#DEE2E7"/>
+<g id="th">
+<rect width="704" height="29" transform="translate(290 232)" fill="#F3F5F7"/>
+<text id="&#228;&#187;&#163;&#231;&#160;&#129;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="298" y="250.5">&#x4ee3;&#x7801;</tspan></text>
+<text id="&#229;&#133;&#172;&#229;&#143;&#184;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="390" y="250.5">&#x516c;&#x53f8;</tspan></text>
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="522" y="250.5">&#x884c;&#x4e1a;</tspan></text>
+<text id="&#231;&#187;&#188;&#229;&#144;&#136;&#230;&#142;&#146;&#229;&#144;&#141;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="650" y="250.5">&#x7efc;&#x5408;&#x6392;&#x540d;</tspan></text>
+<text id="&#230;&#142;&#146;&#229;&#144;&#141;&#229;&#143;&#152;&#229;&#140;&#150;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="742" y="250.5">&#x6392;&#x540d;&#x53d8;&#x5316;</tspan></text>
+<text id="&#231;&#189;&#174;&#228;&#191;&#161;&#229;&#186;&#166;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="798" y="250.5">&#x7f6e;&#x4fe1;&#x5ea6;</tspan></text>
+<text id="&#233;&#178;&#156;&#229;&#186;&#166;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="964" y="250.5">&#x9c9c;&#x5ea6;</tspan></text>
+</g>
+<g id="row-0">
+<rect width="704" height="32" transform="translate(290 261)" fill="white"/>
+<text id="600519.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="281.364">600519.SH</tspan></text>
+<text id="&#232;&#180;&#181;&#229;&#183;&#158;&#232;&#140;&#133;&#229;&#143;&#176;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="281.364">&#x8d35;&#x5dde;&#x8305;&#x53f0;</tspan></text>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="281.364">&#x767d;&#x9152;</tspan></text>
+<text id="#3" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="678.461" y="281.364">#3</tspan></text>
+<g id="change-cell">
+<text id="+2" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="758" y="281.364">+2</tspan></text>
+<g id="arrow-up" clip-path="url(#clip3_3_398)">
+<path id="Vector_10" d="M784.334 277L782 274.666L779.666 277M782 274.666V279.334" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge">
+<g id="Frame_6">
+<rect x="798.5" y="269.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="798.5" y="269.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="280.636">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="T-1" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="969.586" y="281">T-1</tspan></text>
+</g>
+<g id="row-1">
+<rect width="704" height="32" transform="translate(290 293)" fill="#EAF2FC"/>
+<text id="000858.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="313.364">000858.SZ</tspan></text>
+<text id="&#228;&#186;&#148;&#231;&#178;&#174;&#230;&#182;&#178;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="313.364">&#x4e94;&#x7cae;&#x6db2;</tspan></text>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="313.364">&#x767d;&#x9152;</tspan></text>
+<text id="#8" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="678.531" y="313.364">#8</tspan></text>
+<g id="change-cell_2">
+<text id="+1" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="760" y="313.364">+1</tspan></text>
+<g id="arrow-up_2" clip-path="url(#clip4_3_398)">
+<path id="Vector_11" d="M784.334 309L782 306.666L779.666 309M782 306.666V311.334" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge_2">
+<g id="Frame_7">
+<rect x="798.5" y="301.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="798.5" y="301.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_2" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="312.636">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="T-1_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="969.586" y="313">T-1</tspan></text>
+</g>
+<g id="row-2">
+<rect width="704" height="32" transform="translate(290 325)" fill="white"/>
+<text id="601318.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="345.364">601318.SH</tspan></text>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#229;&#185;&#179;&#229;&#174;&#137;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="345.364">&#x4e2d;&#x56fd;&#x5e73;&#x5b89;</tspan></text>
+<text id="&#228;&#191;&#157;&#233;&#153;&#169;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="345.364">&#x4fdd;&#x9669;</tspan></text>
+<text id="#12" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="673.059" y="345.364">#12</tspan></text>
+<g id="change-cell_3">
+<text id="-3" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="760" y="345.364">-3</tspan></text>
+<g id="arrow-down" clip-path="url(#clip5_3_398)">
+<path id="Vector_12" d="M782 338.666V343.334M779.666 341L782 343.334L784.334 341" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge_3">
+<g id="Frame_8">
+<rect x="798.5" y="333.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="798.5" y="333.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_3" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="344.636">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="T-1_3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="969.586" y="345">T-1</tspan></text>
+</g>
+<g id="row-3">
+<rect width="704" height="32" transform="translate(290 357)" fill="#F3F5F7"/>
+<text id="000333.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="377.364">000333.SZ</tspan></text>
+<text id="&#231;&#190;&#142;&#231;&#154;&#132;&#233;&#155;&#134;&#229;&#155;&#162;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="377.364">&#x7f8e;&#x7684;&#x96c6;&#x56e2;</tspan></text>
+<text id="&#229;&#174;&#182;&#231;&#148;&#181;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="377.364">&#x5bb6;&#x7535;</tspan></text>
+<text id="#15" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="672.918" y="377.364">#15</tspan></text>
+<g id="change-cell_4">
+<text id="--" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="774" y="377.364">--</tspan></text>
+</g>
+<g id="trust-badge_4">
+<g id="Frame_9">
+<rect x="798.5" y="365.5" width="51" height="15" rx="1.5" fill="#FDF8E2"/>
+<rect x="798.5" y="365.5" width="51" height="15" rx="1.5" stroke="#B87A14"/>
+<text id="&#233;&#131;&#168;&#229;&#136;&#134;&#229;&#143;&#175;&#231;&#148;&#168;" fill="#B87A14" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="376.636">&#x90e8;&#x5206;&#x53ef;&#x7528;</tspan></text>
+</g>
+</g>
+<text id="T-2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="968.415" y="377">T-2</tspan></text>
+</g>
+<g id="row-4">
+<rect width="704" height="32" transform="translate(290 389)" fill="white"/>
+<text id="600036.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="409.364">600036.SH</tspan></text>
+<text id="&#230;&#139;&#155;&#229;&#149;&#134;&#233;&#147;&#182;&#232;&#161;&#140;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="409.364">&#x62db;&#x5546;&#x94f6;&#x884c;</tspan></text>
+<text id="&#233;&#147;&#182;&#232;&#161;&#140;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="409.364">&#x94f6;&#x884c;</tspan></text>
+<text id="#21" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="673.059" y="409.364">#21</tspan></text>
+<g id="change-cell_5">
+<text id="+4" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="757" y="409.364">+4</tspan></text>
+<g id="arrow-up_3" clip-path="url(#clip6_3_398)">
+<path id="Vector_13" d="M784.334 405L782 402.666L779.666 405M782 402.666V407.334" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge_5">
+<g id="Frame_10">
+<rect x="798.5" y="397.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="798.5" y="397.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_4" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="408.636">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="T-1_4" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="969.586" y="409">T-1</tspan></text>
+</g>
+<g id="row-5">
+<rect width="704" height="32" transform="translate(290 421)" fill="#F3F5F7"/>
+<text id="002714.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="441.364">002714.SZ</tspan></text>
+<text id="&#231;&#137;&#167;&#229;&#142;&#159;&#232;&#130;&#161;&#228;&#187;&#189;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="441.364">&#x7267;&#x539f;&#x80a1;&#x4efd;</tspan></text>
+<text id="&#229;&#133;&#187;&#230;&#174;&#150;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="441.364">&#x517b;&#x6b96;</tspan></text>
+<text id="#29" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="671.043" y="441.364">#29</tspan></text>
+<g id="change-cell_6">
+<text id="-1" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="762" y="441.364">-1</tspan></text>
+<g id="arrow-down_2" clip-path="url(#clip7_3_398)">
+<path id="Vector_14" d="M782 434.666V439.334M779.666 437L782 439.334L784.334 437" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge_6">
+<g id="Frame_11">
+<rect x="798.5" y="429.5" width="41" height="15" rx="1.5" fill="#FDF8E2"/>
+<rect x="798.5" y="429.5" width="41" height="15" rx="1.5" stroke="#B87A14"/>
+<text id="&#229;&#190;&#133;&#229;&#174;&#161;&#230;&#137;&#185;" fill="#B87A14" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="440.636">&#x5f85;&#x5ba1;&#x6279;</tspan></text>
+</g>
+</g>
+<text id="T-1_5" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="969.586" y="441">T-1</tspan></text>
+</g>
+<g id="row-6">
+<rect width="704" height="32" transform="translate(290 453)" fill="white"/>
+<text id="002475.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="473.364">002475.SZ</tspan></text>
+<text id="&#231;&#171;&#139;&#232;&#174;&#175;&#231;&#178;&#190;&#229;&#175;&#134;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="473.364">&#x7acb;&#x8baf;&#x7cbe;&#x5bc6;</tspan></text>
+<text id="&#230;&#182;&#136;&#232;&#180;&#185;&#231;&#148;&#181;&#229;&#173;&#144;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="473.364">&#x6d88;&#x8d39;&#x7535;&#x5b50;</tspan></text>
+<text id="#34" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="670.469" y="473.364">#34</tspan></text>
+<g id="change-cell_7">
+<text id="+5" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="758" y="473.364">+5</tspan></text>
+<g id="arrow-up_4" clip-path="url(#clip8_3_398)">
+<path id="Vector_15" d="M784.334 469L782 466.666L779.666 469M782 466.666V471.334" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge_7">
+<g id="Frame_12">
+<rect x="798.5" y="461.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="798.5" y="461.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_5" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="472.636">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="T-3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="967.824" y="473">T-3</tspan></text>
+</g>
+<g id="row-7">
+<rect width="704" height="32" transform="translate(290 485)" fill="#F3F5F7"/>
+<text id="600900.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="298" y="505.364">600900.SH</tspan></text>
+<text id="&#233;&#149;&#191;&#230;&#177;&#159;&#231;&#148;&#181;&#229;&#138;&#155;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="390" y="505.364">&#x957f;&#x6c5f;&#x7535;&#x529b;</tspan></text>
+<text id="&#231;&#148;&#181;&#229;&#138;&#155;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="522" y="505.364">&#x7535;&#x529b;</tspan></text>
+<text id="#40" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="670.281" y="505.364">#40</tspan></text>
+<g id="change-cell_8">
+<text id="-2" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="761" y="505.364">-2</tspan></text>
+<g id="arrow-down_3" clip-path="url(#clip9_3_398)">
+<path id="Vector_16" d="M782 498.666V503.334M779.666 501L782 503.334L784.334 501" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="trust-badge_8">
+<g id="Frame_13">
+<rect x="798.5" y="493.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="798.5" y="493.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_6" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="804" y="504.636">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="T-1_6" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="969.586" y="505">T-1</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-metrics">
+<g id="card-risk">
+<rect x="272.5" y="559.5" width="357" height="160" rx="2.5" fill="white"/>
+<rect x="272.5" y="559.5" width="357" height="160" rx="2.5" stroke="#DEE2E7"/>
+<g id="title">
+<rect id="Rectangle_2" x="290" y="578.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136;&#229;&#129;&#143;&#231;&#166;&#187;&#228;&#184;&#142;&#233;&#163;&#142;&#233;&#153;&#169; / Portfolio Tracking" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="301" y="590.591">&#x7ec4;&#x5408;&#x504f;&#x79bb;&#x4e0e;&#x98ce;&#x9669; / Portfolio Tracking</tspan></text>
+</g>
+<g id="Frame_14">
+<g id="Frame_15">
+<text id="&#228;&#184;&#187;&#229;&#138;&#168;&#230;&#157;&#131;&#233;&#135;&#141;&#229;&#129;&#143;&#231;&#166;&#187; (Active Share)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="290" y="626.364">&#x4e3b;&#x52a8;&#x6743;&#x91cd;&#x504f;&#x79bb; (Active Share)</tspan></text>
+<text id="2.3 %" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="577" y="626.727">2.3 %</tspan></text>
+</g>
+<g id="Frame_16">
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;&#233;&#155;&#134;&#228;&#184;&#173;&#229;&#186;&#166; (HHI Index)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="290" y="650.364">&#x884c;&#x4e1a;&#x96c6;&#x4e2d;&#x5ea6; (HHI Index)</tspan></text>
+<text id="28.1 %" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="572" y="650.727">28.1 %</tspan></text>
+</g>
+<g id="Frame_17">
+<text id="&#230;&#156;&#128;&#229;&#164;&#167;&#229;&#141;&#149;&#232;&#130;&#161;&#230;&#149;&#158;&#229;&#143;&#163; (Max Position)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="290" y="674.364">&#x6700;&#x5927;&#x5355;&#x80a1;&#x655e;&#x53e3; (Max Position)</tspan></text>
+<text id="4.8 %" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="577" y="674.727">4.8 %</tspan></text>
+</g>
+<g id="Frame_18">
+<text id="&#229;&#142;&#134;&#229;&#143;&#178;&#230;&#151;&#165;&#229;&#186;&#166;&#233;&#162;&#132;&#230;&#181;&#139; VaR (95%)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="290" y="698.364">&#x5386;&#x53f2;&#x65e5;&#x5ea6;&#x9884;&#x6d4b; VaR (95%)</tspan></text>
+<text id="-1.62 %" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="566" y="698.727">-1.62 %</tspan></text>
+</g>
+</g>
+</g>
+<g id="card-shadow">
+<rect x="654.5" y="559.5" width="357" height="160" rx="2.5" fill="white"/>
+<rect x="654.5" y="559.5" width="357" height="160" rx="2.5" stroke="#DEE2E7"/>
+<g id="title_2">
+<rect id="Rectangle_3" x="672" y="578.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="Timing Shadow / &#229;&#189;&#177;&#229;&#173;&#144;&#232;&#183;&#159;&#232;&#184;&#170;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="683" y="590.591">Timing Shadow / &#x5f71;&#x5b50;&#x8ddf;&#x8e2a;</tspan></text>
+</g>
+<g id="Frame_19">
+<g id="Frame_20">
+<text id="&#231;&#180;&#175;&#232;&#174;&#161;&#232;&#182;&#133;&#233;&#162;&#157;&#230;&#148;&#182;&#231;&#155;&#138; (Active Return)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="672" y="626.364">&#x7d2f;&#x8ba1;&#x8d85;&#x989d;&#x6536;&#x76ca; (Active Return)</tspan></text>
+<text id="+3.2 %" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="951" y="626.727">+3.2 %</tspan></text>
+</g>
+<g id="Frame_21">
+<text id="&#230;&#156;&#172;&#229;&#145;&#168;&#232;&#182;&#133;&#233;&#162;&#157; (Weekly Alpha)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="672" y="650.364">&#x672c;&#x5468;&#x8d85;&#x989d; (Weekly Alpha)</tspan></text>
+<text id="+0.4 %" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="950" y="650.727">+0.4 %</tspan></text>
+</g>
+<g id="Frame_22">
+<text id="&#229;&#189;&#147;&#229;&#137;&#141;&#230;&#140;&#129;&#228;&#187;&#147;&#232;&#130;&#161;&#231;&#165;&#168;&#230;&#149;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="672" y="674.364">&#x5f53;&#x524d;&#x6301;&#x4ed3;&#x80a1;&#x7968;&#x6570;</tspan></text>
+<text id="35 &#230;&#160;&#135;&#231;&#154;&#132;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="948" y="674.727">35 &#x6807;&#x7684;</tspan></text>
+</g>
+<g id="Frame_23">
+<text id="&#229;&#141;&#149;&#230;&#156;&#136;&#233;&#162;&#132;&#230;&#181;&#139;&#230;&#141;&#162;&#230;&#137;&#139;&#231;&#142;&#135; (Turnover)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="672" y="698.364">&#x5355;&#x6708;&#x9884;&#x6d4b;&#x6362;&#x624b;&#x7387; (Turnover)</tspan></text>
+<text id="12.8 %" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="953" y="698.727">12.8 %</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="grid-right">
+<g id="card-events">
+<rect x="1036.5" y="185.5" width="379" height="488" rx="2.5" fill="white"/>
+<rect x="1036.5" y="185.5" width="379" height="488" rx="2.5" stroke="#DEE2E7"/>
+<g id="title_3">
+<rect id="Rectangle_4" x="1054" y="204.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#233;&#135;&#141;&#229;&#164;&#167;&#228;&#186;&#139;&#228;&#187;&#182;/&#229;&#133;&#172;&#229;&#145;&#138;&#230;&#181;&#129; / Basic Feeds" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="1065" y="216.591">&#x91cd;&#x5927;&#x4e8b;&#x4ef6;/&#x516c;&#x544a;&#x6d41; / Basic Feeds</tspan></text>
+</g>
+<g id="feed-list">
+<g id="event-0">
+<rect x="1054" y="232" width="344" height="64" rx="3" fill="#F3F5F7"/>
+<g id="evt-header">
+<text id="09:15" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1062" y="250.5">09:15</tspan></text>
+<text id="wind_terminal" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1324" y="250.136">wind_terminal</tspan></text>
+</g>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#229;&#185;&#179;&#229;&#174;&#137;&#229;&#143;&#145;&#229;&#184;&#131;&#228;&#184;&#137;&#229;&#173;&#163;&#230;&#138;&#165;&#239;&#188;&#140;&#230;&#137;&#163;&#233;&#157;&#158;&#229;&#189;&#146;&#230;&#175;&#141;&#229;&#135;&#128;&#229;&#136;&#169;&#230;&#182;&#166;&#229;&#144;&#140;&#230;&#175;&#148;+18.2%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1062" y="268.864">&#x4e2d;&#x56fd;&#x5e73;&#x5b89;&#x53d1;&#x5e03;&#x4e09;&#x5b63;&#x62a5;&#xff0c;&#x6263;&#x975e;&#x5f52;&#x6bcd;&#x51c0;&#x5229;&#x6da6;&#x540c;&#x6bd4;+18.2%</tspan></text>
+<g id="evt-footer">
+<text id="sha256:d8a2..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1062" y="285.636">sha256:d8a2...</tspan></text>
+<text id="&#229;&#147;&#136;&#229;&#184;&#140;&#232;&#191;&#189;&#232;&#184;&#170;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em" text-decoration="underline"><tspan x="1350" y="285.636">&#x54c8;&#x5e0c;&#x8ffd;&#x8e2a;</tspan></text>
+</g>
+</g>
+<g id="event-1">
+<rect x="1054" y="304" width="344" height="64" rx="3" fill="#F3F5F7"/>
+<g id="evt-header_2">
+<text id="09:11" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1062" y="322.5">09:11</tspan></text>
+<text id="mira_feed" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1343" y="322.136">mira_feed</tspan></text>
+</g>
+<text id="&#232;&#180;&#181;&#229;&#183;&#158;&#232;&#140;&#133;&#229;&#143;&#176;&#230;&#137;&#185;&#228;&#187;&#183;&#228;&#188;&#129;&#231;&#168;&#179;&#229;&#155;&#158;&#229;&#141;&#135;&#239;&#188;&#140;&#232;&#140;&#133;&#229;&#143;&#176;1935&#229;&#141;&#149;&#229;&#145;&#168;&#229;&#135;&#186;&#232;&#180;&#167;&#233;&#135;&#143;&#231;&#172;&#166;&#229;&#144;&#136;&#233;&#162;&#132;&#230;&#156;&#159;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1062" y="340.864">&#x8d35;&#x5dde;&#x8305;&#x53f0;&#x6279;&#x4ef7;&#x4f01;&#x7a33;&#x56de;&#x5347;&#xff0c;&#x8305;&#x53f0;1935&#x5355;&#x5468;&#x51fa;&#x8d27;&#x91cf;&#x7b26;&#x5408;&#x9884;&#x671f;</tspan></text>
+<g id="evt-footer_2">
+<text id="sha256:f12a..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1062" y="357.636">sha256:f12a...</tspan></text>
+<text id="&#229;&#147;&#136;&#229;&#184;&#140;&#232;&#191;&#189;&#232;&#184;&#170;_2" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em" text-decoration="underline"><tspan x="1350" y="357.636">&#x54c8;&#x5e0c;&#x8ffd;&#x8e2a;</tspan></text>
+</g>
+</g>
+<g id="event-2">
+<rect x="1054" y="376" width="344" height="64" rx="3" fill="#F3F5F7"/>
+<g id="evt-header_3">
+<text id="08:50" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1062" y="394.5">08:50</tspan></text>
+<text id="custom_api" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1336" y="394.136">custom_api</tspan></text>
+</g>
+<text id="&#231;&#190;&#142;&#231;&#154;&#132;&#233;&#155;&#134;&#229;&#155;&#162;&#232;&#176;&#131;&#230;&#149;&#180;&#229;&#164;&#150;&#233;&#148;&#128;&#229;&#174;&#154;&#228;&#187;&#183;&#231;&#173;&#150;&#231;&#149;&#165;&#239;&#188;&#140;Q4&#230;&#177;&#135;&#231;&#142;&#135;&#229;&#175;&#185;&#229;&#134;&#178;&#230;&#150;&#185;&#230;&#161;&#136;&#229;&#183;&#178;&#233;&#148;&#129;&#229;&#174;&#154;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1062" y="412.864">&#x7f8e;&#x7684;&#x96c6;&#x56e2;&#x8c03;&#x6574;&#x5916;&#x9500;&#x5b9a;&#x4ef7;&#x7b56;&#x7565;&#xff0c;Q4&#x6c47;&#x7387;&#x5bf9;&#x51b2;&#x65b9;&#x6848;&#x5df2;&#x9501;&#x5b9a;</tspan></text>
+<g id="evt-footer_3">
+<text id="sha256:e89b..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1062" y="429.636">sha256:e89b...</tspan></text>
+<text id="&#229;&#147;&#136;&#229;&#184;&#140;&#232;&#191;&#189;&#232;&#184;&#170;_3" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em" text-decoration="underline"><tspan x="1350" y="429.636">&#x54c8;&#x5e0c;&#x8ffd;&#x8e2a;</tspan></text>
+</g>
+</g>
+<g id="event-3">
+<rect x="1054" y="448" width="344" height="64" rx="3" fill="#F3F5F7"/>
+<g id="evt-header_4">
+<text id="08:30" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1062" y="466.5">08:30</tspan></text>
+<text id="sse_bulletin" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1334" y="466.136">sse_bulletin</tspan></text>
+</g>
+<text id="&#228;&#186;&#148;&#231;&#178;&#174;&#230;&#182;&#178;&#229;&#164;&#167;&#232;&#130;&#161;&#228;&#184;&#156;&#232;&#174;&#161;&#229;&#136;&#146;&#229;&#162;&#158;&#230;&#140;&#129;&#228;&#184;&#141;&#232;&#182;&#133;&#232;&#191;&#135;20&#228;&#186;&#191;&#229;&#133;&#131;&#239;&#188;&#140;&#233;&#148;&#129;&#229;&#174;&#154;&#230;&#156;&#159;36&#228;&#184;&#170;&#230;&#156;&#136;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1062" y="484.864">&#x4e94;&#x7cae;&#x6db2;&#x5927;&#x80a1;&#x4e1c;&#x8ba1;&#x5212;&#x589e;&#x6301;&#x4e0d;&#x8d85;&#x8fc7;20&#x4ebf;&#x5143;&#xff0c;&#x9501;&#x5b9a;&#x671f;36&#x4e2a;&#x6708;</tspan></text>
+<g id="evt-footer_4">
+<text id="sha256:92cb..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1062" y="501.636">sha256:92cb...</tspan></text>
+<text id="&#229;&#147;&#136;&#229;&#184;&#140;&#232;&#191;&#189;&#232;&#184;&#170;_4" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em" text-decoration="underline"><tspan x="1350" y="501.636">&#x54c8;&#x5e0c;&#x8ffd;&#x8e2a;</tspan></text>
+</g>
+</g>
+<g id="event-4">
+<rect x="1054" y="520" width="344" height="64" rx="3" fill="#F3F5F7"/>
+<g id="evt-header_5">
+<text id="08:00" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1062" y="538.5">08:00</tspan></text>
+<text id="internal_risk" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1332" y="538.136">internal_risk</tspan></text>
+</g>
+<text id="&#230;&#139;&#155;&#229;&#149;&#134;&#233;&#147;&#182;&#232;&#161;&#140;11&#230;&#156;&#136;&#233;&#155;&#182;&#229;&#148;&#174;&#228;&#191;&#161;&#232;&#180;&#183;&#228;&#184;&#141;&#232;&#137;&#175;&#231;&#142;&#135;&#231;&#142;&#175;&#230;&#175;&#148;&#228;&#184;&#139;&#233;&#153;&#141;0.02%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1062" y="556.864">&#x62db;&#x5546;&#x94f6;&#x884c;11&#x6708;&#x96f6;&#x552e;&#x4fe1;&#x8d37;&#x4e0d;&#x826f;&#x7387;&#x73af;&#x6bd4;&#x4e0b;&#x964d;0.02%</tspan></text>
+<g id="evt-footer_5">
+<text id="sha256:1a8d..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1062" y="573.636">sha256:1a8d...</tspan></text>
+<text id="&#229;&#147;&#136;&#229;&#184;&#140;&#232;&#191;&#189;&#232;&#184;&#170;_5" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em" text-decoration="underline"><tspan x="1350" y="573.636">&#x54c8;&#x5e0c;&#x8ffd;&#x8e2a;</tspan></text>
+</g>
+</g>
+<g id="event-5">
+<rect x="1054" y="592" width="344" height="64" rx="3" fill="#F3F5F7"/>
+<g id="evt-header_6">
+<text id="07:45" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1062" y="610.5">07:45</tspan></text>
+<text id="local_news" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1337" y="610.136">local_news</tspan></text>
+</g>
+<text id="&#231;&#171;&#139;&#232;&#174;&#175;&#231;&#178;&#190;&#229;&#175;&#134;&#231;&#178;&#190;&#229;&#175;&#134;&#229;&#136;&#182;&#233;&#128;&#160;&#228;&#186;&#140;&#230;&#156;&#159;&#229;&#183;&#165;&#231;&#168;&#139;&#230;&#173;&#163;&#229;&#188;&#143;&#230;&#138;&#149;&#228;&#186;&#167;&#239;&#188;&#140;&#229;&#185;&#180;&#228;&#186;&#167;&#232;&#131;&#189;&#230;&#143;&#144;&#229;&#141;&#135;12%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1062" y="628.864">&#x7acb;&#x8baf;&#x7cbe;&#x5bc6;&#x7cbe;&#x5bc6;&#x5236;&#x9020;&#x4e8c;&#x671f;&#x5de5;&#x7a0b;&#x6b63;&#x5f0f;&#x6295;&#x4ea7;&#xff0c;&#x5e74;&#x4ea7;&#x80fd;&#x63d0;&#x5347;12%</tspan></text>
+<g id="evt-footer_6">
+<text id="sha256:72fc..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1062" y="645.636">sha256:72fc...</tspan></text>
+<text id="&#229;&#147;&#136;&#229;&#184;&#140;&#232;&#191;&#189;&#232;&#184;&#170;_6" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em" text-decoration="underline"><tspan x="1350" y="645.636">&#x54c8;&#x5e0c;&#x8ffd;&#x8e2a;</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g id="card-pending">
+<rect x="1036.5" y="698.5" width="379" height="272" rx="2.5" fill="white"/>
+<rect x="1036.5" y="698.5" width="379" height="272" rx="2.5" stroke="#DEE2E7"/>
+<g id="title_4">
+<rect id="Rectangle_5" x="1054" y="717.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#229;&#155;&#160;&#229;&#173;&#144;&#229;&#174;&#161;&#230;&#160;&#184;&#228;&#184;&#142;&#229;&#190;&#133;&#229;&#164;&#132;&#231;&#144;&#134; / Pending Tasks" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="1065" y="729.591">&#x56e0;&#x5b50;&#x5ba1;&#x6838;&#x4e0e;&#x5f85;&#x5904;&#x7406; / Pending Tasks</tspan></text>
+</g>
+<g id="pending-list">
+<g id="pending-0">
+<rect x="1054" y="745" width="344" height="46" rx="3" fill="#F3F5F7"/>
+<g id="Frame_24">
+<rect x="1062" y="756" width="24" height="24" rx="12" fill="#2F5EA8"/>
+<text id="S" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1070" y="772">S</tspan></text>
+</g>
+<g id="Frame_25">
+<text id="&#228;&#184;&#173;&#230;&#138;&#165;&#229;&#187;&#182;&#232;&#191;&#159;&#228;&#191;&#174;&#230;&#173;&#163;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="764.864">&#x4e2d;&#x62a5;&#x5ef6;&#x8fdf;&#x4fee;&#x6b63;</tspan></text>
+<text id="600519.SH &#229;&#187;&#182;&#232;&#191;&#159;&#228;&#191;&#174;&#230;&#173;&#163;&#231;&#148;&#179;&#232;&#175;&#183;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="780.5">600519.SH &#x5ef6;&#x8fdf;&#x4fee;&#x6b63;&#x7533;&#x8bf7;</tspan></text>
+</g>
+<g id="Frame_26">
+<rect x="1358.5" y="760.5" width="31" height="15" rx="1.5" fill="#FCECEE"/>
+<rect x="1358.5" y="760.5" width="31" height="15" rx="1.5" stroke="#A64045"/>
+<text id="&#231;&#180;&#167;&#230;&#128;&#165;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1364" y="771.636">&#x7d27;&#x6025;</tspan></text>
+</g>
+</g>
+<g id="pending-1">
+<rect x="1054" y="799" width="344" height="46" rx="3" fill="#F3F5F7"/>
+<g id="Frame_27">
+<rect x="1062" y="810" width="24" height="24" rx="12" fill="#2F5EA8"/>
+<text id="M" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1069" y="826">M</tspan></text>
+</g>
+<g id="Frame_28">
+<text id="&#229;&#155;&#160;&#229;&#173;&#144;&#233;&#133;&#141;&#231;&#189;&#174;&#233;&#135;&#141;&#232;&#189;&#189;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="818.864">&#x56e0;&#x5b50;&#x914d;&#x7f6e;&#x91cd;&#x8f7d;</tspan></text>
+<text id="CSI300 &#232;&#180;&#168;&#233;&#135;&#143;&#229;&#155;&#160;&#229;&#173;&#144;&#230;&#154;&#180;&#233;&#156;&#178;&#230;&#157;&#131;&#233;&#135;&#141;&#232;&#176;&#131;&#230;&#149;&#180;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="834.5">CSI300 &#x8d28;&#x91cf;&#x56e0;&#x5b50;&#x66b4;&#x9732;&#x6743;&#x91cd;&#x8c03;&#x6574;</tspan></text>
+</g>
+<g id="Frame_29">
+<rect x="1358.5" y="814.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1358.5" y="814.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#230;&#153;&#174;&#233;&#128;&#154;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1364" y="825.636">&#x666e;&#x901a;</tspan></text>
+</g>
+</g>
+<g id="pending-2">
+<rect x="1054" y="853" width="344" height="46" rx="3" fill="#F3F5F7"/>
+<g id="Frame_30">
+<rect x="1062" y="864" width="24" height="24" rx="12" fill="#2F5EA8"/>
+<text id="A" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1070" y="880">A</tspan></text>
+</g>
+<g id="Frame_31">
+<text id="&#230;&#149;&#176;&#230;&#141;&#174;&#230;&#186;&#144;&#230;&#179;&#168;&#229;&#134;&#140;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="872.864">&#x6570;&#x636e;&#x6e90;&#x6ce8;&#x518c;</tspan></text>
+<text id="&#230;&#150;&#176;&#229;&#162;&#158; &#232;&#180;&#162;&#232;&#129;&#148;&#231;&#164;&#190;&#232;&#136;&#134;&#230;&#131;&#133;&#230;&#150;&#176;&#233;&#151;&#187;&#230;&#186;&#144;API &#230;&#142;&#165;&#229;&#133;&#165;&#229;&#164;&#141;&#230;&#160;&#184;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="888.5">&#x65b0;&#x589e; &#x8d22;&#x8054;&#x793e;&#x8206;&#x60c5;&#x65b0;&#x95fb;&#x6e90;API &#x63a5;&#x5165;&#x590d;&#x6838;</tspan></text>
+</g>
+<g id="Frame_32">
+<rect x="1358.5" y="868.5" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1358.5" y="868.5" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#230;&#153;&#174;&#233;&#128;&#154;_2" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1364" y="879.636">&#x666e;&#x901a;</tspan></text>
+</g>
+</g>
+<g id="pending-3">
+<rect x="1054" y="907" width="344" height="46" rx="3" fill="#F3F5F7"/>
+<g id="Frame_33">
+<rect x="1062" y="918" width="24" height="24" rx="12" fill="#2F5EA8"/>
+<text id="K" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1070" y="934">K</tspan></text>
+</g>
+<g id="Frame_34">
+<text id="&#230;&#156;&#170;&#230;&#157;&#165;&#230;&#149;&#176;&#230;&#141;&#174;&#230;&#139;&#166;&#230;&#136;&#170;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="926.864">&#x672a;&#x6765;&#x6570;&#x636e;&#x62e6;&#x622a;</tspan></text>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136; [A50_Momentum] &#229;&#188;&#130;&#229;&#184;&#184;&#229;&#155;&#158;&#230;&#187;&#154;&#231;&#148;&#179;&#232;&#175;&#137;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="942.5">&#x7ec4;&#x5408; [A50_Momentum] &#x5f02;&#x5e38;&#x56de;&#x6eda;&#x7533;&#x8bc9;</tspan></text>
+</g>
+<g id="Frame_35">
+<rect x="1358.5" y="922.5" width="31" height="15" rx="1.5" fill="#FCECEE"/>
+<rect x="1358.5" y="922.5" width="31" height="15" rx="1.5" stroke="#A64045"/>
+<text id="&#231;&#180;&#167;&#230;&#128;&#165;_2" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1364" y="933.636">&#x7d27;&#x6025;</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<g id="card-exceptions">
+<rect x="1036.5" y="995.5" width="379" height="218" rx="2.5" fill="white"/>
+<rect x="1036.5" y="995.5" width="379" height="218" rx="2.5" stroke="#DEE2E7"/>
+<g id="title_5">
+<rect id="Rectangle_6" x="1054" y="1014.5" width="3" height="14" rx="1" fill="#A64045"/>
+<text id="&#232;&#191;&#144;&#232;&#161;&#140;&#229;&#188;&#130;&#229;&#184;&#184; / Active Failures" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="1065" y="1026.59">&#x8fd0;&#x884c;&#x5f02;&#x5e38; / Active Failures</tspan></text>
+</g>
+<g id="exception-list">
+<g id="exception-0">
+<rect x="1054" y="1042" width="344" height="46" rx="3" fill="#FCEAEB"/>
+<g id="alert-circle" clip-path="url(#clip10_3_398)">
+<path id="Vector_17" d="M1069 1062.67V1065M1069 1067.33H1069.01M1074.83 1065C1074.83 1068.22 1072.22 1070.83 1069 1070.83C1065.78 1070.83 1063.17 1068.22 1063.17 1065C1063.17 1061.78 1065.78 1059.17 1069 1059.17C1072.22 1059.17 1074.83 1061.78 1074.83 1065Z" stroke="#7A1C20" stroke-width="2" stroke-linecap="round"/>
+</g>
+<g id="Frame_36">
+<text id="&#229;&#155;&#160;&#229;&#173;&#144; [BP_TTM] &#229;&#190;&#170;&#231;&#142;&#175;&#229;&#188;&#149;&#231;&#148;&#168;&#230;&#163;&#128;&#230;&#181;&#139;&#230;&#139;&#166;&#230;&#136;&#170;" fill="#7A1C20" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1086" y="1061.86">&#x56e0;&#x5b50; [BP_TTM] &#x5faa;&#x73af;&#x5f15;&#x7528;&#x68c0;&#x6d4b;&#x62e6;&#x622a;</tspan></text>
+<text id="alpha_pipeline_v3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1086" y="1077.5">alpha_pipeline_v3</tspan></text>
+</g>
+<text id="09:31" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1361" y="1069">09:31</tspan></text>
+</g>
+<g id="exception-1">
+<rect x="1054" y="1096" width="344" height="46" rx="3" fill="#FDF8E2"/>
+<g id="alert-circle_2" clip-path="url(#clip11_3_398)">
+<path id="Vector_18" d="M1069 1116.67V1119M1069 1121.33H1069.01M1074.83 1119C1074.83 1122.22 1072.22 1124.83 1069 1124.83C1065.78 1124.83 1063.17 1122.22 1063.17 1119C1063.17 1115.78 1065.78 1113.17 1069 1113.17C1072.22 1113.17 1074.83 1115.78 1074.83 1119Z" stroke="#B87A14" stroke-width="2" stroke-linecap="round"/>
+</g>
+<g id="Frame_37">
+<text id="002714.SZ &#230;&#136;&#144;&#229;&#136;&#134;&#232;&#130;&#161;&#229;&#129;&#156;&#231;&#137;&#140;&#228;&#188;&#176;&#229;&#128;&#188;&#233;&#153;&#141;&#231;&#186;&#167;" fill="#B87A14" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1086" y="1115.86">002714.SZ &#x6210;&#x5206;&#x80a1;&#x505c;&#x724c;&#x4f30;&#x503c;&#x964d;&#x7ea7;</tspan></text>
+<text id="universe_calc_sync" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1086" y="1131.5">universe_calc_sync</tspan></text>
+</g>
+<text id="09:20" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1359" y="1123">09:20</tspan></text>
+</g>
+<g id="exception-2">
+<rect x="1054" y="1150" width="344" height="46" rx="3" fill="#FDF8E2"/>
+<g id="alert-circle_3" clip-path="url(#clip12_3_398)">
+<path id="Vector_19" d="M1069 1170.67V1173M1069 1175.33H1069.01M1074.83 1173C1074.83 1176.22 1072.22 1178.83 1069 1178.83C1065.78 1178.83 1063.17 1176.22 1063.17 1173C1063.17 1169.78 1065.78 1167.17 1069 1167.17C1072.22 1167.17 1074.83 1169.78 1074.83 1173Z" stroke="#B87A14" stroke-width="2" stroke-linecap="round"/>
+</g>
+<g id="Frame_38">
+<text id="Wind API &#229;&#187;&#182;&#232;&#191;&#159;&#232;&#182;&#133;&#232;&#191;&#135;&#233;&#162;&#132;&#232;&#173;&#166;&#233;&#152;&#128;&#229;&#128;&#188; (1200ms)" fill="#B87A14" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1086" y="1169.86">Wind API &#x5ef6;&#x8fdf;&#x8d85;&#x8fc7;&#x9884;&#x8b66;&#x9600;&#x503c; (1200ms)</tspan></text>
+<text id="market_data_ingest" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1086" y="1185.5">market_data_ingest</tspan></text>
+</g>
+<text id="09:15_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1361" y="1177">09:15</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_3_398">
+<rect width="16" height="16" fill="white" transform="translate(28 230)"/>
+</clipPath>
+<clipPath id="clip1_3_398">
+<rect width="16" height="16" fill="white" transform="translate(28 270)"/>
+</clipPath>
+<clipPath id="clip2_3_398">
+<rect width="14" height="14" fill="white" transform="translate(284 25)"/>
+</clipPath>
+<clipPath id="clip3_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 273)"/>
+</clipPath>
+<clipPath id="clip4_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 305)"/>
+</clipPath>
+<clipPath id="clip5_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 337)"/>
+</clipPath>
+<clipPath id="clip6_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 401)"/>
+</clipPath>
+<clipPath id="clip7_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 433)"/>
+</clipPath>
+<clipPath id="clip8_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 465)"/>
+</clipPath>
+<clipPath id="clip9_3_398">
+<rect width="8" height="8" fill="white" transform="translate(778 497)"/>
+</clipPath>
+<clipPath id="clip10_3_398">
+<rect width="14" height="14" fill="white" transform="translate(1062 1058)"/>
+</clipPath>
+<clipPath id="clip11_3_398">
+<rect width="14" height="14" fill="white" transform="translate(1062 1112)"/>
+</clipPath>
+<clipPath id="clip12_3_398">
+<rect width="14" height="14" fill="white" transform="translate(1062 1166)"/>
+</clipPath>
+</defs>
+</svg>

@@ -42,8 +42,13 @@ Plan 中的“预计文件”用于控制改动边界。执行时若发现必须
 当前不能再把“下一步”写成只有数据工作：
 
 1. **Data/Gate 队列**：`step-02-p2-pit-data-remediation.md` Task 1，strict-PIT 数据源资格探针；
-2. **Prototype/Product 队列**：`track-00-prototype-runtime-delivery.md`，先 PUI-00 设计基线，再 PUI-01
-   Desk、PUI-02 Universe/Screen、PUI-03 P5 黄金路径。
+2. **Prototype/Product 队列**：`track-00-prototype-runtime-delivery.md`。PUI-00 设计基线、
+   PUI-01 Desk、PUI-02 Universe/Screen **已于 2026-08-15 完成**；下一个是 PUI-03 P5 黄金路径。
+
+**2026-08-16 更新**：以上两条队列的可执行展开已收口为 9 份实现级 plan，见
+`docs/superpowers/plans/2026-08-16-roadmap-complete-platform.md`。该路线图基于逐文件代码审计，
+纠正了若干文档描述与真实代码状态的差异，并覆盖 P6–P10 完整平台能力。
+本目录的 step Plan 继续作为阶段 Spec 真源；新 plan 是它们的可执行展开，不替代其 Spec 与 Gate 定义。
 
 两条队列可以作为不同 work package 并行。PUI 不需要等待假数据，可以实现真实
 empty/partial/unavailable/blocked 产品状态；它不能生成 ready 数据或提升 Gate。Data/Gate 通过也不会自动
@@ -60,6 +65,7 @@ empty/partial/unavailable/blocked 产品状态；它不能生成 ready 数据或
 | 1 | `step-01-p5-engineering-completion.md` | `verified`（仅工程范围；P5 Gate 仍阻断） |
 | 2 | `step-02-p2-pit-data-remediation.md` | `ready_for_implementation`（先做资格探针） |
 | 3 | `step-03-p4-real-qualification-gate.md` | `gate_blocked` |
+| 3A | `step-03a-current-only-factor-research.md` | `ready_for_implementation`（current-only 轨道，不替代 Step 3） |
 | 4 | `step-04-p5-real-artifact-gate.md` | `gate_blocked` |
 | 5 | `step-05-p6-core-selection.md` | `dependency_blocked` |
 | 6 | `step-06-p7-active-timing.md` | `dependency_blocked` |

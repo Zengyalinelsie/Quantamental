@@ -1,0 +1,718 @@
+<svg width="1440" height="1200" viewBox="0 0 1440 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="portfolios-construction">
+<rect width="1440" height="1200" fill="#F3F5F7"/>
+<g id="viewport-wrap">
+<g id="sidebar">
+<mask id="path-1-inside-1_7_303" fill="white">
+<path d="M0 0H248V1200H0V0Z"/>
+</mask>
+<path d="M0 0H248V1200H0V0Z" fill="white"/>
+<path d="M248 0H247V1200H248H249V0H248Z" fill="#DEE2E7" mask="url(#path-1-inside-1_7_303)"/>
+<g id="brand">
+<text id="Fundamental Quant" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="16" y="31.3182">Fundamental Quant</tspan></text>
+<text id="A&#232;&#130;&#161;&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#233;&#135;&#143;&#229;&#140;&#150;&#231;&#160;&#148;&#231;&#169;&#182;&#229;&#185;&#179;&#229;&#143;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="49.5">A&#x80a1;&#x57fa;&#x672c;&#x9762;&#x91cf;&#x5316;&#x7814;&#x7a76;&#x5e73;&#x53f0;</tspan></text>
+</g>
+<line id="Line" x1="16" y1="75.5" x2="232" y2="75.5" stroke="#DEE2E7"/>
+<g id="nav-list">
+<g id="nav-item-0">
+<g id="icon-frame">
+<g id="layout-dashboard" clip-path="url(#clip0_7_303)">
+<g id="Vector">
+<path d="M33.25 111.75H30.3333C30.0112 111.75 29.75 112.011 29.75 112.333V116.417C29.75 116.739 30.0112 117 30.3333 117H33.25C33.5722 117 33.8333 116.739 33.8333 116.417V112.333C33.8333 112.011 33.5722 111.75 33.25 111.75Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+<path d="M39.6667 111.75H36.75C36.4278 111.75 36.1667 112.011 36.1667 112.333V114.083C36.1667 114.405 36.4278 114.667 36.75 114.667H39.6667C39.9888 114.667 40.25 114.405 40.25 114.083V112.333C40.25 112.011 39.9888 111.75 39.6667 111.75Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+<path d="M39.6667 117H36.75C36.4278 117 36.1667 117.261 36.1667 117.583V121.667C36.1667 121.989 36.4278 122.25 36.75 122.25H39.6667C39.9888 122.25 40.25 121.989 40.25 121.667V117.583C40.25 117.261 39.9888 117 39.6667 117Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+<path d="M33.25 119.333H30.3333C30.0112 119.333 29.75 119.595 29.75 119.917V121.667C29.75 121.989 30.0112 122.25 30.3333 122.25H33.25C33.5722 122.25 33.8333 121.989 33.8333 121.667V119.917C33.8333 119.595 33.5722 119.333 33.25 119.333Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+<text id="&#228;&#187;&#138;&#230;&#151;&#165;&#229;&#183;&#165;&#228;&#189;&#156;&#229;&#143;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="122.727">&#x4eca;&#x65e5;&#x5de5;&#x4f5c;&#x53f0;</tspan></text>
+</g>
+<g id="nav-item-1">
+<g id="icon-frame_2">
+<g id="book-open">
+<path id="Vector_2" d="M34.9998 154.083V162.25M34.9998 154.083C34.9998 153.464 34.754 152.871 34.3163 152.433C33.8787 151.996 33.2852 151.75 32.6663 151.75H29.7494C29.5947 151.75 29.4463 151.811 29.3369 151.921C29.2275 152.03 29.166 152.179 29.166 152.333V159.917C29.166 160.071 29.2275 160.22 29.3369 160.329C29.4463 160.439 29.5947 160.5 29.7494 160.5H33.2497C33.7138 160.5 34.159 160.684 34.4872 161.013C34.8154 161.341 34.9998 161.786 34.9998 162.25M34.9998 154.083C34.9998 153.464 35.2457 152.871 35.6833 152.433C36.1209 151.996 36.7144 151.75 37.3333 151.75H40.2502C40.405 151.75 40.5533 151.811 40.6627 151.921C40.7722 152.03 40.8336 152.179 40.8336 152.333V159.917C40.8336 160.071 40.7722 160.22 40.6627 160.329C40.5533 160.439 40.405 160.5 40.2502 160.5H36.75C36.2858 160.5 35.8406 160.684 35.5124 161.013C35.1842 161.341 34.9998 161.786 34.9998 162.25" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#231;&#160;&#148;&#231;&#169;&#182;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="162.727">&#x7814;&#x7a76;</tspan></text>
+</g>
+<g id="nav-item-2">
+<g id="icon-frame_3">
+<g id="bar-chart">
+<path id="Vector_3" d="M30.916 202.25V198.75M34.9998 202.25V195.25M39.0836 202.25V191.75" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#229;&#155;&#160;&#229;&#173;&#144;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="202.727">&#x56e0;&#x5b50;</tspan></text>
+</g>
+<g id="nav-item-3">
+<rect x="16" y="220" width="216" height="36" rx="3" fill="#EAF2FC"/>
+<g id="icon-frame_4">
+<g id="pie-chart" clip-path="url(#clip1_7_303)">
+<path id="Vector_4" d="M40.3729 239.27C40.0018 240.147 39.4213 240.921 38.6822 241.522C37.9431 242.123 37.0679 242.535 36.1332 242.72C35.1984 242.905 34.2325 242.858 33.32 242.584C32.4074 242.31 31.576 241.816 30.8983 241.146C30.2207 240.476 29.7174 239.65 29.4326 238.741C29.1478 237.832 29.0902 236.866 29.2646 235.93C29.4391 234.993 29.8403 234.113 30.4334 233.367C31.0264 232.621 31.7931 232.032 32.6665 231.651M40.2502 237.001C40.5722 237.001 40.8365 236.739 40.8044 236.418C40.6699 235.079 40.0764 233.828 39.1244 232.876C38.1725 231.924 36.9208 231.331 35.5814 231.197C35.2606 231.165 34.9992 231.429 34.9992 231.751V236.418C34.9992 236.572 35.0607 236.721 35.1701 236.83C35.2795 236.94 35.4279 237.001 35.5826 237.001L40.2502 237.001Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="56" y="242.727">&#x7ec4;&#x5408;</tspan></text>
+</g>
+<g id="nav-item-4">
+<g id="icon-frame_5">
+<g id="activity" clip-path="url(#clip2_7_303)">
+<path id="Vector_5" d="M40.8336 277H39.3868C39.1319 276.999 38.8838 277.082 38.6804 277.236C38.4771 277.39 38.3297 277.606 38.2609 277.852L36.89 282.729C36.8811 282.759 36.8627 282.786 36.8375 282.805C36.8122 282.824 36.7815 282.834 36.75 282.834C36.7184 282.834 36.6877 282.824 36.6624 282.805C36.6372 282.786 36.6188 282.759 36.6099 282.729L33.3897 271.271C33.3809 271.241 33.3624 271.214 33.3372 271.195C33.3119 271.176 33.2812 271.166 33.2497 271.166C33.2181 271.166 33.1874 271.176 33.1622 271.195C33.1369 271.214 33.1185 271.241 33.1097 271.271L31.7387 276.148C31.6702 276.393 31.5237 276.608 31.3215 276.762C31.1194 276.916 30.8726 276.999 30.6186 277H29.166" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#231;&#155;&#145;&#230;&#142;&#167;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="282.727">&#x76d1;&#x63a7;</tspan></text>
+</g>
+<g id="nav-item-5">
+<g id="icon-frame_6">
+<g id="settings" clip-path="url(#clip3_7_303)">
+<path id="Vector_6" d="M33.6413 312.413C33.6735 312.075 33.8305 311.761 34.0818 311.533C34.3331 311.304 34.6606 311.177 35.0002 311.177C35.3399 311.177 35.6673 311.304 35.9186 311.533C36.1699 311.761 36.327 312.075 36.3591 312.413C36.3784 312.632 36.4501 312.842 36.568 313.027C36.6859 313.212 36.8467 313.366 37.0366 313.475C37.2266 313.585 37.4401 313.647 37.6592 313.657C37.8783 313.666 38.0964 313.623 38.2952 313.53C38.6038 313.39 38.9536 313.37 39.2763 313.473C39.5991 313.577 39.8718 313.797 40.0414 314.09C40.211 314.384 40.2653 314.73 40.1937 315.061C40.1222 315.393 39.9299 315.686 39.6544 315.883C39.4749 316.009 39.3284 316.176 39.2273 316.371C39.1262 316.565 39.0734 316.781 39.0734 317C39.0734 317.22 39.1262 317.436 39.2273 317.63C39.3284 317.824 39.4749 317.992 39.6544 318.118C39.9299 318.315 40.1222 318.608 40.1937 318.939C40.2653 319.271 40.211 319.617 40.0414 319.91C39.8718 320.204 39.5991 320.424 39.2763 320.527C38.9536 320.631 38.6038 320.61 38.2952 320.47C38.0964 320.378 37.8783 320.334 37.6592 320.344C37.4401 320.353 37.2266 320.416 37.0366 320.525C36.8467 320.635 36.6859 320.789 36.568 320.973C36.4501 321.158 36.3784 321.369 36.3591 321.587C36.327 321.925 36.1699 322.239 35.9186 322.468C35.6673 322.697 35.3399 322.823 35.0002 322.823C34.6606 322.823 34.3331 322.697 34.0818 322.468C33.8305 322.239 33.6735 321.925 33.6413 321.587C33.6221 321.369 33.5504 321.158 33.4324 320.973C33.3145 320.788 33.1537 320.635 32.9637 320.525C32.7736 320.415 32.56 320.353 32.3409 320.344C32.1217 320.334 31.9035 320.378 31.7047 320.47C31.396 320.61 31.0463 320.631 30.7235 320.527C30.4007 320.424 30.128 320.204 29.9585 319.91C29.7889 319.617 29.7346 319.271 29.8061 318.939C29.8777 318.608 30.07 318.315 30.3455 318.118C30.525 317.992 30.6714 317.824 30.7726 317.63C30.8737 317.436 30.9265 317.22 30.9265 317C30.9265 316.781 30.8737 316.565 30.7726 316.371C30.6714 316.176 30.525 316.009 30.3455 315.883C30.0703 315.685 29.8784 315.393 29.807 315.062C29.7357 314.73 29.79 314.385 29.9593 314.091C30.1287 313.798 30.4011 313.578 30.7236 313.474C31.046 313.371 31.3955 313.391 31.7041 313.53C31.9029 313.623 32.121 313.666 32.3401 313.657C32.5592 313.647 32.7727 313.585 32.9627 313.475C33.1526 313.366 33.3133 313.212 33.4313 313.027C33.5492 312.842 33.6209 312.632 33.6402 312.413M36.7498 317.001C36.7498 317.967 35.9663 318.751 34.9998 318.751C34.0333 318.751 33.2498 317.967 33.2498 317.001C33.2498 316.034 34.0333 315.251 34.9998 315.251C35.9663 315.251 36.7498 316.034 36.7498 317.001Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#230;&#149;&#176;&#230;&#141;&#174;&#228;&#184;&#142;&#231;&#174;&#161;&#231;&#144;&#134;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="322.727">&#x6570;&#x636e;&#x4e0e;&#x7ba1;&#x7406;</tspan></text>
+</g>
+</g>
+<g id="sidebar-footer">
+<text id="SPEC V2.4.0" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="1164.5">SPEC V2.4.0</tspan></text>
+<text id="Fund Quant Lab &#194;&#169; 2026" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="1181.5">Fund Quant Lab &#xa9; 2026</tspan></text>
+</g>
+</g>
+<g id="main-content">
+<g id="topbar">
+<mask id="path-26-inside-2_7_303" fill="white">
+<path d="M248 0H1440V64H248V0Z"/>
+</mask>
+<path d="M248 0H1440V64H248V0Z" fill="white"/>
+<path d="M1440 64V63H248V64V65H1440V64Z" fill="#DEE2E7" mask="url(#path-26-inside-2_7_303)"/>
+<g id="topbar-left">
+<g id="search-input">
+<rect x="272.5" y="18.5" width="239" height="27" rx="2.5" stroke="#C8CDD4"/>
+<g id="search-icon">
+<g id="search" clip-path="url(#clip4_7_303)">
+<path id="Vector_7" d="M294.5 35.5001L292.33 33.3301M293.5 30.5C293.5 32.7091 291.709 34.5 289.5 34.5C287.291 34.5 285.5 32.7091 285.5 30.5C285.5 28.2909 287.291 26.5 289.5 26.5C291.709 26.5 293.5 28.2909 293.5 30.5Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#230;&#144;&#156;&#231;&#180;&#162;&#232;&#175;&#129;&#229;&#136;&#184;&#228;&#187;&#163;&#231;&#160;&#129;/&#229;&#144;&#141;&#231;&#167;&#176;..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="306" y="36.7273">&#x641c;&#x7d22;&#x8bc1;&#x5238;&#x4ee3;&#x7801;/&#x540d;&#x79f0;...</tspan></text>
+</g>
+<g id="research-time">
+<text id="&#231;&#160;&#148;&#231;&#169;&#182;&#230;&#151;&#182;&#231;&#130;&#185;:" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="528" y="36">&#x7814;&#x7a76;&#x65f6;&#x70b9;:</tspan></text>
+<text id="2024-12-06" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="580" y="36.7273">2024-12-06</tspan></text>
+</g>
+</g>
+<g id="topbar-right">
+<g id="data-mode-toggle">
+<rect x="657" y="19.5" width="267" height="25" rx="3" fill="#F3F5F7"/>
+<g id="mode-current">
+<rect x="659" y="21.5" width="135" height="21" rx="3" fill="white"/>
+<text id="CURRENT RESEARCH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="669" y="36">CURRENT RESEARCH</tspan></text>
+</g>
+<g id="mode-historical">
+<text id="STRICT HISTORICAL" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="804" y="36">STRICT HISTORICAL</tspan></text>
+</g>
+</g>
+<g id="header-tag">
+<rect x="940" y="21.5" width="113" height="21" rx="3" fill="white"/>
+<text id="STAGE: SHADOW" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="950" y="36">STAGE: SHADOW</tspan></text>
+</g>
+<g id="header-tag_2">
+<rect x="1069" y="21.5" width="103" height="21" rx="3" fill="white"/>
+<text id="&#232;&#130;&#161;&#231;&#165;&#168;&#230;&#177;&#160;: &#230;&#178;&#170;&#230;&#183;&#177;300" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1079" y="36">&#x80a1;&#x7968;&#x6c60;: &#x6caa;&#x6df1;300</tspan></text>
+</g>
+<g id="header-tag_3">
+<rect x="1188" y="21.5" width="77" height="21" rx="3" fill="#EAF2FC"/>
+<text id="PROD ENV" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1198" y="36">PROD ENV</tspan></text>
+</g>
+<g id="watermark">
+<rect x="1281.5" y="22" width="145" height="20" rx="2.5" fill="#FCECEE"/>
+<rect x="1281.5" y="22" width="145" height="20" rx="2.5" stroke="#A64045"/>
+<text id="&#229;&#142;&#159;&#229;&#158;&#139;&#231;&#164;&#186;&#228;&#190;&#139;&#230;&#149;&#176;&#230;&#141;&#174; &#194;&#183; &#233;&#157;&#158;&#231;&#148;&#159;&#228;&#186;&#167;&#230;&#149;&#176;&#230;&#141;&#174;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1289" y="36">&#x539f;&#x578b;&#x793a;&#x4f8b;&#x6570;&#x636e; &#xb7; &#x975e;&#x751f;&#x4ea7;&#x6570;&#x636e;</tspan></text>
+</g>
+</g>
+</g>
+<g id="workspace">
+<g id="strategy-config-card">
+<rect x="272.5" y="88.5" width="1143" height="170" rx="2.5" fill="white"/>
+<rect x="272.5" y="88.5" width="1143" height="170" rx="2.5" stroke="#DEE2E7"/>
+<g id="card-title">
+<rect id="Rectangle" x="292" y="109.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#231;&#173;&#150;&#231;&#149;&#165;&#232;&#174;&#190;&#231;&#189;&#174; / Strategy Configuration" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="303" y="121.591">&#x7b56;&#x7565;&#x8bbe;&#x7f6e; / Strategy Configuration</tspan></text>
+</g>
+<g id="fields-row">
+<g id="Frame">
+<text id="Benchmark" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="292" y="151.5">Benchmark</tspan></text>
+<g id="Frame_2">
+<rect x="292.5" y="160.5" width="200.6" height="27" rx="2.5" fill="#F3F5F7"/>
+<rect x="292.5" y="160.5" width="200.6" height="27" rx="2.5" stroke="#C8CDD4"/>
+<text id="CSI500 (&#228;&#184;&#173;&#232;&#175;&#129;500) &#226;&#150;&#190;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="304" y="178.727">CSI500 (&#x4e2d;&#x8bc1;500) &#x25be;</tspan></text>
+</g>
+</g>
+<g id="Frame_3">
+<text id="&#230;&#140;&#129;&#228;&#187;&#147;&#230;&#149;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="517.6" y="151.5">&#x6301;&#x4ed3;&#x6570;</tspan></text>
+<g id="Frame_4">
+<rect x="518.1" y="160.5" width="200.6" height="27" rx="2.5" fill="#F3F5F7"/>
+<rect x="518.1" y="160.5" width="200.6" height="27" rx="2.5" stroke="#C8CDD4"/>
+<text id="Top-50" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="529.6" y="178.727">Top-50</tspan></text>
+</g>
+</g>
+<g id="Frame_5">
+<text id="&#230;&#157;&#131;&#233;&#135;&#141;&#230;&#150;&#185;&#229;&#188;&#143;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="743.2" y="151.5">&#x6743;&#x91cd;&#x65b9;&#x5f0f;</tspan></text>
+<g id="Frame_6">
+<rect x="743.7" y="160.5" width="200.6" height="27" rx="2.5" fill="#F3F5F7"/>
+<rect x="743.7" y="160.5" width="200.6" height="27" rx="2.5" stroke="#C8CDD4"/>
+<text id="Expected Return" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="755.2" y="178.727">Expected Return</tspan></text>
+</g>
+</g>
+<g id="Frame_7">
+<text id="AUM" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="968.8" y="151.5">AUM</tspan></text>
+<g id="Frame_8">
+<rect x="969.3" y="160.5" width="200.6" height="27" rx="2.5" fill="#F3F5F7"/>
+<rect x="969.3" y="160.5" width="200.6" height="27" rx="2.5" stroke="#C8CDD4"/>
+<text id="&#194;&#165;500,000,000" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="980.8" y="178.727">&#xa5;500,000,000</tspan></text>
+</g>
+</g>
+<g id="Frame_9">
+<text id="&#231;&#142;&#176;&#233;&#135;&#145;&#230;&#175;&#148;&#228;&#190;&#139;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1194.4" y="151.5">&#x73b0;&#x91d1;&#x6bd4;&#x4f8b;</tspan></text>
+<g id="Frame_10">
+<rect x="1194.9" y="160.5" width="200.6" height="27" rx="2.5" fill="#F3F5F7"/>
+<rect x="1194.9" y="160.5" width="200.6" height="27" rx="2.5" stroke="#C8CDD4"/>
+<text id="2.0%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1206.4" y="178.727">2.0%</tspan></text>
+</g>
+</g>
+</g>
+<line id="Line_2" x1="292" y1="203.5" x2="1396" y2="203.5" stroke="#DEE2E7"/>
+<g id="pills-row">
+<text id="&#231;&#161;&#172;&#230;&#128;&#167;&#231;&#186;&#166;&#230;&#157;&#159;&#232;&#190;&#185;&#231;&#149;&#140;:" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="292" y="233.5">&#x786c;&#x6027;&#x7ea6;&#x675f;&#x8fb9;&#x754c;:</tspan></text>
+<g id="Frame_11">
+<rect x="372" y="220" width="62" height="19" rx="3" fill="#EAF2FC"/>
+<text id="&#229;&#141;&#149;&#232;&#130;&#161;&#226;&#137;&#164;3%" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="380" y="233.5">&#x5355;&#x80a1;&#x2264;3%</tspan></text>
+</g>
+<g id="Frame_12">
+<rect x="444" y="220" width="84" height="19" rx="3" fill="#EAF2FC"/>
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;&#229;&#129;&#143;&#231;&#166;&#187;&#226;&#137;&#164;5%" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="452" y="233.5">&#x884c;&#x4e1a;&#x504f;&#x79bb;&#x2264;5%</tspan></text>
+</g>
+<g id="Frame_13">
+<rect x="538" y="220" width="80" height="19" rx="3" fill="#EAF2FC"/>
+<text id="&#230;&#156;&#136;&#230;&#141;&#162;&#230;&#137;&#139;&#226;&#137;&#164;20%" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="546" y="233.5">&#x6708;&#x6362;&#x624b;&#x2264;20%</tspan></text>
+</g>
+<g id="Frame_14">
+<rect x="628" y="220" width="78" height="19" rx="3" fill="#EAF2FC"/>
+<text id="&#229;&#143;&#130;&#228;&#184;&#142;&#231;&#142;&#135;&#226;&#137;&#164;15%" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="636" y="233.5">&#x53c2;&#x4e0e;&#x7387;&#x2264;15%</tspan></text>
+</g>
+</g>
+</g>
+<g id="columns-wrapper">
+<g id="left-col">
+<g id="target-holdings-card">
+<rect x="272.5" y="279.5" width="673" height="629" rx="2.5" fill="white"/>
+<rect x="272.5" y="279.5" width="673" height="629" rx="2.5" stroke="#DEE2E7"/>
+<g id="card-title_2">
+<rect id="Rectangle_2" x="292" y="300.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#231;&#155;&#174;&#230;&#160;&#135;&#230;&#140;&#129;&#228;&#187;&#147; / Target Holdings" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="303" y="312.591">&#x76ee;&#x6807;&#x6301;&#x4ed3; / Target Holdings</tspan></text>
+</g>
+<g id="blocked-banner">
+<rect x="292.5" y="332.5" width="633" height="38" rx="2.5" fill="#FCECEE"/>
+<rect x="292.5" y="332.5" width="633" height="38" rx="2.5" stroke="#A64045"/>
+<g id="error-icon" clip-path="url(#clip5_7_303)">
+<g id="alert-circle" clip-path="url(#clip6_7_303)">
+<path id="Vector_8" d="M311 349.166V351.5M311 353.834H311.006M316.834 351.5C316.834 354.722 314.222 357.334 311 357.334C307.778 357.334 305.166 354.722 305.166 351.5C305.166 348.278 307.778 345.666 311 345.666C314.222 345.666 316.834 348.278 316.834 351.5Z" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="Pre-trade Readiness: BLOCKED &#226;&#128;&#148; &#231;&#156;&#159;&#229;&#174;&#158;&#229;&#144;&#136;&#230;&#160;&#188; Snapshot &#228;&#184;&#186; 0&#239;&#188;&#140;&#230;&#151;&#160;&#230;&#179;&#149;&#230;&#158;&#132;&#229;&#187;&#186;&#230;&#156;&#137;&#230;&#149;&#136;&#231;&#155;&#174;&#230;&#160;&#135;&#231;&#187;&#132;&#229;&#144;&#136;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="328" y="355.864">Pre-trade Readiness: BLOCKED &#x2014; &#x771f;&#x5b9e;&#x5408;&#x683c; Snapshot &#x4e3a; 0&#xff0c;&#x65e0;&#x6cd5;&#x6784;&#x5efa;&#x6709;&#x6548;&#x76ee;&#x6807;&#x7ec4;&#x5408;</tspan></text>
+</g>
+<g id="holdings-table">
+<rect x="292.5" y="387.5" width="633" height="472" rx="2.5" stroke="#DEE2E7"/>
+<g id="th">
+<rect width="634" height="68" transform="translate(292 387)" fill="#F3F5F7"/>
+<text id="&#228;&#187;&#163;&#231;&#160;&#129;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="300" y="425">&#x4ee3;&#x7801;</tspan></text>
+<text id="&#229;&#133;&#172;&#229;&#143;&#184;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="384" y="425">&#x516c;&#x53f8;</tspan></text>
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="478" y="425">&#x884c;&#x4e1a;</tspan></text>
+<text id="&#229;&#189;&#147;&#229;&#137;&#141;&#230;&#157;&#131;&#233;&#135;&#141;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="578" y="425">&#x5f53;&#x524d;&#x6743;&#x91cd;</tspan></text>
+<text id="&#231;&#155;&#174;&#230;&#160;&#135;&#230;&#157;&#131;&#233;&#135;&#141;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="652" y="425">&#x76ee;&#x6807;&#x6743;&#x91cd;</tspan></text>
+<text id="&#229;&#143;&#152;&#229;&#140;&#150;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="738" y="425">&#x53d8;&#x5316;</tspan></text>
+<text id="&#233;&#162;&#132;&#230;&#156;&#159;&#230;&#148;&#182;&#231;&#155;&#138;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="800" y="425">&#x9884;&#x671f;&#x6536;&#x76ca;</tspan></text>
+<text id="&#233;&#163;&#142;&#233;&#153;&#169;&#232;&#180;&#161;&#231;&#140;&#174;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="884" y="425">&#x98ce;&#x9669;&#x8d21;&#x732e;</tspan></text>
+<text id="&#230;&#181;&#129;&#229;&#138;&#168;&#230;&#128;&#167;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="932" y="425">&#x6d41;&#x52a8;&#x6027;</tspan></text>
+<text id="&#233;&#152;&#187;&#230;&#150;&#173;&#231;&#138;&#182;&#230;&#128;&#129;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="969" y="405.5">&#x963b;</tspan><tspan x="969" y="418.5">&#x65ad;</tspan><tspan x="969" y="431.5">&#x72b6;</tspan><tspan x="969" y="444.5">&#x6001;</tspan></text>
+</g>
+<g id="row-0">
+<mask id="path-90-inside-3_7_303" fill="white">
+<path d="M292 455H926V482H292V455Z"/>
+</mask>
+<path d="M292 455H926V482H292V455Z" fill="white"/>
+<path d="M926 482V481H292V482V483H926V482Z" fill="#DEE2E7" mask="url(#path-90-inside-3_7_303)"/>
+<text id="600519.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="472.864">600519.SH</tspan></text>
+<text id="&#232;&#180;&#181;&#229;&#183;&#158;&#232;&#140;&#133;&#229;&#143;&#176;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="472.864">&#x8d35;&#x5dde;&#x8305;&#x53f0;</tspan></text>
+<text id="&#233;&#163;&#159;&#229;&#147;&#129;&#233;&#165;&#174;&#230;&#150;&#153;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="472.5">&#x98df;&#x54c1;&#x996e;&#x6599;</tspan></text>
+<text id="0.00%" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="472.864">0.00%</tspan></text>
+<text id="0.00%_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="472.864">0.00%</tspan></text>
+<text id="0.00%_3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="472.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="472.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_2" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="472.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="472.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell">
+<g id="Frame_15">
+<rect x="992.5" y="461.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="461.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="471.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-1">
+<mask id="path-103-inside-4_7_303" fill="white">
+<path d="M292 482H926V509H292V482Z"/>
+</mask>
+<path d="M292 482H926V509H292V482Z" fill="#F3F5F7"/>
+<path d="M926 509V508H292V509V510H926V509Z" fill="#DEE2E7" mask="url(#path-103-inside-4_7_303)"/>
+<text id="000858.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="499.864">000858.SZ</tspan></text>
+<text id="&#228;&#186;&#148;&#231;&#178;&#174;&#230;&#182;&#178;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="499.864">&#x4e94;&#x7cae;&#x6db2;</tspan></text>
+<text id="&#233;&#163;&#159;&#229;&#147;&#129;&#233;&#165;&#174;&#230;&#150;&#153;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="499.5">&#x98df;&#x54c1;&#x996e;&#x6599;</tspan></text>
+<text id="0.00%_4" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="499.864">0.00%</tspan></text>
+<text id="0.00%_5" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="499.864">0.00%</tspan></text>
+<text id="0.00%_6" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="499.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_3" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="499.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_4" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="499.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_2" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="499.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_2">
+<g id="Frame_16">
+<rect x="992.5" y="488.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="488.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_2" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="498.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-2">
+<mask id="path-116-inside-5_7_303" fill="white">
+<path d="M292 509H926V536H292V509Z"/>
+</mask>
+<path d="M292 509H926V536H292V509Z" fill="white"/>
+<path d="M926 536V535H292V536V537H926V536Z" fill="#DEE2E7" mask="url(#path-116-inside-5_7_303)"/>
+<text id="601318.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="526.864">601318.SH</tspan></text>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#229;&#185;&#179;&#229;&#174;&#137;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="526.864">&#x4e2d;&#x56fd;&#x5e73;&#x5b89;</tspan></text>
+<text id="&#233;&#157;&#158;&#233;&#147;&#182;&#233;&#135;&#145;&#232;&#158;&#141;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="526.5">&#x975e;&#x94f6;&#x91d1;&#x878d;</tspan></text>
+<text id="0.00%_7" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="526.864">0.00%</tspan></text>
+<text id="0.00%_8" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="526.864">0.00%</tspan></text>
+<text id="0.00%_9" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="526.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_5" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="526.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_6" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="526.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_3" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="526.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_3">
+<g id="Frame_17">
+<rect x="992.5" y="515.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="515.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_3" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="525.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-3">
+<mask id="path-129-inside-6_7_303" fill="white">
+<path d="M292 536H926V563H292V536Z"/>
+</mask>
+<path d="M292 536H926V563H292V536Z" fill="#F3F5F7"/>
+<path d="M926 563V562H292V563V564H926V563Z" fill="#DEE2E7" mask="url(#path-129-inside-6_7_303)"/>
+<text id="000333.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="553.864">000333.SZ</tspan></text>
+<text id="&#231;&#190;&#142;&#231;&#154;&#132;&#233;&#155;&#134;&#229;&#155;&#162;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="553.864">&#x7f8e;&#x7684;&#x96c6;&#x56e2;</tspan></text>
+<text id="&#229;&#174;&#182;&#231;&#148;&#168;&#231;&#148;&#181;&#229;&#153;&#168;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="553.5">&#x5bb6;&#x7528;&#x7535;&#x5668;</tspan></text>
+<text id="0.00%_10" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="553.864">0.00%</tspan></text>
+<text id="0.00%_11" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="553.864">0.00%</tspan></text>
+<text id="0.00%_12" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="553.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_7" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="553.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_8" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="553.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_4" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="553.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_4">
+<g id="Frame_18">
+<rect x="992.5" y="542.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="542.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_4" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="552.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-4">
+<mask id="path-142-inside-7_7_303" fill="white">
+<path d="M292 563H926V590H292V563Z"/>
+</mask>
+<path d="M292 563H926V590H292V563Z" fill="white"/>
+<path d="M926 590V589H292V590V591H926V590Z" fill="#DEE2E7" mask="url(#path-142-inside-7_7_303)"/>
+<text id="300750.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="580.864">300750.SZ</tspan></text>
+<text id="&#229;&#174;&#129;&#229;&#190;&#183;&#230;&#151;&#182;&#228;&#187;&#163;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="580.864">&#x5b81;&#x5fb7;&#x65f6;&#x4ee3;</tspan></text>
+<text id="&#231;&#148;&#181;&#229;&#138;&#155;&#232;&#174;&#190;&#229;&#164;&#135;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="580.5">&#x7535;&#x529b;&#x8bbe;&#x5907;</tspan></text>
+<text id="0.00%_13" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="580.864">0.00%</tspan></text>
+<text id="0.00%_14" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="580.864">0.00%</tspan></text>
+<text id="0.00%_15" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="580.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_9" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="580.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_10" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="580.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_5" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="580.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_5">
+<g id="Frame_19">
+<rect x="992.5" y="569.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="569.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_5" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="579.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-5">
+<mask id="path-155-inside-8_7_303" fill="white">
+<path d="M292 590H926V617H292V590Z"/>
+</mask>
+<path d="M292 590H926V617H292V590Z" fill="#F3F5F7"/>
+<path d="M926 617V616H292V617V618H926V617Z" fill="#DEE2E7" mask="url(#path-155-inside-8_7_303)"/>
+<text id="600900.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="607.864">600900.SH</tspan></text>
+<text id="&#233;&#149;&#191;&#230;&#177;&#159;&#231;&#148;&#181;&#229;&#138;&#155;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="607.864">&#x957f;&#x6c5f;&#x7535;&#x529b;</tspan></text>
+<text id="&#229;&#133;&#172;&#231;&#148;&#168;&#228;&#186;&#139;&#228;&#184;&#154;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="607.5">&#x516c;&#x7528;&#x4e8b;&#x4e1a;</tspan></text>
+<text id="0.00%_16" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="607.864">0.00%</tspan></text>
+<text id="0.00%_17" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="607.864">0.00%</tspan></text>
+<text id="0.00%_18" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="607.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_11" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="607.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_12" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="607.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_6" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="607.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_6">
+<g id="Frame_20">
+<rect x="992.5" y="596.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="596.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_6" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="606.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-6">
+<mask id="path-168-inside-9_7_303" fill="white">
+<path d="M292 617H926V644H292V617Z"/>
+</mask>
+<path d="M292 617H926V644H292V617Z" fill="white"/>
+<path d="M926 644V643H292V644V645H926V644Z" fill="#DEE2E7" mask="url(#path-168-inside-9_7_303)"/>
+<text id="600036.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="634.864">600036.SH</tspan></text>
+<text id="&#230;&#139;&#155;&#229;&#149;&#134;&#233;&#147;&#182;&#232;&#161;&#140;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="634.864">&#x62db;&#x5546;&#x94f6;&#x884c;</tspan></text>
+<text id="&#233;&#147;&#182;&#232;&#161;&#140;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="634.5">&#x94f6;&#x884c;</tspan></text>
+<text id="0.00%_19" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="634.864">0.00%</tspan></text>
+<text id="0.00%_20" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="634.864">0.00%</tspan></text>
+<text id="0.00%_21" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="634.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_13" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="634.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_14" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="634.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_7" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="634.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_7">
+<g id="Frame_21">
+<rect x="992.5" y="623.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="623.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_7" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="633.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-7">
+<mask id="path-181-inside-10_7_303" fill="white">
+<path d="M292 644H926V671H292V644Z"/>
+</mask>
+<path d="M292 644H926V671H292V644Z" fill="#F3F5F7"/>
+<path d="M926 671V670H292V671V672H926V671Z" fill="#DEE2E7" mask="url(#path-181-inside-10_7_303)"/>
+<text id="002415.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="661.864">002415.SZ</tspan></text>
+<text id="&#230;&#181;&#183;&#229;&#186;&#183;&#229;&#168;&#129;&#232;&#167;&#134;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="661.864">&#x6d77;&#x5eb7;&#x5a01;&#x89c6;</tspan></text>
+<text id="&#231;&#148;&#181;&#229;&#173;&#144;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="661.5">&#x7535;&#x5b50;</tspan></text>
+<text id="0.00%_22" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="661.864">0.00%</tspan></text>
+<text id="0.00%_23" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="661.864">0.00%</tspan></text>
+<text id="0.00%_24" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="661.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_15" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="661.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_16" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="661.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_8" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="661.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_8">
+<g id="Frame_22">
+<rect x="992.5" y="650.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="650.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_8" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="660.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-8">
+<mask id="path-194-inside-11_7_303" fill="white">
+<path d="M292 671H926V698H292V671Z"/>
+</mask>
+<path d="M292 671H926V698H292V671Z" fill="white"/>
+<path d="M926 698V697H292V698V699H926V698Z" fill="#DEE2E7" mask="url(#path-194-inside-11_7_303)"/>
+<text id="600276.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="688.864">600276.SH</tspan></text>
+<text id="&#230;&#129;&#146;&#231;&#145;&#158;&#229;&#140;&#187;&#232;&#141;&#175;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="688.864">&#x6052;&#x745e;&#x533b;&#x836f;</tspan></text>
+<text id="&#229;&#140;&#187;&#232;&#141;&#175;&#231;&#148;&#159;&#231;&#137;&#169;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="688.5">&#x533b;&#x836f;&#x751f;&#x7269;</tspan></text>
+<text id="0.00%_25" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="688.864">0.00%</tspan></text>
+<text id="0.00%_26" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="688.864">0.00%</tspan></text>
+<text id="0.00%_27" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="688.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_17" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="688.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_18" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="688.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_9" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="688.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_9">
+<g id="Frame_23">
+<rect x="992.5" y="677.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="677.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_9" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="687.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-9">
+<mask id="path-207-inside-12_7_303" fill="white">
+<path d="M292 698H926V725H292V698Z"/>
+</mask>
+<path d="M292 698H926V725H292V698Z" fill="#F3F5F7"/>
+<path d="M926 725V724H292V725V726H926V725Z" fill="#DEE2E7" mask="url(#path-207-inside-12_7_303)"/>
+<text id="000651.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="715.864">000651.SZ</tspan></text>
+<text id="&#230;&#160;&#188;&#229;&#138;&#155;&#231;&#148;&#181;&#229;&#153;&#168;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="715.864">&#x683c;&#x529b;&#x7535;&#x5668;</tspan></text>
+<text id="&#229;&#174;&#182;&#231;&#148;&#168;&#231;&#148;&#181;&#229;&#153;&#168;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="715.5">&#x5bb6;&#x7528;&#x7535;&#x5668;</tspan></text>
+<text id="0.00%_28" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="715.864">0.00%</tspan></text>
+<text id="0.00%_29" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="715.864">0.00%</tspan></text>
+<text id="0.00%_30" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="715.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_19" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="715.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_20" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="715.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_10" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="715.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_10">
+<g id="Frame_24">
+<rect x="992.5" y="704.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="704.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_10" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="714.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-10">
+<mask id="path-220-inside-13_7_303" fill="white">
+<path d="M292 725H926V752H292V725Z"/>
+</mask>
+<path d="M292 725H926V752H292V725Z" fill="white"/>
+<path d="M926 752V751H292V752V753H926V752Z" fill="#DEE2E7" mask="url(#path-220-inside-13_7_303)"/>
+<text id="601138.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="742.864">601138.SH</tspan></text>
+<text id="&#229;&#183;&#165;&#228;&#184;&#154;&#229;&#175;&#140;&#232;&#129;&#148;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="742.864">&#x5de5;&#x4e1a;&#x5bcc;&#x8054;</tspan></text>
+<text id="&#231;&#148;&#181;&#229;&#173;&#144;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="742.5">&#x7535;&#x5b50;</tspan></text>
+<text id="0.00%_31" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="742.864">0.00%</tspan></text>
+<text id="0.00%_32" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="742.864">0.00%</tspan></text>
+<text id="0.00%_33" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="742.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_21" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="742.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_22" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="742.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_11" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="742.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_11">
+<g id="Frame_25">
+<rect x="992.5" y="731.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="731.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_11" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="741.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-11">
+<mask id="path-233-inside-14_7_303" fill="white">
+<path d="M292 752H926V779H292V752Z"/>
+</mask>
+<path d="M292 752H926V779H292V752Z" fill="#F3F5F7"/>
+<path d="M926 779V778H292V779V780H926V779Z" fill="#DEE2E7" mask="url(#path-233-inside-14_7_303)"/>
+<text id="601888.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="769.864">601888.SH</tspan></text>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#228;&#184;&#173;&#229;&#133;&#141;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="769.864">&#x4e2d;&#x56fd;&#x4e2d;&#x514d;</tspan></text>
+<text id="&#231;&#164;&#190;&#228;&#188;&#154;&#230;&#156;&#141;&#229;&#138;&#161;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="769.5">&#x793e;&#x4f1a;&#x670d;&#x52a1;</tspan></text>
+<text id="0.00%_34" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="769.864">0.00%</tspan></text>
+<text id="0.00%_35" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="769.864">0.00%</tspan></text>
+<text id="0.00%_36" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="769.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_23" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="769.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_24" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="769.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_12" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="769.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_12">
+<g id="Frame_26">
+<rect x="992.5" y="758.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="758.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_12" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="768.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-12">
+<mask id="path-246-inside-15_7_303" fill="white">
+<path d="M292 779H926V806H292V779Z"/>
+</mask>
+<path d="M292 779H926V806H292V779Z" fill="white"/>
+<path d="M926 806V805H292V806V807H926V806Z" fill="#DEE2E7" mask="url(#path-246-inside-15_7_303)"/>
+<text id="000001.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="796.864">000001.SZ</tspan></text>
+<text id="&#229;&#185;&#179;&#229;&#174;&#137;&#233;&#147;&#182;&#232;&#161;&#140;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="796.864">&#x5e73;&#x5b89;&#x94f6;&#x884c;</tspan></text>
+<text id="&#233;&#147;&#182;&#232;&#161;&#140;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="796.5">&#x94f6;&#x884c;</tspan></text>
+<text id="0.00%_37" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="796.864">0.00%</tspan></text>
+<text id="0.00%_38" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="796.864">0.00%</tspan></text>
+<text id="0.00%_39" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="796.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_25" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="796.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_26" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="796.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_13" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="796.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_13">
+<g id="Frame_27">
+<rect x="992.5" y="785.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="785.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_13" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="795.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-13">
+<mask id="path-259-inside-16_7_303" fill="white">
+<path d="M292 806H926V833H292V806Z"/>
+</mask>
+<path d="M292 806H926V833H292V806Z" fill="#F3F5F7"/>
+<path d="M926 833V832H292V833V834H926V833Z" fill="#DEE2E7" mask="url(#path-259-inside-16_7_303)"/>
+<text id="300059.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="823.864">300059.SZ</tspan></text>
+<text id="&#228;&#184;&#156;&#230;&#150;&#185;&#232;&#180;&#162;&#229;&#175;&#140;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="823.864">&#x4e1c;&#x65b9;&#x8d22;&#x5bcc;</tspan></text>
+<text id="&#233;&#157;&#158;&#233;&#147;&#182;&#233;&#135;&#145;&#232;&#158;&#141;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="823.5">&#x975e;&#x94f6;&#x91d1;&#x878d;</tspan></text>
+<text id="0.00%_40" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="823.864">0.00%</tspan></text>
+<text id="0.00%_41" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="823.864">0.00%</tspan></text>
+<text id="0.00%_42" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="823.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_27" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="823.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_28" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="823.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_14" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="823.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_14">
+<g id="Frame_28">
+<rect x="992.5" y="812.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="812.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_14" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="822.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+<g id="row-14">
+<mask id="path-272-inside-17_7_303" fill="white">
+<path d="M292 833H926V860H292V833Z"/>
+</mask>
+<path d="M292 833H926V860H292V833Z" fill="white"/>
+<path d="M926 860V859H292V860V861H926V860Z" fill="#DEE2E7" mask="url(#path-272-inside-17_7_303)"/>
+<text id="601668.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="298" y="850.864">601668.SH</tspan></text>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#229;&#187;&#186;&#231;&#173;&#145;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="382" y="850.864">&#x4e2d;&#x56fd;&#x5efa;&#x7b51;</tspan></text>
+<text id="&#229;&#187;&#186;&#231;&#173;&#145;&#232;&#163;&#133;&#233;&#165;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="476" y="850.5">&#x5efa;&#x7b51;&#x88c5;&#x9970;</tspan></text>
+<text id="0.00%_43" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="585.055" y="850.864">0.00%</tspan></text>
+<text id="0.00%_44" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="659.055" y="850.864">0.00%</tspan></text>
+<text id="0.00%_45" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="723.055" y="850.864">0.00%</tspan></text>
+<text id="&#226;&#128;&#148;_29" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="830" y="850.864">&#x2014;</tspan></text>
+<text id="&#226;&#128;&#148;_30" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="914" y="850.864">&#x2014;</tspan></text>
+<text id="A-&#231;&#186;&#167;&#233;&#171;&#152;&#230;&#181;&#129;&#229;&#138;&#168;_15" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="930" y="850.5">A-&#x7ea7;&#x9ad8;&#x6d41;&#x52a8;</tspan></text>
+<g id="blocked-cell_15">
+<g id="Frame_29">
+<rect x="992.5" y="839.5" width="54" height="14" rx="1.5" fill="#FCECEE"/>
+<rect x="992.5" y="839.5" width="54" height="14" rx="1.5" stroke="#A64045"/>
+<text id="BLOCKED_15" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" font-weight="bold" letter-spacing="0em"><tspan x="998" y="849.773">BLOCKED</tspan></text>
+</g>
+</g>
+</g>
+</g>
+<text id="&#232;&#175;&#180;&#230;&#152;&#142;: &#231;&#148;&#177;&#228;&#186;&#142; Timing &#230;&#157;&#161;&#228;&#187;&#182;&#230;&#156;&#170;&#230;&#153;&#139;&#231;&#186;&#167;&#239;&#188;&#140;&#230;&#156;&#172;&#230;&#168;&#161;&#229;&#158;&#139;&#229;&#189;&#147;&#229;&#137;&#141;&#232;&#191;&#144;&#232;&#161;&#140;&#228;&#186;&#142;*&#233;&#157;&#153;&#230;&#128;&#129;&#230;&#187;&#161;&#228;&#187;&#147;&#229;&#159;&#186;&#231;&#186;&#191;&#230;&#168;&#161;&#229;&#188;&#143;*&#228;&#184;&#139;&#227;&#128;&#130;&#228;&#184;&#187;&#229;&#138;&#168;&#230;&#138;&#149;&#232;&#181;&#132;&#231;&#187;&#132;&#229;&#144;&#136;&#230;&#157;&#131;&#233;&#135;&#141;&#228;&#184;&#142;&#229;&#189;&#177;&#229;&#147;&#141;&#231;&#179;&#187;&#230;&#149;&#176;&#229;&#157;&#135;&#228;&#184;&#186; 0.00%&#227;&#128;&#130;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="292" y="886.5">&#x8bf4;&#x660e;: &#x7531;&#x4e8e; Timing &#x6761;&#x4ef6;&#x672a;&#x664b;&#x7ea7;&#xff0c;&#x672c;&#x6a21;&#x578b;&#x5f53;&#x524d;&#x8fd0;&#x884c;&#x4e8e;*&#x9759;&#x6001;&#x6ee1;&#x4ed3;&#x57fa;&#x7ebf;&#x6a21;&#x5f0f;*&#x4e0b;&#x3002;&#x4e3b;&#x52a8;&#x6295;&#x8d44;&#x7ec4;&#x5408;&#x6743;&#x91cd;&#x4e0e;&#x5f71;&#x54cd;&#x7cfb;&#x6570;&#x5747;&#x4e3a; 0.00%&#x3002;</tspan></text>
+</g>
+</g>
+<g id="right-col">
+<g id="diagnostics-card">
+<rect x="966.5" y="279.5" width="449" height="406" rx="2.5" fill="white"/>
+<rect x="966.5" y="279.5" width="449" height="406" rx="2.5" stroke="#DEE2E7"/>
+<g id="card-title_3">
+<rect id="Rectangle_3" x="986" y="300.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="&#231;&#186;&#166;&#230;&#157;&#159;&#232;&#175;&#138;&#230;&#150;&#173; / Constraint Diagnostics" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="997" y="312.591">&#x7ea6;&#x675f;&#x8bca;&#x65ad; / Constraint Diagnostics</tspan></text>
+</g>
+<g id="status-hero">
+<rect x="986.5" y="336.5" width="409" height="99" rx="2.5" fill="#FCECEE"/>
+<rect x="986.5" y="336.5" width="409" height="99" rx="2.5" stroke="#A64045"/>
+<text id="PORTFOLIO READINESS" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1121.5" y="363.864">PORTFOLIO READINESS</tspan></text>
+<text id="BLOCKED_16" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="1143" y="394.273">BLOCKED</tspan></text>
+<text id="&#229;&#142;&#159;&#229;&#155;&#160;: &#231;&#156;&#159;&#229;&#174;&#158;&#229;&#144;&#136;&#230;&#160;&#188; Snapshot &#229;&#173;&#152;&#232;&#175;&#129;&#230;&#149;&#176;&#233;&#135;&#143;&#228;&#184;&#186; 0" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1094.5" y="417.5">&#x539f;&#x56e0;: &#x771f;&#x5b9e;&#x5408;&#x683c; Snapshot &#x5b58;&#x8bc1;&#x6570;&#x91cf;&#x4e3a; 0</tspan></text>
+</g>
+<g id="list">
+<g id="diagnostic-row-0">
+<mask id="path-293-inside-18_7_303" fill="white">
+<path d="M986 456H1396V481H986V456Z"/>
+</mask>
+<path d="M1396 481V480H986V481V482H1396V481Z" fill="#DEE2E7" mask="url(#path-293-inside-18_7_303)"/>
+<text id="&#229;&#141;&#149;&#232;&#130;&#161;&#228;&#184;&#138;&#233;&#153;&#144; 3%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="986" y="469.227">&#x5355;&#x80a1;&#x4e0a;&#x9650; 3%</tspan></text>
+<g id="Frame_30">
+<rect x="1345.5" y="456.5" width="50" height="16" rx="1.5" fill="#E8F5F1"/>
+<rect x="1345.5" y="456.5" width="50" height="16" rx="1.5" stroke="#2E7660"/>
+<text id="&#226;&#156;&#147; &#230;&#187;&#161;&#232;&#182;&#179;" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1353" y="468.5">&#x2713; &#x6ee1;&#x8db3;</tspan></text>
+</g>
+</g>
+<g id="diagnostic-row-1">
+<mask id="path-298-inside-19_7_303" fill="white">
+<path d="M986 493H1396V518H986V493Z"/>
+</mask>
+<path d="M1396 518V517H986V518V519H1396V518Z" fill="#DEE2E7" mask="url(#path-298-inside-19_7_303)"/>
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;&#229;&#129;&#143;&#231;&#166;&#187; 5%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="986" y="506.227">&#x884c;&#x4e1a;&#x504f;&#x79bb; 5%</tspan></text>
+<g id="Frame_31">
+<rect x="1345.5" y="493.5" width="50" height="16" rx="1.5" fill="#E8F5F1"/>
+<rect x="1345.5" y="493.5" width="50" height="16" rx="1.5" stroke="#2E7660"/>
+<text id="&#226;&#156;&#147; &#230;&#187;&#161;&#232;&#182;&#179;_2" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1353" y="505.5">&#x2713; &#x6ee1;&#x8db3;</tspan></text>
+</g>
+</g>
+<g id="diagnostic-row-2">
+<mask id="path-303-inside-20_7_303" fill="white">
+<path d="M986 530H1396V555H986V530Z"/>
+</mask>
+<path d="M1396 555V554H986V555V556H1396V555Z" fill="#DEE2E7" mask="url(#path-303-inside-20_7_303)"/>
+<text id="&#230;&#156;&#136;&#230;&#141;&#162;&#230;&#137;&#139; 20%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="986" y="543.227">&#x6708;&#x6362;&#x624b; 20%</tspan></text>
+<g id="Frame_32">
+<rect x="1345.5" y="530.5" width="50" height="16" rx="1.5" fill="#E8F5F1"/>
+<rect x="1345.5" y="530.5" width="50" height="16" rx="1.5" stroke="#2E7660"/>
+<text id="&#226;&#156;&#147; &#230;&#187;&#161;&#232;&#182;&#179;_3" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1353" y="542.5">&#x2713; &#x6ee1;&#x8db3;</tspan></text>
+</g>
+</g>
+<g id="diagnostic-row-3">
+<mask id="path-308-inside-21_7_303" fill="white">
+<path d="M986 567H1396V592H986V567Z"/>
+</mask>
+<path d="M1396 592V591H986V592V593H1396V592Z" fill="#DEE2E7" mask="url(#path-308-inside-21_7_303)"/>
+<text id="&#229;&#143;&#130;&#228;&#184;&#142;&#231;&#142;&#135; 15%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="986" y="580.227">&#x53c2;&#x4e0e;&#x7387; 15%</tspan></text>
+<g id="Frame_33">
+<rect x="1333.5" y="567.5" width="62" height="16" rx="1.5" fill="#FDF8E2"/>
+<rect x="1333.5" y="567.5" width="62" height="16" rx="1.5" stroke="#B87A14"/>
+<text id="&#226;&#154;&#160; &#229;&#190;&#133;&#233;&#170;&#140;&#232;&#175;&#129;" fill="#B87A14" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1341" y="579.5">&#x26a0; &#x5f85;&#x9a8c;&#x8bc1;</tspan></text>
+</g>
+</g>
+<g id="diagnostic-row-4">
+<mask id="path-313-inside-22_7_303" fill="white">
+<path d="M986 604H1396V629H986V604Z"/>
+</mask>
+<path d="M1396 629V628H986V629V630H1396V629Z" fill="#DEE2E7" mask="url(#path-313-inside-22_7_303)"/>
+<text id="&#231;&#142;&#176;&#233;&#135;&#145; 2%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="986" y="617.227">&#x73b0;&#x91d1; 2%</tspan></text>
+<g id="Frame_34">
+<rect x="1345.5" y="604.5" width="50" height="16" rx="1.5" fill="#E8F5F1"/>
+<rect x="1345.5" y="604.5" width="50" height="16" rx="1.5" stroke="#2E7660"/>
+<text id="&#226;&#156;&#147; &#230;&#187;&#161;&#232;&#182;&#179;_4" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1353" y="616.5">&#x2713; &#x6ee1;&#x8db3;</tspan></text>
+</g>
+</g>
+<g id="diagnostic-row-5">
+<mask id="path-318-inside-23_7_303" fill="white">
+<path d="M986 641H1396V666H986V641Z"/>
+</mask>
+<path d="M1396 666V665H986V666V667H1396V666Z" fill="#DEE2E7" mask="url(#path-318-inside-23_7_303)"/>
+<text id="T+1 &#231;&#186;&#166;&#230;&#157;&#159;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="986" y="654.227">T+1 &#x7ea6;&#x675f;</tspan></text>
+<g id="Frame_35">
+<rect x="1323.5" y="641.5" width="72" height="16" rx="1.5" fill="#E8F5F1"/>
+<rect x="1323.5" y="641.5" width="72" height="16" rx="1.5" stroke="#2E7660"/>
+<text id="&#226;&#156;&#147; &#231;&#187;&#147;&#230;&#158;&#132;&#229;&#176;&#177;&#231;&#187;&#170;" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1331" y="653.5">&#x2713; &#x7ed3;&#x6784;&#x5c31;&#x7eea;</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<g id="bottom-action-bar">
+<mask id="path-323-inside-24_7_303" fill="white">
+<path d="M272 932C272 930.343 273.343 929 275 929H1413C1414.66 929 1416 930.343 1416 932V982C1416 983.657 1414.66 985 1413 985H275C273.343 985 272 983.657 272 982V932Z"/>
+</mask>
+<path d="M272 932C272 930.343 273.343 929 275 929H1413C1414.66 929 1416 930.343 1416 932V982C1416 983.657 1414.66 985 1413 985H275C273.343 985 272 983.657 272 982V932Z" fill="white"/>
+<path d="M272 932C272 929.791 273.791 928 276 928H1412C1414.21 928 1416 929.791 1416 932C1416 930.895 1414.66 930 1413 930H275C273.343 930 272 930.895 272 932ZM272 932M1416 985H272H1416M1416 985M272 985V929V985M272 985M1416 929V985V929" fill="#DEE2E7" mask="url(#path-323-inside-24_7_303)"/>
+<g id="bar-left">
+<text id="&#230;&#156;&#128;&#229;&#144;&#142;&#231;&#186;&#166;&#230;&#157;&#159;&#232;&#174;&#161;&#231;&#174;&#151;: 2024-12-06 09:35" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="296" y="961.364">&#x6700;&#x540e;&#x7ea6;&#x675f;&#x8ba1;&#x7b97;: 2024-12-06 09:35</tspan></text>
+<line id="Line_3" x1="496.5" y1="952" x2="496.5" y2="962" stroke="#C8CDD4"/>
+<text id="&#233;&#152;&#187;&#230;&#150;&#173;&#231;&#138;&#182;&#230;&#128;&#129;: &#231;&#188;&#186;&#229;&#176;&#145;&#228;&#191;&#161;&#229;&#143;&#183;&#228;&#190;&#157;&#232;&#181;&#150;&#239;&#188;&#140;&#228;&#184;&#141;&#230;&#137;&#167;&#232;&#161;&#140;&#231;&#156;&#159;&#229;&#174;&#158;&#228;&#186;&#164;&#230;&#152;&#147;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="512" y="961">&#x963b;&#x65ad;&#x72b6;&#x6001;: &#x7f3a;&#x5c11;&#x4fe1;&#x53f7;&#x4f9d;&#x8d56;&#xff0c;&#x4e0d;&#x6267;&#x884c;&#x771f;&#x5b9e;&#x4ea4;&#x6613;</tspan></text>
+</g>
+<g id="btn-run-blocked">
+<rect x="1146" y="941" width="246" height="32" rx="3" fill="#C8CDD4"/>
+<text id="&#232;&#191;&#144;&#232;&#161;&#140;&#230;&#158;&#132;&#229;&#187;&#186; / &#229;&#134;&#187;&#231;&#187;&#147;&#231;&#160;&#148;&#231;&#169;&#182;&#231;&#155;&#174;&#230;&#160;&#135; (Blocked)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1166" y="961.727">&#x8fd0;&#x884c;&#x6784;&#x5efa; / &#x51bb;&#x7ed3;&#x7814;&#x7a76;&#x76ee;&#x6807; (Blocked)</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_7_303">
+<rect width="14" height="14" fill="white" transform="translate(28 110)"/>
+</clipPath>
+<clipPath id="clip1_7_303">
+<rect width="14" height="14" fill="white" transform="translate(28 230)"/>
+</clipPath>
+<clipPath id="clip2_7_303">
+<rect width="14" height="14" fill="white" transform="translate(28 270)"/>
+</clipPath>
+<clipPath id="clip3_7_303">
+<rect width="14" height="14" fill="white" transform="translate(28 310)"/>
+</clipPath>
+<clipPath id="clip4_7_303">
+<rect width="12" height="12" fill="white" transform="translate(284 25)"/>
+</clipPath>
+<clipPath id="clip5_7_303">
+<rect width="14" height="14" fill="white" transform="translate(304 344.5)"/>
+</clipPath>
+<clipPath id="clip6_7_303">
+<rect width="14" height="14" fill="white" transform="translate(304 344.5)"/>
+</clipPath>
+</defs>
+</svg>

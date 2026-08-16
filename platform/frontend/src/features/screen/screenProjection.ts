@@ -35,6 +35,41 @@ export interface ScreenIndustryProjection {
   display_name: string
 }
 
+export type ScreenComponentName = 'quality' | 'valuation' | 'revision' | 'event'
+
+export type ScreenComponentStatus =
+  | 'quantified'
+  | 'constrained'
+  | 'unavailable'
+  | 'not_applicable'
+
+/**
+ * One factor dimension's contribution for a ranked row.
+ *
+ * Projected from the frozen InvestmentView the snapshot is bound to.  `display`
+ * is an em dash for every non-quantified status, so an unavailable dimension is
+ * never shown as a zero.  `status` stays distinct so an auditor can tell
+ * "bounded but unquantified" (constrained) from "missing" (unavailable).
+ */
+export interface ScreenRowComponentProjection {
+  component: ScreenComponentName
+  label: string
+  status: ScreenComponentStatus
+  contribution: ScreenProjectedValue | null
+  display: string
+  reason: string | null
+  evidence_ids: string[]
+}
+
+/** Horizon expected-return interval, from the frozen view's p10/p90. */
+export interface ScreenReturnIntervalProjection {
+  horizon_trading_days: number
+  lower: ScreenProjectedValue | null
+  upper: ScreenProjectedValue | null
+  display: string | null
+  unavailable_reason: string | null
+}
+
 export interface ScreenRankingRowProjection {
   snapshot_id: string
   security: ScreenSecurityIdentityProjection
@@ -45,6 +80,9 @@ export interface ScreenRankingRowProjection {
   score: ScreenProjectedValue
   expected_return: ScreenProjectedValue
   confidence: ScreenProjectedValue
+  /** Server-projected per-dimension contributions. The UI never derives these. */
+  components?: ScreenRowComponentProjection[]
+  expected_return_interval?: ScreenReturnIntervalProjection | null
   investment_view_id: string
   trust_state: ScreenTrustState
   content_hash: string

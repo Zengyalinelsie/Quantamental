@@ -1,0 +1,233 @@
+<svg width="1440" height="1200" viewBox="0 0 1440 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="14-approvals-reviewer-queue" clip-path="url(#clip0_9_883)">
+<path id="Vector" d="M1440 0H0V1200H1440V0Z" fill="#F3F5F7"/>
+<path id="Vector_2" d="M224 0H0V1200H224V0Z" fill="#18202A"/>
+<path id="Vector_3" d="M1440 0H224V64H1440V0Z" fill="white"/>
+<path id="Vector_4" d="M224 64H1440" stroke="#C8CDD4"/>
+<path id="Vector_5" d="M46 18H18C16.8954 18 16 18.8954 16 20V48C16 49.1046 16.8954 50 18 50H46C47.1046 50 48 49.1046 48 48V20C48 18.8954 47.1046 18 46 18Z" fill="#2F5EA8"/>
+<text id="FQ" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="23" y="39.5909">FQ</tspan></text>
+<text id="Fundamental Quant" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="60" y="29.7273">Fundamental Quant</tspan></text>
+<text id="&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#233;&#135;&#143;&#229;&#140;&#150;&#231;&#160;&#148;&#231;&#169;&#182;&#229;&#185;&#179;&#229;&#143;&#176;" fill="#9DA8B6" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="60" y="46.6364">&#x57fa;&#x672c;&#x9762;&#x91cf;&#x5316;&#x7814;&#x7a76;&#x5e73;&#x53f0;</tspan></text>
+<text id="01 &#228;&#187;&#138;&#230;&#151;&#165;&#229;&#183;&#165;&#228;&#189;&#156;&#229;&#143;&#176;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="129.591">01 &#x4eca;&#x65e5;&#x5de5;&#x4f5c;&#x53f0;</tspan></text>
+<text id="02 &#231;&#160;&#148;&#231;&#169;&#182;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="177.591">02 &#x7814;&#x7a76;</tspan></text>
+<text id="03 &#229;&#155;&#160;&#229;&#173;&#144;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="225.591">03 &#x56e0;&#x5b50;</tspan></text>
+<text id="04 &#231;&#187;&#132;&#229;&#144;&#136;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="273.591">04 &#x7ec4;&#x5408;</tspan></text>
+<text id="05 &#231;&#155;&#145;&#230;&#142;&#167;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="321.591">05 &#x76d1;&#x63a7;</tspan></text>
+<path id="Vector_6" d="M210 344H14C12.8954 344 12 344.895 12 346V382C12 383.105 12.8954 384 14 384H210C211.105 384 212 383.105 212 382V346C212 344.895 211.105 344 210 344Z" fill="#273B58"/>
+<path id="Vector_7" d="M16 344H12V384H16V344Z" fill="#6F9BD8"/>
+<text id="06 &#230;&#149;&#176;&#230;&#141;&#174;&#228;&#184;&#142;&#231;&#174;&#161;&#231;&#144;&#134;" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="369.591">06 &#x6570;&#x636e;&#x4e0e;&#x7ba1;&#x7406;</tspan></text>
+<text id="RESEARCH LOOP" fill="#718095" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="24" y="424.636">RESEARCH LOOP</tspan></text>
+<text id="&#229;&#143;&#145;&#231;&#142;&#176; &#226;&#134;&#146; &#231;&#160;&#148;&#231;&#169;&#182; &#226;&#134;&#146; View" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="24" y="451.5">&#x53d1;&#x73b0; &#x2192; &#x7814;&#x7a76; &#x2192; View</tspan></text>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136; &#226;&#134;&#146; &#229;&#155;&#158;&#230;&#181;&#139; &#226;&#134;&#146; Shadow" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="24" y="473.5">&#x7ec4;&#x5408; &#x2192; &#x56de;&#x6d4b; &#x2192; Shadow</tspan></text>
+<path id="Vector_8" d="M200 1016H24V1136H200V1016Z" stroke="#3A4654"/>
+<text id="PROTOTYPE ONLY" fill="#6F9BD8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1041.64">PROTOTYPE ONLY</tspan></text>
+<text id="DESIGN FIXTURE" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1063.64">DESIGN FIXTURE</tspan></text>
+<text id="&#233;&#157;&#158;&#231;&#148;&#159;&#228;&#186;&#167;&#230;&#149;&#176;&#230;&#141;&#174;" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1083.64">&#x975e;&#x751f;&#x4ea7;&#x6570;&#x636e;</tspan></text>
+<text id="&#228;&#184;&#141;&#228;&#187;&#163;&#232;&#161;&#168; PIT / &#231;&#167;&#145;&#229;&#173;&#166;&#230;&#156;&#137;&#230;&#149;&#136;" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1103.64">&#x4e0d;&#x4ee3;&#x8868; PIT / &#x79d1;&#x5b66;&#x6709;&#x6548;</tspan></text>
+<path id="Vector_9" d="M626 16H246V48H626V16Z" fill="#F7F8FA" stroke="#C8CDD4"/>
+<text id="&#230;&#144;&#156;&#231;&#180;&#162;&#232;&#175;&#129;&#229;&#136;&#184;&#227;&#128;&#129;&#229;&#133;&#172;&#229;&#143;&#184;&#227;&#128;&#129;Case&#227;&#128;&#129;Artifact&#226;&#128;&#166;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="262" y="36.5">&#x641c;&#x7d22;&#x8bc1;&#x5238;&#x3001;&#x516c;&#x53f8;&#x3001;Case&#x3001;Artifact&#x2026;</tspan></text>
+<text id="RESEARCH TIME" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="656" y="25.7727">RESEARCH TIME</tspan></text>
+<text id="2026-08-13 15:30 CST" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="656" y="42.5">2026-08-13 15:30 CST</tspan></text>
+<text id="DATA MODE" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="814" y="25.7727">DATA MODE</tspan></text>
+<text id="CURRENT RESEARCH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="814" y="42.5">CURRENT RESEARCH</tspan></text>
+<text id="DEPLOYMENT" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="970" y="25.7727">DEPLOYMENT</tspan></text>
+<text id="RESEARCH" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="970" y="42.5">RESEARCH</tspan></text>
+<text id="UNIVERSE" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="1098" y="25.7727">UNIVERSE</tspan></text>
+<text id="CSI 800" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1098" y="42.5">CSI 800</tspan></text>
+<path id="Vector_10" d="M1414 16H1302V42H1414V16Z" fill="#FFF9E9" stroke="#9A6A16"/>
+<text id="DESIGN FIXTURE_2" fill="#77510F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="1312" y="33.7727">DESIGN FIXTURE</tspan></text>
+<path id="Vector_11" d="M1440 64H224V128H1440V64Z" fill="white"/>
+<path id="Vector_12" d="M224 128H1440" stroke="#C8CDD4"/>
+<text id="Catalog" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="252" y="105.727">Catalog</tspan></text>
+<text id="Quality" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="382" y="105.727">Quality</tspan></text>
+<text id="Lineage" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="512" y="105.727">Lineage</tspan></text>
+<text id="Jobs" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="642" y="105.727">Jobs</tspan></text>
+<text id="Entitlements" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="772" y="105.727">Entitlements</tspan></text>
+<text id="Users" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="902" y="105.727">Users</tspan></text>
+<text id="Agents" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="1032" y="105.727">Agents</tspan></text>
+<text id="Approvals" fill="#244C8A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="1162" y="105.727">Approvals</tspan></text>
+<path id="Vector_13" d="M1266 117H1156V120H1266V117Z" fill="#2F5EA8"/>
+<text id="SYSTEM / P4-P9 &#194;&#183; GOVERNANCE" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="246" y="157.636">SYSTEM / P4-P9 &#xb7; GOVERNANCE</tspan></text>
+<text id="Approvals &#194;&#183; Reviewer Queue" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="25" font-weight="bold" letter-spacing="0em"><tspan x="246" y="186.091">Approvals &#xb7; Reviewer Queue</tspan></text>
+<text id="&#229;&#155;&#160;&#229;&#173;&#144;&#227;&#128;&#129;&#230;&#168;&#161;&#229;&#158;&#139;&#227;&#128;&#129;InvestmentView&#227;&#128;&#129;Timing &#228;&#184;&#142;&#231;&#148;&#168;&#233;&#128;&#148;&#229;&#174;&#161;&#230;&#137;&#185;&#233;&#155;&#134;&#228;&#184;&#173;&#229;&#164;&#132;&#231;&#144;&#134;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1101.08" y="175.5">&#x56e0;&#x5b50;&#x3001;&#x6a21;&#x578b;&#x3001;InvestmentView&#x3001;Timing &#x4e0e;&#x7528;&#x9014;&#x5ba1;&#x6279;&#x96c6;&#x4e2d;&#x5904;&#x7406;</tspan></text>
+<path id="Vector_14" d="M510 196H246V288H510V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Pending" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="262" y="221.864">Pending</tspan></text>
+<text id="7" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="262" y="253.227">7</tspan></text>
+<text id="Factor3 &#194;&#183; View4" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="262" y="275.5">Factor3 &#xb7; View4</tspan></text>
+<path id="Vector_15" d="M788 196H524V288H788V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Approved Research" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="540" y="221.864">Approved Research</tspan></text>
+<text id="6" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="540" y="253.227">6</tspan></text>
+<text id="&#228;&#187;&#133; research_backtest" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="540" y="275.5">&#x4ec5; research_backtest</tspan></text>
+<path id="Vector_16" d="M1066 196H802V288H1066V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Rejected" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="818" y="221.864">Rejected</tspan></text>
+<text id="4" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="818" y="253.227">4</tspan></text>
+<text id="&#228;&#191;&#157;&#231;&#149;&#153;&#229;&#174;&#140;&#230;&#149;&#180;&#231;&#144;&#134;&#231;&#148;&#177;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="818" y="275.5">&#x4fdd;&#x7559;&#x5b8c;&#x6574;&#x7406;&#x7531;</tspan></text>
+<path id="Vector_17" d="M1344 196H1080V288H1344V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Production" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1096" y="221.864">Production</tspan></text>
+<text id="0" fill="#8E4A57" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="253.227">0</tspan></text>
+<text id="&#230;&#151;&#160; Shadow/Paper &#230;&#153;&#139;&#231;&#186;&#167;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="275.5">&#x65e0; Shadow/Paper &#x664b;&#x7ea7;</tspan></text>
+<path id="Vector_18" d="M1036 316H246V358H1036V316Z" fill="white" stroke="#C8CDD4"/>
+<text id="&#229;&#174;&#161;&#230;&#137;&#185;&#233;&#152;&#159;&#229;&#136;&#151; &#194;&#183; server-owned reviewer path" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="262" y="342.591">&#x5ba1;&#x6279;&#x961f;&#x5217; &#xb7; server-owned reviewer path</tspan></text>
+<path id="Vector_19" d="M1036 358H246V392H1036V358Z" fill="#F7F8FA" stroke="#C8CDD4"/>
+<text id="Review" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="379.636">Review</tspan></text>
+<text id="&#229;&#175;&#185;&#232;&#177;&#161;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="379.636">&#x5bf9;&#x8c61;</tspan></text>
+<text id="&#231;&#137;&#136;&#230;&#156;&#172;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="379.636">&#x7248;&#x672c;</tspan></text>
+<text id="&#231;&#148;&#168;&#233;&#128;&#148;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="379.636">&#x7528;&#x9014;</tspan></text>
+<text id="&#230;&#143;&#144;&#228;&#186;&#164;&#228;&#186;&#186;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="379.636">&#x63d0;&#x4ea4;&#x4eba;</tspan></text>
+<text id="&#232;&#175;&#129;&#230;&#141;&#174;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="379.636">&#x8bc1;&#x636e;</tspan></text>
+<text id="Reviewer" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="379.636">Reviewer</tspan></text>
+<text id="&#231;&#138;&#182;&#230;&#128;&#129;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="379.636">&#x72b6;&#x6001;</tspan></text>
+<path id="Vector_20" d="M1036 392H246V431H1036V392Z" fill="white" stroke="#ECEFF3"/>
+<text id="REV-1500" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="416.636">REV-1500</tspan></text>
+<text id="Factor" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="416.636">Factor</tspan></text>
+<text id="v1" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="416.636">v1</tspan></text>
+<text id="research_backtest" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="416.636">research_backtest</tspan></text>
+<text id="User-1" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="416.636">User-1</tspan></text>
+<text id="&#231;&#188;&#186;&#229;&#164;&#177;" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="416.636">&#x7f3a;&#x5931;</tspan></text>
+<text id="Unassigned" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="416.636">Unassigned</tspan></text>
+<text id="Pending_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="416.636">Pending</tspan></text>
+<path id="Vector_21" d="M1036 431H246V470H1036V431Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="REV-1501" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="455.636">REV-1501</tspan></text>
+<text id="Alpha Model" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="455.636">Alpha Model</tspan></text>
+<text id="v2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="455.636">v2</tspan></text>
+<text id="shadow" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="455.636">shadow</tspan></text>
+<text id="User-2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="455.636">User-2</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="455.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Reviewer-2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="455.636">Reviewer-2</tspan></text>
+<text id="Approved" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="455.636">Approved</tspan></text>
+<path id="Vector_22" d="M1036 470H246V509H1036V470Z" fill="white" stroke="#ECEFF3"/>
+<text id="REV-1502" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="494.636">REV-1502</tspan></text>
+<text id="InvestmentView" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="494.636">InvestmentView</tspan></text>
+<text id="v3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="494.636">v3</tspan></text>
+<text id="paper" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="494.636">paper</tspan></text>
+<text id="User-3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="494.636">User-3</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="494.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Reviewer-1" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="494.636">Reviewer-1</tspan></text>
+<text id="Rejected_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="494.636">Rejected</tspan></text>
+<path id="Vector_23" d="M1036 509H246V548H1036V509Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="REV-1503" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="533.636">REV-1503</tspan></text>
+<text id="Timing" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="533.636">Timing</tspan></text>
+<text id="v1_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="533.636">v1</tspan></text>
+<text id="research_backtest_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="533.636">research_backtest</tspan></text>
+<text id="User-1_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="533.636">User-1</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="533.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Unassigned_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="533.636">Unassigned</tspan></text>
+<text id="Blocked" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="533.636">Blocked</tspan></text>
+<path id="Vector_24" d="M1036 548H246V587H1036V548Z" fill="white" stroke="#ECEFF3"/>
+<text id="REV-1504" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="572.636">REV-1504</tspan></text>
+<text id="Factor_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="572.636">Factor</tspan></text>
+<text id="v2_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="572.636">v2</tspan></text>
+<text id="shadow_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="572.636">shadow</tspan></text>
+<text id="User-2_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="572.636">User-2</tspan></text>
+<text id="&#231;&#188;&#186;&#229;&#164;&#177;_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="572.636">&#x7f3a;&#x5931;</tspan></text>
+<text id="Reviewer-1_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="572.636">Reviewer-1</tspan></text>
+<text id="Pending_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="572.636">Pending</tspan></text>
+<path id="Vector_25" d="M1036 587H246V626H1036V587Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="REV-1505" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="611.636">REV-1505</tspan></text>
+<text id="Alpha Model_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="611.636">Alpha Model</tspan></text>
+<text id="v3_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="611.636">v3</tspan></text>
+<text id="paper_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="611.636">paper</tspan></text>
+<text id="User-3_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="611.636">User-3</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="611.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Reviewer-2_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="611.636">Reviewer-2</tspan></text>
+<text id="Approved_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="611.636">Approved</tspan></text>
+<path id="Vector_26" d="M1036 626H246V665H1036V626Z" fill="white" stroke="#ECEFF3"/>
+<text id="REV-1506" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="650.636">REV-1506</tspan></text>
+<text id="InvestmentView_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="650.636">InvestmentView</tspan></text>
+<text id="v1_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="650.636">v1</tspan></text>
+<text id="research_backtest_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="650.636">research_backtest</tspan></text>
+<text id="User-1_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="650.636">User-1</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="650.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Unassigned_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="650.636">Unassigned</tspan></text>
+<text id="Rejected_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="650.636">Rejected</tspan></text>
+<path id="Vector_27" d="M1036 665H246V704H1036V665Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="REV-1507" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="689.636">REV-1507</tspan></text>
+<text id="Timing_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="689.636">Timing</tspan></text>
+<text id="v2_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="689.636">v2</tspan></text>
+<text id="shadow_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="689.636">shadow</tspan></text>
+<text id="User-2_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="689.636">User-2</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_6" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="689.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Reviewer-2_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="689.636">Reviewer-2</tspan></text>
+<text id="Blocked_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="689.636">Blocked</tspan></text>
+<path id="Vector_28" d="M1036 704H246V743H1036V704Z" fill="white" stroke="#ECEFF3"/>
+<text id="REV-1508" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="728.636">REV-1508</tspan></text>
+<text id="Factor_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="728.636">Factor</tspan></text>
+<text id="v3_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="728.636">v3</tspan></text>
+<text id="paper_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="728.636">paper</tspan></text>
+<text id="User-3_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="728.636">User-3</tspan></text>
+<text id="&#231;&#188;&#186;&#229;&#164;&#177;_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="728.636">&#x7f3a;&#x5931;</tspan></text>
+<text id="Reviewer-1_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="728.636">Reviewer-1</tspan></text>
+<text id="Pending_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="728.636">Pending</tspan></text>
+<path id="Vector_29" d="M1036 743H246V782H1036V743Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="REV-1509" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="767.636">REV-1509</tspan></text>
+<text id="Alpha Model_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="767.636">Alpha Model</tspan></text>
+<text id="v1_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="767.636">v1</tspan></text>
+<text id="research_backtest_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="767.636">research_backtest</tspan></text>
+<text id="User-1_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="767.636">User-1</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_7" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="767.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Unassigned_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="767.636">Unassigned</tspan></text>
+<text id="Approved_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="767.636">Approved</tspan></text>
+<path id="Vector_30" d="M1036 782H246V821H1036V782Z" fill="white" stroke="#ECEFF3"/>
+<text id="REV-1510" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="806.636">REV-1510</tspan></text>
+<text id="InvestmentView_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="348" y="806.636">InvestmentView</tspan></text>
+<text id="v2_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="456" y="806.636">v2</tspan></text>
+<text id="shadow_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="516" y="806.636">shadow</tspan></text>
+<text id="User-2_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="640" y="806.636">User-2</tspan></text>
+<text id="&#229;&#174;&#140;&#230;&#149;&#180;_8" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="722" y="806.636">&#x5b8c;&#x6574;</tspan></text>
+<text id="Reviewer-1_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="788" y="806.636">Reviewer-1</tspan></text>
+<text id="Rejected_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="900" y="806.636">Rejected</tspan></text>
+<path id="Vector_31" d="M1414 316H1052V710H1414V316Z" fill="white" stroke="#C8CDD4"/>
+<text id="&#229;&#174;&#161;&#230;&#137;&#185;&#232;&#167;&#132;&#229;&#136;&#153;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="342.591">&#x5ba1;&#x6279;&#x89c4;&#x5219;</tspan></text>
+<path id="Vector_32" d="M1052 358H1414" stroke="#DEE2E7"/>
+<text id="&#230;&#156;&#141;&#229;&#138;&#161;&#231;&#171;&#175;&#229;&#134;&#179;&#229;&#174;&#154;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="383.864">&#x670d;&#x52a1;&#x7aef;&#x51b3;&#x5b9a;</tspan></text>
+<path id="Vector_33" d="M1396 370H1328C1326.9 370 1326 370.895 1326 372V390C1326 391.105 1326.9 392 1328 392H1396C1397.1 392 1398 391.105 1398 390V372C1398 370.895 1397.1 370 1396 370Z" fill="#F0FAF5" stroke="#80AD98"/>
+<text id="READY" fill="#287A55" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1348.95" y="384.909">READY</tspan></text>
+<text id="&#230;&#137;&#185;&#229;&#135;&#134;/&#230;&#139;&#146;&#231;&#187;&#157;/&#230;&#146;&#164;&#229;&#155;&#158;&#230;&#156;&#137;&#232;&#186;&#171;&#228;&#187;&#189;&#227;&#128;&#129;&#230;&#151;&#182;&#233;&#151;&#180;&#229;&#146;&#140;&#231;&#144;&#134;&#231;&#148;&#177;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="405.636">&#x6279;&#x51c6;/&#x62d2;&#x7edd;/&#x64a4;&#x56de;&#x6709;&#x8eab;&#x4efd;&#x3001;&#x65f6;&#x95f4;&#x548c;&#x7406;&#x7531;</tspan></text>
+<path id="Vector_34" d="M1068 426H1398" stroke="#ECEFF3"/>
+<text id="&#231;&#148;&#168;&#233;&#128;&#148;&#231;&#178;&#190;&#231;&#161;&#174;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="465.864">&#x7528;&#x9014;&#x7cbe;&#x786e;</tspan></text>
+<path id="Vector_35" d="M1396 452H1328C1326.9 452 1326 452.895 1326 454V472C1326 473.105 1326.9 474 1328 474H1396C1397.1 474 1398 473.105 1398 472V454C1398 452.895 1397.1 452 1396 452Z" fill="#F0FAF5" stroke="#80AD98"/>
+<text id="READY_2" fill="#287A55" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1348.95" y="466.909">READY</tspan></text>
+<text id="research/shadow/paper &#228;&#184;&#141;&#229;&#143;&#175;&#230;&#143;&#144;&#229;&#141;&#135;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="487.636">research/shadow/paper &#x4e0d;&#x53ef;&#x63d0;&#x5347;</tspan></text>
+<path id="Vector_36" d="M1068 508H1398" stroke="#ECEFF3"/>
+<text id="&#232;&#175;&#129;&#230;&#141;&#174;&#228;&#184;&#141;&#232;&#182;&#179;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="547.864">&#x8bc1;&#x636e;&#x4e0d;&#x8db3;</tspan></text>
+<path id="Vector_37" d="M1396 534H1328C1326.9 534 1326 534.895 1326 536V554C1326 555.105 1326.9 556 1328 556H1396C1397.1 556 1398 555.105 1398 554V536C1398 534.895 1397.1 534 1396 534Z" fill="#FFF3F4" stroke="#BD858B"/>
+<text id="BLOCKER" fill="#8E4A57" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1343.75" y="548.909">BLOCKER</tspan></text>
+<text id="&#231;&#166;&#129;&#231;&#148;&#168;&#229;&#134;&#179;&#229;&#174;&#154;&#229;&#185;&#182;&#229;&#136;&#151;&#229;&#135;&#186;&#229;&#133;&#168;&#233;&#131;&#168; blocker" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="569.636">&#x7981;&#x7528;&#x51b3;&#x5b9a;&#x5e76;&#x5217;&#x51fa;&#x5168;&#x90e8; blocker</tspan></text>
+<path id="Vector_38" d="M1068 590H1398" stroke="#ECEFF3"/>
+<text id="&#231;&#137;&#136;&#230;&#156;&#172;&#228;&#184;&#141;&#229;&#143;&#175;&#229;&#143;&#152;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="629.864">&#x7248;&#x672c;&#x4e0d;&#x53ef;&#x53d8;</tspan></text>
+<path id="Vector_39" d="M1396 616H1328C1326.9 616 1326 616.895 1326 618V636C1326 637.105 1326.9 638 1328 638H1396C1397.1 638 1398 637.105 1398 636V618C1398 616.895 1397.1 616 1396 616Z" fill="#FFF9E9" stroke="#C7A96B"/>
+<text id="ATTENTION" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1339.42" y="630.909">ATTENTION</tspan></text>
+<text id="&#228;&#191;&#174;&#230;&#148;&#185;&#228;&#186;&#167;&#231;&#148;&#159;&#230;&#150;&#176;&#231;&#137;&#136;&#230;&#156;&#172;&#228;&#184;&#142;&#230;&#150;&#176;&#229;&#174;&#161;&#230;&#159;&#165;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="651.636">&#x4fee;&#x6539;&#x4ea7;&#x751f;&#x65b0;&#x7248;&#x672c;&#x4e0e;&#x65b0;&#x5ba1;&#x67e5;</tspan></text>
+<path id="Vector_40" d="M1068 672H1398" stroke="#ECEFF3"/>
+<path id="Vector_41" d="M1414 726H1052V822H1414V726Z" fill="#FFF9E9" stroke="#C7A96B"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;&#228;&#189;&#191;&#231;&#148;&#168;&#232;&#190;&#185;&#231;&#149;&#140;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="752.5">&#x53ef;&#x4fe1;&#x4f7f;&#x7528;&#x8fb9;&#x754c;</tspan></text>
+<text id="&#229;&#137;&#141;&#231;&#171;&#175;&#233;&#154;&#144;&#232;&#151;&#143;&#230;&#140;&#137;&#233;&#146;&#174;&#228;&#184;&#141;&#232;&#131;&#189;&#230;&#155;&#191;&#228;&#187;&#163;&#230;&#157;&#131;&#233;&#153;&#144;&#230;&#160;&#161;&#233;&#170;&#140;&#239;&#188;&#155;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="777.636">&#x524d;&#x7aef;&#x9690;&#x85cf;&#x6309;&#x94ae;&#x4e0d;&#x80fd;&#x66ff;&#x4ee3;&#x6743;&#x9650;&#x6821;&#x9a8c;&#xff1b;</tspan></text>
+<text id="&#229;&#189;&#147;&#229;&#137;&#141;&#230;&#151;&#160;&#231;&#156;&#159;&#229;&#174;&#158;&#232;&#180;&#166;&#230;&#136;&#183;&#230;&#136;&#150; Limited Live &#230;&#142;&#136;&#230;&#157;&#131;&#227;&#128;&#130;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="796.636">&#x5f53;&#x524d;&#x65e0;&#x771f;&#x5b9e;&#x8d26;&#x6237;&#x6216; Limited Live &#x6388;&#x6743;&#x3002;</tspan></text>
+<path id="Vector_42" d="M460 1062H246V1164H460V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="INPUT &#194;&#183; &#232;&#190;&#147;&#229;&#133;&#165;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="260" y="1085.64">INPUT &#xb7; &#x8f93;&#x5165;</tspan></text>
+<text id="&#229;&#175;&#185;&#232;&#177;&#161;&#231;&#137;&#136;&#230;&#156;&#172;/&#231;&#148;&#168;&#233;&#128;&#148;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="260" y="1109.64">&#x5bf9;&#x8c61;&#x7248;&#x672c;/&#x7528;&#x9014;</tspan></text>
+<text id="&#232;&#175;&#129;&#230;&#141;&#174;/&#232;&#186;&#171;&#228;&#187;&#189;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="260" y="1127.64">&#x8bc1;&#x636e;/&#x8eab;&#x4efd;</tspan></text>
+<path id="Vector_43" d="M684 1062H470V1164H684V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="PROCESS &#194;&#183; &#229;&#164;&#132;&#231;&#144;&#134;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="484" y="1085.64">PROCESS &#xb7; &#x5904;&#x7406;</tspan></text>
+<text id="Reviewer&#229;&#134;&#179;&#229;&#174;&#154;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="484" y="1109.64">Reviewer&#x51b3;&#x5b9a;</tspan></text>
+<text id="&#231;&#144;&#134;&#231;&#148;&#177;&#226;&#134;&#146;scope&#226;&#134;&#146;&#230;&#146;&#164;&#229;&#155;&#158;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="484" y="1127.64">&#x7406;&#x7531;&#x2192;scope&#x2192;&#x64a4;&#x56de;</tspan></text>
+<path id="Vector_44" d="M908 1062H694V1164H908V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="OUTPUT &#194;&#183; &#232;&#190;&#147;&#229;&#135;&#186;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="708" y="1085.64">OUTPUT &#xb7; &#x8f93;&#x51fa;</tspan></text>
+<text id="append-only Review" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="708" y="1109.64">append-only Review</tspan></text>
+<text id="&#231;&#148;&#168;&#233;&#128;&#148;&#229;&#174;&#161;&#230;&#137;&#185;&#232;&#174;&#176;&#229;&#189;&#149;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="708" y="1127.64">&#x7528;&#x9014;&#x5ba1;&#x6279;&#x8bb0;&#x5f55;</tspan></text>
+<path id="Vector_45" d="M1132 1062H918V1164H1132V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="ACTION &#194;&#183; &#230;&#147;&#141;&#228;&#189;&#156;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="932" y="1085.64">ACTION &#xb7; &#x64cd;&#x4f5c;</tspan></text>
+<text id="&#230;&#137;&#185;&#229;&#135;&#134;/&#230;&#139;&#146;&#231;&#187;&#157;/&#230;&#146;&#164;&#229;&#155;&#158;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="932" y="1109.64">&#x6279;&#x51c6;/&#x62d2;&#x7edd;/&#x64a4;&#x56de;</tspan></text>
+<text id="&#230;&#137;&#147;&#229;&#188;&#128;&#232;&#175;&#129;&#230;&#141;&#174;&#230;&#138;&#189;&#229;&#177;&#137;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="932" y="1127.64">&#x6253;&#x5f00;&#x8bc1;&#x636e;&#x62bd;&#x5c49;</tspan></text>
+<path id="Vector_46" d="M1356 1062H1142V1164H1356V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="GATE &#194;&#183; &#233;&#151;&#168;&#231;&#166;&#129;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="1156" y="1085.64">GATE &#xb7; &#x95e8;&#x7981;</tspan></text>
+<text id="&#232;&#175;&#129;&#230;&#141;&#174;&#228;&#184;&#141;&#232;&#182;&#179;&#231;&#166;&#129;&#231;&#148;&#168;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1156" y="1109.64">&#x8bc1;&#x636e;&#x4e0d;&#x8db3;&#x7981;&#x7528;</tspan></text>
+<text id="&#231;&#137;&#136;&#230;&#156;&#172;&#228;&#191;&#174;&#230;&#148;&#185;&#233;&#135;&#141;&#229;&#174;&#161;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1156" y="1127.64">&#x7248;&#x672c;&#x4fee;&#x6539;&#x91cd;&#x5ba1;</tspan></text>
+<text id="Prototype Notes &#194;&#183; P4/P5/P7/P9 &#230;&#156;&#141;&#229;&#138;&#161;&#231;&#171;&#175;&#230;&#178;&#187;&#231;&#144;&#134; &#194;&#183; &#230;&#181;&#139;&#232;&#175;&#149;&#233;&#128;&#154;&#232;&#191;&#135;&#228;&#184;&#141;&#231;&#173;&#137;&#228;&#186;&#142;&#230;&#168;&#161;&#229;&#158;&#139;&#231;&#167;&#145;&#229;&#173;&#166;&#230;&#156;&#137;&#230;&#149;&#136;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="246" y="1187.77">Prototype Notes &#xb7; P4/P5/P7/P9 &#x670d;&#x52a1;&#x7aef;&#x6cbb;&#x7406; &#xb7; &#x6d4b;&#x8bd5;&#x901a;&#x8fc7;&#x4e0d;&#x7b49;&#x4e8e;&#x6a21;&#x578b;&#x79d1;&#x5b66;&#x6709;&#x6548;</tspan></text>
+</g>
+<defs>
+<clipPath id="clip0_9_883">
+<rect width="1440" height="1200" fill="white"/>
+</clipPath>
+</defs>
+</svg>

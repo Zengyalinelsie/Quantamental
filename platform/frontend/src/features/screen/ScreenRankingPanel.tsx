@@ -4,10 +4,13 @@ import { useEffect, useState } from 'react'
 
 import type {
   IndustryPeerProjection,
+  ScreenComponentName,
   ScreenNullableRankProjection,
   ScreenRankingProjection,
   ScreenRankingRowProjection,
   ScreenRankChangeProjection,
+  ScreenReturnIntervalProjection,
+  ScreenRowComponentProjection,
 } from './screenProjection'
 import './screen.less'
 
@@ -46,6 +49,67 @@ function RankChange({ value }: { value: ScreenRankChangeProjection }) {
       {value.display}
     </span>
   )
+}
+
+/**
+ * One factor dimension cell.
+ *
+ * The server owns `display`, including the em dash for every non-quantified
+ * status.  The status reason goes into `title` so that constrained ("bounded but
+ * unquantified") stays distinguishable from unavailable ("missing") even though
+ * both render the same dash — that difference matters in an audit.
+ */
+function ComponentCell({
+  value,
+  name,
+}: {
+  value: ScreenRowComponentProjection | undefined
+  name: ScreenComponentName
+}) {
+  if (value === undefined) {
+    return (
+      <span
+        className="screenUnavailableValue"
+        title={`该行没有绑定的冻结 InvestmentView，${name} 分项不可用。`}
+      >
+        —
+      </span>
+    )
+  }
+  const quantified = value.status === 'quantified'
+  return (
+    <span
+      className={quantified ? 'screenTabularValue' : 'screenUnavailableValue'}
+      title={value.reason ?? `${value.label} · ${value.status}`}
+    >
+      {value.display}
+    </span>
+  )
+}
+
+function ReturnIntervalCell({
+  value,
+}: {
+  value: ScreenReturnIntervalProjection | null | undefined
+}) {
+  if (!value || value.display === null) {
+    return (
+      <span
+        className="screenUnavailableValue"
+        title={value?.unavailable_reason ?? '该行没有绑定的冻结 InvestmentView，无法给出区间。'}
+      >
+        —
+      </span>
+    )
+  }
+  return <span className="screenTabularValue">{value.display}</span>
+}
+
+function componentOf(
+  row: ScreenRankingRowProjection,
+  name: ScreenComponentName,
+): ScreenRowComponentProjection | undefined {
+  return row.components?.find((item) => item.component === name)
 }
 
 const columns: ColumnsType<ScreenRankingRowProjection> = [
@@ -107,6 +171,30 @@ const columns: ColumnsType<ScreenRankingRowProjection> = [
     key: 'confidence',
     width: 102,
     render: (_, row) => <span className="screenTabularValue">{row.confidence.display}</span>,
+  },
+  {
+    title: '质量',
+    key: 'component_quality',
+    width: 90,
+    render: (_, row) => <ComponentCell name="quality" value={componentOf(row, 'quality')} />,
+  },
+  {
+    title: '估值预期差',
+    key: 'component_valuation',
+    width: 110,
+    render: (_, row) => <ComponentCell name="valuation" value={componentOf(row, 'valuation')} />,
+  },
+  {
+    title: '改善',
+    key: 'component_revision',
+    width: 90,
+    render: (_, row) => <ComponentCell name="revision" value={componentOf(row, 'revision')} />,
+  },
+  {
+    title: '60日预期收益区间',
+    key: 'expected_return_interval',
+    width: 158,
+    render: (_, row) => <ReturnIntervalCell value={row.expected_return_interval} />,
   },
   {
     title: 'Trust',

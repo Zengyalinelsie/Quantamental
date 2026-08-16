@@ -10,6 +10,7 @@ import { WorkspaceState } from '../components/WorkspaceState'
 import { FrozenArtifactPanel } from '../features/investment-view/FrozenArtifactPanel'
 import { InvestmentViewSummary } from '../features/investment-view/InvestmentViewSummary'
 import { AlphaModelReadinessPanel } from '../features/screen/AlphaModelReadinessPanel'
+import { ScreenBuilderPanel } from '../features/screen/ScreenBuilderPanel'
 import { ScreenRankingPanel } from '../features/screen/ScreenRankingPanel'
 import { useWorkspaceStore } from '../state/workspace'
 import './ResearchP5Screen.less'
@@ -112,11 +113,25 @@ export function ResearchP5Screen({ section }: ResearchP5ScreenProps) {
       ))}
 
       {data.status === 'unavailable' ? (
-        <WorkspaceState
-          reason="服务端 readiness 判定为 unavailable；以下保留完整阻断与审批证据。"
-          state="blocked"
-          title="P5 研究工作区不可用"
-        />
+        section === 'universe-screen' ? (
+          // Keep the prototype's two-column shape: the builder is where an
+          // operator learns which bindings are missing, so it must survive an
+          // unavailable workspace rather than the page collapsing to one notice.
+          <div className="screenWorkspaceGrid">
+            <ScreenBuilderPanel projection={null} />
+            <WorkspaceState
+              reason="服务端 readiness 判定为 unavailable；以下保留完整阻断与审批证据。"
+              state="blocked"
+              title="P5 研究工作区不可用"
+            />
+          </div>
+        ) : (
+          <WorkspaceState
+            reason="服务端 readiness 判定为 unavailable；以下保留完整阻断与审批证据。"
+            state="blocked"
+            title="P5 研究工作区不可用"
+          />
+        )
       ) : data.status === 'partial' ? (
         <Alert
           description="可用投影继续展示；缺失能力不会用零、演示模型或页面计算补齐。"
@@ -131,7 +146,15 @@ export function ResearchP5Screen({ section }: ResearchP5ScreenProps) {
       {data.status !== 'unavailable' ? (
         requestedProjection ? (
           section === 'universe-screen'
-            ? <ScreenRankingPanel projection={data.screen!} />
+            ? (
+              // Figma `workspace` (node 3:726): a 320 read-only builder beside
+              // the 800 ranking table.  The builder reports what the frozen
+              // screen used; it is not an input surface (ADR-0012).
+              <div className="screenWorkspaceGrid">
+                <ScreenBuilderPanel projection={data.screen} />
+                <ScreenRankingPanel projection={data.screen!} />
+              </div>
+            )
             : (
               <>
                 <InvestmentViewSummary projection={data.investment_view!} />
@@ -140,6 +163,14 @@ export function ResearchP5Screen({ section }: ResearchP5ScreenProps) {
                 />
               </>
             )
+        ) : section === 'universe-screen' ? (
+          // Keep the prototype's two-column shape even with no frozen screen, so
+          // the builder can state which bindings are missing instead of the page
+          // collapsing to one generic notice.
+          <div className="screenWorkspaceGrid">
+            <ScreenBuilderPanel projection={null} />
+            <WorkspaceState reason={emptyReason} state="empty" title={emptyTitle} />
+          </div>
         ) : (
           <WorkspaceState reason={emptyReason} state="empty" title={emptyTitle} />
         )

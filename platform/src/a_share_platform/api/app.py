@@ -27,6 +27,7 @@ from a_share_platform.adapters.memory.financial_evidence import StaticFinancialE
 from a_share_platform.adapters.memory.governance import InMemoryGovernanceRepository
 from a_share_platform.adapters.memory.signals import UnavailableSignalSnapshotRepository
 from a_share_platform.adapters.memory.system_catalog import StaticSystemCatalogReader
+from a_share_platform.adapters.memory.timing import UnavailableTimingForecastRepository
 from a_share_platform.adapters.object_store.local import (
     LocalArtifactReader,
     UnavailableArtifactReader,
@@ -44,6 +45,7 @@ from a_share_platform.adapters.postgres.financial_evidence import PostgresFinanc
 from a_share_platform.adapters.postgres.governance import PostgresGovernanceRepository
 from a_share_platform.adapters.postgres.signals import PostgresSignalSnapshotRepository
 from a_share_platform.adapters.postgres.system_catalog import PostgresSystemCatalogReader
+from a_share_platform.application.desk_projection import DeskProjectionService
 from a_share_platform.application.experiments import ExperimentRunService
 from a_share_platform.application.factor_reviews import (
     FactorReviewDenied,
@@ -93,10 +95,12 @@ from a_share_platform.ports.governance import (
 )
 from a_share_platform.ports.signals import SignalSnapshotRepository
 from a_share_platform.ports.system_catalog import SystemCatalogReader
+from a_share_platform.ports.timing import TimingForecastRepository
 
 from .schemas import (
     ArtifactMetadataEnvelope,
     ArtifactMetadataListEnvelope,
+    DeskEnvelope,
     Envelope,
     ExperimentRunInput,
     FactorReviewInput,
@@ -207,6 +211,7 @@ def create_app(
     factor_review_repository: FactorReviewRepository | None = None,
     expected_return_repository: ExpectedReturnLedgerRepository | None = None,
     signal_snapshot_repository: SignalSnapshotRepository | None = None,
+    timing_repository: TimingForecastRepository | None = None,
     artifact_reader: ArtifactObjectReader | None = None,
 ) -> FastAPI:
     app = FastAPI(
@@ -278,6 +283,15 @@ def create_app(
         factor_review_repository=factor_reviews,
         security_master=master,
     )
+    timing_forecasts = timing_repository or UnavailableTimingForecastRepository(
+        "ASP_DATABASE_URL is not configured for timing forecast persistence"
+    )
+    desk_projection_service = DeskProjectionService(
+        system_catalog=system,
+        research_workspace=research_workspace_service,
+        timing_repository=timing_forecasts,
+        factor_review_repository=factor_reviews,
+    )
     app.state.governance_repository = governance
     app.state.artifact_reader = artifact_objects
     app.state.security_master = master
@@ -292,6 +306,8 @@ def create_app(
     app.state.expected_return_repository = expected_returns
     app.state.signal_snapshot_repository = signal_snapshots
     app.state.research_workspace_service = research_workspace_service
+    app.state.timing_repository = timing_forecasts
+    app.state.desk_projection_service = desk_projection_service
     app.state.permission_policy = permission_policy
 
     @app.exception_handler(RunContextOverrideDenied)
@@ -785,6 +801,34 @@ def create_app(
         projection = research_workspace_service.project(security_query=security_id)
         response = envelope(projection, context)
         return ResearchWorkspaceEnvelope.model_validate(response.model_dump())
+
+    @app.get("/api/desk", response_model=DeskEnvelope)
+    def desk(
+        context: Annotated[RunContext, Depends(fixed_read_context)],
+    ) -> DeskEnvelope:
+        """Read-only situation overview across the seven desk domains.
+
+        Each section reports its own status and its own blockers, so an
+        unimplemented or unreachable domain degrades one card instead of the
+        page.  This handler only lists existing records: it never ingests,
+        compiles, scores or invokes an agent.
+        """
+        projection = desk_projection_service.project(now=datetime.now(UTC))
+        payload = {
+            "sections": [
+                {
+                    "key": section.key.value,
+                    "status": section.status.value,
+                    "title": section.title,
+                    "blockers": [asdict(blocker) for blocker in section.blockers],
+                    "coverage": section.coverage,
+                    "payload": section.payload,
+                }
+                for section in projection.sections
+            ]
+        }
+        response = envelope(payload, context)
+        return DeskEnvelope.model_validate(response.model_dump())
 
     @app.post("/api/factors/reviews", response_model=Envelope, status_code=201)
     def create_factor_promotion_review(

@@ -2,10 +2,11 @@
 
 本目录保存可重新导入 Figma 的原型资产，避免浏览器会话或 Figma Agent 配额导致关键 Frame 无法恢复。
 
-当前只有下表两页具有仓库内可恢复的精确 SVG。它们不能代表 14 个关键 1440 Frame 全部已有本地资产，
-更不能代表 31 页和 320/768/1024 三档已有逐页高保真设计。逐页现状见
-`docs/22-prototype-runtime-gap-audit.md`，运行时交付计划见
-`docs/plans/track-00-prototype-runtime-delivery.md`。
+2026-08-15 起，本目录已通过 Figma REST API 取得全部 17 个关键 Frame 的精确 SVG 与结构化节点摘要。
+`docs/22-prototype-runtime-gap-audit.md` §2.2 记录的「Starter MCP 配额用尽导致设计输入阻断」
+**已解除**：任何 PUI 工作包都可直接使用本目录资产作为精确视觉真源，不再依赖 Figma 会话或配额。
+
+下面两份手工核验过的 SVG 保留作为历史对照，不删除：
 
 | 文件 | Figma Frame | 状态 |
 |---|---|---|
@@ -14,6 +15,68 @@
 
 导入后保持 `DESIGN FIXTURE / 非生产数据` 标识；示例数字不连接运行时 API 或数据库，也不代表
 `pit_verified` 或模型科学有效。
+
+## 2026-08-15 REST API 完整资产捕获
+
+### 复现方式
+
+file key：`mrt216q7X7NGqFhRjwQS3f`
+
+需要一个 Figma Personal Access Token，scope 仅需 `File content: read`
+（Figma → Settings → Security → Personal access tokens）。Token 不入库、不写入任何提交文件。
+
+```bash
+# 1. 结构化节点上下文（尺寸、间距、layoutMode、字号、字重、颜色、图层命名）
+curl -H "X-Figma-Token: $TOKEN" \
+  "https://api.figma.com/v1/files/mrt216q7X7NGqFhRjwQS3f/nodes?ids=$IDS"
+
+# 2. 精确 SVG 导出
+curl -H "X-Figma-Token: $TOKEN" \
+  "https://api.figma.com/v1/images/mrt216q7X7NGqFhRjwQS3f?ids=$IDS&format=svg\
+&svg_include_id=true&svg_outline_text=false&svg_simplify_stroke=true"
+```
+
+**`svg_outline_text=false` 是必需参数。** 默认导出会把所有文字转成矢量路径：单页约 1.7 MB
+（17 页共 33 MB），且文字不可读、不可搜索、无法与实现逐条对照，对开发没有参考价值。
+保留 `<text>` 后单页 40–88 KB，17 页共 1.0 MB，每页含 91–221 个可读文字节点。
+
+`svg_include_id=true` 保留图层 id，可与 `figma-node-summary.json` 交叉对照。
+
+### 本目录资产
+
+| 文件 | node id | 1440 尺寸 | 对应轨道 |
+|---|---|---|---|
+| `foundations-product-map.svg` | `3:7` | 1440×2231 | PUI-00 |
+| `desk-daily-workstation.svg` | `3:398` | 1440×1238 | PUI-01 |
+| `research-universe-screen.svg` | `3:726` | 1440×1460 | PUI-02 |
+| `security-overview-600519.svg` | `3:1248` | 1440×1529 | PUI-03（旧版对照） |
+| `product-blueprint-31-pages.svg` | `3:1569` | 1440×1200 | PUI-00 |
+| `factors-alpha-model.svg` | `7:5` | 1440×1200 | PUI-04 |
+| `portfolios-construction.svg` | `7:303` | 1440×1200 | PUI-05 |
+| `portfolios-realistic-backtest.svg` | `7:712` | 1440×1367 | PUI-05 |
+| `portfolios-risk-scenarios.svg` | `7:1060` | 1440×1271 | PUI-05 |
+| `portfolios-attribution.svg` | `7:1348` | 1440×1300 | PUI-05 |
+| `10-events-intelligence.svg` | `9:2` | 1440×1200 | PUI-07 |
+| `11-timing-lab.svg` | `9:238` | 1440×1200 | PUI-06 |
+| `12-timing-shadow-monitor.svg` | `9:431` | 1440×1200 | PUI-06 |
+| `13-data-quality-lineage.svg` | `9:661` | 1440×1200 | PUI-04 |
+| `14-approvals-reviewer-queue.svg` | `9:883` | 1440×1200 | PUI-03 |
+| `security-investmentview.svg` | `15:2` | 1440×1200 | PUI-03 |
+| `security-overview-600519-fused-v2.svg` | `24:400` | 1440×1900 | PUI-03 |
+
+`figma-node-summary.json`：全部 17 个 Frame 的结构化摘要（层级至 4 层、尺寸、`layoutMode`、
+`itemSpacing`、文字内容、字号、字重、字体族）。原始 5 MB 全量节点树不入库，可按上述命令重新取得。
+
+另有 `9:1114` `15-golden-path-state-machine`（6400×1700），为状态机参考图而非页面，未导出。
+
+### 边界与限制
+
+- 全部 17 个 Frame **均为 1440 宽**。320/768/1024 **没有**独立 Figma Frame，三档仍只有文档级
+  响应式合同，不是已通过的视觉证据；
+- 31 页蓝图为全部页面提供信息架构，但不是每页都有独立高保真 Frame；
+- SVG 中的一切数字、公司名、代码、时间和哈希均为 **DESIGN FIXTURE**，严禁进入开发或生产运行时；
+- 本目录资产是**视觉真源**，不是需求真源。冲突时仍按 `AGENTS.md` → `docs/07` → Accepted ADR →
+  `docs/18` → 精确 Figma node 的顺序裁决。
 
 ## 2026-08-13 Chrome/Figma 验收
 

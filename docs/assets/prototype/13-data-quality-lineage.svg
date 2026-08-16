@@ -1,0 +1,224 @@
+<svg width="1440" height="1200" viewBox="0 0 1440 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="13-data-quality-lineage" clip-path="url(#clip0_9_661)">
+<path id="Vector" d="M1440 0H0V1200H1440V0Z" fill="#F3F5F7"/>
+<path id="Vector_2" d="M224 0H0V1200H224V0Z" fill="#18202A"/>
+<path id="Vector_3" d="M1440 0H224V64H1440V0Z" fill="white"/>
+<path id="Vector_4" d="M224 64H1440" stroke="#C8CDD4"/>
+<path id="Vector_5" d="M46 18H18C16.8954 18 16 18.8954 16 20V48C16 49.1046 16.8954 50 18 50H46C47.1046 50 48 49.1046 48 48V20C48 18.8954 47.1046 18 46 18Z" fill="#2F5EA8"/>
+<text id="FQ" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="23" y="39.5909">FQ</tspan></text>
+<text id="Fundamental Quant" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="60" y="29.7273">Fundamental Quant</tspan></text>
+<text id="&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#233;&#135;&#143;&#229;&#140;&#150;&#231;&#160;&#148;&#231;&#169;&#182;&#229;&#185;&#179;&#229;&#143;&#176;" fill="#9DA8B6" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="60" y="46.6364">&#x57fa;&#x672c;&#x9762;&#x91cf;&#x5316;&#x7814;&#x7a76;&#x5e73;&#x53f0;</tspan></text>
+<text id="01 &#228;&#187;&#138;&#230;&#151;&#165;&#229;&#183;&#165;&#228;&#189;&#156;&#229;&#143;&#176;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="129.591">01 &#x4eca;&#x65e5;&#x5de5;&#x4f5c;&#x53f0;</tspan></text>
+<text id="02 &#231;&#160;&#148;&#231;&#169;&#182;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="177.591">02 &#x7814;&#x7a76;</tspan></text>
+<text id="03 &#229;&#155;&#160;&#229;&#173;&#144;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="225.591">03 &#x56e0;&#x5b50;</tspan></text>
+<text id="04 &#231;&#187;&#132;&#229;&#144;&#136;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="273.591">04 &#x7ec4;&#x5408;</tspan></text>
+<text id="05 &#231;&#155;&#145;&#230;&#142;&#167;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="321.591">05 &#x76d1;&#x63a7;</tspan></text>
+<path id="Vector_6" d="M210 344H14C12.8954 344 12 344.895 12 346V382C12 383.105 12.8954 384 14 384H210C211.105 384 212 383.105 212 382V346C212 344.895 211.105 344 210 344Z" fill="#273B58"/>
+<path id="Vector_7" d="M16 344H12V384H16V344Z" fill="#6F9BD8"/>
+<text id="06 &#230;&#149;&#176;&#230;&#141;&#174;&#228;&#184;&#142;&#231;&#174;&#161;&#231;&#144;&#134;" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="369.591">06 &#x6570;&#x636e;&#x4e0e;&#x7ba1;&#x7406;</tspan></text>
+<text id="RESEARCH LOOP" fill="#718095" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="24" y="424.636">RESEARCH LOOP</tspan></text>
+<text id="&#229;&#143;&#145;&#231;&#142;&#176; &#226;&#134;&#146; &#231;&#160;&#148;&#231;&#169;&#182; &#226;&#134;&#146; View" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="24" y="451.5">&#x53d1;&#x73b0; &#x2192; &#x7814;&#x7a76; &#x2192; View</tspan></text>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136; &#226;&#134;&#146; &#229;&#155;&#158;&#230;&#181;&#139; &#226;&#134;&#146; Shadow" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="24" y="473.5">&#x7ec4;&#x5408; &#x2192; &#x56de;&#x6d4b; &#x2192; Shadow</tspan></text>
+<path id="Vector_8" d="M200 1016H24V1136H200V1016Z" stroke="#3A4654"/>
+<text id="PROTOTYPE ONLY" fill="#6F9BD8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1041.64">PROTOTYPE ONLY</tspan></text>
+<text id="DESIGN FIXTURE" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1063.64">DESIGN FIXTURE</tspan></text>
+<text id="&#233;&#157;&#158;&#231;&#148;&#159;&#228;&#186;&#167;&#230;&#149;&#176;&#230;&#141;&#174;" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1083.64">&#x975e;&#x751f;&#x4ea7;&#x6570;&#x636e;</tspan></text>
+<text id="&#228;&#184;&#141;&#228;&#187;&#163;&#232;&#161;&#168; PIT / &#231;&#167;&#145;&#229;&#173;&#166;&#230;&#156;&#137;&#230;&#149;&#136;" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1103.64">&#x4e0d;&#x4ee3;&#x8868; PIT / &#x79d1;&#x5b66;&#x6709;&#x6548;</tspan></text>
+<path id="Vector_9" d="M626 16H246V48H626V16Z" fill="#F7F8FA" stroke="#C8CDD4"/>
+<text id="&#230;&#144;&#156;&#231;&#180;&#162;&#232;&#175;&#129;&#229;&#136;&#184;&#227;&#128;&#129;&#229;&#133;&#172;&#229;&#143;&#184;&#227;&#128;&#129;Case&#227;&#128;&#129;Artifact&#226;&#128;&#166;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="262" y="36.5">&#x641c;&#x7d22;&#x8bc1;&#x5238;&#x3001;&#x516c;&#x53f8;&#x3001;Case&#x3001;Artifact&#x2026;</tspan></text>
+<text id="RESEARCH TIME" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="656" y="25.7727">RESEARCH TIME</tspan></text>
+<text id="2026-08-13 15:30 CST" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="656" y="42.5">2026-08-13 15:30 CST</tspan></text>
+<text id="DATA MODE" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="814" y="25.7727">DATA MODE</tspan></text>
+<text id="CURRENT RESEARCH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="814" y="42.5">CURRENT RESEARCH</tspan></text>
+<text id="DEPLOYMENT" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="970" y="25.7727">DEPLOYMENT</tspan></text>
+<text id="RESEARCH" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="970" y="42.5">RESEARCH</tspan></text>
+<text id="UNIVERSE" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="1098" y="25.7727">UNIVERSE</tspan></text>
+<text id="CSI 800" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1098" y="42.5">CSI 800</tspan></text>
+<path id="Vector_10" d="M1414 16H1302V42H1414V16Z" fill="#FFF9E9" stroke="#9A6A16"/>
+<text id="DESIGN FIXTURE_2" fill="#77510F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="1312" y="33.7727">DESIGN FIXTURE</tspan></text>
+<path id="Vector_11" d="M1440 64H224V128H1440V64Z" fill="white"/>
+<path id="Vector_12" d="M224 128H1440" stroke="#C8CDD4"/>
+<text id="Catalog" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="252" y="105.727">Catalog</tspan></text>
+<text id="Quality" fill="#244C8A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="382" y="105.727">Quality</tspan></text>
+<path id="Vector_13" d="M486 117H376V120H486V117Z" fill="#2F5EA8"/>
+<text id="Lineage" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="512" y="105.727">Lineage</tspan></text>
+<text id="Jobs" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="642" y="105.727">Jobs</tspan></text>
+<text id="Entitlements" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="772" y="105.727">Entitlements</tspan></text>
+<text id="Users" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="902" y="105.727">Users</tspan></text>
+<text id="Agents" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="1032" y="105.727">Agents</tspan></text>
+<text id="Approvals" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="1162" y="105.727">Approvals</tspan></text>
+<text id="SYSTEM / P2-P3 &#194;&#183; DATA TRUST" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="246" y="157.636">SYSTEM / P2-P3 &#xb7; DATA TRUST</tspan></text>
+<text id="Data Quality &#38; Lineage" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="25" font-weight="bold" letter-spacing="0em"><tspan x="246" y="186.091">Data Quality &#38; Lineage</tspan></text>
+<text id="&#228;&#187;&#142;&#233;&#161;&#181;&#233;&#157;&#162;&#230;&#149;&#176;&#229;&#173;&#151;&#229;&#155;&#158;&#230;&#186;&#175;&#229;&#136;&#176;&#229;&#133;&#172;&#229;&#188;&#143;&#227;&#128;&#129;&#232;&#191;&#144;&#232;&#161;&#140;&#227;&#128;&#129;&#230;&#149;&#176;&#230;&#141;&#174;&#231;&#137;&#136;&#230;&#156;&#172;&#229;&#146;&#140;&#229;&#142;&#159;&#229;&#167;&#139;&#232;&#175;&#129;&#230;&#141;&#174;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1145" y="175.5">&#x4ece;&#x9875;&#x9762;&#x6570;&#x5b57;&#x56de;&#x6eaf;&#x5230;&#x516c;&#x5f0f;&#x3001;&#x8fd0;&#x884c;&#x3001;&#x6570;&#x636e;&#x7248;&#x672c;&#x548c;&#x539f;&#x59cb;&#x8bc1;&#x636e;</tspan></text>
+<path id="Vector_14" d="M510 196H246V288H510V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Checks" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="262" y="221.864">Checks</tspan></text>
+<text id="184" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="262" y="253.227">184</tspan></text>
+<text id="13 suites" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="262" y="275.5">13 suites</tspan></text>
+<path id="Vector_15" d="M788 196H524V288H788V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Passed" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="540" y="221.864">Passed</tspan></text>
+<text id="169" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="540" y="253.227">169</tspan></text>
+<text id="92%" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="540" y="275.5">92%</tspan></text>
+<path id="Vector_16" d="M1066 196H802V288H1066V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Warned" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="818" y="221.864">Warned</tspan></text>
+<text id="12" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="818" y="253.227">12</tspan></text>
+<text id="&#228;&#188;&#160;&#230;&#146;&#173;&#229;&#136;&#176; current &#233;&#161;&#181;&#233;&#157;&#162;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="818" y="275.5">&#x4f20;&#x64ad;&#x5230; current &#x9875;&#x9762;</tspan></text>
+<path id="Vector_17" d="M1344 196H1080V288H1344V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Blocked" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1096" y="221.864">Blocked</tspan></text>
+<text id="3" fill="#8E4A57" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="253.227">3</tspan></text>
+<text id="&#231;&#166;&#129;&#230;&#173;&#162; strict &#228;&#184;&#139;&#230;&#184;&#184;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="275.5">&#x7981;&#x6b62; strict &#x4e0b;&#x6e38;</tspan></text>
+<path id="Vector_18" d="M1036 316H246V358H1036V316Z" fill="white" stroke="#C8CDD4"/>
+<text id="&#232;&#180;&#168;&#233;&#135;&#143;&#230;&#138;&#165;&#229;&#145;&#138;&#228;&#184;&#142;&#233;&#152;&#187;&#230;&#150;&#173;&#228;&#188;&#160;&#230;&#146;&#173;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="262" y="342.591">&#x8d28;&#x91cf;&#x62a5;&#x544a;&#x4e0e;&#x963b;&#x65ad;&#x4f20;&#x64ad;</tspan></text>
+<path id="Vector_19" d="M1036 358H246V392H1036V358Z" fill="#F7F8FA" stroke="#C8CDD4"/>
+<text id="Check" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="379.636">Check</tspan></text>
+<text id="Dataset" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="379.636">Dataset</tspan></text>
+<text id="&#232;&#167;&#132;&#229;&#136;&#153;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="379.636">&#x89c4;&#x5219;</tspan></text>
+<text id="&#231;&#187;&#147;&#230;&#158;&#156;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="379.636">&#x7ed3;&#x679c;</tspan></text>
+<text id="&#229;&#189;&#177;&#229;&#147;&#141;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="379.636">&#x5f71;&#x54cd;</tspan></text>
+<text id="&#230;&#138;&#165;&#229;&#145;&#138;&#231;&#137;&#136;&#230;&#156;&#172;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="379.636">&#x62a5;&#x544a;&#x7248;&#x672c;</tspan></text>
+<text id="Run" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="379.636">Run</tspan></text>
+<text id="&#230;&#151;&#182;&#233;&#151;&#180;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="379.636">&#x65f6;&#x95f4;</tspan></text>
+<path id="Vector_20" d="M1036 392H246V431H1036V392Z" fill="white" stroke="#ECEFF3"/>
+<text id="Q-1300" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="416.636">Q-1300</tspan></text>
+<text id="financials" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="416.636">financials</tspan></text>
+<text id="Coverage" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="416.636">Coverage</tspan></text>
+<text id="Passed_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="416.636">Passed</tspan></text>
+<text id="Current warning" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="416.636">Current warning</tspan></text>
+<text id="QR-v1" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="416.636">QR-v1</tspan></text>
+<text id="RUN-1400" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="416.636">RUN-1400</tspan></text>
+<text id="08-13 8:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="416.636">08-13 8:00</tspan></text>
+<path id="Vector_21" d="M1036 431H246V470H1036V431Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="Q-1301" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="455.636">Q-1301</tspan></text>
+<text id="universe" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="455.636">universe</tspan></text>
+<text id="Uniqueness" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="455.636">Uniqueness</tspan></text>
+<text id="Warned_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="455.636">Warned</tspan></text>
+<text id="Current warning_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="455.636">Current warning</tspan></text>
+<text id="QR-v2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="455.636">QR-v2</tspan></text>
+<text id="RUN-1401" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="455.636">RUN-1401</tspan></text>
+<text id="08-13 9:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="455.636">08-13 9:00</tspan></text>
+<path id="Vector_22" d="M1036 470H246V509H1036V470Z" fill="white" stroke="#ECEFF3"/>
+<text id="Q-1302" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="494.636">Q-1302</tspan></text>
+<text id="prices" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="494.636">prices</tspan></text>
+<text id="Time cutoff" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="494.636">Time cutoff</tspan></text>
+<text id="Blocked_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="494.636">Blocked</tspan></text>
+<text id="Strict downstream" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="494.636">Strict downstream</tspan></text>
+<text id="QR-v1_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="494.636">QR-v1</tspan></text>
+<text id="RUN-1402" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="494.636">RUN-1402</tspan></text>
+<text id="08-13 10:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="494.636">08-13 10:00</tspan></text>
+<path id="Vector_23" d="M1036 509H246V548H1036V509Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="Q-1303" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="533.636">Q-1303</tspan></text>
+<text id="actions" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="533.636">actions</tspan></text>
+<text id="Mapping" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="533.636">Mapping</tspan></text>
+<text id="Passed_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="533.636">Passed</tspan></text>
+<text id="Current warning_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="533.636">Current warning</tspan></text>
+<text id="QR-v2_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="533.636">QR-v2</tspan></text>
+<text id="RUN-1403" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="533.636">RUN-1403</tspan></text>
+<text id="08-13 11:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="533.636">08-13 11:00</tspan></text>
+<path id="Vector_24" d="M1036 548H246V587H1036V548Z" fill="white" stroke="#ECEFF3"/>
+<text id="Q-1304" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="572.636">Q-1304</tspan></text>
+<text id="financials_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="572.636">financials</tspan></text>
+<text id="Coverage_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="572.636">Coverage</tspan></text>
+<text id="Warned_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="572.636">Warned</tspan></text>
+<text id="Current warning_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="572.636">Current warning</tspan></text>
+<text id="QR-v1_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="572.636">QR-v1</tspan></text>
+<text id="RUN-1404" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="572.636">RUN-1404</tspan></text>
+<text id="08-13 12:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="572.636">08-13 12:00</tspan></text>
+<path id="Vector_25" d="M1036 587H246V626H1036V587Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="Q-1305" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="611.636">Q-1305</tspan></text>
+<text id="universe_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="611.636">universe</tspan></text>
+<text id="Uniqueness_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="611.636">Uniqueness</tspan></text>
+<text id="Blocked_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="611.636">Blocked</tspan></text>
+<text id="Strict downstream_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="611.636">Strict downstream</tspan></text>
+<text id="QR-v2_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="611.636">QR-v2</tspan></text>
+<text id="RUN-1405" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="611.636">RUN-1405</tspan></text>
+<text id="08-13 13:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="611.636">08-13 13:00</tspan></text>
+<path id="Vector_26" d="M1036 626H246V665H1036V626Z" fill="white" stroke="#ECEFF3"/>
+<text id="Q-1306" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="650.636">Q-1306</tspan></text>
+<text id="prices_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="650.636">prices</tspan></text>
+<text id="Time cutoff_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="650.636">Time cutoff</tspan></text>
+<text id="Passed_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="650.636">Passed</tspan></text>
+<text id="Current warning_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="650.636">Current warning</tspan></text>
+<text id="QR-v1_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="650.636">QR-v1</tspan></text>
+<text id="RUN-1406" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="650.636">RUN-1406</tspan></text>
+<text id="08-13 14:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="650.636">08-13 14:00</tspan></text>
+<path id="Vector_27" d="M1036 665H246V704H1036V665Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="Q-1307" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="689.636">Q-1307</tspan></text>
+<text id="actions_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="689.636">actions</tspan></text>
+<text id="Mapping_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="689.636">Mapping</tspan></text>
+<text id="Warned_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="689.636">Warned</tspan></text>
+<text id="Current warning_6" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="689.636">Current warning</tspan></text>
+<text id="QR-v2_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="689.636">QR-v2</tspan></text>
+<text id="RUN-1407" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="689.636">RUN-1407</tspan></text>
+<text id="08-13 15:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="689.636">08-13 15:00</tspan></text>
+<path id="Vector_28" d="M1036 704H246V743H1036V704Z" fill="white" stroke="#ECEFF3"/>
+<text id="Q-1308" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="728.636">Q-1308</tspan></text>
+<text id="financials_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="728.636">financials</tspan></text>
+<text id="Coverage_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="728.636">Coverage</tspan></text>
+<text id="Blocked_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="728.636">Blocked</tspan></text>
+<text id="Strict downstream_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="728.636">Strict downstream</tspan></text>
+<text id="QR-v1_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="728.636">QR-v1</tspan></text>
+<text id="RUN-1408" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="728.636">RUN-1408</tspan></text>
+<text id="08-13 16:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="728.636">08-13 16:00</tspan></text>
+<path id="Vector_29" d="M1036 743H246V782H1036V743Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="Q-1309" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="767.636">Q-1309</tspan></text>
+<text id="universe_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="338" y="767.636">universe</tspan></text>
+<text id="Uniqueness_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="443" y="767.636">Uniqueness</tspan></text>
+<text id="Passed_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="539" y="767.636">Passed</tspan></text>
+<text id="Current warning_7" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="614" y="767.636">Current warning</tspan></text>
+<text id="QR-v2_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="736" y="767.636">QR-v2</tspan></text>
+<text id="RUN-1409" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="824" y="767.636">RUN-1409</tspan></text>
+<text id="08-13 17:00" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="922" y="767.636">08-13 17:00</tspan></text>
+<path id="Vector_30" d="M1414 316H1052V710H1414V316Z" fill="white" stroke="#C8CDD4"/>
+<text id="Quality / Lineage" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="342.591">Quality / Lineage</tspan></text>
+<path id="Vector_31" d="M1052 358H1414" stroke="#DEE2E7"/>
+<text id="&#233;&#152;&#187;&#230;&#150;&#173;&#228;&#188;&#160;&#230;&#146;&#173;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="383.864">&#x963b;&#x65ad;&#x4f20;&#x64ad;</tspan></text>
+<path id="Vector_32" d="M1396 370H1328C1326.9 370 1326 370.895 1326 372V390C1326 391.105 1326.9 392 1328 392H1396C1397.1 392 1398 391.105 1398 390V372C1398 370.895 1397.1 370 1396 370Z" fill="#FFF3F4" stroke="#BD858B"/>
+<text id="BLOCKER" fill="#8E4A57" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1343.75" y="384.909">BLOCKER</tspan></text>
+<text id="&#228;&#184;&#165;&#233;&#135;&#141;&#233;&#148;&#153;&#232;&#175;&#175;&#233;&#152;&#187;&#230;&#173;&#162; Factor/View/Backtest" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="405.636">&#x4e25;&#x91cd;&#x9519;&#x8bef;&#x963b;&#x6b62; Factor/View/Backtest</tspan></text>
+<path id="Vector_33" d="M1068 426H1398" stroke="#ECEFF3"/>
+<text id="&#232;&#173;&#166;&#229;&#145;&#138;&#228;&#188;&#160;&#230;&#146;&#173;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="465.864">&#x8b66;&#x544a;&#x4f20;&#x64ad;</tspan></text>
+<path id="Vector_34" d="M1396 452H1328C1326.9 452 1326 452.895 1326 454V472C1326 473.105 1326.9 474 1328 474H1396C1397.1 474 1398 473.105 1398 472V454C1398 452.895 1397.1 452 1396 452Z" fill="#FFF9E9" stroke="#C7A96B"/>
+<text id="ATTENTION" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1339.42" y="466.909">ATTENTION</tspan></text>
+<text id="&#229;&#133;&#179;&#233;&#148;&#174;&#230;&#149;&#176;&#229;&#173;&#151;&#230;&#151;&#129;&#229;&#177;&#149;&#231;&#164;&#186; warning &#228;&#184;&#142; evidence" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="487.636">&#x5173;&#x952e;&#x6570;&#x5b57;&#x65c1;&#x5c55;&#x793a; warning &#x4e0e; evidence</tspan></text>
+<path id="Vector_35" d="M1068 508H1398" stroke="#ECEFF3"/>
+<text id="&#229;&#143;&#140;&#230;&#151;&#182;&#233;&#151;&#180;&#232;&#161;&#128;&#231;&#188;&#152;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="547.864">&#x53cc;&#x65f6;&#x95f4;&#x8840;&#x7f18;</tspan></text>
+<path id="Vector_36" d="M1396 534H1328C1326.9 534 1326 534.895 1326 536V554C1326 555.105 1326.9 556 1328 556H1396C1397.1 556 1398 555.105 1398 554V536C1398 534.895 1397.1 534 1396 534Z" fill="#F0FAF5" stroke="#80AD98"/>
+<text id="READY" fill="#287A55" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1348.95" y="548.909">READY</tspan></text>
+<text id="effective/period &#228;&#184;&#142; available_at &#229;&#136;&#134;&#229;&#188;&#128;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="569.636">effective/period &#x4e0e; available_at &#x5206;&#x5f00;</tspan></text>
+<path id="Vector_37" d="M1068 590H1398" stroke="#ECEFF3"/>
+<text id="&#231;&#169;&#186;&#230;&#156;&#159;&#229;&#174;&#136;&#229;&#141;&#171;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="629.864">&#x7a7a;&#x671f;&#x5b88;&#x536b;</tspan></text>
+<path id="Vector_38" d="M1396 616H1328C1326.9 616 1326 616.895 1326 618V636C1326 637.105 1326.9 638 1328 638H1396C1397.1 638 1398 637.105 1398 636V618C1398 616.895 1397.1 616 1396 616Z" fill="#F0FAF5" stroke="#80AD98"/>
+<text id="READY_2" fill="#287A55" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1348.95" y="630.909">READY</tspan></text>
+<text id="&#230;&#156;&#137;&#229;&#142;&#159;&#229;&#167;&#139;&#232;&#161;&#140;&#228;&#189;&#134;&#229;&#133;&#168; unmapped &#228;&#184;&#141;&#230;&#152;&#175;&#229;&#144;&#136;&#230;&#179;&#149;&#231;&#169;&#186;&#230;&#156;&#159;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="651.636">&#x6709;&#x539f;&#x59cb;&#x884c;&#x4f46;&#x5168; unmapped &#x4e0d;&#x662f;&#x5408;&#x6cd5;&#x7a7a;&#x671f;</tspan></text>
+<path id="Vector_39" d="M1068 672H1398" stroke="#ECEFF3"/>
+<path id="Vector_40" d="M1414 726H1052V822H1414V726Z" fill="#FFF9E9" stroke="#C7A96B"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;&#228;&#189;&#191;&#231;&#148;&#168;&#232;&#190;&#185;&#231;&#149;&#140;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="752.5">&#x53ef;&#x4fe1;&#x4f7f;&#x7528;&#x8fb9;&#x754c;</tspan></text>
+<text id="Current source &#231;&#154;&#132; trust ceiling &#228;&#184;&#141;&#232;&#131;&#189;&#230;&#143;&#144;&#229;&#141;&#135;&#239;&#188;&#155;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="777.636">Current source &#x7684; trust ceiling &#x4e0d;&#x80fd;&#x63d0;&#x5347;&#xff1b;</tspan></text>
+<text id="&#229;&#133;&#179;&#233;&#148;&#174; evidence &#230;&#150;&#173;&#233;&#147;&#190;&#229;&#141;&#179; fail closed&#227;&#128;&#130;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="796.636">&#x5173;&#x952e; evidence &#x65ad;&#x94fe;&#x5373; fail closed&#x3002;</tspan></text>
+<path id="Vector_41" d="M460 1062H246V1164H460V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="INPUT &#194;&#183; &#232;&#190;&#147;&#229;&#133;&#165;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="260" y="1085.64">INPUT &#xb7; &#x8f93;&#x5165;</tspan></text>
+<text id="&#232;&#167;&#132;&#229;&#136;&#153;/&#230;&#149;&#176;&#230;&#141;&#174;&#231;&#137;&#136;&#230;&#156;&#172;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="260" y="1109.64">&#x89c4;&#x5219;/&#x6570;&#x636e;&#x7248;&#x672c;</tspan></text>
+<text id="&#229;&#143;&#140;&#230;&#151;&#182;&#233;&#151;&#180;&#228;&#184;&#142; raw hash" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="260" y="1127.64">&#x53cc;&#x65f6;&#x95f4;&#x4e0e; raw hash</tspan></text>
+<path id="Vector_42" d="M684 1062H470V1164H684V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="PROCESS &#194;&#183; &#229;&#164;&#132;&#231;&#144;&#134;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="484" y="1085.64">PROCESS &#xb7; &#x5904;&#x7406;</tspan></text>
+<text id="&#230;&#163;&#128;&#230;&#159;&#165;&#226;&#134;&#146;&#230;&#138;&#165;&#229;&#145;&#138;&#226;&#134;&#146;&#228;&#188;&#160;&#230;&#146;&#173;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="484" y="1109.64">&#x68c0;&#x67e5;&#x2192;&#x62a5;&#x544a;&#x2192;&#x4f20;&#x64ad;</tspan></text>
+<text id="&#232;&#161;&#128;&#231;&#188;&#152;&#232;&#183;&#175;&#229;&#190;&#132;&#229;&#174;&#161;&#232;&#174;&#161;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="484" y="1127.64">&#x8840;&#x7f18;&#x8def;&#x5f84;&#x5ba1;&#x8ba1;</tspan></text>
+<path id="Vector_43" d="M908 1062H694V1164H908V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="OUTPUT &#194;&#183; &#232;&#190;&#147;&#229;&#135;&#186;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="708" y="1085.64">OUTPUT &#xb7; &#x8f93;&#x51fa;</tspan></text>
+<text id="QualityReport" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="708" y="1109.64">QualityReport</tspan></text>
+<text id="Evidence/Lineage" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="708" y="1127.64">Evidence/Lineage</tspan></text>
+<path id="Vector_44" d="M1132 1062H918V1164H1132V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="ACTION &#194;&#183; &#230;&#147;&#141;&#228;&#189;&#156;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="932" y="1085.64">ACTION &#xb7; &#x64cd;&#x4f5c;</tspan></text>
+<text id="&#232;&#191;&#144;&#232;&#161;&#140;&#230;&#163;&#128;&#230;&#159;&#165;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="932" y="1109.64">&#x8fd0;&#x884c;&#x68c0;&#x67e5;</tspan></text>
+<text id="&#228;&#187;&#142;&#230;&#149;&#176;&#229;&#173;&#151;&#233;&#146;&#187;&#229;&#143;&#150;&#232;&#175;&#129;&#230;&#141;&#174;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="932" y="1127.64">&#x4ece;&#x6570;&#x5b57;&#x94bb;&#x53d6;&#x8bc1;&#x636e;</tspan></text>
+<path id="Vector_45" d="M1356 1062H1142V1164H1356V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="GATE &#194;&#183; &#233;&#151;&#168;&#231;&#166;&#129;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="1156" y="1085.64">GATE &#xb7; &#x95e8;&#x7981;</tspan></text>
+<text id="&#229;&#133;&#168; unmapped &#233;&#157;&#158;&#231;&#169;&#186;&#230;&#156;&#159;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1156" y="1109.64">&#x5168; unmapped &#x975e;&#x7a7a;&#x671f;</tspan></text>
+<text id="&#230;&#150;&#173;&#233;&#147;&#190; fail closed" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1156" y="1127.64">&#x65ad;&#x94fe; fail closed</tspan></text>
+<text id="Prototype Notes &#194;&#183; P2/P3 &#230;&#149;&#176;&#230;&#141;&#174;&#229;&#143;&#175;&#228;&#191;&#161;&#229;&#159;&#186;&#231;&#161;&#128; &#194;&#183; &#230;&#181;&#139;&#232;&#175;&#149;&#233;&#128;&#154;&#232;&#191;&#135;&#228;&#184;&#141;&#231;&#173;&#137;&#228;&#186;&#142;&#230;&#168;&#161;&#229;&#158;&#139;&#231;&#167;&#145;&#229;&#173;&#166;&#230;&#156;&#137;&#230;&#149;&#136;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="246" y="1187.77">Prototype Notes &#xb7; P2/P3 &#x6570;&#x636e;&#x53ef;&#x4fe1;&#x57fa;&#x7840; &#xb7; &#x6d4b;&#x8bd5;&#x901a;&#x8fc7;&#x4e0d;&#x7b49;&#x4e8e;&#x6a21;&#x578b;&#x79d1;&#x5b66;&#x6709;&#x6548;</tspan></text>
+</g>
+<defs>
+<clipPath id="clip0_9_661">
+<rect width="1440" height="1200" fill="white"/>
+</clipPath>
+</defs>
+</svg>

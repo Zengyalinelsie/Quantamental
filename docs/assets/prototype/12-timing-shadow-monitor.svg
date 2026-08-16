@@ -1,0 +1,232 @@
+<svg width="1440" height="1200" viewBox="0 0 1440 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="12-timing-shadow-monitor" clip-path="url(#clip0_9_431)">
+<path id="Vector" d="M1440 0H0V1200H1440V0Z" fill="#F3F5F7"/>
+<path id="Vector_2" d="M224 0H0V1200H224V0Z" fill="#18202A"/>
+<path id="Vector_3" d="M1440 0H224V64H1440V0Z" fill="white"/>
+<path id="Vector_4" d="M224 64H1440" stroke="#C8CDD4"/>
+<path id="Vector_5" d="M46 18H18C16.8954 18 16 18.8954 16 20V48C16 49.1046 16.8954 50 18 50H46C47.1046 50 48 49.1046 48 48V20C48 18.8954 47.1046 18 46 18Z" fill="#2F5EA8"/>
+<text id="FQ" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="23" y="39.5909">FQ</tspan></text>
+<text id="Fundamental Quant" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="60" y="29.7273">Fundamental Quant</tspan></text>
+<text id="&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#233;&#135;&#143;&#229;&#140;&#150;&#231;&#160;&#148;&#231;&#169;&#182;&#229;&#185;&#179;&#229;&#143;&#176;" fill="#9DA8B6" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="60" y="46.6364">&#x57fa;&#x672c;&#x9762;&#x91cf;&#x5316;&#x7814;&#x7a76;&#x5e73;&#x53f0;</tspan></text>
+<text id="01 &#228;&#187;&#138;&#230;&#151;&#165;&#229;&#183;&#165;&#228;&#189;&#156;&#229;&#143;&#176;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="129.591">01 &#x4eca;&#x65e5;&#x5de5;&#x4f5c;&#x53f0;</tspan></text>
+<text id="02 &#231;&#160;&#148;&#231;&#169;&#182;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="177.591">02 &#x7814;&#x7a76;</tspan></text>
+<text id="03 &#229;&#155;&#160;&#229;&#173;&#144;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="225.591">03 &#x56e0;&#x5b50;</tspan></text>
+<text id="04 &#231;&#187;&#132;&#229;&#144;&#136;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="273.591">04 &#x7ec4;&#x5408;</tspan></text>
+<path id="Vector_6" d="M210 296H14C12.8954 296 12 296.895 12 298V334C12 335.105 12.8954 336 14 336H210C211.105 336 212 335.105 212 334V298C212 296.895 211.105 296 210 296Z" fill="#273B58"/>
+<path id="Vector_7" d="M16 296H12V336H16V296Z" fill="#6F9BD8"/>
+<text id="05 &#231;&#155;&#145;&#230;&#142;&#167;" fill="white" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="321.591">05 &#x76d1;&#x63a7;</tspan></text>
+<text id="06 &#230;&#149;&#176;&#230;&#141;&#174;&#228;&#184;&#142;&#231;&#174;&#161;&#231;&#144;&#134;" fill="#CBD2DB" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" letter-spacing="0em"><tspan x="42" y="369.591">06 &#x6570;&#x636e;&#x4e0e;&#x7ba1;&#x7406;</tspan></text>
+<text id="RESEARCH LOOP" fill="#718095" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="24" y="424.636">RESEARCH LOOP</tspan></text>
+<text id="&#229;&#143;&#145;&#231;&#142;&#176; &#226;&#134;&#146; &#231;&#160;&#148;&#231;&#169;&#182; &#226;&#134;&#146; View" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="24" y="451.5">&#x53d1;&#x73b0; &#x2192; &#x7814;&#x7a76; &#x2192; View</tspan></text>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136; &#226;&#134;&#146; &#229;&#155;&#158;&#230;&#181;&#139; &#226;&#134;&#146; Shadow" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="24" y="473.5">&#x7ec4;&#x5408; &#x2192; &#x56de;&#x6d4b; &#x2192; Shadow</tspan></text>
+<path id="Vector_8" d="M200 1016H24V1136H200V1016Z" stroke="#3A4654"/>
+<text id="PROTOTYPE ONLY" fill="#6F9BD8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1041.64">PROTOTYPE ONLY</tspan></text>
+<text id="DESIGN FIXTURE" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1063.64">DESIGN FIXTURE</tspan></text>
+<text id="&#233;&#157;&#158;&#231;&#148;&#159;&#228;&#186;&#167;&#230;&#149;&#176;&#230;&#141;&#174;" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1083.64">&#x975e;&#x751f;&#x4ea7;&#x6570;&#x636e;</tspan></text>
+<text id="&#228;&#184;&#141;&#228;&#187;&#163;&#232;&#161;&#168; PIT / &#231;&#167;&#145;&#229;&#173;&#166;&#230;&#156;&#137;&#230;&#149;&#136;" fill="#AEB8C5" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="36" y="1103.64">&#x4e0d;&#x4ee3;&#x8868; PIT / &#x79d1;&#x5b66;&#x6709;&#x6548;</tspan></text>
+<path id="Vector_9" d="M626 16H246V48H626V16Z" fill="#F7F8FA" stroke="#C8CDD4"/>
+<text id="&#230;&#144;&#156;&#231;&#180;&#162;&#232;&#175;&#129;&#229;&#136;&#184;&#227;&#128;&#129;&#229;&#133;&#172;&#229;&#143;&#184;&#227;&#128;&#129;Case&#227;&#128;&#129;Artifact&#226;&#128;&#166;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="262" y="36.5">&#x641c;&#x7d22;&#x8bc1;&#x5238;&#x3001;&#x516c;&#x53f8;&#x3001;Case&#x3001;Artifact&#x2026;</tspan></text>
+<text id="RESEARCH TIME" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="656" y="25.7727">RESEARCH TIME</tspan></text>
+<text id="2026-08-13 15:30 CST" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="656" y="42.5">2026-08-13 15:30 CST</tspan></text>
+<text id="DATA MODE" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="814" y="25.7727">DATA MODE</tspan></text>
+<text id="CURRENT RESEARCH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="814" y="42.5">CURRENT RESEARCH</tspan></text>
+<text id="DEPLOYMENT" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="970" y="25.7727">DEPLOYMENT</tspan></text>
+<text id="RESEARCH" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="970" y="42.5">RESEARCH</tspan></text>
+<text id="UNIVERSE" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="1098" y="25.7727">UNIVERSE</tspan></text>
+<text id="CSI 800" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1098" y="42.5">CSI 800</tspan></text>
+<path id="Vector_10" d="M1414 16H1302V42H1414V16Z" fill="#FFF9E9" stroke="#9A6A16"/>
+<text id="DESIGN FIXTURE_2" fill="#77510F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="1312" y="33.7727">DESIGN FIXTURE</tspan></text>
+<path id="Vector_11" d="M1440 64H224V128H1440V64Z" fill="white"/>
+<path id="Vector_12" d="M224 128H1440" stroke="#C8CDD4"/>
+<text id="Signals" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="252" y="105.727">Signals</tspan></text>
+<text id="Portfolios" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="382" y="105.727">Portfolios</tspan></text>
+<text id="Timing" fill="#244C8A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="512" y="105.727">Timing</tspan></text>
+<path id="Vector_13" d="M616 117H506V120H616V117Z" fill="#2F5EA8"/>
+<text id="Drift" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="642" y="105.727">Drift</tspan></text>
+<text id="Rebalance" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="772" y="105.727">Rebalance</tspan></text>
+<text id="Execution" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="902" y="105.727">Execution</tspan></text>
+<text id="Incidents" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="1032" y="105.727">Incidents</tspan></text>
+<text id="MONITORING / P7 &#194;&#183; FORWARD EVIDENCE" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="246" y="157.636">MONITORING / P7 &#xb7; FORWARD EVIDENCE</tspan></text>
+<text id="Timing Shadow Monitor" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="25" font-weight="bold" letter-spacing="0em"><tspan x="246" y="186.091">Timing Shadow Monitor</tspan></text>
+<text id="&#228;&#184;&#141;&#229;&#143;&#175;&#231;&#188;&#150;&#232;&#190;&#145;&#231;&#154;&#132;&#229;&#137;&#141;&#231;&#158;&#187;&#232;&#175;&#129;&#230;&#141;&#174; &#194;&#183; &#231;&#160;&#148;&#231;&#169;&#182;&#231;&#187;&#147;&#230;&#158;&#156;&#228;&#184;&#142; Shadow &#231;&#187;&#147;&#230;&#158;&#156;&#229;&#136;&#134;&#231;&#166;&#187;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1142.75" y="175.5">&#x4e0d;&#x53ef;&#x7f16;&#x8f91;&#x7684;&#x524d;&#x77bb;&#x8bc1;&#x636e; &#xb7; &#x7814;&#x7a76;&#x7ed3;&#x679c;&#x4e0e; Shadow &#x7ed3;&#x679c;&#x5206;&#x79bb;</tspan></text>
+<path id="Vector_14" d="M510 196H246V288H510V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="&#230;&#156;&#128;&#230;&#150;&#176; Forecast" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="262" y="221.864">&#x6700;&#x65b0; Forecast</tspan></text>
+<text id="UNAVAILABLE" fill="#8E4A57" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="262" y="253.227">UNAVAILABLE</tspan></text>
+<text id="&#228;&#184;&#187;&#229;&#138;&#168;&#230;&#168;&#161;&#229;&#158;&#139;&#229;&#176;&#154;&#230;&#156;&#170;&#232;&#142;&#183;&#230;&#137;&#185;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="262" y="275.5">&#x4e3b;&#x52a8;&#x6a21;&#x578b;&#x5c1a;&#x672a;&#x83b7;&#x6279;</tspan></text>
+<path id="Vector_15" d="M788 196H524V288H788V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Shadow &#230;&#160;&#183;&#230;&#156;&#172;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="540" y="221.864">Shadow &#x6837;&#x672c;</tspan></text>
+<text id="0" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="540" y="253.227">0</tspan></text>
+<text id="&#228;&#184;&#141;&#229;&#143;&#175;&#231;&#148;&#168; current &#229;&#155;&#158;&#229;&#161;&#171;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="540" y="275.5">&#x4e0d;&#x53ef;&#x7528; current &#x56de;&#x586b;</tspan></text>
+<path id="Vector_16" d="M1066 196H802V288H1066V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136;&#229;&#189;&#177;&#229;&#147;&#141;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="818" y="221.864">&#x7ec4;&#x5408;&#x5f71;&#x54cd;</tspan></text>
+<text id="0%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="818" y="253.227">0%</tspan></text>
+<text id="Promotion Gate &#233;&#148;&#129;&#229;&#174;&#154;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="818" y="275.5">Promotion Gate &#x9501;&#x5b9a;</tspan></text>
+<path id="Vector_17" d="M1344 196H1080V288H1344V196Z" fill="white" stroke="#C8CDD4"/>
+<text id="Baseline" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1096" y="221.864">Baseline</tspan></text>
+<text id="VOL TARGET" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="24" font-weight="bold" letter-spacing="0em"><tspan x="1096" y="253.227">VOL TARGET</tspan></text>
+<text id="&#232;&#162;&#171;&#229;&#138;&#168;&#229;&#159;&#186;&#231;&#186;&#191;&#229;&#143;&#175;&#231;&#139;&#172;&#231;&#171;&#139;&#232;&#174;&#176;&#229;&#189;&#149;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1096" y="275.5">&#x88ab;&#x52a8;&#x57fa;&#x7ebf;&#x53ef;&#x72ec;&#x7acb;&#x8bb0;&#x5f55;</tspan></text>
+<path id="Vector_18" d="M1036 316H246V358H1036V316Z" fill="white" stroke="#C8CDD4"/>
+<text id="&#229;&#137;&#141;&#231;&#158;&#187; Forecast Ledger &#194;&#183; no edit / no backfill" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="262" y="342.591">&#x524d;&#x77bb; Forecast Ledger &#xb7; no edit / no backfill</tspan></text>
+<path id="Vector_19" d="M1036 358H246V392H1036V358Z" fill="#F7F8FA" stroke="#C8CDD4"/>
+<text id="&#230;&#151;&#165;&#230;&#156;&#159;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="379.636">&#x65e5;&#x671f;</tspan></text>
+<text id="&#230;&#168;&#161;&#229;&#158;&#139;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="379.636">&#x6a21;&#x578b;</tspan></text>
+<text id="&#230;&#156;&#159;&#233;&#153;&#144;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="379.636">&#x671f;&#x9650;</tspan></text>
+<text id="&#228;&#184;&#138;&#230;&#182;&#168;&#230;&#166;&#130;&#231;&#142;&#135;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="379.636">&#x4e0a;&#x6da8;&#x6982;&#x7387;</tspan></text>
+<text id="&#230;&#148;&#182;&#231;&#155;&#138;p50" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="379.636">&#x6536;&#x76ca;p50</tspan></text>
+<text id="Outcome" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="379.636">Outcome</tspan></text>
+<text id="&#230;&#160;&#161;&#229;&#135;&#134;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="379.636">&#x6821;&#x51c6;</tspan></text>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136;&#229;&#189;&#177;&#229;&#147;&#141;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="379.636">&#x7ec4;&#x5408;&#x5f71;&#x54cd;</tspan></text>
+<path id="Vector_20" d="M1036 392H246V431H1036V392Z" fill="white" stroke="#ECEFF3"/>
+<text id="2026-08-12" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="416.636">2026-08-12</tspan></text>
+<text id="ACTIVE-V0" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="416.636">ACTIVE-V0</tspan></text>
+<text id="1D" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="416.636">1D</tspan></text>
+<text id="N/A" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="416.636">N/A</tspan></text>
+<text id="N/A_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="416.636">N/A</tspan></text>
+<text id="&#231;&#173;&#137;&#229;&#190;&#133;" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="416.636">&#x7b49;&#x5f85;</tspan></text>
+<text id="PIT blocked" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="416.636">PIT blocked</tspan></text>
+<text id="0%_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="416.636">0%</tspan></text>
+<path id="Vector_21" d="M1036 431H246V470H1036V431Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="2026-08-11" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="455.636">2026-08-11</tspan></text>
+<text id="VOL-BASELINE" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="455.636">VOL-BASELINE</tspan></text>
+<text id="5D" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="455.636">5D</tspan></text>
+<text id="49%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="455.636">49%</tspan></text>
+<text id="-0.25%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="455.636">-0.25%</tspan></text>
+<text id="&#231;&#173;&#137;&#229;&#190;&#133;_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="455.636">&#x7b49;&#x5f85;</tspan></text>
+<text id="baseline" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="455.636">baseline</tspan></text>
+<text id="0%_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="455.636">0%</tspan></text>
+<path id="Vector_22" d="M1036 470H246V509H1036V470Z" fill="white" stroke="#ECEFF3"/>
+<text id="2026-08-10" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="494.636">2026-08-10</tspan></text>
+<text id="VOL-BASELINE_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="494.636">VOL-BASELINE</tspan></text>
+<text id="20D" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="494.636">20D</tspan></text>
+<text id="50%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="494.636">50%</tspan></text>
+<text id="-0.10%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="494.636">-0.10%</tspan></text>
+<text id="&#231;&#173;&#137;&#229;&#190;&#133;_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="494.636">&#x7b49;&#x5f85;</tspan></text>
+<text id="baseline_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="494.636">baseline</tspan></text>
+<text id="0%_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="494.636">0%</tspan></text>
+<path id="Vector_23" d="M1036 509H246V548H1036V509Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="2026-08-09" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="533.636">2026-08-09</tspan></text>
+<text id="VOL-BASELINE_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="533.636">VOL-BASELINE</tspan></text>
+<text id="60D" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="533.636">60D</tspan></text>
+<text id="51%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="533.636">51%</tspan></text>
+<text id="0.05%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="533.636">0.05%</tspan></text>
+<text id="-0.20%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="533.636">-0.20%</tspan></text>
+<text id="baseline_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="533.636">baseline</tspan></text>
+<text id="0%_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="533.636">0%</tspan></text>
+<path id="Vector_24" d="M1036 548H246V587H1036V548Z" fill="white" stroke="#ECEFF3"/>
+<text id="2026-08-08" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="572.636">2026-08-08</tspan></text>
+<text id="VOL-BASELINE_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="572.636">VOL-BASELINE</tspan></text>
+<text id="1D_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="572.636">1D</tspan></text>
+<text id="52%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="572.636">52%</tspan></text>
+<text id="0.20%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="572.636">0.20%</tspan></text>
+<text id="0.00%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="572.636">0.00%</tspan></text>
+<text id="baseline_4" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="572.636">baseline</tspan></text>
+<text id="0%_6" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="572.636">0%</tspan></text>
+<path id="Vector_25" d="M1036 587H246V626H1036V587Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="2026-08-07" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="611.636">2026-08-07</tspan></text>
+<text id="VOL-BASELINE_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="611.636">VOL-BASELINE</tspan></text>
+<text id="5D_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="611.636">5D</tspan></text>
+<text id="53%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="611.636">53%</tspan></text>
+<text id="0.35%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="611.636">0.35%</tspan></text>
+<text id="0.20%_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="611.636">0.20%</tspan></text>
+<text id="baseline_5" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="611.636">baseline</tspan></text>
+<text id="0%_7" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="611.636">0%</tspan></text>
+<path id="Vector_26" d="M1036 626H246V665H1036V626Z" fill="white" stroke="#ECEFF3"/>
+<text id="2026-08-06" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="650.636">2026-08-06</tspan></text>
+<text id="VOL-BASELINE_6" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="650.636">VOL-BASELINE</tspan></text>
+<text id="20D_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="650.636">20D</tspan></text>
+<text id="54%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="650.636">54%</tspan></text>
+<text id="0.50%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="650.636">0.50%</tspan></text>
+<text id="0.40%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="650.636">0.40%</tspan></text>
+<text id="baseline_6" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="650.636">baseline</tspan></text>
+<text id="0%_8" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="650.636">0%</tspan></text>
+<path id="Vector_27" d="M1036 665H246V704H1036V665Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="2026-08-05" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="689.636">2026-08-05</tspan></text>
+<text id="VOL-BASELINE_7" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="689.636">VOL-BASELINE</tspan></text>
+<text id="60D_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="689.636">60D</tspan></text>
+<text id="55%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="689.636">55%</tspan></text>
+<text id="0.65%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="689.636">0.65%</tspan></text>
+<text id="0.60%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="689.636">0.60%</tspan></text>
+<text id="baseline_7" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="689.636">baseline</tspan></text>
+<text id="0%_9" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="689.636">0%</tspan></text>
+<path id="Vector_28" d="M1036 704H246V743H1036V704Z" fill="white" stroke="#ECEFF3"/>
+<text id="2026-08-04" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="728.636">2026-08-04</tspan></text>
+<text id="VOL-BASELINE_8" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="728.636">VOL-BASELINE</tspan></text>
+<text id="1D_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="728.636">1D</tspan></text>
+<text id="56%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="728.636">56%</tspan></text>
+<text id="0.80%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="728.636">0.80%</tspan></text>
+<text id="0.80%_2" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="728.636">0.80%</tspan></text>
+<text id="baseline_8" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="728.636">baseline</tspan></text>
+<text id="0%_10" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="728.636">0%</tspan></text>
+<path id="Vector_29" d="M1036 743H246V782H1036V743Z" fill="#FBFCFD" stroke="#ECEFF3"/>
+<text id="2026-08-03" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="767.636">2026-08-03</tspan></text>
+<text id="VOL-BASELINE_9" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="767.636">VOL-BASELINE</tspan></text>
+<text id="5D_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="767.636">5D</tspan></text>
+<text id="57%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="767.636">57%</tspan></text>
+<text id="0.95%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="767.636">0.95%</tspan></text>
+<text id="1.00%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="767.636">1.00%</tspan></text>
+<text id="baseline_9" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="767.636">baseline</tspan></text>
+<text id="0%_11" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="767.636">0%</tspan></text>
+<path id="Vector_30" d="M1036 782H246V821H1036V782Z" fill="white" stroke="#ECEFF3"/>
+<text id="2026-08-02" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="256" y="806.636">2026-08-02</tspan></text>
+<text id="VOL-BASELINE_10" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="360" y="806.636">VOL-BASELINE</tspan></text>
+<text id="20D_3" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="478" y="806.636">20D</tspan></text>
+<text id="58%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="543" y="806.636">58%</tspan></text>
+<text id="1.10%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="621" y="806.636">1.10%</tspan></text>
+<text id="1.20%" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="705" y="806.636">1.20%</tspan></text>
+<text id="baseline_10" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="791" y="806.636">baseline</tspan></text>
+<text id="0%_12" fill="#27313E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="901" y="806.636">0%</tspan></text>
+<path id="Vector_31" d="M1414 316H1052V710H1414V316Z" fill="white" stroke="#C8CDD4"/>
+<text id="Shadow &#231;&#138;&#182;&#230;&#128;&#129;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="342.591">Shadow &#x72b6;&#x6001;</tspan></text>
+<path id="Vector_32" d="M1052 358H1414" stroke="#DEE2E7"/>
+<text id="&#228;&#184;&#141;&#229;&#143;&#175;&#229;&#143;&#152;&#232;&#174;&#176;&#229;&#189;&#149;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="383.864">&#x4e0d;&#x53ef;&#x53d8;&#x8bb0;&#x5f55;</tspan></text>
+<path id="Vector_33" d="M1396 370H1328C1326.9 370 1326 370.895 1326 372V390C1326 391.105 1326.9 392 1328 392H1396C1397.1 392 1398 391.105 1398 390V372C1398 370.895 1397.1 370 1396 370Z" fill="#F0FAF5" stroke="#80AD98"/>
+<text id="READY" fill="#287A55" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1348.95" y="384.909">READY</tspan></text>
+<text id="&#230;&#175;&#143;&#229;&#164;&#169;&#229;&#134;&#179;&#231;&#173;&#150;&#230;&#151;&#182;&#231;&#130;&#185;&#229;&#134;&#187;&#231;&#187;&#147;&#239;&#188;&#140;&#231;&#166;&#129;&#230;&#173;&#162;&#228;&#186;&#139;&#229;&#144;&#142;&#228;&#191;&#174;&#230;&#148;&#185;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="405.636">&#x6bcf;&#x5929;&#x51b3;&#x7b56;&#x65f6;&#x70b9;&#x51bb;&#x7ed3;&#xff0c;&#x7981;&#x6b62;&#x4e8b;&#x540e;&#x4fee;&#x6539;</tspan></text>
+<path id="Vector_34" d="M1068 426H1398" stroke="#ECEFF3"/>
+<text id="&#231;&#160;&#148;&#231;&#169;&#182; / &#229;&#137;&#141;&#231;&#158;&#187;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="465.864">&#x7814;&#x7a76; / &#x524d;&#x77bb;</tspan></text>
+<path id="Vector_35" d="M1396 452H1328C1326.9 452 1326 452.895 1326 454V472C1326 473.105 1326.9 474 1328 474H1396C1397.1 474 1398 473.105 1398 472V454C1398 452.895 1397.1 452 1396 452Z" fill="#F0FAF5" stroke="#80AD98"/>
+<text id="READY_2" fill="#287A55" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1348.95" y="466.909">READY</tspan></text>
+<text id="&#229;&#142;&#134;&#229;&#143;&#178; OOS &#228;&#184;&#142; Shadow &#231;&#187;&#147;&#230;&#158;&#156;&#229;&#136;&#134;&#229;&#188;&#128;&#229;&#177;&#149;&#231;&#164;&#186;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="487.636">&#x5386;&#x53f2; OOS &#x4e0e; Shadow &#x7ed3;&#x679c;&#x5206;&#x5f00;&#x5c55;&#x793a;</tspan></text>
+<path id="Vector_36" d="M1068 508H1398" stroke="#ECEFF3"/>
+<text id="&#230;&#153;&#139;&#231;&#186;&#167;&#233;&#151;&#168;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="547.864">&#x664b;&#x7ea7;&#x95e8;</tspan></text>
+<path id="Vector_37" d="M1396 534H1328C1326.9 534 1326 534.895 1326 536V554C1326 555.105 1326.9 556 1328 556H1396C1397.1 556 1398 555.105 1398 554V536C1398 534.895 1397.1 534 1396 534Z" fill="#FFF9E9" stroke="#C7A96B"/>
+<text id="ATTENTION" fill="#8A651A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1339.42" y="548.909">ATTENTION</tspan></text>
+<text id="&#231;&#187;&#159;&#232;&#174;&#161;&#228;&#184;&#142;&#230;&#136;&#144;&#230;&#156;&#172;&#229;&#144;&#142;&#231;&#187;&#143;&#230;&#181;&#142;&#230;&#140;&#135;&#230;&#160;&#135;&#229;&#144;&#140;&#230;&#151;&#182;&#232;&#191;&#135;&#233;&#151;&#168;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="569.636">&#x7edf;&#x8ba1;&#x4e0e;&#x6210;&#x672c;&#x540e;&#x7ecf;&#x6d4e;&#x6307;&#x6807;&#x540c;&#x65f6;&#x8fc7;&#x95e8;</tspan></text>
+<path id="Vector_38" d="M1068 590H1398" stroke="#ECEFF3"/>
+<text id="&#229;&#174;&#137;&#229;&#133;&#168;&#228;&#184;&#138;&#233;&#153;&#144;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="629.864">&#x5b89;&#x5168;&#x4e0a;&#x9650;</tspan></text>
+<path id="Vector_39" d="M1396 616H1328C1326.9 616 1326 616.895 1326 618V636C1326 637.105 1326.9 638 1328 638H1396C1397.1 638 1398 637.105 1398 636V618C1398 616.895 1397.1 616 1396 616Z" fill="#FFF3F4" stroke="#BD858B"/>
+<text id="BLOCKER" fill="#8E4A57" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="8" letter-spacing="0em"><tspan x="1343.75" y="630.909">BLOCKER</tspan></text>
+<text id="&#230;&#156;&#170;&#232;&#142;&#183;&#230;&#137;&#185;&#230;&#151;&#182;&#228;&#187;&#147;&#228;&#189;&#141;&#229;&#189;&#177;&#229;&#147;&#141;&#229;&#167;&#139;&#231;&#187;&#136;&#228;&#184;&#186;0" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="651.636">&#x672a;&#x83b7;&#x6279;&#x65f6;&#x4ed3;&#x4f4d;&#x5f71;&#x54cd;&#x59cb;&#x7ec8;&#x4e3a;0</tspan></text>
+<path id="Vector_40" d="M1068 672H1398" stroke="#ECEFF3"/>
+<path id="Vector_41" d="M1414 726H1052V822H1414V726Z" fill="#FFF9E9" stroke="#C7A96B"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;&#228;&#189;&#191;&#231;&#148;&#168;&#232;&#190;&#185;&#231;&#149;&#140;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1068" y="752.5">&#x53ef;&#x4fe1;&#x4f7f;&#x7528;&#x8fb9;&#x754c;</tspan></text>
+<text id="&#228;&#184;&#141;&#232;&#131;&#189;&#231;&#148;&#168; current &#230;&#149;&#176;&#230;&#141;&#174;&#229;&#155;&#158;&#229;&#161;&#171;&#229;&#142;&#134;&#229;&#143;&#178; Shadow&#239;&#188;&#155;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="777.636">&#x4e0d;&#x80fd;&#x7528; current &#x6570;&#x636e;&#x56de;&#x586b;&#x5386;&#x53f2; Shadow&#xff1b;</tspan></text>
+<text id="Capability Gate &#233;&#128;&#154;&#232;&#191;&#135;&#228;&#185;&#159;&#228;&#184;&#141;&#232;&#135;&#170;&#229;&#138;&#168;&#230;&#153;&#139;&#231;&#186;&#167;&#227;&#128;&#130;" fill="#694B16" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1068" y="796.636">Capability Gate &#x901a;&#x8fc7;&#x4e5f;&#x4e0d;&#x81ea;&#x52a8;&#x664b;&#x7ea7;&#x3002;</tspan></text>
+<path id="Vector_42" d="M460 1062H246V1164H460V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="INPUT &#194;&#183; &#232;&#190;&#147;&#229;&#133;&#165;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="260" y="1085.64">INPUT &#xb7; &#x8f93;&#x5165;</tspan></text>
+<text id="&#230;&#175;&#143;&#230;&#151;&#165; Forecast" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="260" y="1109.64">&#x6bcf;&#x65e5; Forecast</tspan></text>
+<text id="Outcome/Calibration" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="260" y="1127.64">Outcome/Calibration</tspan></text>
+<path id="Vector_43" d="M684 1062H470V1164H684V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="PROCESS &#194;&#183; &#229;&#164;&#132;&#231;&#144;&#134;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="484" y="1085.64">PROCESS &#xb7; &#x5904;&#x7406;</tspan></text>
+<text id="&#229;&#134;&#187;&#231;&#187;&#147;&#226;&#134;&#146;&#229;&#137;&#141;&#231;&#158;&#187;&#231;&#180;&#175;&#232;&#174;&#161;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="484" y="1109.64">&#x51bb;&#x7ed3;&#x2192;&#x524d;&#x77bb;&#x7d2f;&#x8ba1;</tspan></text>
+<text id="&#230;&#188;&#130;&#231;&#167;&#187;/&#230;&#160;&#161;&#229;&#135;&#134;/&#230;&#153;&#139;&#231;&#186;&#167;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="484" y="1127.64">&#x6f02;&#x79fb;/&#x6821;&#x51c6;/&#x664b;&#x7ea7;</tspan></text>
+<path id="Vector_44" d="M908 1062H694V1164H908V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="OUTPUT &#194;&#183; &#232;&#190;&#147;&#229;&#135;&#186;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="708" y="1085.64">OUTPUT &#xb7; &#x8f93;&#x51fa;</tspan></text>
+<text id="immutable ledger" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="708" y="1109.64">immutable ledger</tspan></text>
+<text id="forward evidence" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="708" y="1127.64">forward evidence</tspan></text>
+<path id="Vector_45" d="M1132 1062H918V1164H1132V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="ACTION &#194;&#183; &#230;&#147;&#141;&#228;&#189;&#156;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="932" y="1085.64">ACTION &#xb7; &#x64cd;&#x4f5c;</tspan></text>
+<text id="&#230;&#159;&#165;&#231;&#156;&#139; outcome" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="932" y="1109.64">&#x67e5;&#x770b; outcome</tspan></text>
+<text id="&#229;&#136;&#155;&#229;&#187;&#186; PromotionReview" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="932" y="1127.64">&#x521b;&#x5efa; PromotionReview</tspan></text>
+<path id="Vector_46" d="M1356 1062H1142V1164H1356V1062Z" fill="#EDF3FA" stroke="#BDCAD9"/>
+<text id="GATE &#194;&#183; &#233;&#151;&#168;&#231;&#166;&#129;" fill="#58708E" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" font-weight="bold" letter-spacing="0em"><tspan x="1156" y="1085.64">GATE &#xb7; &#x95e8;&#x7981;</tspan></text>
+<text id="no edit/backfill" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1156" y="1109.64">no edit/backfill</tspan></text>
+<text id="&#229;&#189;&#177;&#229;&#147;&#141;0%&#231;&#155;&#180;&#229;&#136;&#176;&#230;&#153;&#139;&#231;&#186;&#167;" fill="#27394F" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1156" y="1127.64">&#x5f71;&#x54cd;0%&#x76f4;&#x5230;&#x664b;&#x7ea7;</tspan></text>
+<text id="Prototype Notes &#194;&#183; P7 Shadow &#229;&#137;&#141;&#231;&#158;&#187;&#233;&#170;&#140;&#232;&#175;&#129; &#194;&#183; &#230;&#181;&#139;&#232;&#175;&#149;&#233;&#128;&#154;&#232;&#191;&#135;&#228;&#184;&#141;&#231;&#173;&#137;&#228;&#186;&#142;&#230;&#168;&#161;&#229;&#158;&#139;&#231;&#167;&#145;&#229;&#173;&#166;&#230;&#156;&#137;&#230;&#149;&#136;" fill="#727D8B" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="9" letter-spacing="0em"><tspan x="246" y="1187.77">Prototype Notes &#xb7; P7 Shadow &#x524d;&#x77bb;&#x9a8c;&#x8bc1; &#xb7; &#x6d4b;&#x8bd5;&#x901a;&#x8fc7;&#x4e0d;&#x7b49;&#x4e8e;&#x6a21;&#x578b;&#x79d1;&#x5b66;&#x6709;&#x6548;</tspan></text>
+</g>
+<defs>
+<clipPath id="clip0_9_431">
+<rect width="1440" height="1200" fill="white"/>
+</clipPath>
+</defs>
+</svg>

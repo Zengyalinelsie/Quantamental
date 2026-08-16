@@ -1,0 +1,697 @@
+<svg width="1458" height="1460" viewBox="0 0 1458 1460" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="research-universe-screen">
+<rect width="1440" height="1460" fill="#F3F5F7"/>
+<g id="sidebar">
+<mask id="path-1-inside-1_3_726" fill="white">
+<path d="M0 0H248V1460H0V0Z"/>
+</mask>
+<path d="M0 0H248V1460H0V0Z" fill="white"/>
+<path d="M248 0H247V1460H248H249V0H248Z" fill="#DEE2E7" mask="url(#path-1-inside-1_3_726)"/>
+<g id="brand">
+<text id="Fundamental Quant" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="16" font-weight="bold" letter-spacing="0em"><tspan x="16" y="31.3182">Fundamental Quant</tspan></text>
+<text id="A&#232;&#130;&#161;&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#233;&#135;&#143;&#229;&#140;&#150;&#231;&#160;&#148;&#231;&#169;&#182;&#229;&#185;&#179;&#229;&#143;&#176;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="49.5">A&#x80a1;&#x57fa;&#x672c;&#x9762;&#x91cf;&#x5316;&#x7814;&#x7a76;&#x5e73;&#x53f0;</tspan></text>
+</g>
+<line id="Line" x1="16" y1="75.5" x2="232" y2="75.5" stroke="#DEE2E7"/>
+<g id="nav-list">
+<g id="nav-item-0">
+<g id="layout-dashboard">
+<g id="Vector">
+<path d="M34 112H30.6667C30.2985 112 30 112.298 30 112.667V117.333C30 117.702 30.2985 118 30.6667 118H34C34.3682 118 34.6667 117.702 34.6667 117.333V112.667C34.6667 112.298 34.3682 112 34 112Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+<path d="M41.3333 112H38C37.6318 112 37.3333 112.298 37.3333 112.667V114.667C37.3333 115.035 37.6318 115.333 38 115.333H41.3333C41.7015 115.333 42 115.035 42 114.667V112.667C42 112.298 41.7015 112 41.3333 112Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+<path d="M41.3333 118H38C37.6318 118 37.3333 118.298 37.3333 118.667V123.333C37.3333 123.702 37.6318 124 38 124H41.3333C41.7015 124 42 123.702 42 123.333V118.667C42 118.298 41.7015 118 41.3333 118Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+<path d="M34 120.667H30.6667C30.2985 120.667 30 120.965 30 121.333V123.333C30 123.702 30.2985 124 30.6667 124H34C34.3682 124 34.6667 123.702 34.6667 123.333V121.333C34.6667 120.965 34.3682 120.667 34 120.667Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#228;&#187;&#138;&#230;&#151;&#165;&#229;&#183;&#165;&#228;&#189;&#156;&#229;&#143;&#176;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="122.727">&#x4eca;&#x65e5;&#x5de5;&#x4f5c;&#x53f0;</tspan></text>
+</g>
+<g id="nav-item-1">
+<rect x="16" y="140" width="216" height="36" rx="3" fill="#EAF2FC"/>
+<g id="book-open">
+<path id="Vector_2" d="M36 154.667V164M36 154.667C36 153.959 35.719 153.281 35.2189 152.781C34.7187 152.281 34.0404 152 33.3331 152H29.9995C29.8227 152 29.6531 152.07 29.528 152.195C29.403 152.32 29.3328 152.49 29.3328 152.667V161.333C29.3328 161.51 29.403 161.68 29.528 161.805C29.6531 161.93 29.8227 162 29.9995 162H33.9998C34.5303 162 35.039 162.211 35.4141 162.586C35.7892 162.961 36 163.47 36 164M36 154.667C36 153.959 36.2809 153.281 36.7811 152.781C37.2812 152.281 37.9595 152 38.6668 152H42.0004C42.1773 152 42.3469 152.07 42.4719 152.195C42.5969 152.32 42.6672 152.49 42.6672 152.667V161.333C42.6672 161.51 42.5969 161.68 42.4719 161.805C42.3469 161.93 42.1773 162 42.0004 162H38.0001C37.4696 162 36.9609 162.211 36.5858 162.586C36.2107 162.961 36 163.47 36 164" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#231;&#160;&#148;&#231;&#169;&#182;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="56" y="162.727">&#x7814;&#x7a76;</tspan></text>
+</g>
+<g id="nav-item-2">
+<g id="bar-chart">
+<path id="Vector_3" d="M31.3328 204V200M36 204V196M40.6672 204V192" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#229;&#155;&#160;&#229;&#173;&#144;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="202.727">&#x56e0;&#x5b50;</tspan></text>
+</g>
+<g id="nav-item-3">
+<g id="pie-chart" clip-path="url(#clip0_3_726)">
+<path id="Vector_4" d="M42.1406 240.594C41.7165 241.597 41.0531 242.481 40.2084 243.168C39.3637 243.855 38.3635 244.325 37.2952 244.537C36.2269 244.749 35.1231 244.695 34.0801 244.382C33.0372 244.068 32.087 243.504 31.3125 242.738C30.5381 241.973 29.963 241.029 29.6375 239.99C29.312 238.95 29.2461 237.847 29.4454 236.777C29.6448 235.706 30.1034 234.701 30.7812 233.848C31.4589 232.996 32.3352 232.323 33.3333 231.887M42.0004 238.001C42.3684 238.001 42.6704 237.701 42.6337 237.335C42.48 235.805 41.8017 234.374 40.7138 233.287C39.6259 232.199 38.1953 231.521 36.6646 231.368C36.2979 231.331 35.9993 231.633 35.9993 232.001V237.335C35.9993 237.511 36.0695 237.681 36.1945 237.806C36.3196 237.931 36.4892 238.001 36.666 238.001L42.0004 238.001Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#231;&#187;&#132;&#229;&#144;&#136;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="242.727">&#x7ec4;&#x5408;</tspan></text>
+</g>
+<g id="nav-item-4">
+<g id="activity" clip-path="url(#clip1_3_726)">
+<path id="Vector_5" d="M42.6672 278H41.0137C40.7223 277.999 40.4388 278.094 40.2064 278.27C39.974 278.446 39.8056 278.693 39.7269 278.973L38.1601 284.547C38.15 284.582 38.129 284.612 38.1001 284.634C38.0713 284.656 38.0362 284.667 38.0001 284.667C37.9641 284.667 37.929 284.656 37.9001 284.634C37.8713 284.612 37.8502 284.582 37.8401 284.547L34.1598 271.453C34.1497 271.418 34.1287 271.388 34.0998 271.366C34.071 271.345 34.0359 271.333 33.9998 271.333C33.9637 271.333 33.9286 271.345 33.8998 271.366C33.8709 271.388 33.8499 271.418 33.8398 271.453L32.273 277.027C32.1946 277.306 32.0272 277.552 31.7962 277.728C31.5652 277.904 31.2831 277.999 30.9929 278H29.3328" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#231;&#155;&#145;&#230;&#142;&#167;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="282.727">&#x76d1;&#x63a7;</tspan></text>
+</g>
+<g id="nav-item-5">
+<g id="settings">
+<path id="Vector_6" d="M34.447 312.758C34.4838 312.372 34.6633 312.013 34.9504 311.751C35.2376 311.49 35.6119 311.346 36 311.346C36.3882 311.346 36.7625 311.49 37.0496 311.751C37.3368 312.013 37.5163 312.372 37.553 312.758C37.5751 313.008 37.657 313.248 37.7918 313.46C37.9266 313.671 38.1103 313.847 38.3274 313.972C38.5444 314.097 38.7885 314.168 39.0388 314.179C39.2892 314.19 39.5385 314.14 39.7657 314.035C40.1185 313.874 40.5182 313.851 40.887 313.97C41.2559 314.088 41.5676 314.339 41.7614 314.675C41.9552 315.01 42.0172 315.406 41.9355 315.784C41.8537 316.163 41.634 316.498 41.319 316.723C41.114 316.867 40.9466 317.058 40.831 317.281C40.7154 317.503 40.6551 317.75 40.6551 318C40.6551 318.251 40.7154 318.498 40.831 318.72C40.9466 318.942 41.114 319.133 41.319 319.277C41.634 319.503 41.8537 319.838 41.9355 320.216C42.0172 320.595 41.9552 320.99 41.7614 321.326C41.5676 321.661 41.2559 321.913 40.887 322.031C40.5182 322.149 40.1185 322.126 39.7657 321.966C39.5385 321.86 39.2892 321.811 39.0388 321.822C38.7885 321.832 38.5444 321.904 38.3274 322.029C38.1103 322.154 37.9266 322.33 37.7918 322.541C37.657 322.752 37.5751 322.993 37.553 323.243C37.5163 323.629 37.3368 323.988 37.0496 324.249C36.7625 324.51 36.3882 324.655 36 324.655C35.6119 324.655 35.2376 324.51 34.9504 324.249C34.6633 323.988 34.4838 323.629 34.447 323.243C34.425 322.993 34.3431 322.752 34.2083 322.541C34.0735 322.329 33.8897 322.154 33.6725 322.028C33.4554 321.903 33.2112 321.832 32.9608 321.821C32.7103 321.81 32.4609 321.86 32.2337 321.966C31.881 322.126 31.4813 322.149 31.1124 322.031C30.7435 321.913 30.4318 321.661 30.238 321.326C30.0442 320.99 29.9822 320.595 30.064 320.216C30.1457 319.838 30.3654 319.503 30.6804 319.277C30.8855 319.133 31.0529 318.942 31.1684 318.72C31.284 318.498 31.3444 318.251 31.3444 318C31.3444 317.75 31.284 317.503 31.1684 317.281C31.0529 317.058 30.8855 316.867 30.6804 316.723C30.3659 316.498 30.1465 316.163 30.065 315.785C29.9834 315.406 30.0455 315.011 30.239 314.676C30.4326 314.341 30.7439 314.089 31.1124 313.971C31.481 313.852 31.8804 313.875 32.233 314.035C32.4602 314.14 32.7095 314.19 32.9599 314.179C33.2103 314.168 33.4543 314.097 33.6714 313.972C33.8885 313.847 34.0722 313.671 34.207 313.46C34.3417 313.248 34.4236 313.008 34.4457 312.758M37.9995 318.001C37.9995 319.105 37.1041 320.001 35.9995 320.001C34.8949 320.001 33.9995 319.105 33.9995 318.001C33.9995 316.896 34.8949 316.001 35.9995 316.001C37.1041 316.001 37.9995 316.896 37.9995 318.001Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#230;&#149;&#176;&#230;&#141;&#174;&#228;&#184;&#142;&#231;&#174;&#161;&#231;&#144;&#134;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="56" y="322.727">&#x6570;&#x636e;&#x4e0e;&#x7ba1;&#x7406;</tspan></text>
+</g>
+</g>
+<g id="sidebar-footer">
+<text id="SPEC V2.4.0" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="1424.5">SPEC V2.4.0</tspan></text>
+<text id="Fund Quant Lab &#194;&#169; 2026" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="16" y="1441.5">Fund Quant Lab &#xa9; 2026</tspan></text>
+</g>
+</g>
+<g id="main-content">
+<g id="topbar">
+<mask id="path-26-inside-2_3_726" fill="white">
+<path d="M248 0H1440V64H248V0Z"/>
+</mask>
+<path d="M248 0H1440V64H248V0Z" fill="white"/>
+<path d="M1440 64V63H248V64V65H1440V64Z" fill="#DEE2E7" mask="url(#path-26-inside-2_3_726)"/>
+<g id="topbar-left">
+<g id="search-input">
+<rect x="272.5" y="18.5" width="239" height="27" rx="2.5" stroke="#C8CDD4"/>
+<g id="search" clip-path="url(#clip2_3_726)">
+<path id="Vector_7" d="M296.25 37.2501L293.718 34.7184M295.083 31.4167C295.083 33.994 292.994 36.0833 290.417 36.0833C287.839 36.0833 285.75 33.994 285.75 31.4167C285.75 28.8393 287.839 26.75 290.417 26.75C292.994 26.75 295.083 28.8393 295.083 31.4167Z" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text id="&#230;&#144;&#156;&#231;&#180;&#162;&#232;&#175;&#129;&#229;&#136;&#184;&#228;&#187;&#163;&#231;&#160;&#129;/&#229;&#144;&#141;&#231;&#167;&#176;..." fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="306" y="36.7273">&#x641c;&#x7d22;&#x8bc1;&#x5238;&#x4ee3;&#x7801;/&#x540d;&#x79f0;...</tspan></text>
+</g>
+<g id="research-time">
+<text id="&#231;&#160;&#148;&#231;&#169;&#182;&#230;&#151;&#182;&#231;&#130;&#185;:" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="528" y="36">&#x7814;&#x7a76;&#x65f6;&#x70b9;:</tspan></text>
+<text id="2024-12-06" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="580" y="36.3636">2024-12-06</tspan></text>
+</g>
+</g>
+<g id="topbar-right">
+<g id="data-mode-toggle">
+<rect x="651" y="19.5" width="267" height="25" rx="3" fill="#F3F5F7"/>
+<g id="mode-current">
+<rect x="653" y="21.5" width="135" height="21" rx="3" fill="white"/>
+<text id="CURRENT RESEARCH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="663" y="36">CURRENT RESEARCH</tspan></text>
+</g>
+<g id="mode-historical">
+<text id="STRICT HISTORICAL" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="798" y="36">STRICT HISTORICAL</tspan></text>
+</g>
+</g>
+<g id="stage-selector">
+<rect x="934.5" y="20" width="137" height="24" rx="2.5" fill="white"/>
+<rect x="934.5" y="20" width="137" height="24" rx="2.5" stroke="#C8CDD4"/>
+<text id="STAGE: RESEARCH" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="944" y="36">STAGE: RESEARCH</tspan></text>
+<g id="chevron-down">
+<path id="Vector_8" d="M1054.5 29.25L1057 31.75L1059.5 29.25" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="universe-selector">
+<rect x="1088.5" y="20" width="118" height="24" rx="2.5" fill="white"/>
+<rect x="1088.5" y="20" width="118" height="24" rx="2.5" stroke="#C8CDD4"/>
+<text id="&#232;&#130;&#161;&#231;&#165;&#168;&#230;&#177;&#160;: &#230;&#178;&#170;&#230;&#183;&#177;300" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1098" y="36">&#x80a1;&#x7968;&#x6c60;: &#x6caa;&#x6df1;300</tspan></text>
+<g id="chevron-down_2">
+<path id="Vector_9" d="M1189.5 29.25L1192 31.75L1194.5 29.25" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="env-badge">
+<rect x="1223" y="21.5" width="73" height="21" rx="3" fill="#EAF2FC"/>
+<text id="PROD ENV" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1231" y="36">PROD ENV</tspan></text>
+</g>
+<g id="watermark">
+<rect x="1312.5" y="22" width="145" height="20" rx="2.5" fill="#FCECEE"/>
+<rect x="1312.5" y="22" width="145" height="20" rx="2.5" stroke="#A64045"/>
+<text id="&#229;&#142;&#159;&#229;&#158;&#139;&#231;&#164;&#186;&#228;&#190;&#139;&#230;&#149;&#176;&#230;&#141;&#174; &#194;&#183; &#233;&#157;&#158;&#231;&#148;&#159;&#228;&#186;&#167;&#230;&#149;&#176;&#230;&#141;&#174;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1320" y="36">&#x539f;&#x578b;&#x793a;&#x4f8b;&#x6570;&#x636e; &#xb7; &#x975e;&#x751f;&#x4ea7;&#x6570;&#x636e;</tspan></text>
+</g>
+</g>
+</g>
+<g id="workspace">
+<g id="screen-builder">
+<rect x="272.5" y="88.5" width="319" height="583" rx="2.5" fill="white"/>
+<rect x="272.5" y="88.5" width="319" height="583" rx="2.5" stroke="#DEE2E7"/>
+<g id="builder-title">
+<rect id="Rectangle" x="290" y="107.5" width="3" height="14" rx="1" fill="#2F5EA8"/>
+<text id="Screen &#230;&#158;&#132;&#229;&#187;&#186;&#229;&#153;&#168; / Factor Builder" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="14" font-weight="bold" letter-spacing="0em"><tspan x="301" y="119.591">Screen &#x6784;&#x5efa;&#x5668; / Factor Builder</tspan></text>
+</g>
+<g id="Frame">
+<text id="&#232;&#130;&#161;&#231;&#165;&#168;&#230;&#177;&#160;&#232;&#140;&#131;&#229;&#155;&#180;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="290" y="154.864">&#x80a1;&#x7968;&#x6c60;&#x8303;&#x56f4;</tspan></text>
+<g id="Frame_2">
+<rect x="290.5" y="164.5" width="283" height="31" rx="2.5" stroke="#C8CDD4"/>
+<text id="&#230;&#178;&#170;&#230;&#183;&#177;300 (CSI300)" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" letter-spacing="0em"><tspan x="302" y="184.727">&#x6caa;&#x6df1;300 (CSI300)</tspan></text>
+<g id="chevron-down_3">
+<path id="Vector_10" d="M553 178.5L556 181.5L559 178.5" stroke="#4E5968" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+<g id="Frame_3">
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;&#229;&#164;&#154;&#233;&#128;&#137; (&#231;&#148;&#179;&#228;&#184;&#135;&#228;&#184;&#128;&#231;&#186;&#167;)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="290" y="227.864">&#x884c;&#x4e1a;&#x591a;&#x9009; (&#x7533;&#x4e07;&#x4e00;&#x7ea7;)</tspan></text>
+<g id="Frame_4">
+<rect x="290.5" y="237.5" width="283" height="34" rx="2.5" stroke="#C8CDD4"/>
+<g id="Frame_5">
+<rect x="296" y="243" width="54" height="23" rx="3" fill="#EAF2FC"/>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="304" y="258.864">&#x767d;&#x9152;</tspan></text>
+<g id="x-circle" clip-path="url(#clip3_3_726)">
+<path id="Vector_11" d="M338.25 253.25L335.75 255.75M335.75 253.25L338.25 255.75M341.167 254.5C341.167 256.801 339.301 258.667 337 258.667C334.699 258.667 332.833 256.801 332.833 254.5C332.833 252.199 334.699 250.333 337 250.333C339.301 250.333 341.167 252.199 341.167 254.5Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="Frame_6">
+<rect x="356" y="243" width="54" height="23" rx="3" fill="#EAF2FC"/>
+<text id="&#228;&#191;&#157;&#233;&#153;&#169;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="364" y="258.864">&#x4fdd;&#x9669;</tspan></text>
+<g id="x-circle_2" clip-path="url(#clip4_3_726)">
+<path id="Vector_12" d="M398.25 253.25L395.75 255.75M395.75 253.25L398.25 255.75M401.167 254.5C401.167 256.801 399.301 258.667 397 258.667C394.699 258.667 392.833 256.801 392.833 254.5C392.833 252.199 394.699 250.333 397 250.333C399.301 250.333 401.167 252.199 401.167 254.5Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<g id="Frame_7">
+<rect x="416" y="243" width="54" height="23" rx="3" fill="#EAF2FC"/>
+<text id="&#229;&#174;&#182;&#231;&#148;&#181;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="424" y="258.864">&#x5bb6;&#x7535;</tspan></text>
+<g id="x-circle_3" clip-path="url(#clip5_3_726)">
+<path id="Vector_13" d="M458.25 253.25L455.75 255.75M455.75 253.25L458.25 255.75M461.167 254.5C461.167 256.801 459.301 258.667 457 258.667C454.699 258.667 452.833 256.801 452.833 254.5C452.833 252.199 454.699 250.333 457 250.333C459.301 250.333 461.167 252.199 461.167 254.5Z" stroke="#2F5EA8" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+</g>
+<g id="Frame_8">
+<text id="&#230;&#160;&#184;&#229;&#191;&#131;&#231;&#187;&#180;&#229;&#186;&#166;&#230;&#157;&#131;&#233;&#135;&#141;&#233;&#133;&#141;&#230;&#175;&#148;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="290" y="303.864">&#x6838;&#x5fc3;&#x7ef4;&#x5ea6;&#x6743;&#x91cd;&#x914d;&#x6bd4;</tspan></text>
+<g id="Frame_9">
+<g id="Frame_10">
+<text id="Quality (&#232;&#180;&#168;&#233;&#135;&#143;)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="290" y="329.5">Quality (&#x8d28;&#x91cf;)</tspan></text>
+<text id="40%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="550" y="329.5">40%</tspan></text>
+</g>
+<rect id="Rectangle_2" x="290" y="336" width="284" height="4" rx="2" fill="#DEE2E7"/>
+</g>
+<g id="Frame_11">
+<g id="Frame_12">
+<text id="Valuation (&#228;&#188;&#176;&#229;&#128;&#188;&#233;&#162;&#132;&#230;&#156;&#159;&#229;&#183;&#174;)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="290" y="362.5">Valuation (&#x4f30;&#x503c;&#x9884;&#x671f;&#x5dee;)</tspan></text>
+<text id="30%" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="550" y="362.5">30%</tspan></text>
+</g>
+<rect id="Rectangle_3" x="290" y="369" width="284" height="4" rx="2" fill="#DEE2E7"/>
+</g>
+<g id="Frame_13">
+<g id="Frame_14">
+<text id="Improvement (&#232;&#190;&#185;&#233;&#153;&#133;&#230;&#148;&#185;&#229;&#150;&#132;)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="290" y="395.5">Improvement (&#x8fb9;&#x9645;&#x6539;&#x5584;)</tspan></text>
+<text id="30%_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="550" y="395.5">30%</tspan></text>
+</g>
+<rect id="Rectangle_4" x="290" y="402" width="284" height="4" rx="2" fill="#DEE2E7"/>
+</g>
+</g>
+<g id="Frame_15">
+<text id="&#230;&#181;&#129;&#229;&#138;&#168;&#230;&#128;&#167;&#233;&#151;&#168;&#230;&#167;&#155; (20&#230;&#151;&#165;&#230;&#151;&#165;&#229;&#157;&#135;&#230;&#136;&#144;&#228;&#186;&#164;&#233;&#162;&#157;)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="290" y="437.864">&#x6d41;&#x52a8;&#x6027;&#x95e8;&#x69db; (20&#x65e5;&#x65e5;&#x5747;&#x6210;&#x4ea4;&#x989d;)</tspan></text>
+<g id="Frame_16">
+<text id="&#62; 5000 &#228;&#184;&#135; CNY" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="290" y="457.5">&#62; 5000 &#x4e07; CNY</tspan></text>
+</g>
+<rect id="Rectangle_5" x="290" y="470" width="284" height="4" rx="2" fill="#DEE2E7"/>
+</g>
+<g id="Frame_17">
+<text id="&#230;&#142;&#146;&#233;&#153;&#164;&#231;&#161;&#172;&#230;&#128;&#167;&#230;&#157;&#161;&#228;&#187;&#182;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="290" y="505.864">&#x6392;&#x9664;&#x786c;&#x6027;&#x6761;&#x4ef6;</tspan></text>
+<g id="Frame_18">
+<g id="Frame_19">
+<rect x="290" y="518.5" width="12" height="12" rx="2" fill="#2F5EA8"/>
+<g id="check">
+<path id="Vector_14" d="M298.666 522.5L295 526.166L293.333 524.5" stroke="black" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#230;&#142;&#146;&#233;&#153;&#164; ST / *ST &#232;&#130;&#161;&#231;&#165;&#168;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="310" y="528.864">&#x6392;&#x9664; ST / *ST &#x80a1;&#x7968;</tspan></text>
+</g>
+<g id="Frame_20">
+<g id="Frame_21">
+<rect x="290" y="541.5" width="12" height="12" rx="2" fill="#2F5EA8"/>
+<g id="check_2">
+<path id="Vector_15" d="M298.666 545.5L295 549.166L293.333 547.5" stroke="black" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="&#230;&#142;&#146;&#233;&#153;&#164;&#229;&#129;&#156;&#231;&#137;&#140; / &#229;&#188;&#130;&#229;&#184;&#184;&#230;&#179;&#162;&#229;&#138;&#168;&#230;&#160;&#135;&#231;&#154;&#132;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="310" y="551.864">&#x6392;&#x9664;&#x505c;&#x724c; / &#x5f02;&#x5e38;&#x6ce2;&#x52a8;&#x6807;&#x7684;</tspan></text>
+</g>
+<g id="Frame_22">
+<g id="Frame_23">
+<rect x="290.5" y="565" width="11" height="11" rx="1.5" stroke="#C8CDD4"/>
+</g>
+<text id="&#230;&#142;&#146;&#233;&#153;&#164;&#230;&#172;&#161;&#230;&#150;&#176;&#232;&#130;&#161; (&#228;&#184;&#138;&#229;&#184;&#130; &#60; 1&#229;&#185;&#180;)" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="310" y="574.864">&#x6392;&#x9664;&#x6b21;&#x65b0;&#x80a1; (&#x4e0a;&#x5e02; &#60; 1&#x5e74;)</tspan></text>
+</g>
+</g>
+<line id="Line_2" x1="290" y1="597.5" x2="574" y2="597.5" stroke="#DEE2E7"/>
+<g id="Frame_24">
+<rect x="290" y="618" width="284" height="36" rx="3" fill="#2F5EA8"/>
+<text id="&#232;&#191;&#144;&#232;&#161;&#140; Screen (&#232;&#174;&#161;&#231;&#174;&#151;&#229;&#155;&#160;&#230;&#149;&#176;&#233;&#135;&#141;&#230;&#142;&#146;)" fill="black" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="13" font-weight="bold" letter-spacing="0em"><tspan x="349.5" y="640.727">&#x8fd0;&#x884c; Screen (&#x8ba1;&#x7b97;&#x56e0;&#x6570;&#x91cd;&#x6392;)</tspan></text>
+</g>
+</g>
+<g id="results-panel">
+<g id="version-metadata">
+<rect x="616.5" y="88.5" width="799" height="28" rx="2.5" fill="white"/>
+<rect x="616.5" y="88.5" width="799" height="28" rx="2.5" stroke="#DEE2E7"/>
+<g id="Frame_25">
+<text id="Screen v2.4" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="632" y="106.5">Screen v2.4</tspan></text>
+<text id="Universe v3.1" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="711" y="106.5">Universe v3.1</tspan></text>
+<text id="Model v1.8.2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="796" y="106.5">Model v1.8.2</tspan></text>
+</g>
+<g id="Frame_26">
+<text id="&#229;&#159;&#186;&#230;&#156;&#172;&#233;&#157;&#162;&#229;&#155;&#160;&#229;&#173;&#144;&#230;&#149;&#180;&#228;&#189;&#147;&#232;&#166;&#134;&#231;&#155;&#150;&#231;&#142;&#135;: 96.3%" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1142" y="106.5">&#x57fa;&#x672c;&#x9762;&#x56e0;&#x5b50;&#x6574;&#x4f53;&#x8986;&#x76d6;&#x7387;: 96.3%</tspan></text>
+<text id="&#230;&#151;&#182;&#231;&#130;&#185;&#233;&#152;&#187;&#230;&#150;&#173;&#229;&#155;&#160;&#229;&#173;&#144;: 2 &#231;&#172;&#148;" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1307" y="106.5">&#x65f6;&#x70b9;&#x963b;&#x65ad;&#x56e0;&#x5b50;: 2 &#x7b14;</tspan></text>
+</g>
+</g>
+<g id="table-card">
+<rect x="616.5" y="129.5" width="799" height="1306" rx="2.5" fill="white"/>
+<rect x="616.5" y="129.5" width="799" height="1306" rx="2.5" stroke="#DEE2E7"/>
+<g id="table">
+<g id="th">
+<rect width="776" height="68" transform="translate(628 141)" fill="#F3F5F7"/>
+<text id="&#228;&#187;&#163;&#231;&#160;&#129;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="636" y="179">&#x4ee3;&#x7801;</tspan></text>
+<text id="&#229;&#133;&#172;&#229;&#143;&#184;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="714" y="179">&#x516c;&#x53f8;</tspan></text>
+<text id="&#232;&#161;&#140;&#228;&#184;&#154;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="812" y="179">&#x884c;&#x4e1a;</tspan></text>
+<text id="&#231;&#187;&#188;&#229;&#144;&#136;&#230;&#142;&#146;&#229;&#144;&#141;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="896" y="179">&#x7efc;&#x5408;&#x6392;&#x540d;</tspan></text>
+<text id="&#230;&#142;&#146;&#229;&#144;&#141;&#229;&#143;&#152;&#229;&#140;&#150;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="964" y="179">&#x6392;&#x540d;&#x53d8;&#x5316;</tspan></text>
+<text id="&#232;&#180;&#168;&#233;&#135;&#143;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1044" y="179">&#x8d28;&#x91cf;</tspan></text>
+<text id="&#228;&#188;&#176;&#229;&#128;&#188;&#233;&#162;&#132;&#230;&#156;&#159;&#229;&#183;&#174;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1099" y="179">&#x4f30;&#x503c;&#x9884;&#x671f;&#x5dee;</tspan></text>
+<text id="&#230;&#148;&#185;&#229;&#150;&#132;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1190" y="179">&#x6539;&#x5584;</tspan></text>
+<text id="60&#230;&#151;&#165;&#233;&#162;&#132;&#230;&#156;&#159;&#230;&#148;&#182;&#231;&#155;&#138;&#229;&#140;&#186;&#233;&#151;&#180;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1229.27" y="179">60&#x65e5;&#x9884;&#x671f;&#x6536;&#x76ca;&#x533a;&#x95f4;</tspan></text>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;&#231;&#138;&#182;&#230;&#128;&#129;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1338" y="179">&#x53ef;&#x4fe1;&#x72b6;&#x6001;</tspan></text>
+<text id="&#230;&#149;&#176;&#230;&#141;&#174;&#230;&#136;&#170;&#230;&#173;&#162;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" font-weight="bold" letter-spacing="0em"><tspan x="1385" y="159.5">&#x6570;</tspan><tspan x="1385" y="172.5">&#x636e;</tspan><tspan x="1385" y="185.5">&#x622a;</tspan><tspan x="1385" y="198.5">&#x6b62;</tspan></text>
+</g>
+<g id="row-0">
+<rect width="776" height="81" transform="translate(628 209)" fill="white"/>
+<text id="600519.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="253.864">600519.SH</tspan></text>
+<text id="&#232;&#180;&#181;&#229;&#183;&#158;&#232;&#140;&#133;&#229;&#143;&#176;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="253.864">&#x8d35;&#x5dde;&#x8305;&#x53f0;</tspan></text>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="253.864">&#x767d;&#x9152;</tspan></text>
+<text id="#1" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="926.512" y="253.864">#1</tspan></text>
+<g id="change-cell">
+<text id="--" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="996" y="253.864">--</tspan></text>
+</g>
+<text id="9.8" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1048" y="253.864">9.8</tspan></text>
+<text id="+4.2%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1117.79" y="253.864">+4.2%</tspan></text>
+<text id="9.2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1193.93" y="253.864">9.2</tspan></text>
+<text id="[+8%, +15%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.4" y="253.864">[+8%, +15%]</tspan></text>
+<g id="trust-badge">
+<g id="Frame_27">
+<rect x="1338.5" y="242" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="242" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="253.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="227.5">1</tspan><tspan x="1420.34" y="240.5">2</tspan><tspan x="1421.94" y="253.5">-</tspan><tspan x="1420.12" y="266.5">0</tspan><tspan x="1420.14" y="279.5">6</tspan></text>
+</g>
+<g id="row-1">
+<rect width="776" height="81" transform="translate(628 290)" fill="#F3F5F7"/>
+<text id="000858.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="334.864">000858.SZ</tspan></text>
+<text id="&#228;&#186;&#148;&#231;&#178;&#174;&#230;&#182;&#178;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="334.864">&#x4e94;&#x7cae;&#x6db2;</tspan></text>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;_3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="334.864">&#x767d;&#x9152;</tspan></text>
+<text id="#2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.824" y="334.864">#2</tspan></text>
+<g id="change-cell_2">
+<text id="+1" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="984" y="334.864">+1</tspan></text>
+<g id="arrow-up" clip-path="url(#clip6_3_726)">
+<path id="Vector_16" d="M1006.33 330.5L1004 328.166L1001.67 330.5M1004 328.166V332.834" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="9.2_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.93" y="334.864">9.2</tspan></text>
+<text id="+3.8%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1118.02" y="334.864">+3.8%</tspan></text>
+<text id="8.5" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1193.98" y="334.864">8.5</tspan></text>
+<text id="[+5%, +12%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.55" y="334.864">[+5%, +12%]</tspan></text>
+<g id="trust-badge_2">
+<g id="Frame_28">
+<rect x="1338.5" y="323" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="323" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_2" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="334.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="308.5">1</tspan><tspan x="1420.34" y="321.5">2</tspan><tspan x="1421.94" y="334.5">-</tspan><tspan x="1420.12" y="347.5">0</tspan><tspan x="1420.14" y="360.5">6</tspan></text>
+</g>
+<g id="row-2">
+<rect width="776" height="81" transform="translate(628 371)" fill="#EAF2FC"/>
+<text id="601318.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="415.864">601318.SH</tspan></text>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#229;&#185;&#179;&#229;&#174;&#137;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="415.864">&#x4e2d;&#x56fd;&#x5e73;&#x5b89;</tspan></text>
+<text id="&#228;&#191;&#157;&#233;&#153;&#169;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="415.864">&#x4fdd;&#x9669;</tspan></text>
+<text id="#3" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.461" y="415.864">#3</tspan></text>
+<g id="change-cell_3">
+<text id="-1" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="986" y="415.864">-1</tspan></text>
+<g id="arrow-down" clip-path="url(#clip7_3_726)">
+<path id="Vector_17" d="M1004 409.166V413.834M1001.67 411.5L1004 413.834L1006.33 411.5" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8.9" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.75" y="415.864">8.9</tspan></text>
+<text id="+8.5%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1118.05" y="415.864">+8.5%</tspan></text>
+<text id="7.8" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1195.86" y="415.864">7.8</tspan></text>
+<text id="[+12%, +20%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1234.77" y="415.864">[+12%, +20%]</tspan></text>
+<g id="trust-badge_3">
+<g id="Frame_29">
+<rect x="1338.5" y="404" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="404" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_3" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="415.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-05" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="389.5">1</tspan><tspan x="1420.34" y="402.5">2</tspan><tspan x="1421.94" y="415.5">-</tspan><tspan x="1420.12" y="428.5">0</tspan><tspan x="1420.31" y="441.5">5</tspan></text>
+</g>
+<g id="row-3">
+<rect width="776" height="81" transform="translate(628 452)" fill="#F3F5F7"/>
+<text id="000333.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="496.864">000333.SZ</tspan></text>
+<text id="&#231;&#190;&#142;&#231;&#154;&#132;&#233;&#155;&#134;&#229;&#155;&#162;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="496.864">&#x7f8e;&#x7684;&#x96c6;&#x56e2;</tspan></text>
+<text id="&#229;&#174;&#182;&#231;&#148;&#181;_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="496.864">&#x5bb6;&#x7535;</tspan></text>
+<text id="#4" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.285" y="496.864">#4</tspan></text>
+<g id="change-cell_4">
+<text id="+3" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="982" y="496.864">+3</tspan></text>
+<g id="arrow-up_2" clip-path="url(#clip8_3_726)">
+<path id="Vector_18" d="M1006.33 492.5L1004 490.166L1001.67 492.5M1004 490.166V494.834" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8.7" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1048.55" y="496.864">8.7</tspan></text>
+<text id="-1.2%" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1122.58" y="496.864">-1.2%</tspan></text>
+<text id="8.9_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1193.75" y="496.864">8.9</tspan></text>
+<text id="[+4%, +9%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1241.07" y="496.864">[+4%, +9%]</tspan></text>
+<g id="trust-badge_4">
+<g id="Frame_30">
+<rect x="1338.5" y="485" width="51" height="15" rx="1.5" fill="#FCEAEB"/>
+<rect x="1338.5" y="485" width="51" height="15" rx="1.5" stroke="#7A1C20"/>
+<text id="&#233;&#131;&#168;&#229;&#136;&#134;&#229;&#143;&#175;&#231;&#148;&#168;" fill="#7A1C20" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="496.136">&#x90e8;&#x5206;&#x53ef;&#x7528;</tspan></text>
+</g>
+</g>
+<text id="12-06_3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="470.5">1</tspan><tspan x="1420.34" y="483.5">2</tspan><tspan x="1421.94" y="496.5">-</tspan><tspan x="1420.12" y="509.5">0</tspan><tspan x="1420.14" y="522.5">6</tspan></text>
+</g>
+<g id="row-4">
+<rect width="776" height="81" transform="translate(628 533)" fill="white"/>
+<text id="002714.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="577.864">002714.SZ</tspan></text>
+<text id="&#231;&#137;&#167;&#229;&#142;&#159;&#232;&#130;&#161;&#228;&#187;&#189;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="577.864">&#x7267;&#x539f;&#x80a1;&#x4efd;</tspan></text>
+<text id="&#229;&#133;&#187;&#230;&#174;&#150;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="577.864">&#x517b;&#x6b96;</tspan></text>
+<text id="#5" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.684" y="577.864">#5</tspan></text>
+<g id="change-cell_5">
+<text id="+1_2" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="984" y="577.864">+1</tspan></text>
+<g id="arrow-up_3" clip-path="url(#clip9_3_726)">
+<path id="Vector_19" d="M1006.33 573.5L1004 571.166L1001.67 573.5M1004 571.166V575.834" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="7.8_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1049.86" y="577.864">7.8</tspan></text>
+<text id="+12.4%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1111.79" y="577.864">+12.4%</tspan></text>
+<text id="8" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1204.42" y="577.864">8</tspan></text>
+<text id="[+15%, +30%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1234.41" y="577.864">[+15%, +30%]</tspan></text>
+<g id="trust-badge_5">
+<g id="Frame_31">
+<rect x="1338.5" y="566" width="41" height="15" rx="1.5" fill="#FDF8E2"/>
+<rect x="1338.5" y="566" width="41" height="15" rx="1.5" stroke="#B87A14"/>
+<text id="&#229;&#190;&#133;&#229;&#174;&#161;&#230;&#137;&#185;" fill="#B87A14" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="577.136">&#x5f85;&#x5ba1;&#x6279;</tspan></text>
+</g>
+</g>
+<text id="12-06_4" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="551.5">1</tspan><tspan x="1420.34" y="564.5">2</tspan><tspan x="1421.94" y="577.5">-</tspan><tspan x="1420.12" y="590.5">0</tspan><tspan x="1420.14" y="603.5">6</tspan></text>
+</g>
+<g id="row-5">
+<rect width="776" height="81" transform="translate(628 614)" fill="#F3F5F7"/>
+<text id="600036.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="658.864">600036.SH</tspan></text>
+<text id="&#230;&#139;&#155;&#229;&#149;&#134;&#233;&#147;&#182;&#232;&#161;&#140;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="658.864">&#x62db;&#x5546;&#x94f6;&#x884c;</tspan></text>
+<text id="&#233;&#147;&#182;&#232;&#161;&#140;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="658.864">&#x94f6;&#x884c;</tspan></text>
+<text id="#6" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.496" y="658.864">#6</tspan></text>
+<g id="change-cell_6">
+<text id="-2" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="985" y="658.864">-2</tspan></text>
+<g id="arrow-down_2" clip-path="url(#clip10_3_726)">
+<path id="Vector_20" d="M1004 652.166V656.834M1001.67 654.5L1004 656.834L1006.33 654.5" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8.5_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.98" y="658.864">8.5</tspan></text>
+<text id="+1.0%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1120.07" y="658.864">+1.0%</tspan></text>
+<text id="7.2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1195.79" y="658.864">7.2</tspan></text>
+<text id="[+3%, +7%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1241.73" y="658.864">[+3%, +7%]</tspan></text>
+<g id="trust-badge_6">
+<g id="Frame_32">
+<rect x="1338.5" y="647" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="647" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_4" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="658.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_5" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="632.5">1</tspan><tspan x="1420.34" y="645.5">2</tspan><tspan x="1421.94" y="658.5">-</tspan><tspan x="1420.12" y="671.5">0</tspan><tspan x="1420.14" y="684.5">6</tspan></text>
+</g>
+<g id="row-6">
+<rect width="776" height="81" transform="translate(628 695)" fill="white"/>
+<text id="000568.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="739.864">000568.SZ</tspan></text>
+<text id="&#230;&#179;&#184;&#229;&#183;&#158;&#232;&#128;&#129;&#231;&#170;&#150;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="739.864">&#x6cf8;&#x5dde;&#x8001;&#x7a96;</tspan></text>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;_4" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="739.864">&#x767d;&#x9152;</tspan></text>
+<text id="#7" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="925.234" y="739.864">#7</tspan></text>
+<g id="change-cell_7">
+<text id="+5" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="982" y="739.864">+5</tspan></text>
+<g id="arrow-up_4" clip-path="url(#clip11_3_726)">
+<path id="Vector_21" d="M1006.33 735.5L1004 733.166L1001.67 735.5M1004 733.166V737.834" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8.2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.92" y="739.864">8.2</tspan></text>
+<text id="+2.1%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1121.05" y="739.864">+2.1%</tspan></text>
+<text id="8.1" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1196.66" y="739.864">8.1</tspan></text>
+<text id="[+6%, +14%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.19" y="739.864">[+6%, +14%]</tspan></text>
+<g id="trust-badge_7">
+<g id="Frame_33">
+<rect x="1338.5" y="728" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="728" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_5" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="739.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_6" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="713.5">1</tspan><tspan x="1420.34" y="726.5">2</tspan><tspan x="1421.94" y="739.5">-</tspan><tspan x="1420.12" y="752.5">0</tspan><tspan x="1420.14" y="765.5">6</tspan></text>
+</g>
+<g id="row-7">
+<rect width="776" height="81" transform="translate(628 776)" fill="#F3F5F7"/>
+<text id="002475.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="820.864">002475.SZ</tspan></text>
+<text id="&#231;&#171;&#139;&#232;&#174;&#175;&#231;&#178;&#190;&#229;&#175;&#134;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="820.864">&#x7acb;&#x8baf;&#x7cbe;&#x5bc6;</tspan></text>
+<text id="&#230;&#182;&#136;&#232;&#180;&#185;&#231;&#148;&#181;&#229;&#173;&#144;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="820.864">&#x6d88;&#x8d39;&#x7535;&#x5b50;</tspan></text>
+<text id="#8" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.531" y="820.864">#8</tspan></text>
+<g id="change-cell_8">
+<text id="-2_2" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="985" y="820.864">-2</tspan></text>
+<g id="arrow-down_3" clip-path="url(#clip12_3_726)">
+<path id="Vector_22" d="M1004 814.166V818.834M1001.67 816.5L1004 818.834L1006.33 816.5" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1058.42" y="820.864">8</tspan></text>
+<text id="-3.5%" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1120.45" y="820.864">-3.5%</tspan></text>
+<text id="8.4" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1193.43" y="820.864">8.4</tspan></text>
+<text id="[+8%, +18%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.33" y="820.864">[+8%, +18%]</tspan></text>
+<g id="trust-badge_8">
+<g id="Frame_34">
+<rect x="1338.5" y="809" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="809" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_6" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="820.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-05_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="794.5">1</tspan><tspan x="1420.34" y="807.5">2</tspan><tspan x="1421.94" y="820.5">-</tspan><tspan x="1420.12" y="833.5">0</tspan><tspan x="1420.31" y="846.5">5</tspan></text>
+</g>
+<g id="row-8">
+<rect width="776" height="81" transform="translate(628 857)" fill="white"/>
+<text id="600900.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="901.864">600900.SH</tspan></text>
+<text id="&#233;&#149;&#191;&#230;&#177;&#159;&#231;&#148;&#181;&#229;&#138;&#155;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="901.864">&#x957f;&#x6c5f;&#x7535;&#x529b;</tspan></text>
+<text id="&#231;&#148;&#181;&#229;&#138;&#155;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="901.864">&#x7535;&#x529b;</tspan></text>
+<text id="#9" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="924.496" y="901.864">#9</tspan></text>
+<g id="change-cell_9">
+<text id="--_2" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="996" y="901.864">--</tspan></text>
+</g>
+<text id="9.5" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.99" y="901.864">9.5</tspan></text>
+<text id="-5.0%" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1120.55" y="901.864">-5.0%</tspan></text>
+<text id="6.8" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1194.08" y="901.864">6.8</tspan></text>
+<text id="[+2%, +5%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1241.58" y="901.864">[+2%, +5%]</tspan></text>
+<g id="trust-badge_9">
+<g id="Frame_35">
+<rect x="1338.5" y="890" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="890" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_7" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="901.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_7" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="875.5">1</tspan><tspan x="1420.34" y="888.5">2</tspan><tspan x="1421.94" y="901.5">-</tspan><tspan x="1420.12" y="914.5">0</tspan><tspan x="1420.14" y="927.5">6</tspan></text>
+</g>
+<g id="row-9">
+<rect width="776" height="81" transform="translate(628 938)" fill="#F3F5F7"/>
+<text id="601012.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="982.864">601012.SH</tspan></text>
+<text id="&#233;&#154;&#134;&#229;&#159;&#186;&#231;&#187;&#191;&#232;&#131;&#189;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="982.864">&#x9686;&#x57fa;&#x7eff;&#x80fd;</tspan></text>
+<text id="&#229;&#133;&#137;&#228;&#188;&#143;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="982.864">&#x5149;&#x4f0f;</tspan></text>
+<text id="#10" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="918.508" y="982.864">#10</tspan></text>
+<g id="change-cell_10">
+<text id="+8" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="982" y="982.864">+8</tspan></text>
+<g id="arrow-up_5" clip-path="url(#clip13_3_726)">
+<path id="Vector_23" d="M1006.33 978.5L1004 976.166L1001.67 978.5M1004 976.166V980.834" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="6.9" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.85" y="982.864">6.9</tspan></text>
+<text id="+15.8%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1112.59" y="982.864">+15.8%</tspan></text>
+<text id="7.5" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1195.85" y="982.864">7.5</tspan></text>
+<text id="[+10%, +25%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1234.7" y="982.864">[+10%, +25%]</tspan></text>
+<g id="trust-badge_10">
+<g id="Frame_36">
+<rect x="1338.5" y="971" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="971" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_8" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="982.136">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_8" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="956.5">1</tspan><tspan x="1420.34" y="969.5">2</tspan><tspan x="1421.94" y="982.5">-</tspan><tspan x="1420.12" y="995.5">0</tspan><tspan x="1420.14" y="1008.5">6</tspan></text>
+</g>
+<g id="row-10">
+<rect width="776" height="81" transform="translate(628 1019)" fill="white"/>
+<text id="600276.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="1063.86">600276.SH</tspan></text>
+<text id="&#230;&#129;&#146;&#231;&#145;&#158;&#229;&#140;&#187;&#232;&#141;&#175;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="1063.86">&#x6052;&#x745e;&#x533b;&#x836f;</tspan></text>
+<text id="&#229;&#140;&#187;&#232;&#141;&#175;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="1063.86">&#x533b;&#x836f;</tspan></text>
+<text id="#11" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="920.746" y="1063.86">#11</tspan></text>
+<g id="change-cell_11">
+<text id="-1_2" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="986" y="1063.86">-1</tspan></text>
+<g id="arrow-down_4" clip-path="url(#clip14_3_726)">
+<path id="Vector_24" d="M1004 1057.17V1061.83M1001.67 1059.5L1004 1061.83L1006.33 1059.5" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8.4_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1047.43" y="1063.86">8.4</tspan></text>
+<text id="+2.0%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1118.23" y="1063.86">+2.0%</tspan></text>
+<text id="8_3" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1204.42" y="1063.86">8</tspan></text>
+<text id="[+5%, +12%]_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.55" y="1063.86">[+5%, +12%]</tspan></text>
+<g id="trust-badge_11">
+<g id="Frame_37">
+<rect x="1338.5" y="1052" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="1052" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_9" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="1063.14">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_9" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="1037.5">1</tspan><tspan x="1420.34" y="1050.5">2</tspan><tspan x="1421.94" y="1063.5">-</tspan><tspan x="1420.12" y="1076.5">0</tspan><tspan x="1420.14" y="1089.5">6</tspan></text>
+</g>
+<g id="row-11">
+<rect width="776" height="81" transform="translate(628 1100)" fill="#F3F5F7"/>
+<text id="002304.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="1144.86">002304.SZ</tspan></text>
+<text id="&#230;&#180;&#139;&#230;&#178;&#179;&#232;&#130;&#161;&#228;&#187;&#189;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="1144.86">&#x6d0b;&#x6cb3;&#x80a1;&#x4efd;</tspan></text>
+<text id="&#231;&#153;&#189;&#233;&#133;&#146;_5" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="1144.86">&#x767d;&#x9152;</tspan></text>
+<text id="#12" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="919.059" y="1144.86">#12</tspan></text>
+<g id="change-cell_12">
+<text id="-3" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="984" y="1144.86">-3</tspan></text>
+<g id="arrow-down_5" clip-path="url(#clip15_3_726)">
+<path id="Vector_25" d="M1004 1138.17V1142.83M1001.67 1140.5L1004 1142.83L1006.33 1140.5" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="8.1_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1050.66" y="1144.86">8.1</tspan></text>
+<text id="+0.5%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1117.94" y="1144.86">+0.5%</tspan></text>
+<text id="7.9" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1195.63" y="1144.86">7.9</tspan></text>
+<text id="[+4%, +10%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.07" y="1144.86">[+4%, +10%]</tspan></text>
+<g id="trust-badge_12">
+<g id="Frame_38">
+<rect x="1338.5" y="1133" width="51" height="15" rx="1.5" fill="#FCEAEB"/>
+<rect x="1338.5" y="1133" width="51" height="15" rx="1.5" stroke="#7A1C20"/>
+<text id="&#233;&#131;&#168;&#229;&#136;&#134;&#229;&#143;&#175;&#231;&#148;&#168;_2" fill="#7A1C20" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="1144.14">&#x90e8;&#x5206;&#x53ef;&#x7528;</tspan></text>
+</g>
+</g>
+<text id="12-06_10" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="1118.5">1</tspan><tspan x="1420.34" y="1131.5">2</tspan><tspan x="1421.94" y="1144.5">-</tspan><tspan x="1420.12" y="1157.5">0</tspan><tspan x="1420.14" y="1170.5">6</tspan></text>
+</g>
+<g id="row-12">
+<rect width="776" height="81" transform="translate(628 1181)" fill="white"/>
+<text id="000651.SZ" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="1225.86">000651.SZ</tspan></text>
+<text id="&#230;&#160;&#188;&#229;&#138;&#155;&#231;&#148;&#181;&#229;&#153;&#168;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="1225.86">&#x683c;&#x529b;&#x7535;&#x5668;</tspan></text>
+<text id="&#229;&#174;&#182;&#231;&#148;&#181;_3" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="1225.86">&#x5bb6;&#x7535;</tspan></text>
+<text id="#13" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="918.695" y="1225.86">#13</tspan></text>
+<g id="change-cell_13">
+<text id="+2" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="982" y="1225.86">+2</tspan></text>
+<g id="arrow-up_6" clip-path="url(#clip16_3_726)">
+<path id="Vector_26" d="M1006.33 1221.5L1004 1219.17L1001.67 1221.5M1004 1219.17V1223.83" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="7.6" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1049.84" y="1225.86">7.6</tspan></text>
+<text id="-4.2%" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1120.23" y="1225.86">-4.2%</tspan></text>
+<text id="8.2_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1193.92" y="1225.86">8.2</tspan></text>
+<text id="[+3%, +8%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1241.21" y="1225.86">[+3%, +8%]</tspan></text>
+<g id="trust-badge_13">
+<g id="Frame_39">
+<rect x="1338.5" y="1214" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="1214" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_10" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="1225.14">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_11" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="1199.5">1</tspan><tspan x="1420.34" y="1212.5">2</tspan><tspan x="1421.94" y="1225.5">-</tspan><tspan x="1420.12" y="1238.5">0</tspan><tspan x="1420.14" y="1251.5">6</tspan></text>
+</g>
+<g id="row-13">
+<rect width="776" height="81" transform="translate(628 1262)" fill="#F3F5F7"/>
+<text id="601888.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="1306.86">601888.SH</tspan></text>
+<text id="&#228;&#184;&#173;&#229;&#155;&#189;&#228;&#184;&#173;&#229;&#133;&#141;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="1306.86">&#x4e2d;&#x56fd;&#x4e2d;&#x514d;</tspan></text>
+<text id="&#229;&#133;&#141;&#231;&#168;&#142;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="1306.86">&#x514d;&#x7a0e;</tspan></text>
+<text id="#14" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="918.52" y="1306.86">#14</tspan></text>
+<g id="change-cell_14">
+<text id="-2_3" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="985" y="1306.86">-2</tspan></text>
+<g id="arrow-down_6" clip-path="url(#clip17_3_726)">
+<path id="Vector_27" d="M1004 1300.17V1304.83M1001.67 1302.5L1004 1304.83L1006.33 1302.5" stroke="#2E7660" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="7.5_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1049.85" y="1306.86">7.5</tspan></text>
+<text id="+5.1%" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1120.93" y="1306.86">+5.1%</tspan></text>
+<text id="7" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1205.05" y="1306.86">7</tspan></text>
+<text id="[+6%, +13%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1238.27" y="1306.86">[+6%, +13%]</tspan></text>
+<g id="trust-badge_14">
+<g id="Frame_40">
+<rect x="1338.5" y="1295" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="1295" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_11" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="1306.14">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_12" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="1280.5">1</tspan><tspan x="1420.34" y="1293.5">2</tspan><tspan x="1421.94" y="1306.5">-</tspan><tspan x="1420.12" y="1319.5">0</tspan><tspan x="1420.14" y="1332.5">6</tspan></text>
+</g>
+<g id="row-14">
+<rect width="776" height="81" transform="translate(628 1343)" fill="white"/>
+<text id="600585.SH" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="636" y="1387.86">600585.SH</tspan></text>
+<text id="&#230;&#181;&#183;&#232;&#158;&#186;&#230;&#176;&#180;&#230;&#179;&#165;" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="714" y="1387.86">&#x6d77;&#x87ba;&#x6c34;&#x6ce5;</tspan></text>
+<text id="&#230;&#176;&#180;&#230;&#179;&#165;" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="812" y="1387.86">&#x6c34;&#x6ce5;</tspan></text>
+<text id="#15" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="918.918" y="1387.86">#15</tspan></text>
+<g id="change-cell_15">
+<text id="+1_3" fill="#A64045" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="984" y="1387.86">+1</tspan></text>
+<g id="arrow-up_7" clip-path="url(#clip18_3_726)">
+<path id="Vector_28" d="M1006.33 1383.5L1004 1381.17L1001.67 1383.5M1004 1381.17V1385.83" stroke="#A64045" stroke-width="2" stroke-linecap="round"/>
+</g>
+</g>
+<text id="7.2_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1049.79" y="1387.86">7.2</tspan></text>
+<text id="-1.5%" fill="#2E7660" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1122.64" y="1387.86">-1.5%</tspan></text>
+<text id="6.9_2" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="1193.85" y="1387.86">6.9</tspan></text>
+<text id="[+2%, +6%]" fill="#18202A" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="12" font-weight="bold" letter-spacing="0em"><tspan x="1241.49" y="1387.86">[+2%, +6%]</tspan></text>
+<g id="trust-badge_15">
+<g id="Frame_41">
+<rect x="1338.5" y="1376" width="31" height="15" rx="1.5" fill="#EAF2FC"/>
+<rect x="1338.5" y="1376" width="31" height="15" rx="1.5" stroke="#2F5EA8"/>
+<text id="&#229;&#143;&#175;&#228;&#191;&#161;_12" fill="#2F5EA8" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="10" letter-spacing="0em"><tspan x="1344" y="1387.14">&#x53ef;&#x4fe1;</tspan></text>
+</g>
+</g>
+<text id="12-06_13" fill="#4E5968" style="white-space: pre" xml:space="preserve" font-family="Inter" font-size="11" letter-spacing="0em"><tspan x="1421.89" y="1361.5">1</tspan><tspan x="1420.34" y="1374.5">2</tspan><tspan x="1421.94" y="1387.5">-</tspan><tspan x="1420.12" y="1400.5">0</tspan><tspan x="1420.14" y="1413.5">6</tspan></text>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_3_726">
+<rect width="16" height="16" fill="white" transform="translate(28 230)"/>
+</clipPath>
+<clipPath id="clip1_3_726">
+<rect width="16" height="16" fill="white" transform="translate(28 270)"/>
+</clipPath>
+<clipPath id="clip2_3_726">
+<rect width="14" height="14" fill="white" transform="translate(284 25)"/>
+</clipPath>
+<clipPath id="clip3_3_726">
+<rect width="10" height="10" fill="white" transform="translate(332 249.5)"/>
+</clipPath>
+<clipPath id="clip4_3_726">
+<rect width="10" height="10" fill="white" transform="translate(392 249.5)"/>
+</clipPath>
+<clipPath id="clip5_3_726">
+<rect width="10" height="10" fill="white" transform="translate(452 249.5)"/>
+</clipPath>
+<clipPath id="clip6_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 326.5)"/>
+</clipPath>
+<clipPath id="clip7_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 407.5)"/>
+</clipPath>
+<clipPath id="clip8_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 488.5)"/>
+</clipPath>
+<clipPath id="clip9_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 569.5)"/>
+</clipPath>
+<clipPath id="clip10_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 650.5)"/>
+</clipPath>
+<clipPath id="clip11_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 731.5)"/>
+</clipPath>
+<clipPath id="clip12_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 812.5)"/>
+</clipPath>
+<clipPath id="clip13_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 974.5)"/>
+</clipPath>
+<clipPath id="clip14_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 1055.5)"/>
+</clipPath>
+<clipPath id="clip15_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 1136.5)"/>
+</clipPath>
+<clipPath id="clip16_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 1217.5)"/>
+</clipPath>
+<clipPath id="clip17_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 1298.5)"/>
+</clipPath>
+<clipPath id="clip18_3_726">
+<rect width="8" height="8" fill="white" transform="translate(1000 1379.5)"/>
+</clipPath>
+</defs>
+</svg>

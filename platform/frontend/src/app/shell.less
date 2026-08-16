@@ -341,6 +341,136 @@
   box-shadow: none !important;
 }
 
+// PUI-01 desk, from Figma `desk-daily-workstation` (node 3:398).
+// The design is a 1144 content column split 740 / 380 with a 24 gap.  Runtime
+// keeps the SPEC-045 280 px sider, so the content column is 1160 rather than
+// 1192; the two tracks are declared as ratios so that 32 px difference is
+// absorbed by the columns instead of overflowing the page.
+.deskGrid {
+  display: grid;
+  align-items: start;
+  gap: 24px;
+  grid-template-columns: minmax(0, 740fr) minmax(0, 380fr);
+}
+
+.deskColumn {
+  display: grid;
+  align-content: start;
+  gap: 24px;
+  min-width: 0;
+}
+
+.deskMetricRow {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.deskSection__body {
+  padding: 16px;
+}
+
+.deskSection__body > .workspaceState {
+  min-height: 0;
+  padding: 20px 16px;
+  border: 0;
+}
+
+.deskSection__coverage {
+  margin: 8px 0 0;
+  color: @tertiary-text;
+  font-size: 11px;
+}
+
+.deskSection__blockers {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+}
+
+.deskSection__blocker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.deskSection__blocker dt {
+  color: @severity-high;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.deskSection__blocker dd {
+  margin: 0;
+  color: @tertiary-text;
+  font-size: 11px;
+}
+
+.deskMetrics {
+  display: grid;
+  gap: 12px;
+}
+
+.deskMetric {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.deskMetric__label {
+  color: @secondary-text;
+  font-size: 12px;
+}
+
+.deskMetric__value {
+  color: @text;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.deskFeed {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deskFeed__item {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid @secondary-border;
+}
+
+.deskFeed__item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.deskFeed__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: @tertiary-text;
+  font-size: 11px;
+}
+
+.deskFeed__title {
+  margin: 0;
+  color: @text;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.deskTableScroll {
+  overflow-x: auto;
+}
+
 .systemScreen {
   display: grid;
   gap: 16px;
@@ -609,6 +739,13 @@
 }
 
 @media (max-width: 1280px) {
+  // 1024 narrow desktop: the sider collapses to 72 px and the two desk columns
+  // stack.  The design has no independent frame below 1440, so this follows the
+  // docs/18 responsive contract rather than a Figma measurement.
+  .deskGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .globalHeader {
     height: auto;
     min-height: 72px;
@@ -627,6 +764,13 @@
 }
 
 @media (max-width: 820px) {
+  // 768: the paired metric cards stack so neither is squeezed below a readable
+  // width, and the ranking table scrolls inside its own container instead of
+  // widening the page.
+  .deskMetricRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .desktopSider {
     display: none;
   }
@@ -710,6 +854,18 @@
 }
 
 @media (max-width: 420px) {
+  // 320: sections keep a tighter gap and the ranking table becomes one record
+  // card per security.  Horizontal scrolling is avoided here because at 320 the
+  // key columns (rank, rank change) would sit permanently off-screen.
+  .deskGrid,
+  .deskColumn {
+    gap: 14px;
+  }
+
+  .deskSection__body {
+    padding: 12px;
+  }
+
   .contextItem small {
     display: none;
   }
@@ -733,4 +889,26 @@
   .pageHeading h1 {
     font-size: 19px;
   }
+}
+
+// Figma `today-banner` (1144 × 73): the Platform Pulse strip above the grid.
+.deskBanner {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid @secondary-border;
+  border-radius: @radius;
+  background: @container;
+}
+
+.deskBanner h2 {
+  margin: 0;
+  color: @text;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.deskBanner p {
+  margin: 6px 0 0;
+  color: @secondary-text;
+  font-size: 12px;
 }

@@ -165,8 +165,8 @@ InvestmentView，禁止用 runtime fixture 补齐，因此 `verified` 不包含�
 `security-investmentview`、Approvals 和 Alpha 的高保真结构由 PUI-02/PUI-03 继续实现；当前
 31 页 Design Parity 仍为 0/31。差距证据见 `docs/22-prototype-runtime-gap-audit.md`。
 
-待裁决：SPEC-045 的桌面展开侧栏为 280 px，产品蓝图响应式表为 224 px。本轮运行时遵守权威 Spec
-并保留 280 px，1024 窄桌面使用真实 72 px collapsed state；采用 224 px 前必须先批准并统一文档。
+侧栏宽度已裁决（2026-08-15）：桌面展开 **280 px**，1024 窄桌面收起 72 px，与 SPEC-045 一致。
+本轮实现的 280/72 px 无需改动；`docs/18` 原先的 224 px 已同步更新为 280 px，不再有效。
 
 预计文件：
 

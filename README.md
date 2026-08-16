@@ -44,10 +44,12 @@ Expected Return Compiler 前已有独立的 strict PIT application gate：只有
 合格 PIT bundle，因此运行库 InvestmentView 仍为 0；平台不会用 CLI 参数或运行时 demo 值补造。
 
 运行时 API 没有默认 fixture，页面会诚实显示空状态；合同 fixture 只用于测试。免费原型源的可信上限为
-`normalized_current`，不能冒充 `pit_verified`。当前 31 页中约 12 页只有不同程度的合同/API 接线，
-19 页仍是占位，0 页完成精确 Figma 节点的运行时 Design Parity 验收；详细审计见
-`docs/22-prototype-runtime-gap-audit.md`。当前状态不代表已经具备可盈利策略、模型科学有效、完整原型能力、
-真实交易或真实账户连接能力。
+`normalized_current`，不能冒充 `pit_verified`。31 页中 `/desk` 与 `/research?tab=universe-screen`
+已按精确 Figma 节点实现并通过四视口真实浏览器验收（2026-08-15，PUI-01 / PUI-02），其余约 10 页只有
+不同程度的合同/API 接线，19 页仍是占位。**完全逐像素 Design Parity 仍为 0/31** —— 已完成的两页记为
+`parity_verified_with_known_deviation`，侧栏 280 px 与 Figma 的差异已批准并登记；320/768/1024 三档
+没有独立 Figma Frame。详细审计见 `docs/22-prototype-runtime-gap-audit.md`。当前状态不代表已经具备
+可盈利策略、模型科学有效、完整原型能力、真实交易或真实账户连接能力。
 
 ```text
 sources/                     # 只读来源仓库
@@ -96,6 +98,7 @@ platform/                    # 新平台代码，只在这里实现新能力
 - [从当前状态到最终产品的全局交付路线图](docs/19-end-to-end-product-roadmap.md)
 - [P5–P11 开发前 Spec / Plan 完整性审计](docs/20-pre-development-spec-plan-audit.md)
 - [逐步骤实现级 Spec / Plan 包](docs/plans/README.md)
+- [完整平台交付路线图（2026-08-16，基于代码审计）](docs/superpowers/plans/2026-08-16-roadmap-complete-platform.md)
 - [P5 实现与验证证据](docs/21-p5-implementation-evidence.md)
 - [原型到运行时产品差距审计](docs/22-prototype-runtime-gap-audit.md)
 - [原型驱动的运行时产品交付 Plan](docs/plans/track-00-prototype-runtime-delivery.md)

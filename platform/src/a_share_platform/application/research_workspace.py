@@ -188,6 +188,7 @@ class ResearchWorkspaceProjectionService:
             else self._project_screen(
                 selected_snapshots,
                 selected_security_id=selected_security_id,
+                views=views,
             )
         )
         investment_view = (
@@ -350,16 +351,24 @@ class ResearchWorkspaceProjectionService:
         values: tuple[SignalSnapshot, ...],
         *,
         selected_security_id: str | None,
+        views: tuple[InvestmentView, ...] = (),
     ) -> Projection:
         identities = {
             value.security_id: self._identity(value.security_id, value.decision_time)
             for value in values
+        }
+        # Each row's component contributions come from the exact frozen view the
+        # snapshot is bound to — matched on both id and hash, so a newer view for
+        # the same security can never supply them.
+        bound_views = {
+            (item.view_id, item.content_hash): item for item in views
         }
         rows = [
             self._project_signal_row(
                 value,
                 identity=identities[value.security_id],
                 selected=value.security_id == selected_security_id,
+                view=bound_views.get((value.investment_view_id, value.investment_view_hash)),
             )
             for value in values
         ]
@@ -441,6 +450,7 @@ class ResearchWorkspaceProjectionService:
         *,
         identity: Projection,
         selected: bool,
+        view: InvestmentView | None = None,
     ) -> Projection:
         previous_rank: Projection = (
             {
@@ -488,10 +498,74 @@ class ResearchWorkspaceProjectionService:
             "score": _score(value.score),
             "expected_return": _percent(value.expected_return),
             "confidence": _confidence(value.confidence),
+            "components": ResearchWorkspaceProjectionService._project_row_components(view),
+            "expected_return_interval": (
+                ResearchWorkspaceProjectionService._project_return_interval(value, view)
+            ),
             "investment_view_id": value.investment_view_id,
             "trust_state": value.trust_state.value,
             "content_hash": value.content_hash,
             "selected": selected,
+        }
+
+    @staticmethod
+    def _project_row_components(view: InvestmentView | None) -> list[Projection]:
+        """Per-row quality / valuation / revision / event contributions.
+
+        Read from the frozen view, never derived from the row score: deriving
+        them would create a second source of truth for a governed number.  An
+        unavailable or not-applicable component shows an em dash, never a zero.
+        """
+        if view is None:
+            return []
+        projected: list[Projection] = []
+        for item in view.components:
+            contribution = item.expected_return_contribution
+            quantified = (
+                item.status is InvestmentComponentStatus.QUANTIFIED and contribution is not None
+            )
+            projected.append({
+                "component": item.name,
+                "label": _COMPONENT_LABELS.get(item.name, item.name),
+                "status": item.status.value,
+                "contribution": None if contribution is None else _percent(contribution),
+                "display": (
+                    _percent(contribution)["display"]
+                    if quantified and contribution is not None
+                    else "—"
+                ),
+                "reason": item.status_reason,
+                "evidence_ids": list(item.evidence_ids),
+            })
+        return projected
+
+    @staticmethod
+    def _project_return_interval(
+        value: SignalSnapshot,
+        view: InvestmentView | None,
+    ) -> Projection:
+        """The horizon expected-return interval shown as a single table column.
+
+        p10/p90 come from the frozen view's distribution.  Without the bound view
+        the interval is explicitly unavailable rather than collapsed to the point
+        estimate, which would overstate precision.
+        """
+        if view is None:
+            return {
+                "horizon_trading_days": value.horizon_trading_days,
+                "lower": None,
+                "upper": None,
+                "display": None,
+                "unavailable_reason": "该行没有绑定的冻结 InvestmentView，无法给出区间。",
+            }
+        lower = _percent(view.expected_return.p10)
+        upper = _percent(view.expected_return.p90)
+        return {
+            "horizon_trading_days": view.horizon_trading_days,
+            "lower": lower,
+            "upper": upper,
+            "display": f"[{lower['display']}, {upper['display']}]",
+            "unavailable_reason": None,
         }
 
     def _project_investment_view(self, value: InvestmentView) -> Projection:

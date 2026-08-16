@@ -10,6 +10,10 @@ from a_share_platform.domain.governance import DatasetVersion, LineageEdge, RunR
 from a_share_platform.domain.timing import BenchmarkCloseBatch, TimingForecast
 
 
+class TimingForecastStoreUnavailable(RuntimeError):
+    """Timing forecast persistence is not configured or cannot be reached."""
+
+
 class TimingForecastRepository(Protocol):
     def save(self, value: TimingForecast) -> TimingForecast: ...
 

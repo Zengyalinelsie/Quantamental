@@ -457,6 +457,135 @@
         "title": "DeploymentStage",
         "type": "string"
       },
+      "DeskBlockerProjection": {
+        "additionalProperties": false,
+        "properties": {
+          "affected_binding": {
+            "title": "Affected Binding",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "reason",
+          "affected_binding"
+        ],
+        "title": "DeskBlockerProjection",
+        "type": "object"
+      },
+      "DeskData": {
+        "additionalProperties": false,
+        "properties": {
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/DeskSectionProjection"
+            },
+            "title": "Sections",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sections"
+        ],
+        "title": "DeskData",
+        "type": "object"
+      },
+      "DeskEnvelope": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/ResearchWorkspaceResponseContext"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DeskData"
+          }
+        },
+        "required": [
+          "data",
+          "context"
+        ],
+        "title": "DeskEnvelope",
+        "type": "object"
+      },
+      "DeskSectionProjection": {
+        "additionalProperties": false,
+        "description": "One desk domain.\n\n``status`` covers only what the server can know.  ``loading`` and ``error``\nbelong to the request lifecycle and are resolved by the client.  ``empty``\nand ``unavailable`` stay distinct on purpose: empty means the capability\nworks and holds no record, unavailable means the capability or its store is\nmissing.",
+        "properties": {
+          "blockers": {
+            "items": {
+              "$ref": "#/components/schemas/DeskBlockerProjection"
+            },
+            "title": "Blockers",
+            "type": "array"
+          },
+          "coverage": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Coverage",
+            "type": "object"
+          },
+          "key": {
+            "enum": [
+              "data_health",
+              "screen_shifts",
+              "portfolio_tracking",
+              "timing_shadow",
+              "event_feed",
+              "pending_tasks",
+              "active_failures"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "partial",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "status",
+          "title"
+        ],
+        "title": "DeskSectionProjection",
+        "type": "object"
+      },
       "Envelope": {
         "properties": {
           "context": {
@@ -2306,6 +2435,13 @@
       "ScreenRankingRowProjection": {
         "additionalProperties": false,
         "properties": {
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/ScreenRowComponentProjection"
+            },
+            "title": "Components",
+            "type": "array"
+          },
           "confidence": {
             "$ref": "#/components/schemas/ScreenProjectedValue"
           },
@@ -2315,6 +2451,16 @@
           },
           "expected_return": {
             "$ref": "#/components/schemas/ScreenProjectedValue"
+          },
+          "expected_return_interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenReturnIntervalProjection"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "industry": {
             "$ref": "#/components/schemas/ScreenIndustryProjection"
@@ -2371,6 +2517,133 @@
           "selected"
         ],
         "title": "ScreenRankingRowProjection",
+        "type": "object"
+      },
+      "ScreenReturnIntervalProjection": {
+        "additionalProperties": false,
+        "description": "The horizon expected-return interval, from the frozen view's p10/p90.",
+        "properties": {
+          "display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display"
+          },
+          "horizon_trading_days": {
+            "title": "Horizon Trading Days",
+            "type": "integer"
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unavailable_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unavailable Reason"
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "horizon_trading_days"
+        ],
+        "title": "ScreenReturnIntervalProjection",
+        "type": "object"
+      },
+      "ScreenRowComponentProjection": {
+        "additionalProperties": false,
+        "description": "One factor dimension's contribution for a single ranked row.\n\nProjected from the exact frozen InvestmentView the snapshot is bound to, not\nderived from the row score.  `display` is an em dash for every non-quantified\nstatus, so an unavailable dimension is never shown as a zero.",
+        "properties": {
+          "component": {
+            "enum": [
+              "quality",
+              "valuation",
+              "revision",
+              "event"
+            ],
+            "title": "Component",
+            "type": "string"
+          },
+          "contribution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScreenProjectedValue"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "display": {
+            "title": "Display",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "quantified",
+              "constrained",
+              "unavailable",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "component",
+          "label",
+          "status",
+          "display"
+        ],
+        "title": "ScreenRowComponentProjection",
         "type": "object"
       },
       "ScreenSecurityIdentityProjection": {
@@ -3357,6 +3630,69 @@
           }
         },
         "summary": "Datasets"
+      }
+    },
+    "/api/desk": {
+      "get": {
+        "description": "Read-only situation overview across the seven desk domains.\n\nEach section reports its own status and its own blockers, so an\nunimplemented or unreachable domain degrades one card instead of the\npage.  This handler only lists existing records: it never ingests,\ncompiles, scores or invokes an agent.",
+        "operationId": "desk_api_desk_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "deployment_stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Deployment Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeskEnvelope"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Desk"
       }
     },
     "/api/experiments/runs": {
